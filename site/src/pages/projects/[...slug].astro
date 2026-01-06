@@ -35,6 +35,9 @@ const meta = [
     </header>
 
     <!-- 2. Meta bar -->
+    {d.heroImage && (
+      <img src={d.heroImage} alt={d.title} class="w-full border border-edge mb-10" loading="lazy" />
+    )}
     <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 border-y border-edge py-5 mb-10">
       {meta.map((m) => (
         <div>

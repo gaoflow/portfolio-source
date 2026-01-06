@@ -11,6 +11,7 @@ const projects = defineCollection({
     tags: z.array(z.string()).default([]),
     summary: z.string(),
     methodLine: z.string(),
+    heroImage: z.string().optional(),
     role: z.string().optional(),
     team: z.string().optional(),
     duration: z.string().optional(),

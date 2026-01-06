@@ -10,10 +10,14 @@ const d = project.data;
   data-categories={d.categories.join(' ')}
   class="group block border border-edge bg-surface hover:border-accent/50 transition-colors"
 >
-  <!-- Visual slot: gradient placeholder until a real result image exists -->
-  <div class="aspect-[16/9] bg-gradient-to-br from-surface via-edge/40 to-accent/10 flex items-end p-4">
-    <span class="font-mono text-[10px] tracking-widest text-muted uppercase">{d.methodLine}</span>
-  </div>
+  <!-- Result image (contour/photo) or gradient placeholder until one exists -->
+  {d.heroImage ? (
+    <img src={d.heroImage} alt={d.title} class="aspect-[16/9] w-full object-cover" loading="lazy" />
+  ) : (
+    <div class="aspect-[16/9] bg-gradient-to-br from-surface via-edge/40 to-accent/10 flex items-end p-4">
+      <span class="font-mono text-[10px] tracking-widest text-muted uppercase">{d.methodLine}</span>
+    </div>
+  )}
   <div class="p-5 space-y-3">
     <div class="flex items-baseline justify-between gap-2">
       <h3 class="text-lg font-medium leading-snug group-hover:text-accent transition-colors">{d.title}</h3>
