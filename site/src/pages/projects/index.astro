@@ -1,0 +1,53 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+const filters = [
+  { key: 'all', label: 'All' },
+  { key: 'fsae', label: 'FSAE full-car' },
+  { key: 'component-cfd', label: 'Component CFD' },
+  { key: 'tooling', label: 'Tools & automation' },
+  { key: 'validation', label: 'Validation' },
+];
+---
+
+<Base title="Projects">
+  <section class="mx-auto max-w-5xl px-6 pt-16 pb-20">
+    <h1 class="section-label mb-2">Projects</h1>
+    <p class="text-muted mb-10">Every project, in one place.</p>
+
+    <div class="flex flex-wrap gap-2 mb-10" data-filters>
+      {filters.map((f, i) => (
+        <button
+          data-filter={f.key}
+          class="filter-btn font-mono text-xs tracking-wider uppercase px-3 py-1.5 border border-edge text-muted hover:text-ink transition-colors data-[on]:border-accent data-[on]:text-accent"
+          {...(i === 0 ? { 'data-on': '' } : {})}
+        >
+          {f.label}
+        </button>
+      ))}
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-6" data-grid>
+      {projects.map((p) => <ProjectCard project={p} />)}
+    </div>
+  </section>
+
+  <script>
+    const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const cards = document.querySelectorAll<HTMLAnchorElement>('[data-grid] > [data-categories]');
+    btns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.filter!;
+        btns.forEach((b) => (b === btn ? b.setAttribute('data-on', '') : b.removeAttribute('data-on')));
+        cards.forEach((c) => {
+          const show = key === 'all' || (c.dataset.categories ?? '').split(' ').includes(key);
+          c.classList.toggle('hidden', !show);
+        });
+      });
+    });
+  </script>
+</Base>

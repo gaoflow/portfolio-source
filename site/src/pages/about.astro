@@ -1,0 +1,58 @@
+---
+import Base from '../layouts/Base.astro';
+import { profile } from '../data/profile';
+---
+
+<Base title="About">
+  <section class="mx-auto max-w-3xl px-6 pt-16 pb-24">
+    <h1 class="section-label mb-2">About</h1>
+    <p class="text-muted mb-12">
+      {profile.name} — {profile.role}. {profile.tagline}. Based in {profile.location}.
+      <a href={profile.cvUrl} class="text-accent">CV (PDF) ↓</a>
+    </p>
+
+    <h2 class="section-label mb-6">Timeline</h2>
+    {profile.timeline.length === 0 ? (
+      <p class="font-mono text-xs text-muted border border-dashed border-edge p-4">
+        Add your work &amp; education entries in <code>src/data/profile.ts</code> → <code>timeline</code>.
+      </p>
+    ) : (
+      <ol class="border-l border-edge ml-2">
+        {profile.timeline.map((t) => (
+          <li class="relative pl-6 pb-6">
+            <span class="absolute -left-[5px] top-1.5 size-2 rounded-full bg-accent"></span>
+            <p class="font-mono text-[10px] tracking-widest uppercase text-muted">{t.kind} · {t.period}</p>
+            <p class="mt-1">
+              {t.href ? <a href={t.href} class="text-accent">{t.org}</a> : t.org} — {t.title}
+            </p>
+          </li>
+        ))}
+      </ol>
+    )}
+
+    <h2 class="section-label mt-16 mb-6">References</h2>
+    {profile.references.length === 0 ? (
+      <p class="font-mono text-xs text-muted border border-dashed border-edge p-4">
+        Add 1–3 supervisor quotes in <code>src/data/profile.ts</code> → <code>references</code> (name + title + quote).
+      </p>
+    ) : (
+      <div class="space-y-8">
+        {profile.references.map((r) => (
+          <blockquote class="border-l-2 border-accent/50 pl-5">
+            <p class="headline-serif text-lg leading-relaxed">“{r.quote}”</p>
+            <footer class="mt-2 font-mono text-xs text-muted">
+              {r.href ? <a href={r.href} class="text-accent">{r.name}</a> : r.name} · {r.title}
+            </footer>
+          </blockquote>
+        ))}
+      </div>
+    )}
+
+    <h2 class="section-label mt-16 mb-6">Contact</h2>
+    <p class="font-mono text-sm space-x-6">
+      <a href={`mailto:${profile.email}`} class="text-accent">{profile.email}</a>
+      <a href={profile.linkedin} class="text-muted hover:text-accent">LinkedIn</a>
+      <a href={profile.github} class="text-muted hover:text-accent">GitHub</a>
+    </p>
+  </section>
+</Base>

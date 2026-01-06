@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-bg: #0a0a0b;
+  --color-surface: #131315;
+  --color-edge: #232326;
+  --color-ink: #e8e6e3;
+  --color-muted: #9b978f;
+  --color-accent: oklch(0.78 0.12 220);
+  --color-ok: #34d399;
+
+  --font-sans: "Inter Tight", system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+body {
+  @apply bg-bg text-ink font-sans antialiased;
+  font-feature-settings: "ss01";
+}
+
+/* Editorial section number, Swiss style */
+.section-label {
+  @apply font-mono text-xs tracking-[0.2em] text-muted uppercase;
+}
+
+/* Mixed serif/sans editorial headline */
+.headline-serif {
+  @apply font-serif italic font-normal;
+}
+
+/* Subtle scroll reveal — the only global animation (Balasko, dialed back) */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.reveal {
+  animation: rise 0.5s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation: none; }
+}

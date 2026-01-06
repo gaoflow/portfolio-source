@@ -1,0 +1,79 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const d = project.data;
+const { Content } = await render(project);
+
+const meta = [
+  d.role && { label: 'Role', value: d.role },
+  d.team && { label: 'Team', value: d.team },
+  d.duration && { label: 'Duration', value: d.duration },
+  { label: 'Year', value: String(d.year) },
+].filter(Boolean) as { label: string; value: string }[];
+---
+
+<Base title={d.title} description={d.summary}>
+  <article class="mx-auto max-w-3xl px-6 pt-16 pb-24">
+    <!-- 1. Hero: quantified one-liner + method stack -->
+    <header class="space-y-5 mb-10">
+      <a href="/projects" class="font-mono text-xs text-muted hover:text-accent">← Projects</a>
+      <h1 class="text-3xl md:text-5xl font-medium leading-tight tracking-tight">{d.title}</h1>
+      <p class="font-mono text-xs tracking-wider uppercase text-muted">{d.methodLine}</p>
+      <p class="text-lg text-muted leading-relaxed">{d.summary}</p>
+      <div class="flex flex-wrap gap-2 font-mono text-[10px] tracking-wider uppercase">
+        {d.sample && <span class="px-2 py-0.5 border border-accent/60 text-accent">Sample project — replace with yours</span>}
+        {d.nda && <span class="px-2 py-0.5 border border-edge text-muted">NDA-safe write-up</span>}
+        {d.tags.map((t) => <span class="px-2 py-0.5 border border-edge text-muted">{t}</span>)}
+      </div>
+    </header>
+
+    <!-- 2. Meta bar -->
+    <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 border-y border-edge py-5 mb-10">
+      {meta.map((m) => (
+        <div>
+          <dt class="font-mono text-[10px] tracking-widest uppercase text-muted">{m.label}</dt>
+          <dd class="text-sm mt-1">{m.value}</dd>
+        </div>
+      ))}
+    </dl>
+
+    <!-- 3. Hero metrics -->
+    {d.heroMetrics.length > 0 && (
+      <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
+        {d.heroMetrics.map((m) => (
+          <div class="border border-edge bg-surface p-4">
+            <dt class="font-mono text-[10px] tracking-widest uppercase text-muted">{m.label}</dt>
+            <dd class="font-mono text-2xl text-accent mt-1">{m.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
+
+    <!-- 4-8. Body: Context / Methodology / Results / Validation / Iterations (markdown) -->
+    <div class="prose prose-invert prose-neutral max-w-none
+      prose-headings:font-medium prose-headings:tracking-tight
+      prose-h2:mt-12 prose-h2:text-2xl
+      prose-p:text-muted prose-li:text-muted
+      prose-strong:text-ink prose-a:text-accent
+      prose-table:font-mono prose-table:text-sm">
+      <Content />
+    </div>
+
+    <!-- 9. Key outputs: recruiter 10-second takeaways -->
+    {d.keyOutputs.length > 0 && (
+      <aside class="mt-16 border border-accent/30 bg-accent/5 p-6">
+        <h2 class="section-label mb-4">What this demonstrates</h2>
+        <ul class="space-y-2 text-sm">
+          {d.keyOutputs.map((o) => <li class="flex gap-3"><span class="text-accent">→</span>{o}</li>)}
+        </ul>
+      </aside>
+    )}
+  </article>
+</Base>

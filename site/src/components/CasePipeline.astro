@@ -1,0 +1,59 @@
+---
+// The Balasko signature: one representative case as an interactive 4-step pipeline
+// with hard metrics. The site's single interactive component (per design framework).
+interface Step {
+  label: string;
+  caption: string;
+  metrics: { label: string; value: string }[];
+}
+interface Props { steps: Step[]; sample?: boolean }
+const { steps, sample = false } = Astro.props;
+---
+<div class="border border-edge bg-surface" data-pipeline>
+  <div class="flex items-center justify-between px-5 pt-4">
+    <span class="section-label">Representative case</span>
+    {sample && <span class="font-mono text-[10px] tracking-widest uppercase text-accent border border-accent/60 px-2 py-0.5">Sample data</span>}
+  </div>
+  <div class="grid md:grid-cols-[1fr_2fr]">
+    <!-- Step selector -->
+    <div class="flex md:flex-col border-b md:border-b-0 md:border-r border-edge">
+      {steps.map((s, i) => (
+        <button
+          data-step={i}
+          class="pipeline-btn flex-1 md:flex-none text-left px-5 py-4 font-mono text-xs tracking-wider uppercase text-muted hover:text-ink transition-colors border-l-2 border-transparent data-[on]:border-accent data-[on]:text-ink"
+        >
+          <span class="text-accent mr-2">{String(i + 1).padStart(2, '0')}</span>{s.label}
+        </button>
+      ))}
+    </div>
+    <!-- Metrics panel -->
+    <div class="p-6">
+      {steps.map((s, i) => (
+        <div data-panel={i} class="pipeline-panel hidden data-[on]:block">
+          <p class="text-sm text-muted mb-5">{s.caption}</p>
+          <dl class="grid grid-cols-2 gap-x-8 gap-y-4">
+            {s.metrics.map((m) => (
+              <div>
+                <dt class="font-mono text-[10px] tracking-widest uppercase text-muted">{m.label}</dt>
+                <dd class="font-mono text-xl text-ink mt-1">{m.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-pipeline]').forEach((root) => {
+    const btns = root.querySelectorAll<HTMLButtonElement>('.pipeline-btn');
+    const panels = root.querySelectorAll<HTMLElement>('.pipeline-panel');
+    const select = (n: number) => {
+      btns.forEach((b, i) => (i === n ? b.setAttribute('data-on', '') : b.removeAttribute('data-on')));
+      panels.forEach((p, i) => (i === n ? p.setAttribute('data-on', '') : p.removeAttribute('data-on')));
+    };
+    btns.forEach((b, i) => b.addEventListener('click', () => select(i)));
+    select(0);
+  });
+</script>

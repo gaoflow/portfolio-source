@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+import '@fontsource/inter-tight/400.css';
+import '@fontsource/inter-tight/500.css';
+import '@fontsource/inter-tight/600.css';
+import '@fontsource/newsreader/400.css';
+import '@fontsource/newsreader/400-italic.css';
+import '@fontsource/newsreader/500.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+import { profile } from '../data/profile';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = profile.tagline } = Astro.props;
+const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — ${profile.role}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{pageTitle}</title>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <header class="border-b border-edge">
+      <nav class="mx-auto max-w-5xl px-6 py-4 flex items-baseline justify-between">
+        <a href="/" class="font-mono text-sm tracking-widest text-ink">{profile.name.toUpperCase()}</a>
+        <div class="flex gap-6 font-mono text-xs text-muted">
+          <a href="/projects" class="hover:text-accent transition-colors">Projects</a>
+          <a href="/about" class="hover:text-accent transition-colors">About</a>
+          <a href={`mailto:${profile.email}`} class="hover:text-accent transition-colors">Contact</a>
+        </div>
+      </nav>
+    </header>
+    <main class="flex-1">
+      <slot />
+    </main>
+    <footer class="border-t border-edge">
+      <div class="mx-auto max-w-5xl px-6 py-6 flex justify-between font-mono text-xs text-muted">
+        <span>{profile.name} · {profile.role}</span>
+        <span>
+          <a href={profile.linkedin} class="hover:text-accent">LinkedIn</a> ·
+          <a href={profile.github} class="hover:text-accent">GitHub</a>
+        </span>
+      </div>
+    </footer>
+  </body>
+</html>

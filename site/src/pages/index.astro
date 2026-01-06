@@ -1,0 +1,66 @@
+---
+import Base from '../layouts/Base.astro';
+import StatusBar from '../components/StatusBar.astro';
+import CasePipeline from '../components/CasePipeline.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { profile } from '../data/profile';
+import { getCollection } from 'astro:content';
+
+const all = await getCollection('projects');
+const featured = all.filter((p) => p.data.featured).sort((a, b) => a.data.order - b.data.order);
+
+// ⚠️ Sample pipeline data — replace with your own representative case.
+const caseSteps = [
+  { label: 'Geometry', caption: 'Full-car FSAE geometry, cleaned and defeatured for external aero.', metrics: [
+    { label: 'Patch count', value: '184' }, { label: 'Source', value: 'CAD → STL' },
+  ]},
+  { label: 'External flow', caption: 'High-Re external aerodynamics, rotating wheels and ground plane.', metrics: [
+    { label: 'Reynolds', value: '1.5×10⁷' }, { label: 'Solver', value: 'simpleFoam' },
+  ]},
+  { label: 'Mesh', caption: 'Trimmed hexa-dominant mesh with prism layers to wall-resolved y⁺.', metrics: [
+    { label: 'Cells', value: '36.2M' }, { label: 'y⁺ target', value: '0.9' },
+    { label: 'Prism layers', value: '18' }, { label: 'Max skewness', value: '0.62' },
+  ]},
+  { label: 'Results', caption: 'Force breakdown per assembly; decision-ready deltas vs baseline.', metrics: [
+    { label: 'Δ Downforce', value: '+7.3%' }, { label: 'Δ Drag', value: '−1.9%' },
+  ]},
+];
+---
+
+<Base>
+  <!-- Hero -->
+  <section class="mx-auto max-w-5xl px-6 pt-20 pb-16 space-y-8 reveal">
+    <StatusBar line={profile.statusLine} />
+    <h1 class="text-4xl md:text-6xl font-medium leading-[1.05] tracking-tight">
+      Making air visible,<br /><span class="headline-serif">turning physics into lap time.</span>
+    </h1>
+    <p class="max-w-xl text-muted leading-relaxed">
+      I'm {profile.name} — a {profile.role.toLowerCase()} working on {profile.tagline.toLowerCase()}.
+      I build robust CFD setups that engineers can trust, from geometry cleanup to validated results.
+    </p>
+    <dl class="grid sm:grid-cols-2 gap-x-10 gap-y-3 font-mono text-sm pt-2">
+      {profile.capabilities.map((c) => (
+        <div class="flex gap-4">
+          <dt class="text-muted w-24 shrink-0 uppercase text-xs tracking-widest pt-0.5">{c.label}</dt>
+          <dd>{c.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <!-- Representative case -->
+  <section class="mx-auto max-w-5xl px-6 pb-20 reveal">
+    <CasePipeline steps={caseSteps} sample />
+  </section>
+
+  <!-- Featured work -->
+  <section class="mx-auto max-w-5xl px-6 pb-20">
+    <div class="flex items-baseline justify-between mb-8">
+      <h2 class="section-label">Featured work</h2>
+      <a href="/projects" class="font-mono text-xs text-muted hover:text-accent">Every project →</a>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-6">
+      {featured.map((p) => <ProjectCard project={p} />)}
+    </div>
+  </section>
+</Base>
