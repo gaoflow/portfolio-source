@@ -1,13 +1,13 @@
 // Single source of truth for identity & profile content.
 // ⚠️ SAMPLE values — replace with your real details; every page reads from here.
 export const profile = {
-  name: 'Your Name',
+  name: 'Bing Gao',
   role: 'CFD Engineer',
   tagline: 'External aerodynamics & CFD methodology',
   statusLine: 'Open to CFD / Aerodynamics roles — 2026',
   location: 'City, Country',
   email: 'you@example.com',
-  linkedin: 'https://www.linkedin.com/in/your-handle',
+  linkedin: 'https://www.linkedin.com/in/bing-gao/',
   github: 'https://github.com/your-handle',
   cvUrl: '/cv.pdf', // drop your PDF into site/public/cv.pdf
 
