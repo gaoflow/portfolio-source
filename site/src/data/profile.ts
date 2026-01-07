@@ -8,7 +8,7 @@ export const profile = {
   location: 'City, Country',
   email: 'you@example.com',
   linkedin: 'https://www.linkedin.com/in/bing-gao/',
-  github: 'https://github.com/your-handle',
+  github: 'https://github.com/gaoflow',
   cvUrl: '/cv.pdf', // drop your PDF into site/public/cv.pdf
 
   // Headline capability rows, Balasko-style (mono, scan in 5 s)
