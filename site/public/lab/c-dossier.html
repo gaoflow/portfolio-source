@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Direction C — Wind Tunnel Dossier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FAFAF6;
+    --ink: #141412;
+    --pen: #1B3A8F;   /* ballpoint blue */
+    --red: #C8102E;   /* annotation red */
+    --hair: #C9C9C0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--paper) ;
+    background-image:
+      linear-gradient(var(--hair) 1px, transparent 1px),
+      linear-gradient(90deg, var(--hair) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-position: -1px -1px;
+    color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px; line-height: 1.6;
+  }
+  .sans { font-family: 'Archivo', sans-serif; }
+  .sheet { max-width: 1080px; margin: 48px auto; background: var(--paper); border: 1px solid var(--ink); box-shadow: 6px 6px 0 rgba(20,20,18,.12); }
+
+  /* document header block */
+  .dochead { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--ink); }
+  .dochead > div { padding: 12px 16px; border-right: 1px solid var(--ink); font-size: 12px; }
+  .dochead > div:last-child { border-right: 0; }
+  .dochead .k { font-size: 10px; letter-spacing: .12em; color: #6a6a60; text-transform: uppercase; display: block; }
+  .stamp { display: inline-block; border: 2px solid var(--red); color: var(--red); padding: 2px 10px; font-weight: 500; font-size: 12px; letter-spacing: .15em; transform: rotate(-3deg); text-transform: uppercase; }
+
+  .title-block { padding: 64px 64px 48px; border-bottom: 1px solid var(--ink); position: relative; }
+  .title-block .ref { position: absolute; top: 20px; right: 64px; }
+  h1 { font-family: 'Archivo'; font-weight: 700; font-size: clamp(36px, 5vw, 64px); line-height: 1.02; letter-spacing: -0.01em; max-width: 16ch; }
+  h1 span { color: var(--pen); }
+  .abstract { margin-top: 28px; max-width: 62ch; font-style: italic; color: #3c3c34; }
+  .signline { margin-top: 32px; font-size: 12px; color: #6a6a60; }
+
+  section { padding: 48px 64px; border-bottom: 1px solid var(--ink); }
+  .secno { font-size: 12px; letter-spacing: .15em; color: var(--pen); text-transform: uppercase; margin-bottom: 24px; }
+  .secno::before { content: "§ "; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-weight: 500; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #6a6a60; border-bottom: 1px solid var(--ink); padding: 8px 12px 8px 0; }
+  td { border-bottom: 1px solid var(--hair); padding: 12px 12px 12px 0; vertical-align: baseline; }
+  td.num { font-variant-numeric: tabular-nums; }
+  .delta { color: var(--pen); font-weight: 500; }
+  .ok-stamp { color: var(--red); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; border: 1.5px solid var(--red); padding: 1px 6px; white-space: nowrap; }
+
+  .proj td:first-child { font-weight: 500; white-space: nowrap; }
+  .proj .t { font-family: 'Archivo'; font-weight: 600; font-size: 16px; }
+  .proj .d { color: #3c3c34; font-size: 12.5px; display: block; margin-top: 4px; max-width: 56ch; }
+
+  .annot { color: var(--red); font-size: 12px; transform: rotate(-1.2deg); display: inline-block; margin-left: 10px; }
+
+  footer { padding: 40px 64px 56px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
+  footer .sig { font-family: 'Archivo'; font-weight: 600; font-size: 22px; }
+  footer .sig::after { content: ""; display: block; width: 220px; border-bottom: 1px solid var(--ink); margin-top: 6px; }
+
+  @media (max-width: 860px) {
+    .sheet { margin: 0; border-left: 0; border-right: 0; }
+    .dochead { grid-template-columns: 1fr 1fr; }
+    .dochead > div:nth-child(2n) { border-right: 0; }
+    .dochead > div { border-bottom: 1px solid var(--ink); }
+    .title-block, section, footer { padding-left: 24px; padding-right: 24px; }
+    .title-block .ref { position: static; margin-top: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <div class="dochead">
+    <div><span class="k">Document no.</span>BG-2026-001</div>
+    <div><span class="k">Prepared by</span>Gao, Bing — ESILV FSAE</div>
+    <div><span class="k">Discipline</span>External Aerodynamics / CFD</div>
+    <div><span class="k">Status</span><span class="stamp">Issued</span></div>
+  </div>
+
+  <div class="title-block">
+    <div class="ref"><span class="stamp">Reviewed</span></div>
+    <h1>Aerodynamic Development <span>Portfolio</span>, 2024—2026</h1>
+    <p class="abstract">Abstract. This document summarises computational aerodynamics work carried out within the ESILV Formula Student aero group and supporting simulation-tooling development. All performance figures are stated against the referenced baseline configuration. Simulation methodology and correlation data are included in the respective project annexes.</p>
+    <p class="signline">Distribution: hiring managers, aero departments. Reproduction permitted.</p>
+  </div>
+
+  <section>
+    <div class="secno">01 — Test article &amp; facilities</div>
+    <table>
+      <tr><th style="width:220px">Item</th><th>Specification</th></tr>
+      <tr><td>Solver stack</td><td>Ansys Fluent · STAR-CCM+ · OpenFOAM</td></tr>
+      <tr><td>CAD / geometry</td><td>CATIA · SolidWorks</td></tr>
+      <tr><td>Automation</td><td>Python · MATLAB · Simulink (9 yrs software engineering background)</td></tr>
+      <tr><td>Facility</td><td>ESILV, Paris La Défense — Vinci Eco Drive aero group</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <div class="secno">02 — Summary of results</div>
+    <table>
+      <tr><th>Quantity</th><th>Baseline</th><th>Final</th><th>Δ</th><th>Note</th></tr>
+      <tr><td>Total downforce (C_L·A rel.)</td><td class="num">1.000</td><td class="num">1.182</td><td class="num delta">+18.2%</td><td>12 iterations</td></tr>
+      <tr><td>Full-car mesh size</td><td class="num">—</td><td class="num">36.2M cells</td><td class="num">—</td><td>y⁺ ≈ 0.9</td></tr>
+      <tr><td>CFD ↔ track correlation</td><td class="num">—</td><td class="num">±4%</td><td class="num">—</td><td><span class="ok-stamp">Validated</span></td></tr>
+      <tr><td>Manual setup time / case</td><td class="num">~3 h</td><td class="num">~20 min</td><td class="num delta">−90%</td><td>batch wrapper</td></tr>
+    </table>
+    <p style="margin-top:16px"><span class="annot">← correlation figure verified against constant-speed runs, see §03 ref 01</span></p>
+  </section>
+
+  <section>
+    <div class="secno">03 — Project index</div>
+    <table class="proj">
+      <tr><th style="width:90px">Ref.</th><th>Title / scope</th><th style="width:220px">Method stack</th><th style="width:110px">Class</th></tr>
+      <tr>
+        <td>01</td>
+        <td><span class="t">FSAE Full-Car Aero Package</span><span class="d">Baseline → race-ready package; per-assembly force breakdown; on-track correlation.</span></td>
+        <td>OpenFOAM · steady RANS · k-ω SST</td><td><span class="ok-stamp">Validated</span></td>
+      </tr>
+      <tr>
+        <td>02</td>
+        <td><span class="t">CFD Batch Automation Wrapper</span><span class="d">JSON-driven mesh→solve→postprocess; AoA / sideslip / airspeed sweeps.</span></td>
+        <td>Python · OpenFOAM</td><td>Tooling</td>
+      </tr>
+      <tr>
+        <td>03</td>
+        <td><span class="t">Front Wing Sensitivity Study</span><span class="d">Ride-height sweep DOE; decision plot for design review.</span></td>
+        <td>STAR-CCM+ · DOE</td><td>Study</td>
+      </tr>
+    </table>
+  </section>
+
+  <footer>
+    <div>
+      <div class="sig sans">Bing Gao</div>
+      <div style="font-size:11px;color:#6a6a60;margin-top:8px">CFD Engineer &amp; Developer — open to internships, 2026</div>
+    </div>
+    <div style="font-size:12px">gaobing1230@gmail.com · linkedin.com/in/bing-gao · github.com/gaoflow</div>
+  </footer>
+</div>
+
+</body>
+</html>
