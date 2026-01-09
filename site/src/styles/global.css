@@ -2,16 +2,15 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-bg: #0a0a0b;
-  --color-surface: #131315;
-  --color-edge: #232326;
-  --color-ink: #e8e6e3;
-  --color-muted: #9b978f;
-  --color-accent: oklch(0.78 0.12 220);
+  --color-bg: #0f172a;
+  --color-surface: #16213a;
+  --color-edge: #1e293b;
+  --color-ink: #e2e8f0;
+  --color-muted: #94a3b8;
+  --color-accent: #5eead4;
   --color-ok: #34d399;
 
   --font-sans: "Inter Tight", system-ui, sans-serif;
-  --font-serif: "Newsreader", Georgia, serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
@@ -20,14 +19,9 @@ body {
   font-feature-settings: "ss01";
 }
 
-/* Editorial section number, Swiss style */
+/* Editorial section label, mono caps */
 .section-label {
   @apply font-mono text-xs tracking-[0.2em] text-muted uppercase;
-}
-
-/* Mixed serif/sans editorial headline */
-.headline-serif {
-  @apply font-serif italic font-normal;
 }
 
 /* Subtle scroll reveal — the only global animation (Balasko, dialed back) */

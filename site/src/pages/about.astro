@@ -42,7 +42,7 @@ import { profile } from '../data/profile';
       <div class="space-y-8">
         {profile.references.map((r) => (
           <blockquote class="border-l-2 border-accent/50 pl-5">
-            <p class="headline-serif text-lg leading-relaxed">“{r.quote}”</p>
+            <p class="italic text-lg leading-relaxed text-ink/90">“{r.quote}”</p>
             <footer class="mt-2 font-mono text-xs text-muted">
               {r.href ? <a href={r.href} class="text-accent">{r.name}</a> : r.name} · {r.title}
             </footer>

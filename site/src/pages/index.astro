@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import StatusBar from '../components/StatusBar.astro';
 import CasePipeline from '../components/CasePipeline.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import { profile } from '../data/profile';
@@ -28,33 +27,31 @@ const caseSteps = [
 ---
 
 <Base>
-  <!-- Hero -->
-  <section class="mx-auto max-w-5xl px-6 pt-20 pb-16 space-y-8 reveal">
-    <StatusBar line={profile.statusLine} />
-    <h1 class="text-4xl md:text-6xl font-medium leading-[1.05] tracking-tight">
-      Making air visible,<br /><span class="headline-serif">turning physics into lap time.</span>
-    </h1>
-    <p class="max-w-xl text-muted leading-relaxed">
-      I'm {profile.name} — a {profile.role.toLowerCase()} working on {profile.tagline.toLowerCase()}.
-      I build robust CFD setups that engineers can trust, from geometry cleanup to validated results.
+  <!-- Intro (right column opens with the pitch, identity lives in the rail) -->
+  <section class="reveal">
+    <h2 class="section-label">Intro</h2>
+    <p class="mt-5 text-xl leading-relaxed text-ink/90 max-w-2xl">
+      I build CFD setups that engineers can trust — from geometry cleanup to validated results.
+      Nine years of software engineering leadership, now aimed at external aerodynamics and
+      simulation tooling.
     </p>
-    <dl class="grid sm:grid-cols-2 gap-x-10 gap-y-3 font-mono text-sm pt-2">
+    <dl class="mt-8 grid sm:grid-cols-2 gap-x-10 gap-y-3 font-mono text-[13px]">
       {profile.capabilities.map((c) => (
         <div class="flex gap-4">
-          <dt class="text-muted w-24 shrink-0 uppercase text-xs tracking-widest pt-0.5">{c.label}</dt>
-          <dd>{c.value}</dd>
+          <dt class="text-muted w-24 shrink-0 uppercase text-[10px] tracking-widest pt-0.5">{c.label}</dt>
+          <dd class="text-ink/90">{c.value}</dd>
         </div>
       ))}
     </dl>
   </section>
 
   <!-- Representative case -->
-  <section class="mx-auto max-w-5xl px-6 pb-20 reveal">
+  <section class="mt-16 reveal">
     <CasePipeline steps={caseSteps} sample />
   </section>
 
   <!-- Featured work -->
-  <section class="mx-auto max-w-5xl px-6 pb-20">
+  <section class="mt-20">
     <div class="flex items-baseline justify-between mb-8">
       <h2 class="section-label">Featured work</h2>
       <a href="/projects" class="font-mono text-xs text-muted hover:text-accent">Every project →</a>
