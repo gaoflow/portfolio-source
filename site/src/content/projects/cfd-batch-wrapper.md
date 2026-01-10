@@ -15,9 +15,9 @@ keyOutputs:
   - 'Turned a manual mesh→solve→postprocess routine into a one-command pipeline.'
   - 'Batch parameter sweeps (AoA, sideslip, airspeed) run unattended.'
 nda: true
-featured: true
+featured: false
 sample: true
-order: 2
+order: 9
 ---
 
 > ⚠️ Sample of the **NDA-safe variant** (RMZC formula): architecture + capability + scale are described; data and geometry are not.

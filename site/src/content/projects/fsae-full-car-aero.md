@@ -18,9 +18,9 @@ keyOutputs:
   - 'Full-car external aero workflow: CAD cleanup → meshing → RANS → post-processing, owned end to end.'
   - 'Quantified development: +18.2% downforce over 12 documented iterations.'
   - 'CFD↔track correlation within ±4% via coast-down and constant-speed runs.'
-featured: true
+featured: false
 sample: true
-order: 1
+order: 8
 ---
 
 > ⚠️ This is **sample content** demonstrating the nine-section project template. Replace it with your real project — keep the section structure.

@@ -1,0 +1,29 @@
+---
+// Interactive 3D model embed (Google model-viewer): drag to rotate, scroll to zoom.
+interface Props {
+  src: string;
+  alt: string;
+  poster?: string;
+  caption?: string;
+}
+const { src, alt, poster, caption } = Astro.props;
+---
+<figure class="my-8">
+  <model-viewer
+    src={src}
+    alt={alt}
+    poster={poster}
+    camera-controls
+    auto-rotate
+    auto-rotate-delay="1500"
+    rotation-per-second="20deg"
+    shadow-intensity="0.6"
+    exposure="1"
+    style="width:100%;height:480px;background:#16213a;border:1px solid #1e293b;border-radius:4px;"
+  ></model-viewer>
+  {caption && <figcaption class="mt-2 font-mono text-[11px] text-muted">{caption}</figcaption>}
+</figure>
+
+<script>
+  import '@google/model-viewer';
+</script>

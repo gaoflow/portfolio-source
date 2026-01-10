@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import ModelViewer from '../../components/ModelViewer.astro';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -35,6 +36,9 @@ const meta = [
     </header>
 
     <!-- 2. Meta bar -->
+    {d.model3d && (
+      <ModelViewer src={d.model3d} alt={d.title} caption="Interactive 3D — drag to rotate, scroll to zoom." />
+    )}
     {d.heroImage && (
       <img src={d.heroImage} alt={d.title} class="w-full border border-edge mb-10" loading="lazy" />
     )}

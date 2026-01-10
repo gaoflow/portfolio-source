@@ -7,10 +7,12 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
 
 const filters = [
   { key: 'all', label: 'All' },
-  { key: 'fsae', label: 'FSAE full-car' },
+  { key: 'full-car', label: 'Full-car CFD' },
+  { key: 'fsae', label: 'FSAE' },
   { key: 'component-cfd', label: 'Component CFD' },
   { key: 'tooling', label: 'Tools & automation' },
   { key: 'validation', label: 'Validation' },
+  { key: 'design', label: 'Design & CAD' },
 ];
 ---
 
