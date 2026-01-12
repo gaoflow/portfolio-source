@@ -16,7 +16,8 @@ keyOutputs:
   - 'Web-native delivery: exported to glTF and embedded as an interactive viewer on this site.'
 featured: true
 sample: false
-order: 3
+order: 8
+studySequence: 1
 model3d: /models/space-rider.glb
 heroImage: /images/projects/space-rider-blueprint.png
 ---

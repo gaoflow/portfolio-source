@@ -3,6 +3,11 @@ airfoil-methods,linear-lift-rmse,True,0.08235000596158368,<=,0.1,results/analysi
 airfoil-methods,linear-lift-slope,True,0.13828082296989544,<=,0.15,results/analysis.json/linearLift/hessSmithSlopeRelativeError
 airfoil-methods,panel-refinement,True,0.00030715996551477885,<=,0.01,results/analysis.json/panelRefinementAtFourDegrees/relativeChange160To240
 airfoil-methods,drag-blind-spot,True,True,==,True,results/analysis.json/acceptance/inviscidDragBlindSpotIsExplicit
+f1-2026-aero,drag-confidence,True,0.6448512475311386,<,1,results/pilot-analysis.json/correctedPilot/Cd/relative_ci_percent
+f1-2026-aero,lift-confidence,True,0.5897989853845276,<,1,results/pilot-analysis.json/correctedPilot/Cl/relative_ci_percent
+f1-2026-aero,force-groups,True,True,==,True,results/pilot-analysis.json/acceptance/allSevenForceOutputsPresent
+f1-2026-aero,failure-preserved,True,True,==,True,results/pilot-analysis.json/acceptance/failedRunRemainsVisible
+f1-2026-aero,baseline-boundary,True,False,==,False,results/pilot-analysis.json/baseline/completed
 flowlab,u-centerline-rmse,True,0.0028640901117929765,<=,0.01,results/validation.json/cases/2/uCenterlineRmse
 flowlab,v-centerline-rmse,True,0.002023614927851531,<=,0.01,results/validation.json/cases/2/vCenterlineRmse
 flowlab,mass-conservation,True,2.5575097595265106e-12,<=,1e-09,results/validation.json/cases/2/relativeMassDrift
@@ -11,6 +16,11 @@ flowrom,pod-holdout-error,True,0.0012341728231584426,<=,0.02,results/analysis.js
 flowrom,frequency-recovery,True,9.265513541689696e-06,<=,0.05,results/analysis.json/dmd/dominantFrequencyRelativeError
 flowrom,dmd-holdout-error,True,0.0010049685338576688,<=,0.02,results/analysis.json/dmd/holdoutFullStateRelativeError
 flowrom,compression,True,48.813559322033896,>=,40,results/analysis.json/pod/rank8CompressionRatio
+fsae-cooling,total-flow,True,10.033961629027765,>=,10,results/analysis.json/hydraulicOperatingPoint/total_flow_lpm
+fsae-cooling,branch-flow,True,4.156202991074535,>=,4,results/analysis.json/hydraulicOperatingPoint/minimum_motor_branch_flow_lpm
+fsae-cooling,mesh-convergence,True,0.02944026043042669,<=,0.1,results/analysis.json/convergence/finest_mesh_difference_k
+fsae-cooling,time-convergence,True,0.01832218272306818,<=,0.1,results/analysis.json/convergence/finest_time_step_difference_k
+fsae-cooling,passive-e3-rejection,True,True,==,True,results/analysis.json/acceptance/passiveE3Rejected
 ground-effect-vlm,ground-boundary,True,0.0,<=,1e-12,results/analysis.json/verification/maximumGroundNormalVelocityResidual
 ground-effect-vlm,far-ground-recovery,True,3.3467430715807655e-05,<=,0.001,results/analysis.json/verification/farGroundToFreeAirLiftRelativeDifference
 ground-effect-vlm,lift-slope-scale,True,0.1100922352377488,<=,0.12,results/analysis.json/verification/liftSlopeRelativeError

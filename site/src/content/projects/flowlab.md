@@ -19,7 +19,8 @@ keyOutputs:
   - 'Kept one solver core for automated Node.js validation and a live browser experience.'
 featured: true
 sample: false
-order: 4
+order: 5
+studySequence: 4
 heroImage: /images/projects/flowlab/cavity-vorticity.svg
 ---
 

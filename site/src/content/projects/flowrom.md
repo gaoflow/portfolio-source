@@ -19,7 +19,8 @@ keyOutputs:
   - 'Recovered the imposed frequency to 0.00093% relative error and forecast the full held-out velocity state to 0.100% error.'
 featured: true
 sample: false
-order: 5
+order: 4
+studySequence: 5
 heroImage: /images/projects/flowrom/pod-modes.svg
 ---
 

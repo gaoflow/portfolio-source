@@ -22,6 +22,7 @@ const projects = defineCollection({
     featured: z.boolean().default(false),
     sample: z.boolean().default(false),
     order: z.number().default(99),
+    studySequence: z.number().int().positive().optional(),
   }),
 });
 

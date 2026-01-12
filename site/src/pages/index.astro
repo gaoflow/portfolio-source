@@ -6,7 +6,9 @@ import { profile } from '../data/profile';
 import { getCollection } from 'astro:content';
 
 const all = await getCollection('projects');
-const featured = all.filter((p) => p.data.featured).sort((a, b) => a.data.order - b.data.order);
+const featured = all.filter((p) => p.data.featured).sort(
+  (a, b) => (b.data.studySequence ?? 0) - (a.data.studySequence ?? 0) || a.data.order - b.data.order,
+);
 
 // ⚠️ Sample pipeline data — replace with your own representative case.
 const caseSteps = [

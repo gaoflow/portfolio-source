@@ -3,7 +3,9 @@ import Base from '../../layouts/Base.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 
-const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const projects = (await getCollection('projects')).sort(
+  (a, b) => (b.data.studySequence ?? 0) - (a.data.studySequence ?? 0) || a.data.order - b.data.order,
+);
 
 const filters = [
   { key: 'all', label: 'All' },
@@ -19,7 +21,7 @@ const filters = [
 <Base title="Projects">
   <section class="mx-auto max-w-5xl px-6 pt-16 pb-20">
     <h1 class="section-label mb-2">Projects</h1>
-    <p class="text-muted mb-10">Every project, in one place.</p>
+    <p class="text-muted mb-10">Newest and most complex first. Study numbers preserve the article sequence; earlier work intentionally isolates smaller problems.</p>
 
     <div class="flex flex-wrap gap-2 mb-10" data-filters>
       {filters.map((f, i) => (

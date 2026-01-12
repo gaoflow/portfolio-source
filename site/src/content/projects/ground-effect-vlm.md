@@ -18,7 +18,8 @@ keyOutputs:
   - 'Separated the defensible mechanism result from race-car claims the inviscid one-row model cannot support.'
 featured: true
 sample: false
-order: 9
+order: 6
+studySequence: 3
 heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg
 ---
 

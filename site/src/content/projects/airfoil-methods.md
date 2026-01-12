@@ -19,7 +19,8 @@ keyOutputs:
   - 'Showed the inviscid model beside measured wake drag and stall rather than presenting structurally unavailable outputs as weak predictions.'
 featured: true
 sample: false
-order: 6
+order: 7
+studySequence: 2
 heroImage: /images/projects/airfoil-methods/lift-validation.svg
 ---
 

@@ -19,7 +19,8 @@ keyOutputs:
   - 'Preserves failed claims in reports and exits nonzero instead of selectively publishing successful metrics.'
 featured: false
 sample: false
-order: 7
+order: 3
+studySequence: 6
 ---
 
 ## Context & objective

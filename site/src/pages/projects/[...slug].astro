@@ -16,6 +16,7 @@ const meta = [
   d.role && { label: 'Role', value: d.role },
   d.team && { label: 'Team', value: d.team },
   d.duration && { label: 'Duration', value: d.duration },
+  d.studySequence && { label: 'Progression', value: `Study ${String(d.studySequence).padStart(2, '0')}` },
   { label: 'Year', value: String(d.year) },
 ].filter(Boolean) as { label: string; value: string }[];
 ---
