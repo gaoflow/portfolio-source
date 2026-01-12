@@ -1,0 +1,798 @@
+{
+  "schemaVersion": 1,
+  "projectCount": 4,
+  "claimCount": 17,
+  "passedClaimCount": 17,
+  "artifactCount": 16,
+  "allClaimsPass": true,
+  "projects": [
+    {
+      "slug": "airfoil-methods",
+      "title": "Airfoil method hierarchy validation",
+      "summary": "Analytical and Hess\u2013Smith predictions are checked against one traceable NASA NACA 0012 series, with inviscid blind spots kept visible.",
+      "methods": [
+        "Thin-airfoil theory and Prandtl\u2013Glauert correction at Mach 0.15.",
+        "Cosine-spaced Hess\u2013Smith source/vortex panels with a Kutta condition.",
+        "Linear-range comparison and 40/80/160/240-panel refinement."
+      ],
+      "limitations": [
+        "One symmetric airfoil, Reynolds number, Mach number, and transition condition.",
+        "Potential flow cannot predict boundary layers, viscous drag, separation, or stall.",
+        "The validation range is explicitly limited to -4.1 through 10.2 degrees."
+      ],
+      "commands": [
+        "cd projects/airfoil-methods && python3 -m unittest discover -s tests -v",
+        "cd projects/airfoil-methods && python3 scripts/analyse.py",
+        "cd projects/airfoil-methods && python3 scripts/build_demo.py"
+      ],
+      "sources": [
+        {
+          "id": "nasa-tm-4074",
+          "title": "Ladson (1988), NASA TM-4074",
+          "role": "wind-tunnel validation data",
+          "url": "https://ntrs.nasa.gov/citations/19880019495"
+        },
+        {
+          "id": "solver",
+          "title": "Airfoil method implementation",
+          "role": "generated prediction",
+          "artifact": {
+            "path": "src/airfoil_methods.py",
+            "bytes": 7556,
+            "sha256": "6b6402525c9d97c3414bc3882021278c6b08434fe81b50e55a03ea465955e3ce"
+          }
+        },
+        {
+          "id": "analysis",
+          "title": "Airfoil validation runner",
+          "role": "acceptance evaluation",
+          "artifact": {
+            "path": "scripts/analyse.py",
+            "bytes": 8436,
+            "sha256": "79a77c5e796eed2a3a04f2f7c4a8f0b3cc954aa70140273a5dae378aa937bf50"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "linear-lift-rmse",
+          "statement": "Panel-model lift RMSE remains below 0.1 inside the declared linear range.",
+          "value": 0.08235000596158368,
+          "display_value": "0.0824",
+          "operator": "<=",
+          "threshold": 0.1,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/linearLift/hessSmithRmse",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2068,
+              "sha256": "7e00a34e94c22174274f4cc0ec8417a00a306f5d2d90fc0c81d3cca4e82524c3"
+            },
+            {
+              "path": "results/lift-validation.svg",
+              "bytes": 47740,
+              "sha256": "95806dfc147fdf541ce08f22d82d25de7a09f613fab29ec1d472967566effb62"
+            }
+          ],
+          "source_ids": [
+            "nasa-tm-4074",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "linear-lift-slope",
+          "statement": "Panel-model lift slope is within 15% of the measured linear slope.",
+          "value": 0.13828082296989544,
+          "display_value": "13.83%",
+          "operator": "<=",
+          "threshold": 0.15,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/linearLift/hessSmithSlopeRelativeError",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2068,
+              "sha256": "7e00a34e94c22174274f4cc0ec8417a00a306f5d2d90fc0c81d3cca4e82524c3"
+            },
+            {
+              "path": "results/lift-validation.svg",
+              "bytes": 47740,
+              "sha256": "95806dfc147fdf541ce08f22d82d25de7a09f613fab29ec1d472967566effb62"
+            }
+          ],
+          "source_ids": [
+            "nasa-tm-4074",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "panel-refinement",
+          "statement": "The 160-to-240-panel lift change at four degrees is below 1%.",
+          "value": 0.00030715996551477885,
+          "display_value": "0.031%",
+          "operator": "<=",
+          "threshold": 0.01,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/panelRefinementAtFourDegrees/relativeChange160To240",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2068,
+              "sha256": "7e00a34e94c22174274f4cc0ec8417a00a306f5d2d90fc0c81d3cca4e82524c3"
+            },
+            {
+              "path": "results/pressure-and-refinement.svg",
+              "bytes": 69111,
+              "sha256": "de160905de34c386c9334effe58d4b6cf51a0c9289b366222123f94ad14b5ff2"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "drag-blind-spot",
+          "statement": "The acceptance record explicitly retains the inviscid drag blind spot.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/inviscidDragBlindSpotIsExplicit",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2068,
+              "sha256": "7e00a34e94c22174274f4cc0ec8417a00a306f5d2d90fc0c81d3cca4e82524c3"
+            },
+            {
+              "path": "results/drag-blind-spot.svg",
+              "bytes": 42397,
+              "sha256": "5f930c0ed312bf8a8224f10371b24f45e5c14c47b360f5944bd7c2b747cfa82f"
+            }
+          ],
+          "source_ids": [
+            "nasa-tm-4074",
+            "solver",
+            "analysis"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 4,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 2068,
+          "sha256": "7e00a34e94c22174274f4cc0ec8417a00a306f5d2d90fc0c81d3cca4e82524c3"
+        },
+        {
+          "path": "results/drag-blind-spot.svg",
+          "bytes": 42397,
+          "sha256": "5f930c0ed312bf8a8224f10371b24f45e5c14c47b360f5944bd7c2b747cfa82f"
+        },
+        {
+          "path": "results/lift-validation.svg",
+          "bytes": 47740,
+          "sha256": "95806dfc147fdf541ce08f22d82d25de7a09f613fab29ec1d472967566effb62"
+        },
+        {
+          "path": "results/pressure-and-refinement.svg",
+          "bytes": 69111,
+          "sha256": "de160905de34c386c9334effe58d4b6cf51a0c9289b366222123f94ad14b5ff2"
+        }
+      ],
+      "manifest": "projects/airfoil-methods/evidence-manifest.json",
+      "manifestSha256": "2c7a26fe5ee0b8633e78a0df18772d30b210cf4f19cd21b9cc1ea08f98e9a8de"
+    },
+    {
+      "slug": "flowlab",
+      "title": "FlowLab lattice-Boltzmann validation",
+      "summary": "One solver core is exercised on three grids, compared with canonical centerline data, and reused by the browser experiment.",
+      "methods": [
+        "D2Q9 BGK collision with halfway bounce-back walls and moving-wall momentum correction.",
+        "Three-grid convergence study at Reynolds number 100.",
+        "Centerline interpolation against Ghia, Ghia and Shin reference values."
+      ],
+      "limitations": [
+        "Two-dimensional single-relaxation-time lattice model on coarse grids.",
+        "Validation covers one Reynolds number and one canonical internal-flow geometry.",
+        "Browser speed and lattice time are not physical vehicle-flow predictions."
+      ],
+      "commands": [
+        "cd projects/flowlab && npm test",
+        "cd projects/flowlab && npm run validate",
+        "cd projects/flowlab && npm run build:report",
+        "cd projects/flowlab && npm run publish:site"
+      ],
+      "sources": [
+        {
+          "id": "ghia-1982",
+          "title": "Ghia, Ghia & Shin (1982)",
+          "role": "canonical validation data",
+          "url": "https://doi.org/10.1016/0021-9991(82)90058-4"
+        },
+        {
+          "id": "solver",
+          "title": "FlowLab solver implementation",
+          "role": "generated numerical result",
+          "artifact": {
+            "path": "src/lbm.js",
+            "bytes": 9110,
+            "sha256": "b0c2af66dad245c780f44cd38039b261350a3c163da6818809b1b82bdca0c588"
+          }
+        },
+        {
+          "id": "validator",
+          "title": "Automated validation runner",
+          "role": "acceptance evaluation",
+          "artifact": {
+            "path": "scripts/validate.mjs",
+            "bytes": 9064,
+            "sha256": "f8c5c793f2a17f50c278a673337a366bdd2dee62b8afc1e27c3124c733e83789"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "u-centerline-rmse",
+          "statement": "The finest-grid streamwise centerline RMSE is below 1% of lid speed.",
+          "value": 0.0028640901117929765,
+          "display_value": "0.00286",
+          "operator": "<=",
+          "threshold": 0.01,
+          "passed": true,
+          "metric_path": "results/validation.json",
+          "metric_pointer": "/cases/2/uCenterlineRmse",
+          "artifacts": [
+            {
+              "path": "results/validation.json",
+              "bytes": 39180,
+              "sha256": "2d04528ddead386bbceb8080263d876191da180c7bd306a719e8c2196a4c4283"
+            },
+            {
+              "path": "results/centerline-validation.svg",
+              "bytes": 5141,
+              "sha256": "8760d1d9ec701112eb1d995d9562feb507362652d8a9d2b5677d404c6e3bebdd"
+            }
+          ],
+          "source_ids": [
+            "ghia-1982",
+            "solver",
+            "validator"
+          ]
+        },
+        {
+          "identifier": "v-centerline-rmse",
+          "statement": "The finest-grid cross-stream centerline RMSE is below 1% of lid speed.",
+          "value": 0.002023614927851531,
+          "display_value": "0.00202",
+          "operator": "<=",
+          "threshold": 0.01,
+          "passed": true,
+          "metric_path": "results/validation.json",
+          "metric_pointer": "/cases/2/vCenterlineRmse",
+          "artifacts": [
+            {
+              "path": "results/validation.json",
+              "bytes": 39180,
+              "sha256": "2d04528ddead386bbceb8080263d876191da180c7bd306a719e8c2196a4c4283"
+            },
+            {
+              "path": "results/centerline-validation.svg",
+              "bytes": 5141,
+              "sha256": "8760d1d9ec701112eb1d995d9562feb507362652d8a9d2b5677d404c6e3bebdd"
+            }
+          ],
+          "source_ids": [
+            "ghia-1982",
+            "solver",
+            "validator"
+          ]
+        },
+        {
+          "identifier": "mass-conservation",
+          "statement": "Finest-grid relative mass drift remains below one part per billion.",
+          "value": 2.5575097595265106e-12,
+          "display_value": "2.558e-12",
+          "operator": "<=",
+          "threshold": 1e-09,
+          "passed": true,
+          "metric_path": "results/validation.json",
+          "metric_pointer": "/cases/2/relativeMassDrift",
+          "artifacts": [
+            {
+              "path": "results/validation.json",
+              "bytes": 39180,
+              "sha256": "2d04528ddead386bbceb8080263d876191da180c7bd306a719e8c2196a4c4283"
+            },
+            {
+              "path": "results/cavity-vorticity.svg",
+              "bytes": 272367,
+              "sha256": "c2f4d2744a9b0a96cdc91d924198469f667a440da5a812a5ef0f735610517a24"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "validator"
+          ]
+        },
+        {
+          "identifier": "all-grids-converged",
+          "statement": "Every declared FlowLab convergence gate passes.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/validation.json",
+          "metric_pointer": "/acceptance/converged",
+          "artifacts": [
+            {
+              "path": "results/validation.json",
+              "bytes": 39180,
+              "sha256": "2d04528ddead386bbceb8080263d876191da180c7bd306a719e8c2196a4c4283"
+            },
+            {
+              "path": "report/technical-report.html",
+              "bytes": 3077,
+              "sha256": "02c571a6cd8fd6a060aecb00d97ab9f9958bbba4d9e09616e77d8c237de538ed"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "validator"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 4,
+      "artifacts": [
+        {
+          "path": "report/technical-report.html",
+          "bytes": 3077,
+          "sha256": "02c571a6cd8fd6a060aecb00d97ab9f9958bbba4d9e09616e77d8c237de538ed"
+        },
+        {
+          "path": "results/cavity-vorticity.svg",
+          "bytes": 272367,
+          "sha256": "c2f4d2744a9b0a96cdc91d924198469f667a440da5a812a5ef0f735610517a24"
+        },
+        {
+          "path": "results/centerline-validation.svg",
+          "bytes": 5141,
+          "sha256": "8760d1d9ec701112eb1d995d9562feb507362652d8a9d2b5677d404c6e3bebdd"
+        },
+        {
+          "path": "results/validation.json",
+          "bytes": 39180,
+          "sha256": "2d04528ddead386bbceb8080263d876191da180c7bd306a719e8c2196a4c4283"
+        }
+      ],
+      "manifest": "projects/flowlab/evidence-manifest.json",
+      "manifestSha256": "ff4d46d666726248149787210ce8e6d095cce0f9d1d32f675295965c61aa5ee5"
+    },
+    {
+      "slug": "flowrom",
+      "title": "FlowROM reduced-order validation",
+      "summary": "POD reconstruction and exact-DMD forecasting are evaluated on complete forcing cycles withheld from model fitting.",
+      "methods": [
+        "Independent FlowLab generation of 480 full-field velocity snapshots.",
+        "Mean-subtracted singular-value POD with orthogonal held-out projection.",
+        "Rank-12 exact DMD trained on eight cycles and forecast over four later cycles."
+      ],
+      "limitations": [
+        "The controlled response contains one imposed periodic frequency.",
+        "Training and holdout share geometry, Reynolds number, and forcing amplitude.",
+        "The result does not establish turbulent external-aerodynamics accuracy."
+      ],
+      "commands": [
+        "node projects/flowrom/scripts/generate-snapshots.mjs",
+        "cd projects/flowrom && python3 -m unittest discover -s tests -v",
+        "cd projects/flowrom && python3 scripts/analyse.py"
+      ],
+      "sources": [
+        {
+          "id": "schmid-2010",
+          "title": "Schmid (2010), Dynamic mode decomposition",
+          "role": "method reference",
+          "url": "https://doi.org/10.1017/S0022112010001217"
+        },
+        {
+          "id": "generator",
+          "title": "FlowLab snapshot generator",
+          "role": "source data",
+          "artifact": {
+            "path": "scripts/generate-snapshots.mjs",
+            "bytes": 3599,
+            "sha256": "b5b0659e26095ba8aefa1dcfbf776087984540ff7669377affc0b3b999120248"
+          }
+        },
+        {
+          "id": "analysis",
+          "title": "FlowROM analysis runner",
+          "role": "acceptance evaluation",
+          "artifact": {
+            "path": "scripts/analyse.py",
+            "bytes": 8159,
+            "sha256": "657d5e7a989cf5439879b630ff5b76155ffaef74d7b1115ac269f429d5e42522"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "pod-holdout-error",
+          "statement": "Rank-8 POD reconstructs held-out fluctuations below 2% relative error.",
+          "value": 0.0012341728231584426,
+          "display_value": "0.123%",
+          "operator": "<=",
+          "threshold": 0.02,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/pod/holdoutRelativeFluctuationErrors/8",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3482,
+              "sha256": "ad38c29f745b7355ee68a7e422e808fc47478583cc482acd918aa0224a3d8507"
+            },
+            {
+              "path": "results/pod-spectrum.svg",
+              "bytes": 63990,
+              "sha256": "6b48c6183c291bd457fe658d07cfde099ec78ea42c988ec0ea26e297519a9be3"
+            },
+            {
+              "path": "results/pod-modes.svg",
+              "bytes": 75184,
+              "sha256": "093035670ba13cec9ec2100739abae37cddef22244f31c8944164182d4be26bf"
+            }
+          ],
+          "source_ids": [
+            "generator",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "frequency-recovery",
+          "statement": "The dominant DMD frequency is within 5% of the imposed frequency.",
+          "value": 9.265513541689696e-06,
+          "display_value": "0.0009%",
+          "operator": "<=",
+          "threshold": 0.05,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/dmd/dominantFrequencyRelativeError",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3482,
+              "sha256": "ad38c29f745b7355ee68a7e422e808fc47478583cc482acd918aa0224a3d8507"
+            },
+            {
+              "path": "results/dmd-forecast.svg",
+              "bytes": 76650,
+              "sha256": "9c4388217f73f311e51a71c99d2c49b628426db8904f4a3bea9a19c8afda9999"
+            }
+          ],
+          "source_ids": [
+            "schmid-2010",
+            "generator",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "dmd-holdout-error",
+          "statement": "The four-cycle DMD full-state forecast stays below 2% relative error.",
+          "value": 0.0010049685338576688,
+          "display_value": "0.100%",
+          "operator": "<=",
+          "threshold": 0.02,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/dmd/holdoutFullStateRelativeError",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3482,
+              "sha256": "ad38c29f745b7355ee68a7e422e808fc47478583cc482acd918aa0224a3d8507"
+            },
+            {
+              "path": "results/dmd-forecast.svg",
+              "bytes": 76650,
+              "sha256": "9c4388217f73f311e51a71c99d2c49b628426db8904f4a3bea9a19c8afda9999"
+            }
+          ],
+          "source_ids": [
+            "schmid-2010",
+            "generator",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "compression",
+          "statement": "The rank-8 representation reduces stored scalar values by at least 40 times.",
+          "value": 48.813559322033896,
+          "display_value": "48.8",
+          "operator": ">=",
+          "threshold": 40,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/pod/rank8CompressionRatio",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3482,
+              "sha256": "ad38c29f745b7355ee68a7e422e808fc47478583cc482acd918aa0224a3d8507"
+            }
+          ],
+          "source_ids": [
+            "generator",
+            "analysis"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 4,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 3482,
+          "sha256": "ad38c29f745b7355ee68a7e422e808fc47478583cc482acd918aa0224a3d8507"
+        },
+        {
+          "path": "results/dmd-forecast.svg",
+          "bytes": 76650,
+          "sha256": "9c4388217f73f311e51a71c99d2c49b628426db8904f4a3bea9a19c8afda9999"
+        },
+        {
+          "path": "results/pod-modes.svg",
+          "bytes": 75184,
+          "sha256": "093035670ba13cec9ec2100739abae37cddef22244f31c8944164182d4be26bf"
+        },
+        {
+          "path": "results/pod-spectrum.svg",
+          "bytes": 63990,
+          "sha256": "6b48c6183c291bd457fe658d07cfde099ec78ea42c988ec0ea26e297519a9be3"
+        }
+      ],
+      "manifest": "projects/flowrom/evidence-manifest.json",
+      "manifestSha256": "31ab76b074a4a7688dd4196a7712433f8b633adeba3e4d078c17252ab503cf5b"
+    },
+    {
+      "slug": "ground-effect-vlm",
+      "title": "Ground-effect image-vortex validation",
+      "summary": "A from-primitives horseshoe-vortex solver isolates finite-wing ground effect and checks boundary enforcement, asymptotic recovery, analytical scale, and panel refinement.",
+      "methods": [
+        "Finite Biot-Savart segments assembled into one-row horseshoe-vortex lattices.",
+        "Reversed image vortices enforce a moving ground plane without a viscous road boundary layer.",
+        "Ride-height sweep, Trefftz-plane induced drag, analytical scale check, and span refinement."
+      ],
+      "limitations": [
+        "The model is linear, inviscid, steady, incompressible, and zero-thickness.",
+        "There are no tyres, body, diffuser, leakage, separation, or moving-road boundary layer.",
+        "The published sweep stops at quarter-chord height h/c=0.25 and is not a race-car performance prediction."
+      ],
+      "commands": [
+        "cd projects/ground-effect-vlm && python3 -m unittest discover -s tests -v",
+        "cd projects/ground-effect-vlm && python3 scripts/analyse.py",
+        "cd projects/ground-effect-vlm && python3 scripts/build_demo.py"
+      ],
+      "sources": [
+        {
+          "id": "nasa-vlm",
+          "title": "NASA SP-405, Vortex-Lattice Utilization",
+          "role": "method reference",
+          "url": "https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19760021075.pdf"
+        },
+        {
+          "id": "nasa-mvl",
+          "title": "NASA/TM-2015-218804, Description, Usage, and Validation of MVL-15",
+          "role": "linear-method scope reference",
+          "url": "https://ntrs.nasa.gov/citations/20160000765"
+        },
+        {
+          "id": "solver",
+          "title": "Ground-effect VLM solver",
+          "role": "numerical implementation",
+          "artifact": {
+            "path": "src/ground_effect_vlm.py",
+            "bytes": 6951,
+            "sha256": "2c38d08993ea1aedc745fa84eae0f0160f824cc4d22f50d874dda3f9eced192a"
+          }
+        },
+        {
+          "id": "analysis",
+          "title": "Ground-effect verification runner",
+          "role": "acceptance evaluation",
+          "artifact": {
+            "path": "scripts/analyse.py",
+            "bytes": 8507,
+            "sha256": "9b41d83d0778ff26e8374880eb574d32222db50efd51a075472cc681137713c2"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "ground-boundary",
+          "statement": "The reversed image system leaves less than 1e-12 normal velocity on the ground plane.",
+          "value": 0.0,
+          "display_value": "0.00e+00",
+          "operator": "<=",
+          "threshold": 1e-12,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/verification/maximumGroundNormalVelocityResidual",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 5425,
+              "sha256": "889572f5bfc35a2fc6b33e5be1d6b901087bb78ab967b71065eb002755537ede"
+            },
+            {
+              "path": "results/ground-sweep.svg",
+              "bytes": 62366,
+              "sha256": "40775efcafdcd009f751471c709db9895a6b92890f249c9ccf81309430c660b7"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "far-ground-recovery",
+          "statement": "The h/c=50 image solution recovers free-air lift within 0.1%.",
+          "value": 3.3467430715807655e-05,
+          "display_value": "0.0033%",
+          "operator": "<=",
+          "threshold": 0.001,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/verification/farGroundToFreeAirLiftRelativeDifference",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 5425,
+              "sha256": "889572f5bfc35a2fc6b33e5be1d6b901087bb78ab967b71065eb002755537ede"
+            },
+            {
+              "path": "results/verification.svg",
+              "bytes": 58023,
+              "sha256": "a5a83553494f47c3613eb4948e567a30f4905c0a95c4839c363b47f3b43a3c2d"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "lift-slope-scale",
+          "statement": "The free-air lift slope is within 12% of the Prandtl finite-wing estimate.",
+          "value": 0.1100922352377488,
+          "display_value": "11.01%",
+          "operator": "<=",
+          "threshold": 0.12,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/verification/liftSlopeRelativeError",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 5425,
+              "sha256": "889572f5bfc35a2fc6b33e5be1d6b901087bb78ab967b71065eb002755537ede"
+            },
+            {
+              "path": "results/verification.svg",
+              "bytes": 58023,
+              "sha256": "a5a83553494f47c3613eb4948e567a30f4905c0a95c4839c363b47f3b43a3c2d"
+            }
+          ],
+          "source_ids": [
+            "nasa-vlm",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "span-refinement",
+          "statement": "Lift changes less than 1% from 64 to 96 span panels at h/c=1.",
+          "value": 0.0025794159545061163,
+          "display_value": "0.258%",
+          "operator": "<=",
+          "threshold": 0.01,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/verification/refinementRelativeChange64To96",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 5425,
+              "sha256": "889572f5bfc35a2fc6b33e5be1d6b901087bb78ab967b71065eb002755537ede"
+            },
+            {
+              "path": "results/verification.svg",
+              "bytes": 58023,
+              "sha256": "a5a83553494f47c3613eb4948e567a30f4905c0a95c4839c363b47f3b43a3c2d"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "half-chord-lift-amplification",
+          "statement": "The ideal image model produces at least 30% fixed-incidence lift amplification at h/c=0.5.",
+          "value": 1.3237339832422048,
+          "display_value": "1.324",
+          "operator": ">=",
+          "threshold": 1.3,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/results/halfChordHeightLiftAmplification",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 5425,
+              "sha256": "889572f5bfc35a2fc6b33e5be1d6b901087bb78ab967b71065eb002755537ede"
+            },
+            {
+              "path": "results/ground-sweep.svg",
+              "bytes": 62366,
+              "sha256": "40775efcafdcd009f751471c709db9895a6b92890f249c9ccf81309430c660b7"
+            },
+            {
+              "path": "results/span-loading.svg",
+              "bytes": 45258,
+              "sha256": "24846d7f1c9f1e8e3251948590936228b64a0584f7123b244bbd604bd478322f"
+            }
+          ],
+          "source_ids": [
+            "nasa-mvl",
+            "solver",
+            "analysis"
+          ]
+        }
+      ],
+      "claimCount": 5,
+      "passedClaimCount": 5,
+      "artifactCount": 4,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 5425,
+          "sha256": "889572f5bfc35a2fc6b33e5be1d6b901087bb78ab967b71065eb002755537ede"
+        },
+        {
+          "path": "results/ground-sweep.svg",
+          "bytes": 62366,
+          "sha256": "40775efcafdcd009f751471c709db9895a6b92890f249c9ccf81309430c660b7"
+        },
+        {
+          "path": "results/span-loading.svg",
+          "bytes": 45258,
+          "sha256": "24846d7f1c9f1e8e3251948590936228b64a0584f7123b244bbd604bd478322f"
+        },
+        {
+          "path": "results/verification.svg",
+          "bytes": 58023,
+          "sha256": "a5a83553494f47c3613eb4948e567a30f4905c0a95c4839c363b47f3b43a3c2d"
+        }
+      ],
+      "manifest": "projects/ground-effect-vlm/evidence-manifest.json",
+      "manifestSha256": "fe37171a822f6bce8ce2f3e91e0f81869bea3be1dc3f396b1e2eb38a5fc5c10b"
+    }
+  ]
+}

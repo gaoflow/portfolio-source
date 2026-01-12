@@ -1,0 +1,102 @@
+---
+title: 'Evidence Kit — Claims, Gates & Artifact Hashes'
+year: 2026
+status: complete
+categories: [tooling, validation]
+tags: [Python, JSON Pointer, SHA-256, reporting, reproducibility]
+summary: 'A manifest-driven audit layer that connects portfolio claims to observed metrics, explicit gates, public sources, and hashed artifacts.'
+methodLine: 'JSON manifests · typed gates · RFC 6901 pointers · SHA-256 · HTML/CSV/JSON'
+role: 'Tooling & technical communication'
+duration: 'Independent build'
+heroMetrics:
+  - { label: 'Studies audited', value: '3' }
+  - { label: 'Claims', value: '12/12' }
+  - { label: 'Artifacts', value: '11' }
+  - { label: 'Interface', value: '1 call' }
+keyOutputs:
+  - 'Reduced the caller interface to one catalog build while hiding pointer resolution, typed comparisons, path containment, hashing, and multi-format publication.'
+  - 'Dogfooded the same module across FlowLab, FlowROM, and Airfoil Methods; all 12 declared gates pass against 11 unique claim artifacts.'
+  - 'Preserves failed claims in reports and exits nonzero instead of selectively publishing successful metrics.'
+featured: false
+sample: false
+order: 7
+---
+
+## Context & objective
+
+A technical portfolio can contain correct plots and still make weak claims: the metric may not match the sentence, the threshold may have been chosen afterward, the reference may be missing, or the displayed file may not be the one produced by the command.
+
+Evidence Kit turns those relationships into data. Each study declares claims, JSON-pointer metrics, typed expectations, sources, artifacts, methods, limitations, and reproduction commands. One module audits the manifests and publishes both human and machine-readable reports.
+
+## Live evidence catalog
+
+This dashboard is generated from the same manifests used to gate publication. Open any study to inspect observed values, thresholds, source roles, artifact sizes, and SHA-256 fingerprints.
+
+<iframe src="/evidence/" title="Portfolio evidence catalog" style="width:100%;height:760px;border:1px solid #233226;background:#08111f" loading="lazy"></iframe>
+
+## A deliberately small interface
+
+```python
+catalog = build_evidence_catalog(
+    manifest_paths,
+    repository_root,
+    output_directory,
+)
+```
+
+That call hides the implementation details that every project would otherwise duplicate:
+
+- manifest validation and unique project/claim identifiers;
+- RFC 6901-style JSON pointer traversal through objects and arrays;
+- numeric and boolean gates with `<`, `<=`, `>`, `>=`, and `==`;
+- project-directory containment for every local path;
+- external HTTPS and hashed repository-source adapters;
+- deduplicated artifact hashing;
+- per-project HTML, aggregate HTML, catalog JSON, and coverage CSV;
+- staged output replacement so partial reports are not published.
+
+The function returns the catalog instead of printing or terminating. The CLI is a thin adapter that prints summary counts and exits nonzero when any claim fails.
+
+## Manifest as a review surface
+
+A claim is not just a sentence. It must name one observed value and one expectation:
+
+```json
+{
+  "id": "pod-holdout-error",
+  "statement": "Rank-8 POD reconstructs held-out fluctuations below 2% relative error.",
+  "metric": {
+    "path": "results/analysis.json",
+    "pointer": "/pod/holdoutRelativeFluctuationErrors/8",
+    "display": ".3%"
+  },
+  "expectation": {"operator": "<=", "value": 0.02},
+  "artifacts": ["results/analysis.json", "results/pod-spectrum.svg"],
+  "sourceIds": ["generator", "analysis"]
+}
+```
+
+This makes scope errors reviewable. A claim cannot silently swap a full-state error for a fluctuation error, cite an unknown source, omit its output, or point outside its project directory.
+
+## Dogfood result
+
+The current audit covers the three independently executable numerical studies:
+
+| Study | Claims passing | Unique claim artifacts |
+|---|---:|---:|
+| FlowLab | 4 / 4 | 3 |
+| FlowROM | 4 / 4 | 4 |
+| Airfoil Methods | 4 / 4 | 4 |
+| **Total** | **12 / 12** | **11** |
+
+The generated `catalog.json` keeps full claim records and SHA-256 values. `coverage.csv` flattens the same data for review or CI ingestion.
+
+## Failure behavior
+
+The toolkit does not remove a failed claim. It writes the observed value and `FAIL` state into the project report, returns `allClaimsPass: false`, and lets the CLI terminate with a nonzero status. Missing artifacts, escaping paths, malformed pointers, duplicate identifiers, unknown sources, and incompatible comparisons are hard errors.
+
+## Verification
+
+Interface-level tests cover successful multi-format publication, nested array pointers, boolean and numeric comparisons, deduplicated hashing, preserved failed gates, and rejected path traversal. `python3 scripts/audit_portfolio.py` is the smoke test: it consumes real project outputs rather than test fixtures.
+
+[Open the machine-readable catalog](/evidence/catalog.json) or [download the coverage matrix](/evidence/coverage.csv).

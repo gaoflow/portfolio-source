@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>FlowROM technical report</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="/documents/flowrom-report.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">FlowROM technical report</h1>
+</header>
+<h1 id="flowrom-reduced-order-analysis-of-an-unsteady-cavity">FlowROM:
+reduced-order analysis of an unsteady cavity</h1>
+<h2 id="question">Question</h2>
+<p>Can a compact linear representation recover and forecast a controlled
+unsteady component in full-field CFD-like velocity data? The study
+compares two related but distinct decompositions:</p>
+<ul>
+<li><strong>POD</strong> asks which orthonormal spatial basis captures
+the most fluctuation energy.</li>
+<li><strong>DMD</strong> asks which spatial modes evolve with a single
+complex growth rate and frequency.</li>
+</ul>
+<p>The test is intentionally narrow. FlowLab supplies auditable,
+independently generated fields; the known input frequency provides a
+ground-truth temporal target. It is a numerical-method study, not a
+claim about vehicle aerodynamics.</p>
+<h2 id="data-provenance">Data provenance</h2>
+<p>The snapshot generator imports the FlowLab D2Q9 BGK solver. It
+converges a
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>48</mn><mo>×</mo><mn>48</mn></mrow><annotation encoding="application/x-tex">48\times48</annotation></semantics></math>
+lid-driven cavity at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>e</mi><mo>=</mo><mn>100</mn></mrow><annotation encoding="application/x-tex">Re=100</annotation></semantics></math>
+with base lid speed
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mo>=</mo><mn>0.05</mn></mrow><annotation encoding="application/x-tex">U=0.05</annotation></semantics></math>
+lattice units, then varies the driving speed as</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>0.05</mn><mo>+</mo><mn>0.01</mn><mrow><mi mathvariant="normal">sin</mi><mo>&#8289;</mo></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mn>2</mn><mi>π</mi><mi>n</mi><mi>/</mi><mn>400</mn><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">U(n)=0.05+0.01\sin\left(2\pi n/400\right).</annotation></semantics></math></p>
+<p>After four settling cycles, it records
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>u</mi><annotation encoding="application/x-tex">u</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>
+at every fluid cell every 10 solver iterations for 12 forcing cycles.
+This produces a matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><mo>∈</mo><msup><mi>ℝ</mi><mrow><mn>4608</mn><mo>×</mo><mn>480</mn></mrow></msup></mrow><annotation encoding="application/x-tex">X\in\mathbb{R}^{4608\times480}</annotation></semantics></math>.
+The first 320 columns (eight cycles) train both models; the final 160
+columns (four cycles) are reserved for evaluation. The imposed frequency
+is therefore
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>10</mn><mi>/</mi><mn>400</mn><mo>=</mo><mn>0.025</mn></mrow><annotation encoding="application/x-tex">10/400=0.025</annotation></semantics></math>
+cycles per snapshot.</p>
+<h2 id="pod-method">POD method</h2>
+<p>The training mean
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>x</mi><mo accent="true">‾</mo></mover><annotation encoding="application/x-tex">\bar{x}</annotation></semantics></math>
+is removed and the centered matrix is factored with the singular value
+decomposition</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>X</mi><mo>′</mo></msup><mo>=</mo><mi>X</mi><mo>−</mo><mover><mi>x</mi><mo accent="true">‾</mo></mover><mo>=</mo><mi>U</mi><mi mathvariant="normal">Σ</mi><msup><mi>V</mi><mi>T</mi></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">X&#39;=X-\bar{x}=U\Sigma V^T.</annotation></semantics></math></p>
+<p>The first
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>
+columns of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>U</mi><annotation encoding="application/x-tex">U</annotation></semantics></math>
+form the
+rank-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>
+spatial basis. New snapshots are reconstructed by orthogonal projection,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mover><mi>X</mi><mo accent="true">̂</mo></mover><mo>′</mo></msup><mo>=</mo><msub><mi>U</mi><mi>r</mi></msub><msubsup><mi>U</mi><mi>r</mi><mi>T</mi></msubsup><msup><mi>X</mi><mo>′</mo></msup></mrow><annotation encoding="application/x-tex">\hat{X}&#39;=U_rU_r^TX&#39;</annotation></semantics></math>.
+Energy fractions are
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>σ</mi><mi>i</mi><mn>2</mn></msubsup><mi>/</mi><msub><mo>∑</mo><mi>j</mi></msub><msubsup><mi>σ</mi><mi>j</mi><mn>2</mn></msubsup></mrow><annotation encoding="application/x-tex">\sigma_i^2/\sum_j\sigma_j^2</annotation></semantics></math>.
+This follows the snapshot/POD interpretation introduced for coherent
+flow structures by Sirovich [1].</p>
+<p>The first two modes retain 99.973% of training fluctuation energy.
+They represent the dominant quadrature pair associated with the imposed
+periodic response. Held-out relative fluctuation error decreases
+monotonically:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Rank</th>
+<th style="text-align: right;">Training error</th>
+<th style="text-align: right;">Held-out error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">35.981%</td>
+<td style="text-align: right;">35.971%</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1.630%</td>
+<td style="text-align: right;">1.301%</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0.387%</td>
+<td style="text-align: right;">0.471%</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">0.0885%</td>
+<td style="text-align: right;">0.123%</td>
+</tr>
+<tr>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.00439%</td>
+<td style="text-align: right;">0.00949%</td>
+</tr>
+</tbody>
+</table>
+<p>At rank 8, storing one mean, eight spatial modes, and eight time
+coefficients per snapshot uses 48.8× fewer scalar values than the
+original matrix.</p>
+<h2 id="dmd-method">DMD method</h2>
+<p>Exact DMD uses consecutive centered snapshot blocks
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mn>1</mn></msub><annotation encoding="application/x-tex">X_1</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mn>2</mn></msub><annotation encoding="application/x-tex">X_2</annotation></semantics></math>.
+A rank-12 SVD of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><mn>1</mn></msub><annotation encoding="application/x-tex">X_1</annotation></semantics></math>
+forms the reduced operator</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>A</mi><mo accent="true">̃</mo></mover><mo>=</mo><msubsup><mi>U</mi><mi>r</mi><mi>T</mi></msubsup><msub><mi>X</mi><mn>2</mn></msub><msub><mi>V</mi><mi>r</mi></msub><msubsup><mi mathvariant="normal">Σ</mi><mi>r</mi><mrow><mi>−</mi><mn>1</mn></mrow></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">\tilde{A}=U_r^TX_2V_r\Sigma_r^{-1},</annotation></semantics></math></p>
+<p>whose eigenpairs produce exact DMD modes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Φ</mi><mo>=</mo><msub><mi>X</mi><mn>2</mn></msub><msub><mi>V</mi><mi>r</mi></msub><msubsup><mi mathvariant="normal">Σ</mi><mi>r</mi><mrow><mi>−</mi><mn>1</mn></mrow></msubsup><mi>W</mi></mrow><annotation encoding="application/x-tex">\Phi=X_2V_r\Sigma_r^{-1}W</annotation></semantics></math>
+[2,3]. Modal amplitudes come from a least-squares fit to the first
+training snapshot. The model then advances autonomously across all 480
+sample times; it does not see the final four cycles during fitting.</p>
+<p>The strongest oscillatory mode is 0.02500023 cycles per snapshot.
+Relative error against the known 0.025 forcing frequency is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>9.27</mn><mo>×</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">9.27\times10^{-6}</annotation></semantics></math>
+(0.00093%). Over the four held-out cycles:</p>
+<ul>
+<li>full-state relative Frobenius error is 0.100%;</li>
+<li>fluctuation-only relative error is 1.41%.</li>
+</ul>
+<p>The full-state figure is smaller because the steady cavity mean
+contains most of the velocity norm. Both are reported to avoid hiding
+that denominator effect.</p>
+<h2 id="interpretation-and-limits">Interpretation and limits</h2>
+<p>This case supports three bounded conclusions:</p>
+<ol type="1">
+<li>A two-dimensional POD subspace captures almost all energy in this
+deliberately single-frequency response.</li>
+<li>Higher-rank POD modes reduce residual spatial/nonlinear structure on
+unseen cycles without reversing the error trend.</li>
+<li>Exact DMD recovers the imposed temporal frequency and preserves
+phase well enough to forecast four cycles within the stated error
+gates.</li>
+</ol>
+<p>It does <strong>not</strong> establish accuracy on turbulent,
+separated, moving-boundary, or parameter-varying vehicle flows. The D2Q9
+BGK solver is low-order, the grid is coarse, the excitation is
+deterministic, and train and holdout segments share one operating
+condition. A production study would add independent operating points,
+noise sensitivity, rank-selection cross-validation, non-stationary
+transients, and cost comparisons against the parent solver.</p>
+<h2 id="reproducibility-and-acceptance">Reproducibility and
+acceptance</h2>
+<p><code>python3 scripts/analyse.py</code> regenerates
+<code>results/analysis.json</code> and the three figures. It exits
+nonzero unless all four observable gates pass:</p>
+<ul>
+<li>held-out POD errors decrease with retained rank;</li>
+<li>rank-8 held-out fluctuation error is below 2%;</li>
+<li>the dominant DMD frequency is within 5% of the imposed value;</li>
+<li>DMD full-state holdout error is below 2%.</li>
+</ul>
+<p>Synthetic unit tests separately verify exact recovery of a rank-two
+sinusoid and frequency identification, preventing the case generator
+from being the sole oracle.</p>
+<h2 id="references">References</h2>
+<ol type="1">
+<li>Sirovich, L. (1987). Turbulence and the dynamics of coherent
+structures, Parts I–III. <em>Quarterly of Applied Mathematics</em>,
+45(3), 561–590. https://doi.org/10.1090/qam/910462</li>
+<li>Schmid, P. J. (2010). Dynamic mode decomposition of numerical and
+experimental data. <em>Journal of Fluid Mechanics</em>, 656, 5–28.
+https://doi.org/10.1017/S0022112010001217</li>
+<li>Tu, J. H., Rowley, C. W., Luchtenburg, D. M., Brunton, S. L., &amp;
+Kutz, J. N. (2014). On dynamic mode decomposition: Theory and
+applications. <em>Journal of Computational Dynamics</em>, 1(2), 391–421.
+https://doi.org/10.3934/jcd.2014.1.391</li>
+</ol>
+</body>
+</html>

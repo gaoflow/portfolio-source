@@ -4,3 +4,8 @@ dist/
 *.log
 .env*
 .firecrawl/
+
+__pycache__/
+*.pyc
+.venv/
+projects/*/data/generated/*.f32

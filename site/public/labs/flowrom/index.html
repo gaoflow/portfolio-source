@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08111f">
+  <title>FlowROM mode explorer</title>
+  <link rel="stylesheet" href="./style.css?v=1">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">Interactive POD explorer</p>
+        <h1>How much flow can <span>eight modes</span> retain?</h1>
+      </div>
+      <output id="status">Loading fields…</output>
+    </header>
+
+    <section class="controls" aria-label="Mode controls">
+      <div class="rank-control">
+        <span>Retained rank</span>
+        <div id="rank-buttons" role="group" aria-label="POD rank"></div>
+      </div>
+      <label>
+        <span>Snapshot</span>
+        <input id="frame" type="range" min="0" max="59" value="0">
+      </label>
+      <button id="toggle" type="button">Pause</button>
+    </section>
+
+    <section class="fields">
+      <figure>
+        <figcaption><span>FlowLab field</span><small>Reference speed</small></figcaption>
+        <canvas id="actual" width="480" height="480"></canvas>
+      </figure>
+      <figure>
+        <figcaption><span id="rank-label">POD rank 2</span><small>Projected reconstruction</small></figcaption>
+        <canvas id="reconstructed" width="480" height="480"></canvas>
+      </figure>
+    </section>
+
+    <footer>
+      <div><span class="dot training"></span><strong id="phase">Training interval</strong></div>
+      <div><span>Frame error</span><strong id="error">—</strong></div>
+      <div><span>Field scale</span><strong>0 → 0.06 lu</strong></div>
+    </footer>
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
