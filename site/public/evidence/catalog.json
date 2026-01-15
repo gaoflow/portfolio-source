@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "projectCount": 6,
-  "claimCount": 27,
-  "passedClaimCount": 27,
-  "artifactCount": 21,
+  "claimCount": 31,
+  "passedClaimCount": 31,
+  "artifactCount": 24,
   "allClaimsPass": true,
   "projects": [
     {
@@ -201,13 +201,14 @@
       "methods": [
         "Fourteen STEP parts are converted and repaired for an OpenFOAM half-car external-flow workflow.",
         "A corrected one-million-cell pilot is advanced for 400 steady iterations with moving-ground and staged numerical controls.",
-        "A batch-means confidence-interval criterion selects the averaging window for drag and lift coefficients."
+        "A batch-means confidence-interval criterion selects the averaging window for drag and lift coefficients.",
+        "A zero-failure gate now covers nineteen OpenFOAM mesh outcomes plus one external volume-topology attempt, including bounded surface repair and a discrete-STL Gmsh route, before solver launch."
       ],
       "limitations": [
         "The published coefficients are pipeline-validation values from a coarse pilot, not production aerodynamic predictions.",
         "The 25\u201335 million-cell baseline and mesh/model sensitivity programme have not run.",
         "The third-party geometry is reconstructed from public imagery and is not official team CAD.",
-        "A coarse boundary-layer trial exposed front-wing force corruption; the failure is retained and the production correction remains open."
+        "All twenty bounded qualification paths failed: the best uniform-envelope topology retains eight face-interior skew failures, both tested repaired-surface meshes retain fifteen, and Gmsh generates no volume elements from the overlapping discrete boundary."
       ],
       "commands": [
         "python3 projects/f1-2026-aero/scripts/publish.py"
@@ -219,8 +220,18 @@
           "role": "Generated pilot evidence",
           "artifact": {
             "path": "results/pilot-analysis.json",
-            "bytes": 1495,
-            "sha256": "204756aab8e3ab1db5e7a3218ba69067719c0d50b3977f51eb146ad487400b58"
+            "bytes": 3525,
+            "sha256": "1c2dc80323e7761e4dc8db30236161eb65c1de57e316e82628292ec634da4a1c"
+          }
+        },
+        {
+          "id": "front-wing-qualification",
+          "title": "Controlled front-wing mesh qualification",
+          "role": "Generated mesh-gate and force-gate evidence",
+          "artifact": {
+            "path": "results/qualification-summary.json",
+            "bytes": 20082,
+            "sha256": "afd1f2bda315034fb62b7b7680cdf0c8843815efa94ccb1941f2c84f1e0d5e46"
           }
         },
         {
@@ -244,13 +255,13 @@
           "artifacts": [
             {
               "path": "results/pilot-analysis.json",
-              "bytes": 1495,
-              "sha256": "204756aab8e3ab1db5e7a3218ba69067719c0d50b3977f51eb146ad487400b58"
+              "bytes": 3525,
+              "sha256": "1c2dc80323e7761e4dc8db30236161eb65c1de57e316e82628292ec634da4a1c"
             },
             {
               "path": "results/pilot-force-convergence.svg",
-              "bytes": 96960,
-              "sha256": "0eccb648023aadb333764ebc090bff30ca960b8eebea159ba78bfb19600d9649"
+              "bytes": 94378,
+              "sha256": "97627dd3fb292a8a0d3401d0fe54912632c6ce8813926054e5adf53b8aa9e05d"
             }
           ],
           "source_ids": [
@@ -271,13 +282,13 @@
           "artifacts": [
             {
               "path": "results/pilot-analysis.json",
-              "bytes": 1495,
-              "sha256": "204756aab8e3ab1db5e7a3218ba69067719c0d50b3977f51eb146ad487400b58"
+              "bytes": 3525,
+              "sha256": "1c2dc80323e7761e4dc8db30236161eb65c1de57e316e82628292ec634da4a1c"
             },
             {
               "path": "results/pilot-force-convergence.svg",
-              "bytes": 96960,
-              "sha256": "0eccb648023aadb333764ebc090bff30ca960b8eebea159ba78bfb19600d9649"
+              "bytes": 94378,
+              "sha256": "97627dd3fb292a8a0d3401d0fe54912632c6ce8813926054e5adf53b8aa9e05d"
             }
           ],
           "source_ids": [
@@ -298,8 +309,8 @@
           "artifacts": [
             {
               "path": "results/pilot-analysis.json",
-              "bytes": 1495,
-              "sha256": "204756aab8e3ab1db5e7a3218ba69067719c0d50b3977f51eb146ad487400b58"
+              "bytes": 3525,
+              "sha256": "1c2dc80323e7761e4dc8db30236161eb65c1de57e316e82628292ec634da4a1c"
             }
           ],
           "source_ids": [
@@ -319,8 +330,8 @@
           "artifacts": [
             {
               "path": "results/pilot-analysis.json",
-              "bytes": 1495,
-              "sha256": "204756aab8e3ab1db5e7a3218ba69067719c0d50b3977f51eb146ad487400b58"
+              "bytes": 3525,
+              "sha256": "1c2dc80323e7761e4dc8db30236161eb65c1de57e316e82628292ec634da4a1c"
             }
           ],
           "source_ids": [
@@ -340,32 +351,158 @@
           "artifacts": [
             {
               "path": "results/pilot-analysis.json",
-              "bytes": 1495,
-              "sha256": "204756aab8e3ab1db5e7a3218ba69067719c0d50b3977f51eb146ad487400b58"
+              "bytes": 3525,
+              "sha256": "1c2dc80323e7761e4dc8db30236161eb65c1de57e316e82628292ec634da4a1c"
             }
           ],
           "source_ids": [
             "pilot"
           ]
+        },
+        {
+          "identifier": "front-wing-qualification-no-go",
+          "statement": "All controlled front-wing qualification meshes remain rejected; none is promoted to a solver or production mesh.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/pilot-analysis.json",
+          "metric_pointer": "/acceptance/frontWingQualificationMeshPassCountZero",
+          "artifacts": [
+            {
+              "path": "results/pilot-analysis.json",
+              "bytes": 3525,
+              "sha256": "1c2dc80323e7761e4dc8db30236161eb65c1de57e316e82628292ec634da4a1c"
+            },
+            {
+              "path": "results/qualification-summary.json",
+              "bytes": 20082,
+              "sha256": "afd1f2bda315034fb62b7b7680cdf0c8843815efa94ccb1941f2c84f1e0d5e46"
+            },
+            {
+              "path": "results/mesh-variant-quality.svg",
+              "bytes": 100961,
+              "sha256": "a3b87d4d3a7543db35ebf0c14f6a5536f757c4941b7050f675d24c4e07944978"
+            },
+            {
+              "path": "results/force-corruption-before-after.svg",
+              "bytes": 77390,
+              "sha256": "ad48b7327ca1fa0babe8a25d6512c05482a2b9467fa0ac7b0da50ddbaea8977b"
+            }
+          ],
+          "source_ids": [
+            "pilot",
+            "front-wing-qualification"
+          ]
+        },
+        {
+          "identifier": "bounded-qualification-paths",
+          "statement": "The qualification evidence covers twenty bounded paths: nineteen OpenFOAM mesh outcomes and one external topology attempt.",
+          "value": 20,
+          "display_value": "20",
+          "operator": "==",
+          "threshold": 20,
+          "passed": true,
+          "metric_path": "results/pilot-analysis.json",
+          "metric_pointer": "/frontWingQualification/boundedPathCount",
+          "artifacts": [
+            {
+              "path": "results/pilot-analysis.json",
+              "bytes": 3525,
+              "sha256": "1c2dc80323e7761e4dc8db30236161eb65c1de57e316e82628292ec634da4a1c"
+            },
+            {
+              "path": "results/qualification-summary.json",
+              "bytes": 20082,
+              "sha256": "afd1f2bda315034fb62b7b7680cdf0c8843815efa94ccb1941f2c84f1e0d5e46"
+            }
+          ],
+          "source_ids": [
+            "pilot",
+            "front-wing-qualification"
+          ]
+        },
+        {
+          "identifier": "bounded-surface-repair-rejected",
+          "statement": "The repaired front-wing surface nearest the 0.1 mm deviation budget still fails the strict mesh gate.",
+          "value": false,
+          "display_value": "FAIL",
+          "operator": "==",
+          "threshold": false,
+          "passed": true,
+          "metric_path": "results/pilot-analysis.json",
+          "metric_pointer": "/frontWingQualification/surfaceRepairCampaign/budgetEdgeCandidate/meshPass",
+          "artifacts": [
+            {
+              "path": "results/pilot-analysis.json",
+              "bytes": 3525,
+              "sha256": "1c2dc80323e7761e4dc8db30236161eb65c1de57e316e82628292ec634da4a1c"
+            },
+            {
+              "path": "results/qualification-summary.json",
+              "bytes": 20082,
+              "sha256": "afd1f2bda315034fb62b7b7680cdf0c8843815efa94ccb1941f2c84f1e0d5e46"
+            }
+          ],
+          "source_ids": [
+            "front-wing-qualification"
+          ]
+        },
+        {
+          "identifier": "external-topology-volume-rejected",
+          "statement": "The discrete-STL Gmsh alternative writes zero volume elements from the overlapping boundary.",
+          "value": 0,
+          "display_value": "0",
+          "operator": "==",
+          "threshold": 0,
+          "passed": true,
+          "metric_path": "results/qualification-summary.json",
+          "metric_pointer": "/external_discrete_campaign/volumeElements",
+          "artifacts": [
+            {
+              "path": "results/qualification-summary.json",
+              "bytes": 20082,
+              "sha256": "afd1f2bda315034fb62b7b7680cdf0c8843815efa94ccb1941f2c84f1e0d5e46"
+            }
+          ],
+          "source_ids": [
+            "front-wing-qualification"
+          ]
         }
       ],
-      "claimCount": 5,
-      "passedClaimCount": 5,
-      "artifactCount": 2,
+      "claimCount": 9,
+      "passedClaimCount": 9,
+      "artifactCount": 5,
       "artifacts": [
         {
+          "path": "results/force-corruption-before-after.svg",
+          "bytes": 77390,
+          "sha256": "ad48b7327ca1fa0babe8a25d6512c05482a2b9467fa0ac7b0da50ddbaea8977b"
+        },
+        {
+          "path": "results/mesh-variant-quality.svg",
+          "bytes": 100961,
+          "sha256": "a3b87d4d3a7543db35ebf0c14f6a5536f757c4941b7050f675d24c4e07944978"
+        },
+        {
           "path": "results/pilot-analysis.json",
-          "bytes": 1495,
-          "sha256": "204756aab8e3ab1db5e7a3218ba69067719c0d50b3977f51eb146ad487400b58"
+          "bytes": 3525,
+          "sha256": "1c2dc80323e7761e4dc8db30236161eb65c1de57e316e82628292ec634da4a1c"
         },
         {
           "path": "results/pilot-force-convergence.svg",
-          "bytes": 96960,
-          "sha256": "0eccb648023aadb333764ebc090bff30ca960b8eebea159ba78bfb19600d9649"
+          "bytes": 94378,
+          "sha256": "97627dd3fb292a8a0d3401d0fe54912632c6ce8813926054e5adf53b8aa9e05d"
+        },
+        {
+          "path": "results/qualification-summary.json",
+          "bytes": 20082,
+          "sha256": "afd1f2bda315034fb62b7b7680cdf0c8843815efa94ccb1941f2c84f1e0d5e46"
         }
       ],
       "manifest": "projects/f1-2026-aero/evidence-manifest.json",
-      "manifestSha256": "7c3c1c9ca06d4854a41bb8a6647119ae1dab7fcbc079b4e7e8e38261281007b3"
+      "manifestSha256": "e5ccb09272185814721844a935aaf33efc1d4fc98ae8daf36b14952d8c00b370"
     },
     {
       "slug": "flowlab",

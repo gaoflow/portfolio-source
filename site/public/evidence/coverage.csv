@@ -8,6 +8,10 @@ f1-2026-aero,lift-confidence,True,0.5897989853845276,<,1,results/pilot-analysis.
 f1-2026-aero,force-groups,True,True,==,True,results/pilot-analysis.json/acceptance/allSevenForceOutputsPresent
 f1-2026-aero,failure-preserved,True,True,==,True,results/pilot-analysis.json/acceptance/failedRunRemainsVisible
 f1-2026-aero,baseline-boundary,True,False,==,False,results/pilot-analysis.json/baseline/completed
+f1-2026-aero,front-wing-qualification-no-go,True,True,==,True,results/pilot-analysis.json/acceptance/frontWingQualificationMeshPassCountZero
+f1-2026-aero,bounded-qualification-paths,True,20,==,20,results/pilot-analysis.json/frontWingQualification/boundedPathCount
+f1-2026-aero,bounded-surface-repair-rejected,True,False,==,False,results/pilot-analysis.json/frontWingQualification/surfaceRepairCampaign/budgetEdgeCandidate/meshPass
+f1-2026-aero,external-topology-volume-rejected,True,0,==,0,results/qualification-summary.json/external_discrete_campaign/volumeElements
 flowlab,u-centerline-rmse,True,0.0028640901117929765,<=,0.01,results/validation.json/cases/2/uCenterlineRmse
 flowlab,v-centerline-rmse,True,0.002023614927851531,<=,0.01,results/validation.json/cases/2/vCenterlineRmse
 flowlab,mass-conservation,True,2.5575097595265106e-12,<=,1e-09,results/validation.json/cases/2/relativeMassDrift

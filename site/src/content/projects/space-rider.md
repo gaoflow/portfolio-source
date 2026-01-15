@@ -28,7 +28,7 @@ A modelling study of the ESA Space Rider — the European uncrewed lifting-body 
 
 ## Methodology
 
-Hard-surface modelling in Blender, cross-checked against the reference blueprint views. The web version above uses the latest v5.051 joined export with web-compatible PBR materials in glTF 2.0 (GLB), rendered in the browser with an interactive viewer — drag to rotate, scroll to zoom.
+Hard-surface modelling in Blender, cross-checked against the reference blueprint views. The web version above uses the latest v5.051 joined export with web-compatible PBR materials in glTF 2.0 (GLB). Its site derivative uses Draco geometry compression without simplification, reducing the transfer asset from 14.05 MB to 579 KB while retaining the original render-vertex count. Drag to rotate and scroll to zoom.
 
 ## Results
 
@@ -36,4 +36,4 @@ The interactive model is embedded above. The project was submitted with a writte
 
 ## Failures & iterations
 
-The `.blend` source (~490 MB with full texture set) is far too heavy for the web — the shipped asset is a compacted GLB export. Geometry fidelity was prioritised over texture detail for interactive use.
+The `.blend` source (~490 MB with full texture set) is far too heavy for the web. The authored GLB is 14.05 MB; the shipped, non-simplified Draco derivative is 579 KB. Geometry fidelity was prioritised over texture detail for interactive use.
