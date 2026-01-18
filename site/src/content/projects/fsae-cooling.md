@@ -80,3 +80,44 @@ The repository also runs **22 zero-dimensional / finite-volume tests** and **8 O
 - Primary boundaries: AMK `PDK 205481`; component curves: Boyd 6310G3 and SPAL brushless fan catalogue
 
 The result is intentionally bounded: a verified coolant-domain system screen and an auditable no-go decision, not a finished race-car cooling installation.
+
+## Requirements before components
+
+The screening order is intentional. The E3 environment fixes radiator-inlet air at 40 °C, while the rated KW26 requirement asks for coolant no warmer than 25 °C. A passive radiator can approach ambient from above but cannot produce below-ambient coolant. That thermodynamic contradiction exists before fan, pump, or mesh optimisation.
+
+Component maps are still evaluated because they answer a different question: whether flow capacity is also a blocker and which parts of the architecture could be retained after the temperature-level problem is corrected.
+
+## Why hydraulic pass does not mean system pass
+
+| Gate | Observed | Decision |
+|---|---:|---|
+| Total loop flow | 10.03 L/min | passes 10 L/min screen |
+| Limiting motor branch | 4.16 L/min | passes 4 L/min screen |
+| Baseline KW26 inlet | 59.45 °C | fails rated temperature boundary |
+| Baseline maximum coolant | 63.87 °C | rejects passive E3 concept |
+| Legacy 10 s peak | 68.18 °C maximum | retained as sensitivity, not validation |
+
+The pump and branch network therefore have plausible screening flow, yet the combined system is unacceptable. Sizing each component independently would hide this result.
+
+## Transient energy accounting
+
+The 80-cell loop distributes inverter and motor heat at their physical positions and removes energy through the radiator cells. At the selected baseline, the model receives 3,061.53 W and rejects 3,061.43 W near steady state; only 0.105 W remains in storage. The reported algebraic energy residual is approximately numerical precision.
+
+During the retained 6 kW peak, rejection is 3,595.51 W and storage rises to 2,404.49 W. The temperature increase is therefore tied to an explicit energy balance rather than an imposed ramp. The peak remains a legacy sensitivity boundary because the underlying application duty is not yet closed.
+
+## Architecture branches
+
+| Branch | State | Closure evidence |
+|---|---|---|
+| Passive loop at rated KW26 inlet | reject | below-ambient supply is impossible |
+| Passive high-inlet derating | blocked | manufacturer-approved loss and temperature limits |
+| Two-temperature active system | candidate for design | real chiller map, heat leak, parasitics, condenser rejection, condensation control |
+| Lower ambient/load envelope | candidate for design | approved operating envelope followed by a complete re-screen |
+
+The active branch estimates 0.5–2.0 kW of KW26 evaporator capacity or 1.87–4.75 kW for a combined conditioned loop, but these are sizing ranges—not selected hardware. The input contract remains blocked until synchronized duty, component heat partitions, installed maps, hydraulics, electrical limits, packaging, coolant compatibility, and failure evidence are available.
+
+## Why CFD remains gated
+
+Detailed sidepod or duct CFD cannot repair an architecture that fails its system-level temperature boundary. Production air-path CFD starts only after one replacement branch passes the zero-dimensional/finite-volume screen and the geometry, core maps, and installation boundary conditions are frozen.
+
+This ordering protects expensive analysis from answering the wrong question: first establish a viable heat-rejection architecture, then use CFD to improve its installed airflow and thermal margin.

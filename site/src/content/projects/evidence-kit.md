@@ -9,13 +9,13 @@ methodLine: 'JSON manifests · typed gates · RFC 6901 pointers · SHA-256 · HT
 role: 'Tooling & technical communication'
 duration: 'Independent build'
 heroMetrics:
-  - { label: 'Studies audited', value: '3' }
-  - { label: 'Claims', value: '12/12' }
-  - { label: 'Artifacts', value: '11' }
+  - { label: 'Studies audited', value: '6' }
+  - { label: 'Claims', value: '31/31' }
+  - { label: 'Artifacts', value: '24' }
   - { label: 'Interface', value: '1 call' }
 keyOutputs:
   - 'Reduced the caller interface to one catalog build while hiding pointer resolution, typed comparisons, path containment, hashing, and multi-format publication.'
-  - 'Dogfooded the same module across FlowLab, FlowROM, and Airfoil Methods; all 12 declared gates pass against 11 unique claim artifacts.'
+  - 'Dogfooded the same module across six numerical studies; all 31 declared gates pass against 24 project artifacts.'
   - 'Preserves failed claims in reports and exits nonzero instead of selectively publishing successful metrics.'
 featured: false
 sample: false
@@ -81,14 +81,17 @@ This makes scope errors reviewable. A claim cannot silently swap a full-state er
 
 ## Dogfood result
 
-The current audit covers the three independently executable numerical studies:
+The current audit covers six independently evidenced studies:
 
-| Study | Claims passing | Unique claim artifacts |
+| Study | Claims passing | Project artifacts |
 |---|---:|---:|
-| FlowLab | 4 / 4 | 3 |
-| FlowROM | 4 / 4 | 4 |
 | Airfoil Methods | 4 / 4 | 4 |
-| **Total** | **12 / 12** | **11** |
+| F1 2026 Aero | 9 / 9 | 5 |
+| FlowLab | 4 / 4 | 4 |
+| FlowROM | 4 / 4 | 4 |
+| FSAE Cooling | 5 / 5 | 3 |
+| Ground Effect VLM | 5 / 5 | 4 |
+| **Total** | **31 / 31** | **24** |
 
 The generated `catalog.json` keeps full claim records and SHA-256 values. `coverage.csv` flattens the same data for review or CI ingestion.
 
@@ -101,3 +104,41 @@ The toolkit does not remove a failed claim. It writes the observed value and `FA
 Interface-level tests cover successful multi-format publication, nested array pointers, boolean and numeric comparisons, deduplicated hashing, preserved failed gates, and rejected path traversal. `python3 scripts/audit_portfolio.py` is the smoke test: it consumes real project outputs rather than test fixtures.
 
 [Open the machine-readable catalog](/evidence/catalog.json) or [download the coverage matrix](/evidence/coverage.csv).
+
+## Audit pipeline
+
+Publication is a deterministic transformation rather than a manual review checklist:
+
+1. discover each `evidence-manifest.json`;
+2. validate project identity, source identifiers, reproduction commands, methods, and limitations;
+3. resolve every metric path and JSON pointer;
+4. evaluate the typed expectation without coercing booleans into numbers;
+5. verify artifact containment and existence;
+6. hash artifacts once and reuse the fingerprint across claims;
+7. write per-project HTML, aggregate HTML, catalog JSON, coverage CSV, and summary JSON into a staged directory;
+8. replace the public output only after the complete catalog succeeds.
+
+The generated site and CI therefore consume the same claim records. A hand-edited HTML pass cannot disagree with the machine-readable result.
+
+## Threat model
+
+The toolkit targets ordinary evidence failures rather than cryptographic authorship. It rejects:
+
+- `../` path traversal or symlink resolution outside a project directory;
+- missing metrics, malformed array/object pointers, and incompatible comparisons;
+- duplicate project or claim identifiers;
+- claims that cite unknown sources or artifacts that do not exist;
+- manifests with no methods, limitations, or reproduction commands;
+- selective reporting that removes a failed gate from the output.
+
+SHA-256 proves that two published references point to the same bytes; it does not prove that the underlying experiment was designed correctly. Experimental validity remains the responsibility of each project.
+
+## Interface depth
+
+The single public function is intentionally narrower than the implementation behind it. Callers provide manifests, a repository root, and an output directory. They do not manage pointer traversal, typed comparison, hashing, HTML escaping, CSV encoding, or atomic publication.
+
+That is the tooling result: project authors describe evidence in domain terms, while one deep module owns the repetitive integrity mechanics.
+
+## Current boundary
+
+All 31 declared claims pass, but that does not make every project a successful engineering design. FSAE Cooling and F1 qualification intentionally contain NO-GO decisions; their claims pass because the published decision matches the observed evidence. The audit checks traceability and gate evaluation, not whether the engineering outcome is favourable.

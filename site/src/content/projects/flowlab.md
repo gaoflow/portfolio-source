@@ -79,3 +79,38 @@ This is a numerical-method study and interactive teaching artifact, not a substi
 ## Reproducibility
 
 The project directory contains the solver, tests, benchmark transcription, validation runner, generated JSON/CSV evidence, and figures. `npm test && npm run validate` regenerates every metric shown above. The committed [technical report](/documents/flowlab-report.html) records the method, three-grid comparison, acceptance gates, source, and limitations.
+
+## One time step, made inspectable
+
+Each solver iteration follows a fixed sequence:
+
+1. recover density and velocity from the nine populations;
+2. build the second-order equilibrium distribution;
+3. apply BGK relaxation with $\omega=1/\tau$;
+4. stream populations along the D2Q9 lattice directions;
+5. reflect wall populations, adding the lid momentum correction at the moving boundary;
+6. recompute macroscopic fields and periodically evaluate convergence.
+
+The order is shared by Node.js validation and the browser. The interactive layer receives fields from the solver; it does not contain a second numerical implementation tuned for display.
+
+## Benchmark discipline
+
+The Ghia reference coordinates do not generally land on the same points as each FlowLab grid. The validation runner therefore interpolates the generated centerline velocities to the published sample coordinates before computing RMSE. It compares $u/U_{lid}$ along the vertical centreline and $v/U_{lid}$ along the horizontal centreline.
+
+Field images remain secondary evidence. A visually plausible primary vortex can coexist with incorrect wall momentum, shifted corner structures, or a biased centreline profile. The tabulated comparison is the publication gate.
+
+## Convergence is not validation
+
+The finest case reaches a residual of $1.89\times10^{-7}$, but that only establishes that its discrete state has stopped changing under the chosen iteration. Agreement with Ghia establishes the separate validation result. Conversely, the first 20,000-iteration run already had small velocity error yet still failed the convergence contract; both conditions are required.
+
+Mass drift provides another independent invariant. The recorded $2.56\times10^{-12}$ relative change is far below the $10^{-9}$ gate and guards against a solver that matches selected velocities while losing population mass globally.
+
+## Software architecture
+
+The core has no plotting or DOM dependency. Tests exercise collision/streaming behaviour and invalid relaxation parameters; the validation runner owns benchmark interpolation, grid sequencing, JSON output, and figure generation; the browser owns controls and rendering. This boundary keeps presentation latency out of the solver contract.
+
+The measured 26.3 million lattice updates per second is a workstation observation, not a cross-platform guarantee. Browser frame rate is reported live because rendering cost, display refresh, and power state are environmental inputs.
+
+## Extension gates
+
+Higher Reynolds numbers remain exploratory until they pass an external reference and stability study. Replacing BGK with MRT or a regularised collision operator would require repeating the three-grid benchmark rather than inheriting the current validation. Cylinder wake or aeroacoustic modes would additionally need Strouhal-number and force-history gates before publication.

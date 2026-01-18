@@ -85,3 +85,38 @@ The drag comparison is even clearer. NASA wake-survey $C_d$ rises from about 0.0
 ## Reproduce
 
 `python3 -m unittest discover -s tests -v` exercises the geometry and solver contracts. `python3 scripts/analyse.py` regenerates every metric and figure and exits nonzero if any acceptance gate fails. The [technical report](/documents/airfoil-methods-report.html) records equations, provenance, interpretation, and limitations.
+
+## Experimental provenance
+
+The reference series is deliberately narrow: free transition, $M=0.15$, and $Re=5.97\times10^6$ from one NASA table. Lift and pitching moment were obtained by integrating model pressures; drag came from a wake survey. NASA reports repeated zero-angle precision of 0.0002 in $C_d$, 0.004 in normal-force coefficient, and 0.0002 in moment coefficient.
+
+Keeping all 16 points in one test condition prevents an apparently smooth polar assembled from incompatible Reynolds numbers or transition states. It also establishes which discrepancy belongs to the numerical model and which may be comparable to measurement repeatability.
+
+## Numerical implementation
+
+Cosine spacing concentrates panels at the leading and trailing edges without changing the physical geometry. The Hess–Smith system solves one source strength per panel and one global circulation unknown. Collocation enforces no penetration, while the trailing-edge equation supplies the Kutta condition. Surface tangential velocity then gives
+
+$$C_p=1-\left(V_t/V_\infty\right)^2.$$
+
+Twelve-point Gauss–Legendre integration is used for non-self panel influence, and analytical half-jump terms handle the singular self contribution. This separation is important: increasing panel count cannot repair an incorrect singular term or trailing-edge condition.
+
+## Verification, validation, and capability
+
+| Question | Evidence | Conclusion |
+|---|---|---|
+| Is the geometry implementation credible? | symmetry, closure, and thickness tests | verified for NACA 0012 generation |
+| Is the panel result discretisation-stable? | 160→240-panel $C_l$ change of 0.0307% | adequate for this comparison |
+| Does integral lift match experiment? | linear-range slope and RMSE against NASA | bounded validation pass |
+| Does the model predict drag or stall? | near-zero pressure drag and continuing linear lift | structurally unavailable |
+
+The distinction prevents one successful scalar comparison from being promoted into validation of every requested output.
+
+## Error interpretation
+
+The panel method's 13.83% lift-slope error is inside the predeclared 15% gate but materially larger than thin-airfoil theory's 3.81%. Panel refinement has already converged far below that discrepancy, so additional panels are not the corrective action. The remaining gap is dominated by model-form differences: thickness treatment, inviscid flow, and the absence of boundary-layer displacement and transition.
+
+Beyond the attached-flow range, the error changes category rather than merely increasing. At $17.35^\circ$, the measurement is $C_l=1.660$ while the panel method returns 2.085. A viscous or empirical separation model is required before this region can support design decisions.
+
+## Engineering use
+
+This hierarchy is useful for geometry checks, sign conventions, linear lift scale, surface-loading inspection, and cheap pre-CFD screening. It is not suitable for ranking high-lift sections by stall margin or drag. The next fidelity step must earn its complexity with transition, wall resolution, and a grid/model sensitivity programme—not simply a denser inviscid discretisation.

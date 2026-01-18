@@ -72,3 +72,35 @@ The solver is linear, steady, incompressible, inviscid, and zero-thickness. It c
 ## Reproduce
 
 `python3 -m unittest discover -s tests -v` checks the solver contracts. `python3 scripts/analyse.py` regenerates all metrics and figures and exits nonzero if any gate fails. The committed [technical report](/documents/ground-effect-vlm-report.html) preserves the method, checks, interpretation, sources, and negative claims.
+
+## Boundary condition and sign discipline
+
+The image construction is not a cosmetic reflection. Each real vortex segment above the road is mirrored below it with reversed circulation. The induced vertical velocities cancel at $z=0$, enforcing the moving-ground no-penetration condition without introducing a viscous road boundary layer.
+
+The solver tests that condition directly at 257 road-plane samples after circulation is solved. A zero residual is therefore an implementation invariant, not an aerodynamic validation result. Far-ground recovery supplies a second independent check: at $h/c=50$, lift differs from the free-air solution by only 0.00335%.
+
+## Reading the ride-height trend
+
+Three quantities must be kept separate:
+
+1. **fixed-incidence lift**, which increases as the image system changes downwash;
+2. **absolute induced drag**, which remains close to the free-air value at $h/c=0.5$;
+3. **induced-drag cost per lift squared**, which falls by 41.9%.
+
+Conflating the third quantity with absolute drag would reverse the engineering meaning. The model supports “less induced penalty for a required lift” within its assumptions; it does not support “the car has less total drag near the ground.”
+
+The conventional free-air span-efficiency expression can exceed one here because the reference relation is being applied to a different boundary-value problem. It remains a comparison indicator, not an aircraft-style Oswald-efficiency claim.
+
+## Decision matrix
+
+| Proposed use | Decision | Reason |
+|---|---|---|
+| Check ground-effect sign and scale | suitable | image mechanism is isolated and verified |
+| Define a bounded ride-height sweep | suitable | 14 states share one solver and normalisation |
+| Rank race-car floor geometries | reject | no floor, diffuser, leakage, tyres, or viscosity |
+| Predict separation or stall | reject | linear potential-flow formulation |
+| Seed a higher-fidelity study | suitable | supplies a cheap far-field and trend baseline |
+
+## What higher fidelity must add
+
+A useful next model would introduce finite thickness and chordwise loading before adding vehicle complexity. A viscous CFD study would then need moving-road boundary layers, ride-height and pitch gradients, wheel interaction, leakage, and a grid-independence check. The low-order result should remain as a sign and scale oracle; it should not be recalibrated after seeing the higher-fidelity answer.

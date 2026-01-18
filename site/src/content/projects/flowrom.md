@@ -86,3 +86,35 @@ The result is deliberately bounded. A coarse D2Q9 BGK cavity with one determinis
 ## Reproduce
 
 `node scripts/generate-snapshots.mjs` creates the fields. `python3 scripts/analyse.py` fits both models, evaluates the holdout, regenerates every figure and JSON metric, and enforces the acceptance gates. The committed [technical report](/documents/flowrom-report.html) records equations, interpretation, limitations, and canonical POD/DMD references.
+
+## Why the holdout is chronological
+
+Randomly withholding individual snapshots would place nearly identical phases of the same periodic response on both sides of the split. That tests interpolation between neighbouring states, not autonomous prediction. Reserving the final four complete cycles forces DMD to advance beyond its fitting interval and makes every POD error an evaluation on later fields.
+
+The split is still not a distribution shift. Training and holdout share geometry, Reynolds number, mean lid speed, amplitude, and forcing frequency. The result measures temporal continuation under one operating condition.
+
+## POD and DMD answer different questions
+
+POD orders orthogonal modes by captured fluctuation energy. It is the better tool here for storage and reconstruction: rank 8 reduces the scalar count by 48.8× while keeping held-out fluctuation error at 0.123%.
+
+DMD attaches a single complex evolution factor to each mode. It is therefore judged on frequency and autonomous forecast rather than maximum captured energy. The rank-12 model identifies 0.02500023 cycles per snapshot and continues phase through the reserved interval.
+
+Neither result implies that eight or twelve modes are universal. Rank is part of the model contract and must be selected again when the operating envelope or observable changes.
+
+## Error denominators matter
+
+The DMD holdout error is 0.100% when normalised by the complete velocity state and 1.41% when normalised by fluctuations about the training mean. The first number answers “how much of the total field norm is wrong?” The second answers “how much of the unsteady content is wrong?”
+
+Reporting only the full-state number would let a dominant steady mean hide temporal error. Reporting both prevents a numerically correct denominator from becoming a misleading communication choice.
+
+## Numerical safeguards
+
+The production case is not the only oracle. Synthetic tests require exact recovery of a known rank-two field and correct identification of a known sinusoid. The analysis also rejects non-monotonic POD holdout error, excessive rank-8 error, a misplaced DMD frequency, or excessive full-state forecast error.
+
+These tests separate decomposition defects from FlowLab data-generation defects. A plausible mode plot cannot pass the project if the known-rank or known-frequency contracts fail.
+
+## Motorsport relevance and boundary
+
+The transferable skill is field-data reduction: choosing snapshots, preventing leakage, defining a metric, and preserving the distinction between reconstruction and prediction. Applied to vehicle CFD, the same discipline could compress pressure or wake databases and identify coherent operating modes.
+
+That application would require multiple ride heights, yaw angles, speeds, and geometry states with operating-point holdouts. Until then, this article demonstrates ROM methodology—not a surrogate for turbulent vehicle aerodynamics.

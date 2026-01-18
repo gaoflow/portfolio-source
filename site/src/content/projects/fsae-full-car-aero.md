@@ -1,46 +1,105 @@
 ---
-title: 'Sample — FSAE Full-Car Aero Package (replace me)'
-year: 2025
+title: 'Template — FSAE Full-Car Aero Evidence Contract'
+year: 2026
 status: complete
-categories: [fsae]
-tags: [OpenFOAM, simpleFoam, snappyHexMesh, Python]
-summary: 'Iterative CFD development of a full aero package, closing the loop with on-track data.'
-methodLine: 'OpenFOAM · steady RANS · k-ω SST'
-role: 'Aerodynamics Lead'
-team: '5 engineers'
-duration: '9 months'
+categories: [fsae, validation]
+tags: [OpenFOAM, RANS, correlation, publication contract]
+summary: 'A nine-section contract for turning future Formula Student aero work into a permission-safe, quantitatively defensible case study.'
+methodLine: 'Requirements · CFD verification · contribution accounting · correlation'
+role: 'Case-study template'
+team: 'Not claimed'
+duration: 'Publication template'
 heroMetrics:
-  - { label: 'Δ Downforce', value: '+18.2%' }
-  - { label: 'L/D', value: '3.4' }
-  - { label: 'Mesh', value: '36M cells' }
-  - { label: 'Correlation', value: '±4%' }
+  - { label: 'Published claims', value: '0' }
+  - { label: 'Required sections', value: '9' }
 keyOutputs:
-  - 'Full-car external aero workflow: CAD cleanup → meshing → RANS → post-processing, owned end to end.'
-  - 'Quantified development: +18.2% downforce over 12 documented iterations.'
-  - 'CFD↔track correlation within ±4% via coast-down and constant-speed runs.'
+  - 'Defines the minimum mesh, solver, component, uncertainty, and correlation evidence for a full-car case study.'
+  - 'Keeps team permission and NDA boundaries ahead of geometry screenshots or aerodynamic numbers.'
 featured: false
 sample: true
 order: 8
 ---
 
-> ⚠️ This is **sample content** demonstrating the nine-section project template. Replace it with your real project — keep the section structure.
+> This is **sample content**, not a completed FSAE aerodynamic result. No downforce, drag, mesh-size, or correlation value is claimed. The page stays marked `sample: true` until real work and publication permission satisfy every gate below.
 
-## Context & objectives
+## 1. Permission and scope
 
-What problem, under what constraints (rules, budget, compute)? One paragraph. State the baseline and the target metric.
+Before technical writing, record what the team owns, what the author produced, and what may be published. Geometry, livery, operating maps, competitor comparisons, wind-tunnel data, and track telemetry can have different permissions.
 
-## Methodology
+An NDA-safe article may describe method and responsibility while withholding geometry and coefficients. Permission must be explicit; absence of an NDA does not automatically make team work public.
 
-The proof of technical depth — be specific: turbulence model and why, y+ target and wall treatment, mesh strategy (cell count, growth rate, prism layers), boundary conditions, convergence criteria. Tool versions included.
+## 2. Engineering objective
 
-## Results
+Define the vehicle state and decision before running CFD:
 
-Numbers first. Per-assembly contribution tables beat prose (e.g. floor 78.9% of total downforce). Prefer normalised coefficients (SCd/SCl) over raw counts. Contour plots here, with engineering captions.
+- regulation year and relevant bodywork constraints;
+- baseline package and allowed design variables;
+- speed, ride height, pitch, yaw, steering, wheel rotation, and moving-ground assumptions;
+- objective metric such as load balance, efficiency, sensitivity, or cooling interaction;
+- acceptance and rejection thresholds.
 
-## Validation
+“Increase downforce” is not a sufficient objective. The study needs a trade-off and an operating envelope.
 
-Its own section — the metric F1 aero departments care about most. Wind tunnel or track correlation with error percentages; if unavailable, mesh-independence study plus benchmark against published data.
+## 3. Geometry and reference quantities
 
-## Failures & iterations
+Document CAD provenance, cleanup operations, symmetry decisions, suppressed details, wheel/ground treatment, and component groups. Freeze reference area, length, coordinate system, coefficient signs, and moment origin before comparing variants.
 
-Engineering honesty: diverged cases, geometry simplifications, ideas that didn't survive the wind tunnel. What changed because of each failure.
+Component contributions must sum consistently to the whole-car convention. Raw force counts without reference definitions are not portable evidence.
+
+## 4. Numerical methodology
+
+The article must state:
+
+- OpenFOAM and mesher versions;
+- steady or transient formulation and the reason;
+- turbulence model, wall treatment, and target/observed $y^+$ regime;
+- domain dimensions and blockage;
+- inlet turbulence, moving road, rotating wheels, symmetry, and outlet conditions;
+- cell count, refinement regions, layer settings, and transition limits;
+- discretisation schemes, solver staging, relaxation, and stopping criteria.
+
+Tool names alone do not establish depth. Each choice needs a physical or numerical reason.
+
+## 5. Verification before aerodynamics
+
+The minimum mesh gate includes complete `checkMesh` output, no unresolved failed checks, mass balance, finite fields, bounded residual/force histories, and component-output completeness. A three-level grid study should report the exact refinement variable and observed-order/GCI assumptions rather than comparing unrelated meshes.
+
+If the mesh fails, coefficient plots remain diagnostic artifacts and cannot be promoted as design evidence.
+
+## 6. Results and contribution accounting
+
+Publish normalised coefficients with uncertainty and the complete operating condition. A useful table separates whole-car and component changes:
+
+| Output | Baseline | Candidate | Difference | Evidence |
+|---|---:|---:|---:|---|
+| $C_L$ or $SC_L$ | measured value | measured value | computed delta | force history + steady-window rule |
+| $C_D$ or $SC_D$ | measured value | measured value | computed delta | same |
+| Aero balance | measured value | measured value | computed delta | component force definitions |
+
+Contour images must answer a mechanism question—pressure recovery, separation, leakage, wake interaction—not merely decorate the result.
+
+## 7. Validation and correlation
+
+Correlation is its own section. State the independent reference, sensor/calibration uncertainty, test repeatability, configuration match, and comparison metric. Track data require speed, ride, yaw, wind, tyre, and control-state context; wind-tunnel data require blockage, Reynolds scaling, moving-ground, and support-system context.
+
+When no physical reference exists, say so. Mesh independence and convergence are verification, not experimental validation.
+
+## 8. Failures and iterations
+
+Retain diverged runs, rejected mesh strategies, geometry simplifications, and concepts that failed the design gate. For each failure, record the symptom, diagnosis, controlled change, and resulting decision. A development history is stronger evidence than a single polished contour.
+
+## 9. Publication gate
+
+Replace this template only when the case has:
+
+1. written publication permission;
+2. owned, versioned inputs and scripts;
+3. a passing mesh/solver gate;
+4. traceable force and component histories;
+5. grid or discretisation evidence;
+6. correlation evidence or an explicit statement that none exists;
+7. generated figures and a reproducible report;
+8. limitations and failed cases;
+9. an evidence manifest connecting each public number to an artifact.
+
+Until then, the honest output is this contract—not invented performance.
