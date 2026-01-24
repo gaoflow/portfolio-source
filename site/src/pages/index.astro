@@ -9,6 +9,10 @@ const all = await getCollection('projects');
 const featured = all.filter((p) => p.data.featured).sort(
   (a, b) => (b.data.studySequence ?? 0) - (a.data.studySequence ?? 0) || a.data.order - b.data.order,
 );
+const featuredNotes = (await getCollection('notes'))
+  .filter((note) => note.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
 
 // ⚠️ Sample pipeline data — replace with your own representative case.
 const caseSteps = [
@@ -60,6 +64,26 @@ const caseSteps = [
     </div>
     <div class="grid sm:grid-cols-2 gap-6">
       {featured.map((p) => <ProjectCard project={p} />)}
+    </div>
+  </section>
+
+  <section class="mt-20">
+    <div class="flex items-baseline justify-between mb-8">
+      <h2 class="section-label">Engineering notes</h2>
+      <a href="/notes" class="font-mono text-xs text-muted hover:text-accent">Every note →</a>
+    </div>
+    <div class="divide-y divide-edge border-y border-edge">
+      {featuredNotes.map((note) => (
+        <a href={`/notes/${note.id}`} class="group grid gap-2 py-5 sm:grid-cols-[1fr_auto] sm:items-baseline">
+          <div>
+            <h3 class="text-lg font-medium group-hover:text-accent">{note.data.title}</h3>
+            <p class="mt-1 text-sm leading-relaxed text-muted">{note.data.summary}</p>
+          </div>
+          <time class="font-mono text-[10px] tracking-wider text-muted" datetime={note.data.published.toISOString()}>
+            {note.data.published.toISOString().slice(0, 10)}
+          </time>
+        </a>
+      ))}
     </div>
   </section>
 </Base>

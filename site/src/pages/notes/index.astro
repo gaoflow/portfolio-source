@@ -1,0 +1,33 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const notes = (await getCollection('notes')).sort(
+  (a, b) => a.data.order - b.data.order || b.data.published.getTime() - a.data.published.getTime(),
+);
+---
+
+<Base title="Engineering Notes" description="Technical notes on CFD verification, aerodynamic modelling, simulation decisions, and reproducible engineering evidence.">
+  <section class="mx-auto max-w-5xl px-6 pt-16 pb-20">
+    <h1 class="section-label mb-2">Engineering Notes</h1>
+    <p class="max-w-2xl text-muted mb-10">
+      Focused explanations of the numerical decisions behind the project work. These are not extra project claims: each note identifies the evidence it uses and the boundary it does not cross.
+    </p>
+
+    <div class="grid gap-5">
+      {notes.map((note, index) => (
+        <a href={`/notes/${note.id}`} class="group border border-edge bg-surface/40 p-6 transition-colors hover:border-accent/50">
+          <div class="flex flex-wrap items-center justify-between gap-3 font-mono text-[10px] tracking-widest uppercase text-muted">
+            <span>Note {String(index + 1).padStart(2, '0')}</span>
+            <time datetime={note.data.published.toISOString()}>{note.data.published.toISOString().slice(0, 10)}</time>
+          </div>
+          <h2 class="mt-4 text-2xl font-medium tracking-tight group-hover:text-accent">{note.data.title}</h2>
+          <p class="mt-3 max-w-3xl leading-relaxed text-muted">{note.data.summary}</p>
+          <div class="mt-5 flex flex-wrap gap-2 font-mono text-[10px] tracking-wider uppercase text-accent/80">
+            {note.data.tags.map((tag) => <span>{tag}</span>)}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>
