@@ -1,6 +1,7 @@
 ---
 title: 'ESA Space Rider — Blender Model'
 year: 2026
+date: 2026-01
 status: complete
 categories: [design]
 tags: [Blender, glTF, 3D]
@@ -18,7 +19,7 @@ keyOutputs:
 featured: true
 sample: false
 order: 8
-studySequence: 1
+studySequence: 5
 model3d: /models/space-rider.glb
 heroImage: /images/projects/space-rider-blueprint.png
 ---

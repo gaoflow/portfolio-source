@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { profile } from '../../data/profile';
 
 const notes = (await getCollection('notes')).sort(
   (a, b) => a.data.order - b.data.order || b.data.published.getTime() - a.data.published.getTime(),
@@ -19,7 +20,7 @@ const notes = (await getCollection('notes')).sort(
         <a href={`/notes/${note.id}`} class="group border border-edge bg-surface/40 p-6 transition-colors hover:border-accent/50">
           <div class="flex flex-wrap items-center justify-between gap-3 font-mono text-[10px] tracking-widest uppercase text-muted">
             <span>Note {String(index + 1).padStart(2, '0')}</span>
-            <time datetime={note.data.published.toISOString()}>{note.data.published.toISOString().slice(0, 10)}</time>
+            <span>{profile.name} · <time datetime={note.data.published.toISOString()}>{note.data.published.toISOString().slice(0, 10)}</time></span>
           </div>
           <h2 class="mt-4 text-2xl font-medium tracking-tight group-hover:text-accent">{note.data.title}</h2>
           <p class="mt-3 max-w-3xl leading-relaxed text-muted">{note.data.summary}</p>

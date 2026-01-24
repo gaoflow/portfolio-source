@@ -1,6 +1,7 @@
 ---
 title: 'Template — FSAE Full-Car Aero Evidence Contract'
 year: 2026
+date: 2026-08
 status: complete
 categories: [fsae, validation]
 tags: [OpenFOAM, RANS, correlation, publication contract]

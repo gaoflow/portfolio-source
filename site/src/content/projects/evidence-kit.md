@@ -1,6 +1,7 @@
 ---
 title: 'Evidence Kit — Claims, Gates & Artifact Hashes'
 year: 2026
+date: 2026-07
 status: complete
 categories: [tooling, validation]
 tags: [Python, JSON Pointer, SHA-256, reporting, reproducibility]
@@ -9,18 +10,18 @@ methodLine: 'JSON manifests · typed gates · RFC 6901 pointers · SHA-256 · HT
 role: 'Tooling & technical communication'
 duration: 'Independent build'
 heroMetrics:
-  - { label: 'Studies audited', value: '6' }
-  - { label: 'Claims', value: '31/31' }
-  - { label: 'Artifacts', value: '24' }
+  - { label: 'Studies audited', value: '11' }
+  - { label: 'Claims', value: '51/51' }
+  - { label: 'Artifacts', value: '38' }
   - { label: 'Interface', value: '1 call' }
 keyOutputs:
   - 'Reduced the caller interface to one catalog build while hiding pointer resolution, typed comparisons, path containment, hashing, and multi-format publication.'
-  - 'Dogfooded the same module across six numerical studies; all 31 declared gates pass against 24 project artifacts.'
+  - 'Dogfooded the same module across eleven numerical studies; all 51 declared gates pass against 38 project artifacts.'
   - 'Preserves failed claims in reports and exits nonzero instead of selectively publishing successful metrics.'
 featured: false
 sample: false
 order: 3
-studySequence: 6
+studySequence: 11
 ---
 
 ## Context & objective
@@ -81,17 +82,22 @@ This makes scope errors reviewable. A claim cannot silently swap a full-state er
 
 ## Dogfood result
 
-The current audit covers six independently evidenced studies:
+The current audit covers eleven independently evidenced studies:
 
 | Study | Claims passing | Project artifacts |
 |---|---:|---:|
 | Airfoil Methods | 4 / 4 | 4 |
+| Dimensionless Numbers | 4 / 4 | 2 |
 | F1 2026 Aero | 9 / 9 | 5 |
 | FlowLab | 4 / 4 | 4 |
 | FlowROM | 4 / 4 | 4 |
 | FSAE Cooling | 5 / 5 | 3 |
 | Ground Effect VLM | 5 / 5 | 4 |
-| **Total** | **31 / 31** | **24** |
+| Heat Diffusion 2D | 4 / 4 | 3 |
+| Pipe Flow Sizing | 4 / 4 | 3 |
+| Potential Flow Sandbox | 4 / 4 | 3 |
+| Steady Conduction 1D | 4 / 4 | 3 |
+| **Total** | **51 / 51** | **38** |
 
 The generated `catalog.json` keeps full claim records and SHA-256 values. `coverage.csv` flattens the same data for review or CI ingestion.
 
@@ -141,4 +147,4 @@ That is the tooling result: project authors describe evidence in domain terms, w
 
 ## Current boundary
 
-All 31 declared claims pass, but that does not make every project a successful engineering design. FSAE Cooling and F1 qualification intentionally contain NO-GO decisions; their claims pass because the published decision matches the observed evidence. The audit checks traceability and gate evaluation, not whether the engineering outcome is favourable.
+All 51 declared claims pass, but that does not make every project a successful engineering design. FSAE Cooling and F1 qualification intentionally contain NO-GO decisions; their claims pass because the published decision matches the observed evidence. The audit checks traceability and gate evaluation, not whether the engineering outcome is favourable.

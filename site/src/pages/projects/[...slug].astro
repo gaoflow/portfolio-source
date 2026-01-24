@@ -17,7 +17,7 @@ const meta = [
   d.team && { label: 'Team', value: d.team },
   d.duration && { label: 'Duration', value: d.duration },
   d.studySequence && { label: 'Progression', value: `Study ${String(d.studySequence).padStart(2, '0')}` },
-  { label: 'Year', value: String(d.year) },
+  { label: 'Date', value: new Date(`${d.date}-02`).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) },
 ].filter(Boolean) as { label: string; value: string }[];
 ---
 

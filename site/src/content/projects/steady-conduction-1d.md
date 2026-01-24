@@ -1,0 +1,78 @@
+---
+title: 'Steady 1-D Conduction — First Discretised PDE'
+year: 2025
+date: 2025-10
+status: complete
+categories: [validation]
+tags: [Python, NumPy, finite differences, heat conduction, verification]
+summary: 'A generating rod with a convective tip, solved with finite differences and a from-scratch Thomas algorithm, then verified against a closed-form exact solution, a manufactured-solution convergence study, and a machine-precision energy balance.'
+methodLine: 'Central differences · half-cell Robin tip · Thomas algorithm · manufactured solutions'
+role: 'Heat transfer & numerical methods'
+duration: 'Independent study'
+heroMetrics:
+  - { label: 'Nodal error, N=160', value: '1.34e-11 K' }
+  - { label: 'Observed order', value: '2.0002' }
+  - { label: 'Energy residual', value: '1.59e-12' }
+  - { label: 'Thomas vs dense', value: '1.1e-16' }
+keyOutputs:
+  - 'Discretised the steady 1-D conduction equation with a Dirichlet wall, a half-control-volume convective tip, and uniform volumetric generation, and solved the tridiagonal system with a Thomas algorithm written from scratch.'
+  - 'Derived the closed-form exact solution and showed the scheme reproduces it to roundoff — then explained why that makes a manufactured source necessary for a genuine grid-convergence study (observed order 2.0002 over N=20/40/80/160).'
+  - 'Closed the global energy balance to a relative residual of 1.59e-12 and cross-checked the tridiagonal solver against a NumPy dense solve at 1.1e-16 on 64 randomized systems.'
+featured: false
+sample: false
+order: 12
+studySequence: 2
+heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg
+---
+
+## Context & objective
+
+This is the second study in the sequence, from my second month after moving from software engineering into mechanical engineering. It is the first time I discretise a differential equation rather than evaluate a closed-form correlation, so the point is not the physics — a generating rod is deliberately simple — but the workflow that every later CFD project depends on: discretise, impose boundary conditions honestly, solve, and verify before interpreting.
+
+The problem: steady conduction in a rod of length $L=0.5$ m with uniform conductivity $k=167$ W/(m·K), uniform volumetric generation $q'''=2\times10^{4}$ W/m³, a fixed temperature $T(0)=350$ K, and a convective tip $-k\,T'(L)=h_c(T(L)-T_\infty)$ with $h_c=25$ W/(m²·K) and $T_\infty=300$ K.
+
+## Method
+
+The rod is split into $N$ uniform cells. Interior nodes use central differences on $kT''+q'''=0$. The convective tip is a half-control-volume balance: the last interior face flux plus half a cell of generation equals the surface convection. The resulting tridiagonal system is solved with a Thomas algorithm implemented from scratch — forward elimination, back substitution, explicit zero-pivot guards — with no library solve in the production path.
+
+The governing equation integrates twice to a closed form,
+
+$$T(x)=T_\text{left}+C_1x-\frac{q'''x^2}{2k},\qquad C_1=\frac{q'''L+\dfrac{h_cq'''L^2}{2k}-h_c(T_\text{left}-T_\infty)}{k+h_cL},$$
+
+derived in the [technical report](/documents/steady-conduction-1d-report.html). That exact solution is the primary validation reference.
+
+![Numerical and exact temperature profiles with the convective tip](/images/projects/steady-conduction-1d/temperature-profile.svg)
+
+## Validation
+
+Four predeclared gates, all passing:
+
+| Gate | Observed | Threshold |
+|---|---:|---:|
+| Max nodal error vs exact, $N=160$ | $1.34\times10^{-11}$ K | $\leq 10^{-9}$ K |
+| Observed order, $N=20/40/80/160$ | 2.0002 | $\in[1.8,\,2.2]$ |
+| Energy-balance relative residual | $1.59\times10^{-12}$ | $\leq 10^{-10}$ |
+| Thomas vs NumPy dense solve | $1.1\times10^{-16}$ | $\leq 10^{-12}$ |
+
+The first gate needs an honest caveat. Central differences are exact for quadratics, and the exact solution here *is* quadratic, so the numerical solution matches it to roundoff at any grid. That is a real verification result — it catches sign and boundary-row assembly errors — but it cannot demonstrate the convergence rate. The refinement study therefore uses the method of manufactured solutions: a sinusoidal source whose exact solution satisfies the same boundary conditions. Its error falls from $4.81\times10^{-2}$ K at $N=20$ to $7.51\times10^{-4}$ K at $N=160$, a least-squares slope of 2.0002 against a slope-2 reference.
+
+![Log-log error versus grid spacing with slope-2 reference](/images/projects/steady-conduction-1d/convergence.svg)
+
+## Quantitative results
+
+The exact tip temperature is 360.446 K and the profile peaks at 360.788 K at $x=0.425$ m. The global balance is the more interesting number: of the $10{,}000$ W/m² generated per unit area, only $1{,}511$ W/m² leaves through the convective tip — the remaining $8{,}489$ W/m² conducts backwards into the fixed-temperature wall at $x=0$. Summing the discrete cell balances reproduces that identity with a relative residual of $1.59\times10^{-12}$, confirming the scheme is conservative, not merely accurate pointwise.
+
+## Limitations
+
+The model is one-dimensional and steady with constant properties; temperature-dependent conductivity would make it nonlinear. There is no contact resistance at either boundary, and tip radiation — a nonlinear $T^4$ term — is excluded. The manufactured convergence case is a verification device, not a physical scenario. Nothing here extends to multidimensional spreading, fins of varying section, or transients.
+
+## Reproduce
+
+```bash
+cd projects/steady-conduction-1d
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+python3 scripts/publish_site.py
+```
+
+`analyse.py` regenerates `results/analysis.json` and both figures and exits nonzero if any gate fails. The committed [technical report](/documents/steady-conduction-1d-report.html) carries the derivation, the verification argument, and the sources.

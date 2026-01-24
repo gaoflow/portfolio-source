@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "projectCount": 6,
-  "claimCount": 31,
-  "passedClaimCount": 31,
-  "artifactCount": 24,
+  "projectCount": 11,
+  "claimCount": 51,
+  "passedClaimCount": 51,
+  "artifactCount": 38,
   "allClaimsPass": true,
   "projects": [
     {
@@ -193,6 +193,174 @@
       ],
       "manifest": "projects/airfoil-methods/evidence-manifest.json",
       "manifestSha256": "2c7a26fe5ee0b8633e78a0df18772d30b210cf4f19cd21b9cc1ea08f98e9a8de"
+    },
+    {
+      "slug": "dimensionless-numbers",
+      "title": "Dimensionless numbers toolkit with dimensional guards",
+      "summary": "Reynolds, Mach, Prandtl, Nusselt, Grashof and Rayleigh computed under strict SI dimension checks, with a property table anchored to Incropera's textbook tables.",
+      "methods": [
+        "Defining equations implemented in expanded form so the Ra = Gr * Pr identity is a genuine check.",
+        "SI dimension-vector guards reject dimensionally inconsistent or non-physical inputs with explicit errors.",
+        "Property table: piecewise-linear lookup, exact at anchors transcribed from Incropera 7th ed. Tables A.4/A.6."
+      ],
+      "limitations": [
+        "Constant-property table: five anchors for air and water, linear interpolation, no extrapolation.",
+        "Incompressible-regime scope; no real-gas effects beyond the perfect-gas speed of sound.",
+        "Regime-limit annotations in the sweep figure are intuition, not transition predictions."
+      ],
+      "commands": [
+        "cd projects/dimensionless-numbers && python3 -m unittest discover -s tests -v",
+        "cd projects/dimensionless-numbers && python3 scripts/analyse.py",
+        "cd projects/dimensionless-numbers && python3 scripts/publish_site.py"
+      ],
+      "sources": [
+        {
+          "id": "incropera-7th",
+          "title": "Incropera, DeWitt, Bergman & Lavine (2011), Fundamentals of Heat and Mass Transfer, 7th ed., Tables A.4/A.6",
+          "role": "property-table anchors",
+          "url": "https://books.google.com/books?id=c5h-EQAAQBAJ"
+        },
+        {
+          "id": "nist-webbook",
+          "title": "NIST Chemistry WebBook, Thermophysical Properties of Fluid Systems",
+          "role": "property cross-check",
+          "url": "https://webbook.nist.gov/chemistry/fluid/"
+        },
+        {
+          "id": "solver",
+          "title": "Dimensionless groups implementation",
+          "role": "generated prediction",
+          "artifact": {
+            "path": "src/dimensionless_numbers.py",
+            "bytes": 19546,
+            "sha256": "8fc44c4f612202253e9614861f6538b2abb23c8a2345bc45dc9d813f8127e0c3"
+          }
+        },
+        {
+          "id": "analysis",
+          "title": "Gate runner",
+          "role": "acceptance evaluation",
+          "artifact": {
+            "path": "scripts/analyse.py",
+            "bytes": 9507,
+            "sha256": "444607ef31e94b4751871879b13e0b7a3c849ab294b8e221c12f6c920cdf36ac"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "reference-reynolds-machine-exact",
+          "statement": "The 15 m/s, 0.3 m chord reference Reynolds number equals the hand calculation to machine precision.",
+          "value": 0.0,
+          "display_value": "0.000e+00",
+          "operator": "<=",
+          "threshold": 1e-12,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/referenceCaseWorstRelativeError",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3687,
+              "sha256": "8bd835c98776fb098136ea961fe37cab2ac37e4aa05e3a3fe901a39f82df0644"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "rayleigh-grashof-prandtl-identity",
+          "statement": "Ra = Gr * Pr holds to machine precision across 500 seeded random input draws.",
+          "value": 4.403170223828359e-16,
+          "display_value": "4.403e-16",
+          "operator": "<=",
+          "threshold": 1e-12,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/identityRaGrPr/maxRelativeError",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3687,
+              "sha256": "8bd835c98776fb098136ea961fe37cab2ac37e4aa05e3a3fe901a39f82df0644"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "guard-rejection-coverage",
+          "statement": "Every intentionally invalid call in the guard suite is rejected.",
+          "value": 10,
+          "display_value": "10",
+          "operator": "==",
+          "threshold": 10,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/unitGuards/rejectedCount",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3687,
+              "sha256": "8bd835c98776fb098136ea961fe37cab2ac37e4aa05e3a3fe901a39f82df0644"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "property-anchor-exactness",
+          "statement": "Every tabulated property anchor is reproduced exactly by table lookup.",
+          "value": 20,
+          "display_value": "20",
+          "operator": "==",
+          "threshold": 20,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/propertyTable/anchorExactMatches",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3687,
+              "sha256": "8bd835c98776fb098136ea961fe37cab2ac37e4aa05e3a3fe901a39f82df0644"
+            },
+            {
+              "path": "results/reynolds-sweep.svg",
+              "bytes": 71834,
+              "sha256": "efd6582a211f9c989614a1420208c87c10060d8484c088d1d3a02ea0e3af3972"
+            }
+          ],
+          "source_ids": [
+            "incropera-7th",
+            "nist-webbook",
+            "solver",
+            "analysis"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 3687,
+          "sha256": "8bd835c98776fb098136ea961fe37cab2ac37e4aa05e3a3fe901a39f82df0644"
+        },
+        {
+          "path": "results/reynolds-sweep.svg",
+          "bytes": 71834,
+          "sha256": "efd6582a211f9c989614a1420208c87c10060d8484c088d1d3a02ea0e3af3972"
+        }
+      ],
+      "manifest": "projects/dimensionless-numbers/evidence-manifest.json",
+      "manifestSha256": "e58e0420368e7980079d07836025c843deb5380e5b58dbc3c0bee15695d018cd"
     },
     {
       "slug": "f1-2026-aero",
@@ -1307,6 +1475,744 @@
       ],
       "manifest": "projects/ground-effect-vlm/evidence-manifest.json",
       "manifestSha256": "fe37171a822f6bce8ce2f3e91e0f81869bea3be1dc3f396b1e2eb38a5fc5c10b"
+    },
+    {
+      "slug": "heat-diffusion-2d",
+      "title": "2-D unsteady heat diffusion: explicit FTCS with analytical validation",
+      "summary": "A first time-dependent PDE solver: explicit FTCS heat diffusion on a uniform grid, validated against the analytical slab transient with a hard stability gate and an exact energy-conservation identity.",
+      "methods": [
+        "Cell-centred finite-volume FTCS on a uniform square grid with Dirichlet and zero-flux Neumann boundaries.",
+        "Hard stability gate: runs with r = alpha*dt/dx^2 > 0.25 are refused and logged before integration.",
+        "Quasi-1-D validation against the analytical slab series truncated at a 1e-14 envelope tolerance.",
+        "Temporal order isolated by refinement against a fine-time reference on a fixed grid."
+      ],
+      "limitations": [
+        "Explicit scheme: the stability bound forces dt to shrink with dx^2.",
+        "Constant isotropic diffusivity; no advection, sources, or phase change.",
+        "Cartesian uniform grids with square cells only.",
+        "First order in time, second order in space; the temporal-order check uses a fine-time reference because the analytical error couples space and time truncation."
+      ],
+      "commands": [
+        "cd projects/heat-diffusion-2d && python3 -m unittest discover -s tests -v",
+        "cd projects/heat-diffusion-2d && python3 scripts/analyse.py",
+        "cd projects/heat-diffusion-2d && python3 scripts/publish_site.py"
+      ],
+      "sources": [
+        {
+          "id": "mathworld-heat-equation",
+          "title": "Weisstein, Heat Conduction Equation \u2014 Wolfram MathWorld",
+          "role": "analytical reference equation and separation-of-variables solution form",
+          "url": "https://mathworld.wolfram.com/HeatConductionEquation.html"
+        },
+        {
+          "id": "solver",
+          "title": "FTCS heat diffusion implementation",
+          "role": "generated prediction",
+          "artifact": {
+            "path": "src/heat_diffusion.py",
+            "bytes": 7581,
+            "sha256": "d16bfe7bc7a5fb1b27eab71795c1b2a11ec28d95d679fb2b515959180cc4cec5"
+          }
+        },
+        {
+          "id": "analysis",
+          "title": "Heat diffusion validation runner",
+          "role": "acceptance evaluation",
+          "artifact": {
+            "path": "scripts/analyse.py",
+            "bytes": 9023,
+            "sha256": "74841ed69dc029fc0fc2518187480c85547e72e6d86cb28ee435bc7d125c042a"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "analytical-error-gate",
+          "statement": "The quasi-1-D FTCS transient matches the analytical slab series with L-infinity error below 5e-5 at t = 0.05 s on a 100x20 grid.",
+          "value": 1.3841340867015717e-05,
+          "display_value": "1.384e-05",
+          "operator": "<=",
+          "threshold": 5e-05,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/analyticalValidation/linfError",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2076,
+              "sha256": "e63cc65c73b8413969ede19c9d1087abaf8adebc06e3afcd560e556ff530745d"
+            },
+            {
+              "path": "results/temperature-field.svg",
+              "bytes": 43129,
+              "sha256": "92417c23f051d27417cb242c629d99f2c3c1b2a80116651a716a9e7c46585389"
+            }
+          ],
+          "source_ids": [
+            "mathworld-heat-equation",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "temporal-order-band",
+          "statement": "Temporal refinement at fixed grid shows first-order convergence: the observed order stays within 0.1 of 1.",
+          "value": 0.01694211114644273,
+          "display_value": "0.017",
+          "operator": "<=",
+          "threshold": 0.1,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/temporalRefinement/orderDeviationFromOne",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2076,
+              "sha256": "e63cc65c73b8413969ede19c9d1087abaf8adebc06e3afcd560e556ff530745d"
+            },
+            {
+              "path": "results/temporal-refinement.svg",
+              "bytes": 45641,
+              "sha256": "0ed467d10b546ef8c63d1698aaeeabbcbb4ddeaa2b88756c773364271a9ba03a"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "energy-conservation",
+          "statement": "A fully insulated run conserves cell-integrated energy with relative drift below 1e-12.",
+          "value": 0.0,
+          "display_value": "0.000e+00",
+          "operator": "<=",
+          "threshold": 1e-12,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/energyConservation/relativeDrift",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2076,
+              "sha256": "e63cc65c73b8413969ede19c9d1087abaf8adebc06e3afcd560e556ff530745d"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "stability-gate-refusal",
+          "statement": "The solver refuses and logs an attempted run at r = 0.26, above the FTCS limit 0.25.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/stabilityGate/refused",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2076,
+              "sha256": "e63cc65c73b8413969ede19c9d1087abaf8adebc06e3afcd560e556ff530745d"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 2076,
+          "sha256": "e63cc65c73b8413969ede19c9d1087abaf8adebc06e3afcd560e556ff530745d"
+        },
+        {
+          "path": "results/temperature-field.svg",
+          "bytes": 43129,
+          "sha256": "92417c23f051d27417cb242c629d99f2c3c1b2a80116651a716a9e7c46585389"
+        },
+        {
+          "path": "results/temporal-refinement.svg",
+          "bytes": 45641,
+          "sha256": "0ed467d10b546ef8c63d1698aaeeabbcbb4ddeaa2b88756c773364271a9ba03a"
+        }
+      ],
+      "manifest": "projects/heat-diffusion-2d/evidence-manifest.json",
+      "manifestSha256": "57a84d51ecf19c35d3a1a4c7d794ba3049ce62443cb8d73f71f46c3124b622fc"
+    },
+    {
+      "slug": "pipe-flow-sizing",
+      "title": "Pipe flow sizing with verified friction and pump intersection",
+      "summary": "Darcy-Weisbach friction, Newton-solved Colebrook, series-network closure, and a pump operating point checked against identities, residuals, and the published Swamee-Jain band.",
+      "methods": [
+        "Laminar Darcy friction f=64/Re below Re=2300.",
+        "Colebrook equation solved by Newton iteration from a Haaland initial guess.",
+        "Minor losses via summed K coefficients; series-network flow by monotone bisection.",
+        "Pump/system operating point by Newton with central-difference derivative, cross-checked by brute-force scan."
+      ],
+      "limitations": [
+        "Steady, incompressible, single-phase flow only; no transients or compressibility.",
+        "No cavitation or NPSH modelling.",
+        "K coefficients are declared handbook order-of-magnitude values with wide published uncertainty.",
+        "The pump curve is a declared quadratic model, not vendor data.",
+        "Hard laminar/turbulent switch at Re=2300; series topology only."
+      ],
+      "commands": [
+        "cd projects/pipe-flow-sizing && python3 -m unittest discover -s tests -v",
+        "cd projects/pipe-flow-sizing && python3 scripts/analyse.py",
+        "cd projects/pipe-flow-sizing && python3 scripts/publish_site.py"
+      ],
+      "sources": [
+        {
+          "id": "swamee-jain-1976",
+          "title": "Swamee & Jain (1976), Explicit Equations for Pipe-Flow Problems, ASCE J. Hydraulics Division 102(5)",
+          "role": "explicit friction formula with published +/-3% accuracy band",
+          "url": "https://doi.org/10.1061/JYCEAJ.0004542"
+        },
+        {
+          "id": "haaland-1983",
+          "title": "Haaland (1983), Simple and Explicit Formulas for the Friction Factor in Turbulent Pipe Flow, ASME J. Fluids Engineering 105(1)",
+          "role": "explicit initial guess for the Newton iteration",
+          "url": "https://doi.org/10.1115/1.3240948"
+        },
+        {
+          "id": "colebrook-1939",
+          "title": "Colebrook (1939), Turbulent Flow in Pipes, J. Institution of Civil Engineers 11(4)",
+          "role": "implicit friction equation being solved",
+          "url": "https://doi.org/10.1680/ijoti.1939.13150"
+        },
+        {
+          "id": "solver",
+          "title": "Pipe-flow implementation",
+          "role": "generated prediction",
+          "artifact": {
+            "path": "src/pipe_flow.py",
+            "bytes": 9863,
+            "sha256": "837d07cc725a3c0640b6552fe32290ec3aa0d4ae767c86196710c92593dcd80c"
+          }
+        },
+        {
+          "id": "analysis",
+          "title": "Pipe-flow validation runner",
+          "role": "acceptance evaluation",
+          "artifact": {
+            "path": "scripts/analyse.py",
+            "bytes": 10298,
+            "sha256": "ab6779fefa9c3462565ea672b666811f088a698b61927fa7ca518f7febd69834"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "laminar-exactness",
+          "statement": "The laminar branch reproduces 64/Re with absolute error at most 1e-12 over a 200-point grid on Re in [100, 2300].",
+          "value": 0.0,
+          "display_value": "0.000e+00",
+          "operator": "<=",
+          "threshold": 1e-12,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/laminar/maxAbsoluteError",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2508,
+              "sha256": "3ae6f06bfe11ace361bb4724a6f0f1396aeb97efe86dfb0f93672cae39fe7d6b"
+            },
+            {
+              "path": "results/moody.svg",
+              "bytes": 77437,
+              "sha256": "eef7a74675dbd1fdb788ab9ff059f60d477aa75aab6ab7d65623bb738ea15cd8"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "colebrook-residual",
+          "statement": "The Newton Colebrook solution keeps the implicit-equation residual below 1e-12 across a 150-point Reynolds/roughness grid.",
+          "value": 3.552713678800501e-15,
+          "display_value": "3.553e-15",
+          "operator": "<",
+          "threshold": 1e-12,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/colebrook/maxResidual",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2508,
+              "sha256": "3ae6f06bfe11ace361bb4724a6f0f1396aeb97efe86dfb0f93672cae39fe7d6b"
+            },
+            {
+              "path": "results/moody.svg",
+              "bytes": 77437,
+              "sha256": "eef7a74675dbd1fdb788ab9ff059f60d477aa75aab6ab7d65623bb738ea15cd8"
+            }
+          ],
+          "source_ids": [
+            "colebrook-1939",
+            "haaland-1983",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "swamee-jain-band",
+          "statement": "Colebrook solutions agree with the explicit Swamee-Jain formula within its published +/-3% band across its declared validity range.",
+          "value": 0.028279295919229352,
+          "display_value": "2.83%",
+          "operator": "<=",
+          "threshold": 0.03,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/swameeJain/maxRelativeDeviation",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2508,
+              "sha256": "3ae6f06bfe11ace361bb4724a6f0f1396aeb97efe86dfb0f93672cae39fe7d6b"
+            },
+            {
+              "path": "results/moody.svg",
+              "bytes": 77437,
+              "sha256": "eef7a74675dbd1fdb788ab9ff059f60d477aa75aab6ab7d65623bb738ea15cd8"
+            }
+          ],
+          "source_ids": [
+            "swamee-jain-1976",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "operating-point-residual",
+          "statement": "The pump/system intersection residual stays below 1e-10 Pa and the solution lands inside the independent brute-force bracket.",
+          "value": 2.1827872842550278e-11,
+          "display_value": "2.183e-11",
+          "operator": "<=",
+          "threshold": 1e-10,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/coolingLoop/operatingPoint/absResidualPa",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 2508,
+              "sha256": "3ae6f06bfe11ace361bb4724a6f0f1396aeb97efe86dfb0f93672cae39fe7d6b"
+            },
+            {
+              "path": "results/pump-operating-point.svg",
+              "bytes": 48524,
+              "sha256": "7ca79079f11082e688899d326db84bee4bb932c51e36df65f5e5e659607a12c3"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 2508,
+          "sha256": "3ae6f06bfe11ace361bb4724a6f0f1396aeb97efe86dfb0f93672cae39fe7d6b"
+        },
+        {
+          "path": "results/moody.svg",
+          "bytes": 77437,
+          "sha256": "eef7a74675dbd1fdb788ab9ff059f60d477aa75aab6ab7d65623bb738ea15cd8"
+        },
+        {
+          "path": "results/pump-operating-point.svg",
+          "bytes": 48524,
+          "sha256": "7ca79079f11082e688899d326db84bee4bb932c51e36df65f5e5e659607a12c3"
+        }
+      ],
+      "manifest": "projects/pipe-flow-sizing/evidence-manifest.json",
+      "manifestSha256": "6a91b1bde94341e57091d945e67a1447fd8d6ca43e58ea14492f676e84b5e9e9"
+    },
+    {
+      "slug": "potential-flow-sandbox",
+      "title": "Potential-flow sandbox: complex potentials and cylinder superposition",
+      "summary": "Elementary complex potentials superposed into cylinder flow with circulation, verified against analytical Cp, stagnation, circulation, streamfunction, and Kutta-Joukowski identities.",
+      "methods": [
+        "Complex-potential elementary flows (uniform, source/sink, doublet, vortex) with dW/dz = u - iv.",
+        "Superposed flow past a circular cylinder with imposed circulation, positive clockwise.",
+        "Fixed-step RK4 streamline tracing checked against the analytical streamfunction Im(W)."
+      ],
+      "limitations": [
+        "Inviscid, irrotational, incompressible, and strictly two-dimensional: no boundary layer, separation, or wake.",
+        "Circulation is imposed, not predicted; no Kutta condition selects it.",
+        "Zero drag is a property of the model class (d'Alembert), not a prediction."
+      ],
+      "commands": [
+        "cd projects/potential-flow-sandbox && python3 -m unittest discover -s tests -v",
+        "cd projects/potential-flow-sandbox && python3 scripts/analyse.py",
+        "cd projects/potential-flow-sandbox && python3 scripts/publish_site.py"
+      ],
+      "sources": [
+        {
+          "id": "cylinder-reference",
+          "title": "Potential flow around a circular cylinder (analytical solution)",
+          "role": "analytical validation reference",
+          "url": "https://en.wikipedia.org/wiki/Potential_flow_around_a_circular_cylinder"
+        },
+        {
+          "id": "kutta-joukowski-reference",
+          "title": "Kutta-Joukowski theorem, L' = rho U Gamma",
+          "role": "analytical validation reference",
+          "url": "https://en.wikipedia.org/wiki/Kutta%E2%80%93Joukowski_theorem"
+        },
+        {
+          "id": "solver",
+          "title": "Complex-potential sandbox implementation",
+          "role": "generated prediction",
+          "artifact": {
+            "path": "src/potential_flow.py",
+            "bytes": 8550,
+            "sha256": "2386ab646cf86eab5719094b0ed9be2bba9799a59982a6c3cfb281ae8da379c7"
+          }
+        },
+        {
+          "id": "analysis",
+          "title": "Sandbox acceptance runner",
+          "role": "acceptance evaluation",
+          "artifact": {
+            "path": "scripts/analyse.py",
+            "bytes": 9367,
+            "sha256": "712b86ed16b6a16a09affcae4cb42ebd5d7a553dc538a5e2292877c098062dc2"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "cp-exactness",
+          "statement": "Surface Cp from the velocity field matches 1 - 4 sin^2(theta) to below 1e-12.",
+          "value": 2.6645352591003757e-15,
+          "display_value": "2.66e-15",
+          "operator": "<=",
+          "threshold": 1e-12,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/cpExactness/maxAbsError",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 1589,
+              "sha256": "cebffdf0e3bfca5fb7e96376c41a26c775edda57d7e739f0f981c601141dfc59"
+            },
+            {
+              "path": "results/cp-comparison.svg",
+              "bytes": 99591,
+              "sha256": "26966abce7e5eaa80fc28478c95e41bdfa96f7be9dacad83474d7a2e33a70e4a"
+            }
+          ],
+          "source_ids": [
+            "cylinder-reference",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "stagnation-theory",
+          "statement": "Stagnation-point angles with circulation match sin(theta) = -Gamma/(4 pi U R) to below 1e-9 rad.",
+          "value": 8.881784197001252e-16,
+          "display_value": "8.88e-16",
+          "operator": "<=",
+          "threshold": 1e-09,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/stagnationPoints/maxAbsAngleErrorRad",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 1589,
+              "sha256": "cebffdf0e3bfca5fb7e96376c41a26c775edda57d7e739f0f981c601141dfc59"
+            },
+            {
+              "path": "results/streamlines-cylinder.svg",
+              "bytes": 256247,
+              "sha256": "230b12758dde02f1b854486fb62f0f4cfde4e1ca62919767e9b81db3e57d6e6f"
+            }
+          ],
+          "source_ids": [
+            "cylinder-reference",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "circulation-recovery",
+          "statement": "A contour integral of the computed velocity field recovers the imposed circulation to below 1e-9.",
+          "value": 8.881784197001252e-16,
+          "display_value": "8.88e-16",
+          "operator": "<=",
+          "threshold": 1e-09,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/circulationRecovery/absError",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 1589,
+              "sha256": "cebffdf0e3bfca5fb7e96376c41a26c775edda57d7e739f0f981c601141dfc59"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "streamline-fidelity",
+          "statement": "RK4 streamlines stay on the analytical streamfunction level to below 1e-6 at step 0.01.",
+          "value": 2.5566215811068105e-12,
+          "display_value": "2.56e-12",
+          "operator": "<=",
+          "threshold": 1e-06,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/streamlineFidelity/maxStreamfunctionDrift",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 1589,
+              "sha256": "cebffdf0e3bfca5fb7e96376c41a26c775edda57d7e739f0f981c601141dfc59"
+            },
+            {
+              "path": "results/streamlines-cylinder.svg",
+              "bytes": 256247,
+              "sha256": "230b12758dde02f1b854486fb62f0f4cfde4e1ca62919767e9b81db3e57d6e6f"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 1589,
+          "sha256": "cebffdf0e3bfca5fb7e96376c41a26c775edda57d7e739f0f981c601141dfc59"
+        },
+        {
+          "path": "results/cp-comparison.svg",
+          "bytes": 99591,
+          "sha256": "26966abce7e5eaa80fc28478c95e41bdfa96f7be9dacad83474d7a2e33a70e4a"
+        },
+        {
+          "path": "results/streamlines-cylinder.svg",
+          "bytes": 256247,
+          "sha256": "230b12758dde02f1b854486fb62f0f4cfde4e1ca62919767e9b81db3e57d6e6f"
+        }
+      ],
+      "manifest": "projects/potential-flow-sandbox/evidence-manifest.json",
+      "manifestSha256": "f25b15d758db83e3d2358b63aac0eee0d29479e5f061cf193ea8e7d267c0ffe0"
+    },
+    {
+      "slug": "steady-conduction-1d",
+      "title": "Steady 1-D conduction with finite differences",
+      "summary": "The first discretised PDE in the study sequence: a generating rod with a convective tip, solved with a from-scratch Thomas algorithm and verified against closed-form and manufactured solutions.",
+      "methods": [
+        "Node-centred finite differences with a half-control-volume Robin tip.",
+        "Thomas algorithm implemented from scratch for the tridiagonal solve.",
+        "Closed-form exact solution, manufactured-solution grid-convergence study, and conservative global energy balance."
+      ],
+      "limitations": [
+        "One-dimensional, steady state with constant thermal properties.",
+        "No contact resistance at either boundary; tip radiation is excluded.",
+        "The quadratic physical solution is reproduced to roundoff, so the convergence order is demonstrated on a manufactured source term."
+      ],
+      "commands": [
+        "cd projects/steady-conduction-1d && python3 -m unittest discover -s tests -v",
+        "cd projects/steady-conduction-1d && python3 scripts/analyse.py",
+        "cd projects/steady-conduction-1d && python3 scripts/publish_site.py"
+      ],
+      "sources": [
+        {
+          "id": "incropera",
+          "title": "Incropera et al., Fundamentals of Heat and Mass Transfer, 7th ed.",
+          "role": "governing equation and boundary-condition reference",
+          "url": "https://www.wiley.com/en-us/Fundamentals+of+Heat+and+Mass+Transfer%2C+7th+Edition-p-9780470501979"
+        },
+        {
+          "id": "roache-mms",
+          "title": "Roache (2002), Code verification by the method of manufactured solutions",
+          "role": "grid-convergence verification method",
+          "url": "https://doi.org/10.1115/1.1436090"
+        },
+        {
+          "id": "solver",
+          "title": "Conduction solver implementation",
+          "role": "generated prediction",
+          "artifact": {
+            "path": "src/steady_conduction_1d.py",
+            "bytes": 5519,
+            "sha256": "dbd1a22c3ee7bcd82565ba4c12e19520f2742795b4df2f9778a2d0ac2aa8a4c9"
+          }
+        },
+        {
+          "id": "analysis",
+          "title": "Conduction validation runner",
+          "role": "acceptance evaluation",
+          "artifact": {
+            "path": "scripts/analyse.py",
+            "bytes": 6629,
+            "sha256": "11d29a625d1d33f6a2d0f0ef862aec3406808f509824a2cb77c376b99194e24d"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "physical-nodal-error",
+          "statement": "Max nodal error against the closed-form exact solution at N=160 is below 1e-9 K (roundoff; the scheme is exact for the quadratic solution).",
+          "value": 1.3358203432289883e-11,
+          "display_value": "1.336e-11",
+          "operator": "<=",
+          "threshold": 1e-09,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/physicalCase/nodalError/max",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 1512,
+              "sha256": "f5c58e5d50ee4bad4b994c29d9d8ed540375e322c8841a695dccea339a97ae3f"
+            },
+            {
+              "path": "results/temperature-profile.svg",
+              "bytes": 51791,
+              "sha256": "cfbdc2ee8ac85b5f8128d7070b887a1fd99a94375f07999f436ca00af5ad367a"
+            }
+          ],
+          "source_ids": [
+            "incropera",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "observed-order",
+          "statement": "Observed grid-convergence order on the manufactured case stays within 0.2 of second order.",
+          "value": 0.00018639747137338958,
+          "display_value": "0.0002",
+          "operator": "<=",
+          "threshold": 0.2,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/manufacturedCase/orderDeviationFromTwo",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 1512,
+              "sha256": "f5c58e5d50ee4bad4b994c29d9d8ed540375e322c8841a695dccea339a97ae3f"
+            },
+            {
+              "path": "results/convergence.svg",
+              "bytes": 49442,
+              "sha256": "f164286aa12d4ce458ba62c22818324b6e8d905d6689bc395b673b227ad2fed4"
+            }
+          ],
+          "source_ids": [
+            "roache-mms",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "energy-closure",
+          "statement": "Global energy balance (flux in at x=0 plus generation equals convected out at the tip) closes with relative residual below 1e-10.",
+          "value": 1.585954123584088e-12,
+          "display_value": "1.586e-12",
+          "operator": "<=",
+          "threshold": 1e-10,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/physicalCase/energyBalance/relativeResidual",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 1512,
+              "sha256": "f5c58e5d50ee4bad4b994c29d9d8ed540375e322c8841a695dccea339a97ae3f"
+            },
+            {
+              "path": "results/temperature-profile.svg",
+              "bytes": 51791,
+              "sha256": "cfbdc2ee8ac85b5f8128d7070b887a1fd99a94375f07999f436ca00af5ad367a"
+            }
+          ],
+          "source_ids": [
+            "incropera",
+            "solver",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "thomas-cross-check",
+          "statement": "The from-scratch Thomas algorithm matches a NumPy dense solve below 1e-12 on 64 randomized tridiagonal systems.",
+          "value": 1.1102230246251565e-16,
+          "display_value": "1.110e-16",
+          "operator": "<=",
+          "threshold": 1e-12,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/solverCrossCheck/maxAbsDifference",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 1512,
+              "sha256": "f5c58e5d50ee4bad4b994c29d9d8ed540375e322c8841a695dccea339a97ae3f"
+            }
+          ],
+          "source_ids": [
+            "solver",
+            "analysis"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 3,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 1512,
+          "sha256": "f5c58e5d50ee4bad4b994c29d9d8ed540375e322c8841a695dccea339a97ae3f"
+        },
+        {
+          "path": "results/convergence.svg",
+          "bytes": 49442,
+          "sha256": "f164286aa12d4ce458ba62c22818324b6e8d905d6689bc395b673b227ad2fed4"
+        },
+        {
+          "path": "results/temperature-profile.svg",
+          "bytes": 51791,
+          "sha256": "cfbdc2ee8ac85b5f8128d7070b887a1fd99a94375f07999f436ca00af5ad367a"
+        }
+      ],
+      "manifest": "projects/steady-conduction-1d/evidence-manifest.json",
+      "manifestSha256": "62c362b38b7cb0049b06efe4f47fc37fbde1e245a441d99f4466ab537d278cef"
     }
   ]
 }

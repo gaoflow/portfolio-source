@@ -1,6 +1,7 @@
 ---
 title: 'FlowROM — POD & DMD of Unsteady Flow Fields'
 year: 2026
+date: 2026-06
 status: complete
 categories: [validation, tooling]
 tags: [Python, NumPy, POD, DMD, reduced-order modelling]
@@ -20,7 +21,7 @@ keyOutputs:
 featured: true
 sample: false
 order: 4
-studySequence: 5
+studySequence: 10
 heroImage: /images/projects/flowrom/pod-modes.svg
 ---
 

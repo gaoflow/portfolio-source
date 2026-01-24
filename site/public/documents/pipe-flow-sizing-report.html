@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Pipe Flow Sizing technical report</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="/documents/pipe-flow-sizing-report.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Pipe Flow Sizing technical report</h1>
+</header>
+<h1
+id="pipe-flow-sizing-verified-hydraulics-before-a-real-loop-exists">Pipe
+Flow Sizing: verified hydraulics before a real loop exists</h1>
+<h2 id="objective">Objective</h2>
+<p>Written in the third month after moving from software engineering
+into mechanical engineering, this study builds the smallest useful
+hydraulic tool: size a pipe run, total a series network, and find where
+a pump actually operates. The objective was not capability — handbooks
+provide that — but verified foundations. Every friction factor, drop,
+and operating point the later FSAE cooling study would use had to trace
+back to an identity, an implicit-equation residual, or a published
+accuracy band before being trusted.</p>
+<p>Five checks were predeclared:</p>
+<ol type="1">
+<li>the laminar branch reproduces
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>=</mo><mn>64</mn><mi>/</mi><mi>R</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">f=64/Re</annotation></semantics></math>
+to machine precision;</li>
+<li>the Newton Colebrook solution drives the implicit residual below
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>12</mn></mrow></msup><annotation encoding="application/x-tex">10^{-12}</annotation></semantics></math>
+across a Reynolds/roughness grid;</li>
+<li>turbulent friction factors agree with the explicit Swamee–Jain
+formula inside its published
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>±</mi><mn>3</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\pm3\%</annotation></semantics></math>
+band, and the deviation is reported rather than hidden;</li>
+<li>the pump/system intersection solves with residual below
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>10</mn></mrow></msup><annotation encoding="application/x-tex">10^{-10}</annotation></semantics></math>
+Pa and lands inside an independent brute-force bracket;</li>
+<li>the series-network total drop equals the sum of the per-element
+drops exactly.</li>
+</ol>
+<h2 id="method">Method</h2>
+<h3 id="friction-factor">Friction factor</h3>
+<p>For incompressible flow in a circular pipe, the Darcy–Weisbach head
+loss is</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>p</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>f</mi><mspace width="0.167em"></mspace><mfrac><mi>L</mi><mi>D</mi></mfrac><mo>+</mo><mo>∑</mo><mi>K</mi><mo stretchy="true" form="postfix">)</mo></mrow><mfrac><mrow><mi>ρ</mi><msup><mi>V</mi><mn>2</mn></msup></mrow><mn>2</mn></mfrac><mo>,</mo><mspace width="2.0em"></mspace><mi>R</mi><mi>e</mi><mo>=</mo><mfrac><mrow><mi>ρ</mi><mi>V</mi><mi>D</mi></mrow><mi>μ</mi></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">\Delta p = \left(f\,\frac{L}{D} + \sum K\right)\frac{\rho V^2}{2}, \qquad Re=\frac{\rho V D}{\mu},</annotation></semantics></math></p>
+<p>with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+the Darcy friction factor and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∑</mo><mi>K</mi></mrow><annotation encoding="application/x-tex">\sum K</annotation></semantics></math>
+the summed minor-loss coefficients of the element. Below the critical
+Reynolds number
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>e</mi><mo>=</mo><mn>2300</mn></mrow><annotation encoding="application/x-tex">Re=2300</annotation></semantics></math>
+the analytical solution
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>=</mo><mn>64</mn><mi>/</mi><mi>R</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">f=64/Re</annotation></semantics></math>
+is used. Above it, the Colebrook equation</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mn>1</mn><msqrt><mi>f</mi></msqrt></mfrac><mo>=</mo><mi>−</mi><mn>2</mn><msub><mrow><mi mathvariant="normal">log</mi><mo>&#8289;</mo></mrow><mn>10</mn></msub><mspace width="-0.167em"></mspace><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>ε</mi><mrow><mn>3.7</mn><mi>D</mi></mrow></mfrac><mo>+</mo><mfrac><mn>2.51</mn><mrow><mi>R</mi><mi>e</mi><mspace width="0.167em"></mspace><msqrt><mi>f</mi></msqrt></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\frac{1}{\sqrt{f}} = -2\log_{10}\!\left(\frac{\varepsilon}{3.7D} + \frac{2.51}{Re\,\sqrt{f}}\right)</annotation></semantics></math></p>
+<p>is implicit in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>.
+It is solved by Newton iteration on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>=</mo><mn>1</mn><mi>/</mi><msqrt><mi>f</mi></msqrt></mrow><annotation encoding="application/x-tex">x=1/\sqrt{f}</annotation></semantics></math>,</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>x</mi><mo>+</mo><mn>2</mn><msub><mrow><mi mathvariant="normal">log</mi><mo>&#8289;</mo></mrow><mn>10</mn></msub><mspace width="-0.167em"></mspace><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mi>ε</mi><mrow><mn>3.7</mn><mi>D</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><mn>2.51</mn><mspace width="0.167em"></mspace><mi>x</mi></mrow><mrow><mi>R</mi><mi>e</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo><mspace width="2.0em"></mspace><msup><mi>g</mi><mo>′</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>1</mn><mo>+</mo><mfrac><mn>2</mn><mrow><mrow><mi mathvariant="normal">ln</mi><mo>&#8289;</mo></mrow><mn>10</mn></mrow></mfrac><mspace width="0.167em"></mspace><mfrac><mrow><mn>2.51</mn><mi>/</mi><mi>R</mi><mi>e</mi></mrow><mrow><mi>ε</mi><mi>/</mi><mn>3.7</mn><mi>D</mi><mo>+</mo><mn>2.51</mn><mspace width="0.167em"></mspace><mi>x</mi><mi>/</mi><mi>R</mi><mi>e</mi></mrow></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">g(x)=x+2\log_{10}\!\left(\frac{\varepsilon}{3.7D}+\frac{2.51\,x}{Re}\right),\qquad g&#39;(x)=1+\frac{2}{\ln 10}\,\frac{2.51/Re}{\varepsilon/3.7D+2.51\,x/Re},</annotation></semantics></math></p>
+<p>starting from the explicit Haaland estimate [1]. Quadratic
+convergence from that guess reaches the residual gate in a handful of
+iterations; a 50-iteration guard turns non-convergence into a loud
+failure rather than a silent bad factor. The explicit Swamee–Jain
+formula [2],</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>=</mo><mfrac><mn>0.25</mn><msup><mrow><mo stretchy="true" form="prefix">[</mo><msub><mrow><mi mathvariant="normal">log</mi><mo>&#8289;</mo></mrow><mn>10</mn></msub><mspace width="-0.167em"></mspace><mrow><mo stretchy="true" form="prefix">(</mo><mstyle displaystyle="true"><mfrac><mi>ε</mi><mrow><mn>3.7</mn><mi>D</mi></mrow></mfrac></mstyle><mo>+</mo><mstyle displaystyle="true"><mfrac><mn>5.74</mn><mrow><mi>R</mi><msup><mi>e</mi><mn>0.9</mn></msup></mrow></mfrac></mstyle><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mn>2</mn></msup></mfrac><mo>,</mo></mrow><annotation encoding="application/x-tex">f=\frac{0.25}{\left[\log_{10}\!\left(\dfrac{\varepsilon}{3.7D}+\dfrac{5.74}{Re^{0.9}}\right)\right]^2},</annotation></semantics></math></p>
+<p>serves as the independent cross-check over its published validity
+range
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn><mo>×</mo><msup><mn>10</mn><mn>3</mn></msup><mo>≤</mo><mi>R</mi><mi>e</mi><mo>≤</mo><msup><mn>10</mn><mn>8</mn></msup></mrow><annotation encoding="application/x-tex">5\times10^3\le Re\le10^8</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mrow><mi>−</mi><mn>6</mn></mrow></msup><mo>≤</mo><mi>ε</mi><mi>/</mi><mi>D</mi><mo>≤</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>2</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-6}\le\varepsilon/D\le10^{-2}</annotation></semantics></math>.</p>
+<h3 id="series-network">Series network</h3>
+<p>A series network shares one flow rate
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Q</mi><annotation encoding="application/x-tex">Q</annotation></semantics></math>
+through every element, so the total drop is the sum of element drops
+and, given an available pressure, the flow follows from a monotone
+bisection on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∑</mo><mi mathvariant="normal">Δ</mi><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>Q</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi mathvariant="normal">Δ</mi><msub><mi>p</mi><mrow><mi mathvariant="normal">a</mi><mi mathvariant="normal">v</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\sum \Delta p_i(Q)=\Delta p_\mathrm{avail}</annotation></semantics></math>.
+Monotonicity of the system curve guarantees a unique bracket.</p>
+<h3 id="pump-operating-point">Pump operating point</h3>
+<p>The pump is a declared quadratic model, not vendor data:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><msub><mi>p</mi><mrow><mi mathvariant="normal">p</mi><mi mathvariant="normal">u</mi><mi mathvariant="normal">m</mi><mi mathvariant="normal">p</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>Q</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>p</mi><mn>0</mn></msub><mo>−</mo><mi>c</mi><mspace width="0.167em"></mspace><msup><mi>Q</mi><mn>2</mn></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">\Delta p_\mathrm{pump}(Q)=p_0-c\,Q^2,</annotation></semantics></math></p>
+<p>intersected with the system resistance curve
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><msub><mi>p</mi><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">y</mi><mi mathvariant="normal">s</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><mi>Q</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>p</mi><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">t</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">c</mi></mrow></msub><mo>+</mo><mo>∑</mo><mi mathvariant="normal">Δ</mi><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>Q</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\Delta p_\mathrm{sys}(Q)=p_\mathrm{static}+\sum\Delta p_i(Q)</annotation></semantics></math>
+by Newton iteration with a central-difference derivative, backstopped by
+bisection on the guaranteed bracket
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><msub><mi>Q</mi><mrow><mi mathvariant="normal">m</mi><mi mathvariant="normal">a</mi><mi mathvariant="normal">x</mi></mrow></msub><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0, Q_\mathrm{max}]</annotation></semantics></math>.
+The example loop is a representative FSAE-scale cooling circuit —
+suction hose, radiator core, engine gallery, return hose — with declared
+water properties
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>998.2</mn></mrow><annotation encoding="application/x-tex">\rho=998.2</annotation></semantics></math>
+kg/m³,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo>=</mo><mn>1.0016</mn><mo>×</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>3</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\mu=1.0016\times10^{-3}</annotation></semantics></math>
+Pa·s), declared K coefficients, and declared pump coefficients
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mn>0</mn></msub><mo>=</mo><mn>90</mn></mrow><annotation encoding="application/x-tex">p_0=90</annotation></semantics></math>
+kPa,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>=</mo><mn>2.025</mn><mo>×</mo><msup><mn>10</mn><mn>11</mn></msup></mrow><annotation encoding="application/x-tex">c=2.025\times10^{11}</annotation></semantics></math>
+Pa·s²/m⁶ (40 L/min free delivery). Every coefficient is
+arbitrary-but-declared: the point is the verified intersection
+machinery, not a specific product.</p>
+<h2 id="verification">Verification</h2>
+<p>The acceptance runner (<code>scripts/analyse.py</code>) regenerates
+every number and exits nonzero unless all gates pass:</p>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 36%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th>Check</th>
+<th style="text-align: right;">Observed</th>
+<th style="text-align: right;">Threshold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Laminar max
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo>−</mo><mn>64</mn><mi>/</mi><mi>R</mi><mi>e</mi><mo stretchy="false" form="postfix">|</mo></mrow><annotation encoding="application/x-tex">\lvert f-64/Re\rvert</annotation></semantics></math>,
+200-point grid,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>e</mi><mo>∈</mo><mo stretchy="false" form="prefix">[</mo><mn>100</mn><mo>,</mo><mn>2300</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">Re\in[100,2300]</annotation></semantics></math></td>
+<td style="text-align: right;">0.0</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≤</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>12</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\le10^{-12}</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>Colebrook max residual, 150-point grid,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>e</mi><mo>∈</mo><mo stretchy="false" form="prefix">[</mo><mn>4</mn><mo>×</mo><msup><mn>10</mn><mn>3</mn></msup><mo>,</mo><msup><mn>10</mn><mn>8</mn></msup><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">Re\in[4\times10^3,10^8]</annotation></semantics></math></td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3.55</mn><mo>×</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>15</mn></mrow></msup></mrow><annotation encoding="application/x-tex">3.55\times10^{-15}</annotation></semantics></math></td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>12</mn></mrow></msup></mrow><annotation encoding="application/x-tex">&lt;10^{-12}</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>Swamee–Jain max deviation, published validity range</td>
+<td style="text-align: right;">2.83%</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≤</mo><mn>3</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\le3\%</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>Operating-point residual</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.18</mn><mo>×</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>11</mn></mrow></msup></mrow><annotation encoding="application/x-tex">2.18\times10^{-11}</annotation></semantics></math>
+Pa</td>
+<td
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>10</mn></mrow></msup></mrow><annotation encoding="application/x-tex">&lt;10^{-10}</annotation></semantics></math>
+Pa</td>
+</tr>
+<tr>
+<td>Operating point inside brute-force bracket</td>
+<td style="text-align: right;">yes</td>
+<td style="text-align: right;">bracket</td>
+</tr>
+<tr>
+<td>Network closure (total
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>−</mi><annotation encoding="application/x-tex">-</annotation></semantics></math>
+sum of element drops)</td>
+<td style="text-align: right;">0.0 Pa</td>
+<td style="text-align: right;">relative
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>12</mn></mrow></msup></mrow><annotation encoding="application/x-tex">&lt;10^{-12}</annotation></semantics></math></td>
+</tr>
+</tbody>
+</table>
+<p>The laminar branch is a direct evaluation of the identity, so its
+zero error is exact, not approximate. The Colebrook residual measures
+the solved
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+against the defining equation itself. The Swamee–Jain comparison is the
+only check against an external published result; restricting it to the
+formula’s declared validity range matters, because the deviation exceeds
+3% outside it (for example at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>e</mi><mo>=</mo><mn>4</mn><mo>×</mo><msup><mn>10</mn><mn>3</mn></msup></mrow><annotation encoding="application/x-tex">Re=4\times10^3</annotation></semantics></math>
+with very low roughness), and the runner reports that rather than
+silently widening the grid.</p>
+<h2 id="results-representative-cooling-loop">Results: representative
+cooling loop</h2>
+<p>At the operating point the loop flows 26.22 L/min against 51.34 kPa.
+The element breakdown shows where the pressure goes:</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 26%" />
+<col style="width: 26%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr>
+<th>Element</th>
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">Re</annotation></semantics></math></th>
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math></th>
+<th
+style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Δ</mi><mi>p</mi></mrow><annotation encoding="application/x-tex">\Delta p</annotation></semantics></math></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Suction hose (0.40 m, 16 mm,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>=</mo><mn>1.5</mn></mrow><annotation encoding="application/x-tex">K=1.5</annotation></semantics></math>)</td>
+<td style="text-align: right;">34 654</td>
+<td style="text-align: right;">0.0230</td>
+<td style="text-align: right;">4.89 kPa</td>
+</tr>
+<tr>
+<td>Radiator core (0.15 m, 16 mm,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>=</mo><mn>8.0</mn></mrow><annotation encoding="application/x-tex">K=8.0</annotation></semantics></math>)</td>
+<td style="text-align: right;">34 654</td>
+<td style="text-align: right;">0.0230</td>
+<td style="text-align: right;">19.37 kPa</td>
+</tr>
+<tr>
+<td>Engine gallery (0.50 m, 14 mm,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>=</mo><mn>4.0</mn></mrow><annotation encoding="application/x-tex">K=4.0</annotation></semantics></math>)</td>
+<td style="text-align: right;">39 605</td>
+<td style="text-align: right;">0.0296</td>
+<td style="text-align: right;">20.33 kPa</td>
+</tr>
+<tr>
+<td>Return hose (0.60 m, 16 mm,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>=</mo><mn>2.0</mn></mrow><annotation encoding="application/x-tex">K=2.0</annotation></semantics></math>)</td>
+<td style="text-align: right;">34 654</td>
+<td style="text-align: right;">0.0230</td>
+<td style="text-align: right;">6.75 kPa</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>51.34 kPa</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Minor losses dominate: the radiator core and engine gallery
+contribute about 78% of the total drop through their K coefficients, and
+the purely frictional share is small at this scale. The brute-force scan
+brackets the intersection at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>26.2173</mn><mo>,</mo><mn>26.2271</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[26.2173, 26.2271]</annotation></semantics></math>
+L/min — 0.0098 L/min wide at 4096 samples — and the Newton solution sits
+inside it. Adding a 10 kPa static lift reduces the operating flow, as
+the model must.</p>
+<p>The Moody-style figure is drawn from computed curves only: the
+laminar line and six Colebrook sweeps at declared relative roughnesses.
+No external chart was digitised.</p>
+<h2 id="limitations">Limitations</h2>
+<ul>
+<li>Steady, incompressible, single-phase flow. No transients, no
+compressibility, no air entrainment.</li>
+<li>No cavitation model: the pump curve is followed wherever the
+mathematics goes, and suction-side vapour pressure is never
+checked.</li>
+<li>Minor-loss K coefficients are declared handbook order-of-magnitude
+values; published K tables carry wide uncertainty, and real fittings
+vary with manufacture and Reynolds number.</li>
+<li>The pump curve is a declared quadratic, not vendor data; a real
+curve bends near shutoff and free delivery, and real pumps have
+efficiency and NPSH limits this model cannot express.</li>
+<li>The laminar/turbulent transition is a hard switch at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>e</mi><mo>=</mo><mn>2300</mn></mrow><annotation encoding="application/x-tex">Re=2300</annotation></semantics></math>;
+the transition band is not modelled.</li>
+<li>The network solver handles series topology only; parallel branches
+need a junction-pressure iteration this study deliberately did not build
+yet.</li>
+</ul>
+<h2 id="sources">Sources</h2>
+<ol type="1">
+<li>Haaland, S. E. (1983). <em>Simple and Explicit Formulas for the
+Friction Factor in Turbulent Pipe Flow</em>. Journal of Fluids
+Engineering, 105(1), 89–90. https://doi.org/10.1115/1.3240948</li>
+<li>Swamee, P. K., &amp; Jain, A. K. (1976). <em>Explicit Equations for
+Pipe-Flow Problems</em>. Journal of the Hydraulics Division, ASCE,
+102(5), 657–664. https://doi.org/10.1061/JYCEAJ.0004542</li>
+<li>Colebrook, C. F. (1939). <em>Turbulent Flow in Pipes, with
+Particular Reference to the Transition Region between the Smooth and
+Rough Pipe Laws</em>. Journal of the Institution of Civil Engineers,
+11(4), 133–156. https://doi.org/10.1680/ijoti.1939.13150</li>
+</ol>
+</body>
+</html>

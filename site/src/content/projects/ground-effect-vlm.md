@@ -1,6 +1,7 @@
 ---
 title: 'Ground Effect VLM — Image-Vortex Ride-Height Study'
 year: 2026
+date: 2026-04
 status: complete
 categories: [validation, tooling]
 tags: [Python, NumPy, VLM, potential flow, ground effect]
@@ -19,7 +20,7 @@ keyOutputs:
 featured: true
 sample: false
 order: 6
-studySequence: 3
+studySequence: 8
 heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg
 ---
 

@@ -1,0 +1,87 @@
+---
+title: 'Potential Flow Sandbox — Complex Potentials and Circulation'
+year: 2025
+date: 2025-12
+status: complete
+categories: [component-cfd]
+tags: [Python, NumPy, potential flow, complex potential, circulation, RK4]
+summary: 'The classical elementary flows implemented as complex potentials, superposed into cylinder flow with circulation, and verified against every available analytical identity.'
+methodLine: 'Complex potentials · superposition · circulation · RK4 streamlines'
+role: 'Aerodynamics fundamentals'
+duration: 'Fourth-month study'
+heroMetrics:
+  - { label: 'Cp error', value: '2.66e-15' }
+  - { label: 'Stagnation error', value: '8.9e-16 rad' }
+  - { label: 'Γ recovery error', value: '8.9e-16' }
+  - { label: 'RK4 order', value: '4.003' }
+keyOutputs:
+  - 'Implemented uniform, source/sink, doublet, and vortex complex potentials and superposed cylinder flow with circulation; surface Cp matches 1 − 4 sin²θ to 2.7×10⁻¹⁵.'
+  - 'Recovered the imposed circulation from a contour integral of the velocity field to 8.9×10⁻¹⁶ and matched the Kutta–Joukowski lift L′ = ρUΓ exactly in sign and magnitude.'
+  - 'Verified fixed-step RK4 streamline tracing against the analytical streamfunction: 2.6×10⁻¹² maximum drift at step 0.01 with observed fourth-order convergence.'
+featured: false
+sample: false
+order: 14
+studySequence: 4
+heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
+---
+
+## Context & objective
+
+This study belongs to my fourth month after moving from software engineering into mechanical engineering, and it closes the fluids-coursework phase of the ladder. The motivation is practical: the panel method in [Airfoil Methods](/projects/airfoil-methods) and the vortex-lattice code in [Ground Effect VLM](/projects/ground-effect-vlm) both assume that sources, doublets, and vortices are exact, that superposition is legitimate, and that circulation means lift. Rather than import those assumptions, I built the layer they rest on and verified every identity it claims.
+
+The deliverable is a small sandbox: elementary flows written as complex potentials, superposed into flow past a circular cylinder with and without circulation, with an RK4 streamline tracer checked against the analytical streamfunction.
+
+## Method
+
+Each elementary flow is a complex potential $W(z)$, $z = x + iy$, with the physical velocity from $dW/dz = u - iv$:
+
+$$W_{\text{uniform}} = Uz, \quad W_{\text{source}} = \frac{m}{2\pi}\ln z, \quad W_{\text{doublet}} = \frac{\mu}{2\pi z}, \quad W_{\text{vortex}} = \frac{i\Gamma}{2\pi}\ln z .$$
+
+Circulation follows the aerodynamics convention — positive $\Gamma$ is clockwise — because that is the convention under which $L' = \rho U \Gamma$ points upward. Superposing the stream, a doublet of moment $\mu = 2\pi U R^2$, and the vortex gives cylinder flow with circulation:
+
+$$W(z) = U\!\left(z + \frac{R^2}{z}\right) + \frac{i\Gamma}{2\pi}\ln z .$$
+
+The linearity that permits this superposition is the same linearity the panel and vortex-lattice methods exploit; the difference is that here the superposed field has a closed form, so the implementation can be tested to machine precision rather than to experimental scatter.
+
+![Streamlines around the cylinder at both circulations](/images/projects/potential-flow-sandbox/streamlines-cylinder.svg)
+
+## Validation
+
+Five checks, each against theory rather than another numerical method:
+
+| Check | Observed | Gate |
+|---|---:|---:|
+| Surface $C_p$ vs $1 - 4\sin^2\theta$ | $2.66\times10^{-15}$ | $<10^{-12}$ |
+| Stagnation angles vs $\sin\theta = -\Gamma/(4\pi U R)$ | $8.9\times10^{-16}$ rad | $<10^{-9}$ rad |
+| Contour-integral circulation vs imposed $\Gamma$ | $8.9\times10^{-16}$ | $<10^{-9}$ |
+| RK4 streamfunction drift, step 0.01 | $2.56\times10^{-12}$ | $<10^{-6}$ |
+| Integrated lift vs $\rho U \Gamma$ | 0.0 relative | $<10^{-9}$ |
+
+The lift case imposes $\Gamma = 2\pi U R$, moving the stagnation points from $0^\circ, 180^\circ$ to $-30^\circ, -150^\circ$; the figure marks the located points on top of the traced field. The streamline check is a genuine numerical experiment: the tracer knows only the velocity field, and its drift from the analytical $\psi$ level shrinks by a factor of 16 when the step halves — an observed convergence order of 4.003.
+
+![Surface Cp: velocity-field evaluation against the analytical distribution](/images/projects/potential-flow-sandbox/cp-comparison.svg)
+
+## Quantitative results
+
+With $U = 1$, $R = 1$, $\rho = 1.225$, and $\Gamma = 2\pi$:
+
+- surface $C_p$ from $|dW/dz|$ matches $1 - 4\sin^2\theta$ to $2.66\times10^{-15}$ over 4097 stations;
+- stagnation points are recovered at $-30.00000000000005^\circ$ and $-149.99999999999997^\circ$ by bisecting the signed tangential surface speed;
+- a 4096-point contour integral at $r = 2.5R$ returns $6.283185307179585$ against the imposed $6.283185307179586$;
+- the RK4 tracer's maximum streamfunction drift is $2.56\times10^{-12}$ at step 0.01 over 720 samples around the body;
+- integrated surface pressure gives $L' = 7.6969$ per unit span, equal to $\rho U \Gamma$ at integration precision, upward for positive $\Gamma$, with zero drag to machine precision.
+
+## Limitations
+
+The model is inviscid, irrotational, incompressible, and strictly two-dimensional. There is no boundary layer, so the real flow's separation and wake — which dominate an actual cylinder's drag — are absent by construction. Circulation is imposed, not predicted: nothing here explains why a lifting body carries a particular $\Gamma$; that requires the Kutta condition introduced with the airfoil work. The zero-drag result is d'Alembert's paradox, a property of the model class, and I treated it as a limitation signal rather than a successful drag prediction.
+
+## Reproduce
+
+```bash
+cd projects/potential-flow-sandbox
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+python3 scripts/publish_site.py
+```
+
+Twelve unit tests pin the elementary-flow hand values, surface impermeability, far-field decay, circulation sign, and the tracer's fourth-order convergence. `analyse.py` regenerates `results/analysis.json` and both figures and exits nonzero if any gate fails. The committed [technical report](/documents/potential-flow-sandbox-report.html) records the equations, gates, and sources.

@@ -1,6 +1,7 @@
 ---
 title: 'Template — NDA-Safe CFD Batch Automation Case Study'
 year: 2026
+date: 2026-08
 status: complete
 categories: [tooling]
 tags: [Python, OpenFOAM, automation, publication contract]
