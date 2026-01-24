@@ -1,6 +1,6 @@
 ---
 title: 'Screen the Cooling System Before Spending CFD Compute'
-published: 2026-08-18
+published: 2026-08-16
 summary: 'Why pump, branch, radiator, fan, and transient thermal constraints should be closed as a system before detailed airflow CFD is allowed to optimise the installation.'
 tags: [FSAE, cooling, hydraulics, thermal modelling]
 sourceProjects: [fsae-cooling]
