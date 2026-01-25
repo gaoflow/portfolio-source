@@ -16,7 +16,7 @@ const { steps, sample = false } = Astro.props;
   </div>
   <div class="grid md:grid-cols-[1fr_2fr]">
     <!-- Step selector -->
-    <div class="flex md:flex-col border-b md:border-b-0 md:border-r border-edge">
+    <div class="flex flex-wrap md:flex-col border-b md:border-b-0 md:border-r border-edge min-w-0">
       {steps.map((s, i) => (
         <button
           data-step={i}
@@ -27,7 +27,7 @@ const { steps, sample = false } = Astro.props;
       ))}
     </div>
     <!-- Metrics panel -->
-    <div class="p-6">
+    <div class="p-6 min-w-0">
       {steps.map((s, i) => (
         <div data-panel={i} class="pipeline-panel hidden data-[on]:block">
           <p class="text-sm text-muted mb-5">{s.caption}</p>
