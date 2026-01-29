@@ -8,13 +8,11 @@ featured: true
 order: 3
 ---
 
-A meshing campaign is not successful because it produces cells. It succeeds when the resulting volume mesh satisfies the contract required by the solver and the decision.
-
-That distinction matters on complex full-car geometry. `snappyHexMesh` can complete while leaving skew faces, non-manifold interactions, missing layers, leakage, or a boundary representation that no longer matches the intended vehicle. Launching the solver anyway converts a known geometry problem into a harder numerical problem.
+A meshing campaign succeeds when the volume mesh satisfies the contract the solver and the decision require — producing cells is not the bar. On complex full-car geometry, `snappyHexMesh` can complete while leaving skew faces, non-manifold interactions, missing layers, leakage, or a boundary that no longer matches the intended vehicle. Launching the solver anyway converts a known geometry problem into a harder numerical one.
 
 ## Define the zero-failure gate first
 
-A production gate should be written before parameter sweeps begin. At minimum it records:
+Write the production gate before parameter sweeps begin. At minimum it records:
 
 - geometry revision and byte-identical source hashes;
 - watertightness and self-intersection checks per surface;
@@ -27,19 +25,19 @@ A production gate should be written before parameter sweeps begin. At minimum it
 - boundary patch names and areas;
 - whether a solver launch is permitted.
 
-The gate should return a machine-readable verdict. A warning copied into a log but omitted from the decision record is not a gate.
+The gate returns a machine-readable verdict. A warning copied into a log but omitted from the decision record is no gate.
 
-## Separate surface defects from volume-mesh defects
+## "Bad CAD" is four different problems
 
-Meshing failures often get grouped under “bad CAD”, but the corrective action depends on the failure layer.
+The fix depends on the failure layer.
 
 ### Source-surface defects
 
-Examples include open shells, duplicate triangles, zero-area facets, self-intersections, inconsistent normals, and overlapping solids. They must be measured before meshing because downstream smoothing can hide, move, or duplicate them.
+Open shells, duplicate triangles, zero-area facets, self-intersections, inconsistent normals, overlapping solids. Measure them before meshing, because downstream smoothing can hide, move, or duplicate them.
 
 ### Topology defects
 
-Two individually closed solids can overlap in a way that does not define one valid fluid boundary. Surface smoothing will not resolve the Boolean meaning of that intersection. The remedy is topology replacement, Boolean reconstruction, or engineer-directed simplification—not more snap iterations.
+Two individually closed solids can overlap in a way that defines no valid fluid boundary. Surface smoothing cannot resolve the Boolean meaning of that intersection. The remedy is topology replacement, Boolean reconstruction, or engineer-directed simplification — more snap iterations will not help.
 
 ### Volume-mesh defects
 
@@ -63,11 +61,11 @@ A useful meshing sweep maps each variant to one engineering hypothesis:
 | surface repair | a bounded geometry defect can be corrected without changing topology |
 | alternative mesher | the installed topology path, rather than resolution, is the blocker |
 
-Changing all controls together may produce a better mesh, but it does not produce a reusable diagnosis.
+Changing every control together may produce a better mesh. It produces no reusable diagnosis.
 
 ## Preserve source geometry while testing repair
 
-A repair candidate needs a bidirectional surface-deviation contract. Measuring only candidate-to-source distance can miss source regions that vanished. A robust comparison records:
+A repair candidate needs a bidirectional surface-deviation contract. Measuring only candidate-to-source distance can miss source regions that vanished. Record:
 
 - source and candidate unique vertices and triangle counts;
 - source-to-candidate maximum distance;
@@ -77,13 +75,13 @@ A repair candidate needs a bidirectional surface-deviation contract. Measuring o
 - triangle connectivity preservation when required;
 - self-intersection and closure status.
 
-The deviation budget belongs to the engineering requirement. “Looks unchanged” is not measurable, and a geometrically close surface may still have different topology.
+The deviation budget belongs to the engineering requirement. "Looks unchanged" is unmeasurable, and a geometrically close surface can still carry different topology.
 
 ## What the twenty-path F1 campaign established
 
 The [F1 2026 full-car project](/projects/f1-2026-aero) tested twenty bounded routes: nineteen completed OpenFOAM mesh outcomes plus one external topology attempt.
 
-The strongest uniform-envelope mesh contained approximately 5.208 million cells and improved the extrema to:
+The strongest uniform-envelope mesh held 5,207,960 cells and improved the extrema to:
 
 | Metric | Best bounded result |
 |---|---:|
@@ -94,27 +92,25 @@ The strongest uniform-envelope mesh contained approximately 5.208 million cells 
 
 This is improvement, not qualification. Eight failed faces still violate the zero-failure gate.
 
-Six bounded surface-repair candidates then tested a 0.1 mm deviation contract. Five retained triangle connectivity and remained within the geometric budget. The conservative near-zero repair and the 0.08368 mm budget-edge repair both returned to fifteen highly skew faces and one failed check on the resulting 5.322-million-cell meshes.
+Six bounded surface-repair candidates then tested a 0.1 mm deviation contract. Five retained triangle connectivity within budget. The near-zero-deviation candidate (`lambda-mu-0p001`, 0.0000017 mm) and the budget-edge candidate (`lambda-mu-0p15`, 0.08368 mm) produced identical volume-mesh verdicts: 5,322,222 cells, fifteen highly skew faces, one failed check. Both NO-GO.
 
 The evidence rejects two tempting conclusions:
 
-1. **Smoother surface means better volume mesh.** It did not remove the blocking failures.
-2. **Closer to the deviation budget means closer to success.** The budget-edge repair was still NO-GO.
+1. **A smoother surface means a better volume mesh.** It did not remove the blocking failures.
+2. **Closer to the deviation budget means closer to success.** The budget-edge repair changed nothing downstream.
 
-## Why another mesher did not automatically solve topology
+## Why another mesher did not fix topology
 
-An external Gmsh route was tested to separate `snappyHexMesh` behaviour from source-boundary topology.
+An external Gmsh 4.12.1 route separated `snappyHexMesh` behaviour from source-boundary topology. To avoid OpenCASCADE Boolean subtraction on the intersecting multi-solid assembly, the campaign meshed the full domain from discrete STL surface loops. Gmsh imported 14 surfaces, tetrahedralised 3,689,664 nodes into 7,379,556 written elements in 309 s at about 10 GiB peak memory — and wrote zero volume elements, rejecting overlapping facets on one discrete surface.
 
-The OpenCASCADE path could not construct the intended fluid region from the intersecting multi-solid assembly. A discrete-STL route tetrahedralised roughly 3.69 million nodes but rejected overlapping facets on one surface and wrote zero volume elements.
-
-This narrows the diagnosis: the blocker is not one `snappyHexMesh` parameter. The source assembly does not provide an unambiguous, conformal fluid boundary to the installed meshing routes.
+That narrows the diagnosis: the blocker is no single `snappyHexMesh` parameter. The source assembly offers no unambiguous, conformal fluid boundary to either installed meshing route.
 
 ## The correct NO-GO decision
 
 The campaign therefore blocks:
 
 - the gated qualification solve;
-- a 25–35 million-cell production baseline;
+- the 25–35 million-cell production baseline;
 - mesh, roughness, and turbulence-model sensitivity studies;
 - public aerodynamic ranking from the rejected meshes.
 
@@ -145,4 +141,4 @@ The failure becomes useful when another engineer can avoid repeating the same se
 
 ## Boundary of this note
 
-The numerical limits above belong to one bounded campaign and are not universal OpenFOAM tolerances. Other solvers, discretisations, wall treatments, and geometries require different contracts. The transferable result is the diagnostic method: preserve geometry, isolate hypotheses, retain failures, and never let a completed mesher bypass a failed qualification gate.
+The numerical limits above belong to one bounded campaign; they are not universal OpenFOAM tolerances. Other solvers, discretisations, wall treatments, and geometries need different contracts. The transferable result is the diagnostic method: preserve geometry, isolate hypotheses, retain failures, and never let a completed mesher bypass a failed qualification gate.

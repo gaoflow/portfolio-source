@@ -21,13 +21,13 @@ keyOutputs:
 featured: true
 sample: false
 order: 5
-studySequence: 9
+studySequence: 14
 heroImage: /images/projects/flowlab/cavity-vorticity.svg
 ---
 
 ## Context & objective
 
-Interactive CFD graphics are easy to make visually convincing and hard to make numerically accountable. This study asked whether a small JavaScript lattice-Boltzmann implementation could remain inspectable, run live in a browser, and still reproduce a canonical reference quantitatively.
+A dependency-free JavaScript lattice-Boltzmann solver reproduces Ghia et al.'s $Re=100$ cavity centerlines to 0.00286 RMSE on a 64² grid, and the same core runs live in the browser. Interactive CFD graphics are easy to make visually convincing and hard to make numerically accountable; this study asked whether a small implementation could stay inspectable and still meet a canonical reference quantitatively.
 
 The publication gates were fixed before release: three converged grids, less than 0.01 lid-speed RMSE for both centerline velocity components on the finest grid, relative mass drift below $10^{-9}$, and one solver core shared by the validation runner and interactive experience.
 
@@ -67,7 +67,7 @@ The recorded 64² validation run sustained 26.3 million lattice updates per seco
 
 ## Failure & correction
 
-The first automated validation stopped at 20,000 iterations with residual $4.80\times10^{-7}$. Its velocity error was already small, but it failed the declared convergence gate. The iteration allowance was increased; the numerical acceptance criterion was not weakened.
+The first automated validation stopped at 20,000 iterations with residual $4.80\times10^{-7}$. Its velocity error was already small, but it failed the declared convergence gate. The iteration allowance rose to 23,000 for the automated test; the acceptance criterion stayed fixed.
 
 A direct moving-wall velocity overwrite was also rejected. It would display the requested lid speed without defining consistent incoming populations. Momentum-corrected bounce-back makes the boundary condition part of the distribution update instead.
 

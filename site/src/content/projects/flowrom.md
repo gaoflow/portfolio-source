@@ -21,13 +21,13 @@ keyOutputs:
 featured: true
 sample: false
 order: 4
-studySequence: 10
+studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg
 ---
 
 ## Context & objective
 
-A reduced-order model is only useful when its compression claims survive data it did not fit. This study asks whether compact POD and DMD representations can recover a controlled unsteady component in independently generated full-field velocity data, then holds out four full forcing cycles before fitting.
+Rank-8 POD compresses 480 velocity fields 48.8× while holding reconstruction error on four unseen forcing cycles to 0.123%; exact DMD forecasts those cycles at 0.100% full-state error. A reduced-order model earns trust only when its compression claims survive data it did not fit, so this study holds out four full forcing cycles before fitting either model.
 
 The parent data source is the [FlowLab lattice-Boltzmann solver](/projects/flowlab/). FlowROM does not copy or relabel another portfolio project: every snapshot, decomposition, figure, metric, and test is generated in this repository.
 
@@ -41,7 +41,7 @@ Choose a retained POD rank and scrub from the training interval into the held-ou
 
 The FlowLab D2Q9 BGK solver first converges a $48\times48$ lid-driven cavity at $Re=100$. Its lid speed is then perturbed sinusoidally with a 400-iteration period. After four settling cycles, the study records $u$ and $v$ at 2,304 fluid cells every 10 iterations, yielding a $4,608\times480$ matrix.
 
-The first 320 snapshots—eight complete cycles—train both models. The remaining 160 snapshots—four cycles—are untouched until evaluation. That split prevents a random holdout from leaking adjacent phases of the same periodic response across train and test sets.
+The first 320 snapshots, eight complete cycles, train both models. The remaining 160, four cycles, stay untouched until evaluation. That split prevents a random holdout from leaking adjacent phases of the same periodic response across train and test sets.
 
 ![POD modal energy and held-out reconstruction error](/images/projects/flowrom/pod-spectrum.svg)
 
@@ -58,6 +58,8 @@ After subtracting the training mean, singular-value decomposition gives the orth
 | 16 | 0.00439% | 0.00949% |
 
 At rank 8, one mean field, eight spatial modes, and eight coefficients per snapshot require 48.8× fewer scalar values than the original matrix.
+
+Rank 1 is the instructive failure. The first mode alone carries 87.05% of training fluctuation energy, yet rank-1 reconstruction misses 35.97% of the held-out fluctuation. The periodic response is a quadrature pair: the dominant mode without its partner reproduces a spatial shape but cannot follow the phase. Adding the second mode drops held-out error to 1.301%.
 
 ![First four POD mode magnitudes](/images/projects/flowrom/pod-modes.svg)
 

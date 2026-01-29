@@ -21,13 +21,13 @@ sample: true
 order: 9
 ---
 
-> This page is an explicit **template**, not a claim that the described wrapper has been implemented in this repository. It remains visible to show the publication contract for future NDA-safe tooling work.
+> This page is an explicit **template**. It makes no claim that the described wrapper exists in this repository. It stays visible to fix the publication contract for future NDA-safe tooling work.
 
 ## 1. Engineering problem
 
-Start with the manual workflow being replaced. Name the repeated decisions, the handoffs that create errors, and the operator time being consumed. Do not begin with “I wrote a Python wrapper”; begin with the engineering bottleneck.
+Start with the manual workflow being replaced. Name the repeated decisions, the handoffs that create errors, and the operator time being consumed. The opening sentence belongs to the engineering bottleneck; "I wrote a Python wrapper" is not one.
 
-An acceptable publication states which stages are automated—case generation, geometry staging, meshing, decomposition, solver launch, monitoring, post-processing, report generation—and which decisions still require an engineer.
+An acceptable publication states which stages are automated — case generation, geometry staging, meshing, decomposition, solver launch, monitoring, post-processing, report generation — and which decisions still require an engineer.
 
 ## 2. Public architecture
 
@@ -41,7 +41,7 @@ case materialisation → mesh gate → solver gate → result gate
  run manifest        quality JSON   field checks   report/artifacts
 ```
 
-The article should name the configuration schema, state machine, process-isolation boundary, and output contract. It should not publish customer/team paths, CAD, map values, setup-specific coefficients, or screenshots that reveal protected geometry.
+The article should name the configuration schema, state machine, process-isolation boundary, and output contract. It should not publish customer or team paths, CAD, map values, setup-specific coefficients, or screenshots that reveal protected geometry.
 
 ## 3. Configuration contract
 
@@ -55,20 +55,20 @@ Document fields by class rather than dumping a private configuration:
 - retry policy, if retries genuinely exist;
 - provenance fields: tool version, configuration hash, source revision, and run identifier.
 
-Every default shown in the article must come from a public example or be labelled illustrative. A schema count is published only after the actual schema is committed and machine-counted.
+Every default shown in the article must come from a public example or carry an illustrative label. A schema count is published only after the actual schema is committed and machine-counted.
 
 ## 4. Execution and failure semantics
 
 A useful automation case explains what happens when a stage fails. Mesh rejection must block solving. A nonzero solver exit, non-finite field, incomplete log, missing coefficient stream, or failed physical gate must remain visible in the run manifest.
 
-“Unattended” is not the same as “unmonitored.” The real evidence should show timeouts, captured exit codes, partial-artifact handling, and deterministic resumption. Automatic retries must not turn a physically invalid case into a green run.
+"Unattended" does not mean "unmonitored." The real evidence shows timeouts, captured exit codes, partial-artifact handling, and deterministic resumption. Automatic retries must never turn a physically invalid case into a green run.
 
 ## 5. Verification evidence
 
 Before this template is replaced, the implementation needs:
 
 1. unit tests for configuration validation and command construction;
-2. an integration case whose expected mesh/solver/post-processing artifacts are known;
+2. an integration case whose expected mesh, solver, and post-processing artifacts are known;
 3. a deliberately failed mesh and solver case proving downstream stages remain blocked;
 4. a run-manifest schema with timestamps, revisions, exit codes, and checksums;
 5. a reproducible report command;
@@ -76,22 +76,22 @@ Before this template is replaced, the implementation needs:
 
 ## 6. Capability and scale
 
-Turnaround reduction, batch size, and reliability are results—not adjectives. Publish them only with a defined baseline:
+Turnaround reduction, batch size, and reliability are results, not adjectives. Publish them only against a defined baseline:
 
 | Claim | Required observation |
 |---|---|
-| Manual-time reduction | same workflow scope, timed before/after, operator time separated from compute |
-| Batch capacity | completed/failed case count, hardware, wall time, and concurrency |
-| Reliability | repeated runs plus explicit failure denominator |
-| Reproducibility | identical configuration/source hashes and matching gated outputs |
+| Manual-time reduction | same workflow scope, timed before and after, operator time separated from compute |
+| Batch capacity | completed and failed case count, hardware, wall time, and concurrency |
+| Reliability | repeated runs plus an explicit failure denominator |
+| Reproducibility | identical configuration and source hashes with matching gated outputs |
 
-Protected values can be normalised or reported as bounded ranges only if the employer/team permits it. Otherwise omit the number rather than inventing a substitute.
+Protected values can be normalised or reported as bounded ranges only if the employer or team permits it. Otherwise omit the number; an invented substitute is worse than none.
 
 ## 7. NDA-safe result format
 
-Use the RMZC pattern: **Role, Method, scale class, Conclusion**. A defensible short version can describe ownership, interfaces, the number of workflow stages, and what decision the tool automated. Aerodynamic coefficients, geometry, customer identifiers, and operating maps remain absent.
+Use the RMZC pattern: **Role, Method, scale class, Conclusion**. A defensible short version describes ownership, interfaces, the number of workflow stages, and which decision the tool automated. Aerodynamic coefficients, geometry, customer identifiers, and operating maps stay out.
 
-The sentence “details available on request” is not evidence. Public evidence should still include owned generic code, tests, a synthetic or open benchmark case, architecture diagrams, and failure behaviour.
+"Details available on request" is not evidence. Public evidence still includes owned generic code, tests, a synthetic or open benchmark case, architecture diagrams, and failure behaviour.
 
 ## 8. Replacement gate
 

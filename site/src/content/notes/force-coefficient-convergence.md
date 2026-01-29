@@ -8,9 +8,7 @@ featured: true
 order: 2
 ---
 
-A flat-looking force trace is not a convergence criterion. The apparent calm may depend on plot scale, hand-picked bounds, correlated samples, or a late change in numerical settings.
-
-A defensible coefficient needs three things: **a stable definition, a reproducible window-selection rule, and uncertainty that respects temporal correlation.**
+A force coefficient earns trust when its definition is frozen, its averaging window comes from a rule, and its interval accounts for autocorrelation. A flat-looking trace proves none of these: the apparent calm may depend on plot scale, hand-picked bounds, correlated samples, or a late change in numerical settings.
 
 ## Start with the coefficient definition
 
@@ -32,22 +30,20 @@ The case record must identify:
 - whether moving-ground and rotating-wall forces are treated consistently;
 - coefficient sign convention.
 
-A correct mean of the wrong patch group is still wrong. Component sums should be reconciled with the whole-car definition before statistical processing.
+A correct mean of the wrong patch group is still wrong. Reconcile component sums with the whole-car definition before any statistical processing.
 
 ## Residual convergence and force convergence answer different questions
 
-Equation residuals measure the algebraic progress of the field solution. Integrated coefficients respond to the field that remains after that algebraic solve, including physical or numerical oscillation.
-
-The following states are possible:
+Equation residuals measure the algebraic progress of the field solution. Integrated coefficients respond to the field that remains after that solve, including physical or numerical oscillation.
 
 | Residuals | Forces | Interpretation |
 |---|---|---|
 | falling | drifting | field equations are solving, but the aerodynamic output is not stationary |
 | flat | stationary | possible steady state; still needs a declared interval |
-| oscillatory | periodic | may be a physical or numerical cycle; a mean needs correlation-aware uncertainty |
-| small | discontinuous | often a setup, restart, patch, or reference-definition change |
+| oscillatory | periodic | physical or numerical cycle; a mean needs correlation-aware uncertainty |
+| small | discontinuous | usually a setup, restart, patch, or reference-definition change |
 
-Publishing only the final residual panel does not establish a force result.
+Publishing the final residual panel establishes nothing about the force result.
 
 ## Preserve every numerical transition
 
@@ -60,17 +56,17 @@ A force history should carry event markers for changes that alter its statistics
 - geometry, mesh, patch, or reference updates;
 - solver or time-step changes.
 
-Samples on opposite sides of such a transition do not belong to one averaging population. The earliest admissible window begins after the last material transition and after the subsequent transient has decayed.
+Samples on opposite sides of such a transition belong to different populations. The earliest admissible window begins after the last material transition, once the subsequent transient has decayed.
 
-## Why the last N samples rule is weak
+## Why the last-N-samples rule is weak
 
-“Average the final 100 iterations” is reproducible but not necessarily defensible. It can:
+"Average the final 100 iterations" is reproducible but indefensible. It can:
 
-- hide a slow drift longer than the selected window;
-- produce different uncertainty when output frequency changes;
+- hide a drift longer than the selected window;
+- change the uncertainty when output frequency changes;
 - treat autocorrelated samples as independent;
 - select a different physical duration across cases;
-- reward a run that was stopped at a favourable phase.
+- reward a run stopped at a favourable phase.
 
 A better rule evaluates candidate windows against stationarity and uncertainty criteria fixed before comparing variants.
 
@@ -82,15 +78,15 @@ For each force or moment channel:
 2. **Generate candidate starts.** Each candidate extends to the same final sample.
 3. **Test drift.** Fit a linear trend and normalise its total window change by the mean magnitude or a declared engineering scale.
 4. **Test mean stability.** Compare early and late sub-window means.
-5. **Estimate correlated uncertainty.** Use batch means or another method that does not assume every iteration is independent.
+5. **Estimate correlated uncertainty.** Use batch means or another method that respects temporal correlation.
 6. **Require all critical channels to pass.** A stable whole-car coefficient does not excuse an unstable component balance.
 7. **Choose by rule, not appearance.** For example, select the earliest passing candidate to maximise retained evidence.
 
-The procedure should return the chosen start, number of samples, mean, interval, drift statistic, batch construction, and every failed candidate—not only the winning mean.
+The procedure should return the chosen start, sample count, mean, interval, drift statistic, batch construction, and every failed candidate alongside the winning mean.
 
 ## Batch means in engineering terms
 
-Suppose a retained history contains $N$ correlated samples. Divide it into $b$ contiguous batches of $m$ samples, compute one mean per batch, then estimate uncertainty from the variation of those batch means.
+Suppose a retained history contains $N$ correlated samples. Divide it into $b$ contiguous batches of $m$ samples, compute one mean per batch, then estimate uncertainty from the spread of those batch means.
 
 $$
 \bar{x}_j = \frac{1}{m}\sum_{i=(j-1)m+1}^{jm}x_i,
@@ -98,26 +94,28 @@ $$
 \bar{x} = \frac{1}{b}\sum_{j=1}^{b}\bar{x}_j.
 $$
 
-The confidence interval is formed from the batch-mean variance rather than the raw-sample variance. Batches must be long enough that adjacent batch means are approximately independent. More batches improve interval estimation; longer batches reduce residual correlation. The history length must support both.
+The interval comes from the batch-mean variance, not the raw-sample variance. Batches must be long enough that adjacent batch means are approximately independent. More batches sharpen the interval estimate; longer batches reduce residual correlation. The history must support both.
 
-Batch means do not prove physical accuracy. They quantify sampling uncertainty in the retained numerical history.
+Batch means quantify sampling uncertainty in the retained history. They say nothing about physical accuracy.
 
 ## Worked evidence from the F1 pilot
 
-The [F1 2026 full-car project](/projects/f1-2026-aero) retains 301 corrected coefficient samples. Its batch-means rule selects a window beginning at simulation time 370. Within that window:
+The [F1 2026 full-car project](/projects/f1-2026-aero) retains 301 corrected coefficient samples spanning iterations 100–400, across seven force outputs (whole car plus body, floor, front and rear wings, front and rear tyres). The batch-means rule selects a 31-sample window starting at $t = 370$:
 
 | Quantity | Mean | Relative confidence interval |
 |---|---:|---:|
 | $C_D$ | 0.2581 | 0.64% |
 | $C_L$ | -0.3019 | 0.59% |
 
-Those figures verify the coefficient pipeline, signs, data retention, and averaging implementation. They are deliberately not labelled as production aerodynamic predictions because the pilot mesh is coarse, its reference area is provisional, and the later mesh-qualification campaign remains NO-GO.
+The terminal values ($C_D = 0.2609$, $C_L = -0.3068$) still differ visibly from the window means, which is exactly why a rule beats an eyeball.
 
-This separation is important: **a statistically stable output can come from a physically unqualified discretisation.**
+The same project preserves the counterexample. An earlier uncorrected run produced a maximum $|C_L|$ of 10099 against a gate limit of 10 — a front-wing force-definition corruption that residual plots had hidden. Both runs stay in the record.
+
+These figures verify the coefficient pipeline: signs, data retention, window selection, averaging. They stay labelled as pilot output because the mesh is coarse, its reference area is provisional, and the later mesh-qualification campaign remains NO-GO. A stable average can hide a bad mesh. Both were true here.
 
 ## Compare variants only after per-case qualification
 
-For a baseline and candidate, first qualify each history independently. Then compare means with uncertainty carried into the delta.
+Qualify each history independently first. Then compare means with uncertainty carried into the delta.
 
 A useful report includes:
 
@@ -128,7 +126,7 @@ A useful report includes:
 - component contribution changes;
 - evidence that reference quantities and operating states are identical.
 
-If the observed delta is of the same scale as numerical or sampling uncertainty, the correct conclusion is not “small improvement”. It is “no resolved difference under this protocol”.
+If the observed delta is the same scale as numerical or sampling uncertainty, the correct conclusion is "no resolved difference under this protocol".
 
 ## Failure modes worth publishing
 
@@ -142,7 +140,7 @@ A strong convergence report retains cases where:
 - apparent convergence disappears when the y-axis is rescaled;
 - a restart creates an undocumented discontinuity.
 
-These failures identify whether the next action is more iterations, a corrected setup, different sampling, or rejection of the case.
+These failures decide the next action: more iterations, a corrected setup, different sampling, or rejection of the case.
 
 ## Minimum publication payload
 
@@ -157,8 +155,8 @@ A reader should receive:
 7. the mesh and model qualification state;
 8. the exact decision the statistics permit.
 
-The plotted line is presentation. The reusable engineering artifact is the rule that converts raw history into a bounded claim.
+The plotted line is presentation. The reusable artifact is the rule that converts raw history into a bounded claim.
 
 ## Boundary of this note
 
-No single batch length, drift limit, or interval threshold applies to every RANS or transient case. The correct sampling method depends on stationarity, output cadence, dominant time scales, and the decision margin. This note defines what must be exposed; it does not prescribe universal numerical tolerances.
+No single batch length, drift limit, or interval threshold applies to every RANS or transient case. The right sampling method depends on stationarity, output cadence, dominant time scales, and the decision margin. This note defines what must be exposed; it prescribes no universal tolerances.

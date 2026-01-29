@@ -27,31 +27,45 @@ heroImage: /images/projects/pipe-flow-sizing/moody.svg
 
 ## Context & objective
 
-Three months after moving from software engineering into mechanical engineering, I needed hydraulics I could trust for a later FSAE cooling-loop study. The mathematics of pipe sizing is not hard, but it is easy to *almost* get right: a friction factor off by a few percent, a minor-loss coefficient silently dropped, an operating point found by eyeballing two curves. This study builds the primitives from scratch and verifies each one before it is allowed to feed anything downstream.
+The representative cooling loop operates at 26.22 L/min against 51.34 kPa, and about 78% of that pressure drop is minor losses — the K coefficients of the radiator core and engine gallery, with straight-pipe friction a minor share at this scale. That conclusion only matters because every primitive behind it was verified before it was allowed to feed anything downstream.
 
-Everything here is steady, incompressible, single-phase pipe flow: Darcy–Weisbach friction, K-coefficient minor losses, a series network, and the intersection of a pump curve with the system resistance curve.
+Three months after moving from software engineering into mechanical engineering, I needed hydraulics I could trust for a later FSAE cooling-loop study. The mathematics of pipe sizing is not hard, but it is easy to *almost* get right: a friction factor off by a few percent, a minor-loss coefficient silently dropped, an operating point found by eyeballing two curves. Everything here is steady, incompressible, single-phase pipe flow: Darcy–Weisbach friction, K-coefficient minor losses, a series network, and the intersection of a pump curve with the system resistance curve.
 
 ## Friction factor, verified two ways
 
-Below $Re=2300$ the friction factor is the analytical identity $f=64/Re$; the implementation reproduces it with zero floating-point error across a 200-point grid. Above it, the implicit Colebrook equation is solved by Newton iteration on $x=1/\sqrt{f}$ from a [Haaland](https://doi.org/10.1115/1.3240948) initial guess. The solved factor is then substituted back into the defining equation: across 150 $(Re, \varepsilon/D)$ grid points up to $Re=10^8$, the maximum residual is $3.55\times10^{-15}$.
-
-As an independent cross-check, the explicit [Swamee–Jain](https://doi.org/10.1061/JYCEAJ.0004542) formula — published with a $\pm3\%$ accuracy band — is compared against the solved Colebrook values over its declared validity range. The observed maximum deviation is 2.83%, inside the band. The comparison grid is deliberately restricted to that range: outside it (near $Re=4\times10^3$ at very low roughness) the deviation exceeds 3%, and the runner reports the in-range deviation rather than quietly widening the grid.
+Below $Re=2300$ the friction factor is the analytical identity $f=64/Re$; the implementation reproduces it with zero floating-point error across a 200-point grid. Above it, the implicit Colebrook equation is solved by Newton iteration on $x=1/\sqrt{f}$ from a [Haaland](https://doi.org/10.1115/1.3240948) initial guess, with a 50-iteration guard that turns non-convergence into a loud failure instead of a silent bad factor. Substituting the solved factor back into the defining equation across 150 $(Re, \varepsilon/D)$ grid points up to $Re=10^8$ gives a maximum residual of $3.55\times10^{-15}$.
 
 ![Computed Moody-style chart: laminar line and Colebrook curves](/images/projects/pipe-flow-sizing/moody.svg)
 
-The Moody-style chart above is drawn from computed curves only — the laminar line and six Colebrook sweeps at declared relative roughnesses. No external chart was digitised.
+The Moody-style chart is drawn from computed curves only — the laminar line and six Colebrook sweeps at declared relative roughnesses. No external chart was digitised.
+
+## Iteration: the cross-check that needed a fence
+
+The independent cross-check is the explicit [Swamee–Jain](https://doi.org/10.1061/JYCEAJ.0004542) formula, published with a $\pm3\%$ accuracy band over $5\times10^3\le Re\le10^8$ and $10^{-6}\le\varepsilon/D\le10^{-2}$. That band has edges, and the comparison finds them: outside the declared range — near $Re=4\times10^3$ at very low roughness — the deviation exceeds 3%.
+
+That left two bad options and one honest one. Widening the comparison grid would have produced a failing number and a false sense that the solver was wrong; quietly narrowing it would have hidden where the approximation breaks. The runner does neither. It evaluates the declared validity range, reports the in-range maximum deviation of 2.83% (inside the band), and leaves the out-of-range behaviour documented as a property of the formula. The lesson carried forward: a cross-check against an approximation is only meaningful inside that approximation's own fence.
 
 ## Series network and pump operating point
 
-A representative FSAE-scale cooling loop — suction hose, radiator core, engine gallery, return hose, declared water properties, declared K coefficients — is solved in series. The pump is a declared quadratic model $\Delta p = 90\ \text{kPa} - c\,Q^2$ (40 L/min free delivery), explicitly not vendor data. The operating point is where pump curve meets system resistance curve:
+A representative FSAE-scale cooling loop — suction hose, radiator core, engine gallery, return hose, declared water properties, declared K coefficients — is solved in series by bisection on the monotone system curve. The pump is a declared quadratic model $\Delta p = 90\ \text{kPa} - c\,Q^2$ (40 L/min free delivery), explicitly a stand-in rather than vendor data. The operating point is where pump curve meets system resistance curve:
 
 - **Operating flow:** 26.22 L/min at 51.34 kPa, intersection residual $2.18\times10^{-11}$ Pa.
 - **Independent check:** a 4096-sample brute-force scan brackets the intersection at $[26.2173, 26.2271]$ L/min; the Newton solution sits inside.
 - **Closure:** the total drop equals the sum of the per-element drops exactly (0.0 Pa closure error, at the operating point and across a 24-flow sweep).
 
+The element breakdown shows where the pressure goes:
+
+| Element | $Re$ | $f$ | $\Delta p$ |
+|---|---:|---:|---:|
+| Suction hose (0.40 m, 16 mm, $K=1.5$) | 34 654 | 0.0230 | 4.89 kPa |
+| Radiator core (0.15 m, 16 mm, $K=8.0$) | 34 654 | 0.0230 | 19.37 kPa |
+| Engine gallery (0.50 m, 14 mm, $K=4.0$) | 39 605 | 0.0296 | 20.33 kPa |
+| Return hose (0.60 m, 16 mm, $K=2.0$) | 34 654 | 0.0230 | 6.75 kPa |
+| **Total** | | | **51.34 kPa** |
+
 ![Pump curve vs system resistance curve with the operating point](/images/projects/pipe-flow-sizing/pump-operating-point.svg)
 
-The element breakdown is the instructive part: the radiator core (19.37 kPa) and engine gallery (20.33 kPa) dominate through their K coefficients, while straight-pipe friction is a minor share at this scale. Minor losses, not pipe length, size this loop — the first concrete lesson the later cooling work would reuse.
+A sanity check with physics teeth: adding a 10 kPa static lift reduces the operating flow, as the model must.
 
 ## Validation summary
 
@@ -67,7 +81,7 @@ All gates are enforced by the analysis runner, which exits nonzero if any fail.
 
 ## Limitations
 
-The model is steady, incompressible, and single-phase; there is no cavitation or NPSH check, so the pump curve is followed wherever the mathematics goes. Minor-loss K coefficients are declared handbook order-of-magnitude values, and published K tables carry wide uncertainty. The pump curve is a declared quadratic, not vendor data — real curves bend near shutoff and free delivery. The laminar/turbulent transition is a hard switch at $Re=2300$ with no transition band, and the network solver handles series topology only; parallel branches were deliberately left for the later cooling study.
+The model is steady, incompressible, and single-phase; there is no cavitation or NPSH check, so the pump curve is followed wherever the mathematics goes. Minor-loss K coefficients are declared handbook order-of-magnitude values, and published K tables carry wide uncertainty. The pump curve is a declared quadratic; real curves bend near shutoff and free delivery. The laminar/turbulent transition is a hard switch at $Re=2300$ with no transition band, and the network solver handles series topology only; parallel branches were deliberately left for the later cooling study.
 
 ## Reproduce
 

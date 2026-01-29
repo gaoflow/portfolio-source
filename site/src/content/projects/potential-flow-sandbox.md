@@ -27,9 +27,9 @@ heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
 
 ## Context & objective
 
-This study belongs to my fourth month after moving from software engineering into mechanical engineering, and it closes the fluids-coursework phase of the ladder. The motivation is practical: the panel method in [Airfoil Methods](/projects/airfoil-methods) and the vortex-lattice code in [Ground Effect VLM](/projects/ground-effect-vlm) both assume that sources, doublets, and vortices are exact, that superposition is legitimate, and that circulation means lift. Rather than import those assumptions, I built the layer they rest on and verified every identity it claims.
+Every identity this layer of theory claims checks out at machine precision: surface $C_p$ to $2.66\times10^{-15}$, circulation recovery to $8.9\times10^{-16}$, Kutta–Joukowski lift exact in sign and magnitude. The panel method in [Airfoil Methods](/projects/airfoil-methods) and the vortex-lattice code in [Ground Effect VLM](/projects/ground-effect-vlm) both assume that sources, doublets, and vortices are exact, that superposition is legitimate, and that circulation means lift. Rather than import those assumptions, I built the layer they rest on and verified every identity it claims.
 
-The deliverable is a small sandbox: elementary flows written as complex potentials, superposed into flow past a circular cylinder with and without circulation, with an RK4 streamline tracer checked against the analytical streamfunction.
+This study belongs to my fourth month after moving from software engineering into mechanical engineering, and it closes the fluids-coursework phase of the ladder. The deliverable is a small sandbox: elementary flows written as complex potentials, superposed into flow past a circular cylinder with and without circulation, with an RK4 streamline tracer checked against the analytical streamfunction.
 
 ## Method
 
@@ -37,13 +37,23 @@ Each elementary flow is a complex potential $W(z)$, $z = x + iy$, with the physi
 
 $$W_{\text{uniform}} = Uz, \quad W_{\text{source}} = \frac{m}{2\pi}\ln z, \quad W_{\text{doublet}} = \frac{\mu}{2\pi z}, \quad W_{\text{vortex}} = \frac{i\Gamma}{2\pi}\ln z .$$
 
-Circulation follows the aerodynamics convention — positive $\Gamma$ is clockwise — because that is the convention under which $L' = \rho U \Gamma$ points upward. Superposing the stream, a doublet of moment $\mu = 2\pi U R^2$, and the vortex gives cylinder flow with circulation:
+Superposing the stream, a doublet of moment $\mu = 2\pi U R^2$, and the vortex gives cylinder flow with circulation:
 
 $$W(z) = U\!\left(z + \frac{R^2}{z}\right) + \frac{i\Gamma}{2\pi}\ln z .$$
 
 The linearity that permits this superposition is the same linearity the panel and vortex-lattice methods exploit; the difference is that here the superposed field has a closed form, so the implementation can be tested to machine precision rather than to experimental scatter.
 
 ![Streamlines around the cylinder at both circulations](/images/projects/potential-flow-sandbox/streamlines-cylinder.svg)
+
+## Iteration: designing tests for failures that stay silent
+
+Two failure modes in this code produce plausible output, so the test suite is built around them explicitly.
+
+**The sign of circulation.** A sign error in the vortex term crashes nothing and fails no residual; it returns a lift vector of the right magnitude pointing down. The sandbox adopts the aerodynamics convention — positive $\Gamma$ clockwise, the convention under which $L' = \rho U \Gamma$ points upward — and a unit test pins the sign so a later refactor cannot flip it quietly. The contour-integral check isolates the same term from the other direction: the uniform and doublet parts contribute zero circulation, so whatever the integral returns at $r = 2.5R$ belongs to the vortex alone.
+
+**The order of the tracer.** A small streamline drift at one step size would prove little, because a broken integrator can still hug the analytical line at $h = 0.01$. The real check is the halving experiment: drift falls by a factor of 16.0 when the step halves, an observed convergence order of 4.003. That pins the RK4 truncation behaviour, where a single small number would have been luck.
+
+The third deliberate choice is interpretive. Integrated surface pressure gives zero drag to machine precision — d'Alembert's paradox. I recorded it as a limitation of the model class, not as a successful drag prediction.
 
 ## Validation
 
@@ -57,7 +67,7 @@ Five checks, each against theory rather than another numerical method:
 | RK4 streamfunction drift, step 0.01 | $2.56\times10^{-12}$ | $<10^{-6}$ |
 | Integrated lift vs $\rho U \Gamma$ | 0.0 relative | $<10^{-9}$ |
 
-The lift case imposes $\Gamma = 2\pi U R$, moving the stagnation points from $0^\circ, 180^\circ$ to $-30^\circ, -150^\circ$; the figure marks the located points on top of the traced field. The streamline check is a genuine numerical experiment: the tracer knows only the velocity field, and its drift from the analytical $\psi$ level shrinks by a factor of 16 when the step halves — an observed convergence order of 4.003.
+The lift case imposes $\Gamma = 2\pi U R$, moving the stagnation points from $0^\circ, 180^\circ$ to $-30^\circ, -150^\circ$; the figure marks the located points on top of the traced field.
 
 ![Surface Cp: velocity-field evaluation against the analytical distribution](/images/projects/potential-flow-sandbox/cp-comparison.svg)
 
@@ -73,7 +83,7 @@ With $U = 1$, $R = 1$, $\rho = 1.225$, and $\Gamma = 2\pi$:
 
 ## Limitations
 
-The model is inviscid, irrotational, incompressible, and strictly two-dimensional. There is no boundary layer, so the real flow's separation and wake — which dominate an actual cylinder's drag — are absent by construction. Circulation is imposed, not predicted: nothing here explains why a lifting body carries a particular $\Gamma$; that requires the Kutta condition introduced with the airfoil work. The zero-drag result is d'Alembert's paradox, a property of the model class, and I treated it as a limitation signal rather than a successful drag prediction.
+The model is inviscid, irrotational, incompressible, and strictly two-dimensional. There is no boundary layer, so the real flow's separation and wake — which dominate an actual cylinder's drag — are absent by construction. Circulation is imposed, not predicted: nothing here explains why a lifting body carries a particular $\Gamma$; that requires the Kutta condition introduced with the airfoil work.
 
 ## Reproduce
 

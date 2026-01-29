@@ -20,13 +20,13 @@ keyOutputs:
 featured: true
 sample: false
 order: 6
-studySequence: 8
+studySequence: 13
 heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg
 ---
 
 ## Context & objective
 
-Ground effect is easy to describe and easy to overclaim. This study asks a narrower question: how does an ideal moving ground boundary alter the circulation and induced-drag cost of a finite wing, before viscous flow, body interference, and floor geometry are introduced?
+At half-chord ride height, an ideal moving ground raises this finite wing's fixed-incidence lift 32.4% and cuts induced-drag cost per lift squared 41.9%; absolute induced drag barely moves. Ground effect is easy to describe and easy to overclaim, so this study asks a narrower question: how does an ideal moving ground boundary alter the circulation and induced-drag cost of a finite wing, before viscous flow, body interference, and floor geometry are introduced?
 
 The result is an independently implemented low-order solver, not repackaged output from another project. It provides a cheap, auditable baseline for checking sign, scale, normalisation, and ride-height sweep discipline before spending effort on panel or RANS models.
 
@@ -46,7 +46,7 @@ The production sweep uses 64 uniform span panels, fixed geometric incidence of 4
 
 ## Result: useful mechanism, bounded claim
 
-Free air gives $C_L=0.2615$, $C_{D_i}=0.00549$, and $e=0.990$. At $h/c=0.5$, fixed-incidence lift rises 32.4% to $C_L=0.3461$. Absolute induced drag remains similar, while $C_{D_i}/C_L^2$ falls 41.9% relative to free air.
+Free air gives $C_L=0.2615$, $C_{D_i}=0.00549$, and $e=0.990$. At $h/c=0.5$, fixed-incidence lift rises 32.4% to $C_L=0.3461$. Absolute induced drag edges up to 0.00559, while $C_{D_i}/C_L^2$ falls 41.9% relative to free air.
 
 The useful conclusion is lower induced-drag cost for a required lift. It is not a promise of absolute drag reduction at fixed incidence, and it is not a race-car floor prediction. The conventional free-air span-efficiency expression exceeds one in ground effect because the boundary-value problem has changed.
 
@@ -68,7 +68,7 @@ The 11% lift-slope difference is retained rather than calibrated away: a finite 
 
 ## Limitations
 
-The solver is linear, steady, incompressible, inviscid, and zero-thickness. It contains no road boundary layer, tyres, body blockage, finite floor, diffuser, leakage, viscous pressure recovery, or separation. The large amplification at $h/c=0.25$ is therefore a limitation signal, not a design result. No data below that bound is published.
+The solver is linear, steady, incompressible, inviscid, and zero-thickness. It contains no road boundary layer, tyres, body blockage, finite floor, diffuser, leakage, viscous pressure recovery, or separation. At $h/c=0.25$ the linear model predicts $C_L=0.5419$, more than twice the free-air value, with a span-efficiency indicator of 2.59. That endpoint is a warning, not a design result: the sweep stops there and no data below that bound is published.
 
 ## Reproduce
 
@@ -85,7 +85,7 @@ The solver tests that condition directly at 257 road-plane samples after circula
 Three quantities must be kept separate:
 
 1. **fixed-incidence lift**, which increases as the image system changes downwash;
-2. **absolute induced drag**, which remains close to the free-air value at $h/c=0.5$;
+2. **absolute induced drag**, which at $h/c=0.5$ sits at 0.00559 against 0.00549 in free air;
 3. **induced-drag cost per lift squared**, which falls by 41.9%.
 
 Conflating the third quantity with absolute drag would reverse the engineering meaning. The model supports “less induced penalty for a required lift” within its assumptions; it does not support “the car has less total drag near the ground.”

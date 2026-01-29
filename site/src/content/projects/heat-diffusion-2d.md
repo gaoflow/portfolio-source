@@ -22,15 +22,15 @@ keyOutputs:
 featured: false
 sample: false
 order: 15
-studySequence: 7
+studySequence: 12
 heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
 ---
 
 ## Context & objective
 
-Seventh study of the sequence, seven months after moving from software engineering into mechanics. The earlier studies were steady or algebraic; this is the first time-dependent PDE integration, and it is the direct precursor to the [FlowLab lattice-Boltzmann work](/projects/flowlab): before trusting a browser LBM solver, I wanted the smallest possible unsteady solver where every error mechanism — stability, temporal order, conservation — could be checked against something exact.
+The first time-dependent solver of the sequence matches the analytical slab transient to $L^\infty=1.38\times10^{-5}$, and it refuses to run outside its stability bound. It is the seventh study, seven months after moving from software engineering into mechanics, and the direct precursor to the [FlowLab lattice-Boltzmann work](/projects/flowlab): before trusting a browser LBM solver, I wanted the smallest unsteady solver where stability, temporal order, and conservation could each be checked against something exact.
 
-The heat equation $\partial_t T=\alpha\nabla^2 T$ is the right vehicle: it has an analytical transient, a textbook stability bound, and a conservation identity. The objective was not a fast solver but a *verifiable* one, with the gates declared before the numbers were generated.
+The heat equation $\partial_t T=\alpha\nabla^2 T$ is the right vehicle: it has an analytical transient, a textbook stability bound, and a conservation identity. The objective was a verifiable solver, with the gates declared before the numbers were generated.
 
 ## Method
 
@@ -62,7 +62,7 @@ Five predeclared gates, all passing:
 | Attempted $r=0.26$ run | refused and logged | refused |
 | Cross-direction variation, series-initialised 2-D field | $0.0$ | $<10^{-14}$ |
 
-One subtlety is worth stating plainly. FTCS applied to the heat equation carries the combined leading truncation term $\tfrac{\alpha\Delta x^2}{12}(6r-1)\,\partial_x^4T$: temporal and spatial errors couple, so refining $\Delta t$ against the analytical solution at fixed grid cannot show order one. The temporal order is therefore isolated by comparing four runs at $r\in\{0.20,0.10,0.05,0.025\}$ against a fine-time reference ($r=10^{-3}$) on the *same* grid, where the shared spatial error cancels in the difference. The observed slope is 1.017.
+The obvious temporal-refinement plan fails on paper. FTCS applied to the heat equation carries the combined leading truncation term $\tfrac{\alpha\Delta x^2}{12}(6r-1)\,\partial_x^4T$: temporal and spatial errors couple, so refining $\Delta t$ against the analytical solution at fixed grid cannot show order one. The temporal order is therefore isolated by comparing four runs at $r\in\{0.20,0.10,0.05,0.025\}$ against a fine-time reference ($r=10^{-3}$) on the *same* grid, where the shared spatial error cancels in the difference. The observed slope is 1.017.
 
 ![Error versus time step with slope-1 reference](/images/projects/heat-diffusion-2d/temporal-refinement.svg)
 

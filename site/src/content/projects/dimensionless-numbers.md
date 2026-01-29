@@ -26,15 +26,23 @@ heroImage: /images/projects/dimensionless-numbers/reynolds-sweep.svg
 
 ## Context & objective
 
-This is the first study on the ladder, written in my first month after moving from software engineering into mechanics (September 2025). Nearly every aerodynamics estimate I met started with a Reynolds number, and every hand-checked Reynolds number deserved to be one command away. The objective was deliberately small: a strict, honest toolkit — not a spreadsheet — that computes the standard dimensionless groups, refuses dimensionally inconsistent input loudly, and carries a property table whose numbers cite a traceable source.
+Six dimensionless groups — Reynolds, Mach, Prandtl, Nusselt, Grashof, Rayleigh — now sit one command away, machine-exact against a hand calculation, with guards that reject a dimensionally wrong input loudly instead of returning a plausible-looking number. That is the whole deliverable, and it was deliberately small.
+
+This is the first study on the ladder, written in September 2025, my first month after moving from software engineering into mechanics. Nearly every aerodynamics estimate I met started with a Reynolds number, and a Reynolds number computed from the wrong viscosity quietly poisons everything downstream. The objective: a strict toolkit that computes the standard groups, refuses inconsistent input, and carries a property table whose numbers cite a traceable source.
 
 ## Method
 
-Each group is implemented from its defining equation: $Re=\rho u L/\mu$, $Ma=u/a$, $Pr=\mu c_p/k$, $Nu=hL/k$, $Gr=g\beta\lvert\Delta T\rvert L^3\rho^2/\mu^2$, and $Ra$ in expanded form. Rayleigh is written expanded rather than as $Gr\cdot Pr$ so the identity test is a real algebraic check, not a tautology.
+Each group is implemented from its defining equation: $Re=\rho u L/\mu$, $Ma=u/a$, $Pr=\mu c_p/k$, $Nu=hL/k$, $Gr=g\beta\lvert\Delta T\rvert L^3\rho^2/\mu^2$, and $Ra$ in expanded form.
 
-Guarding uses a minimal SI dimension system: every parameter declares its dimension vector over $(M, L, T, \Theta)$, and `Quantity(value, unit)` inputs are checked against it. Passing kinematic viscosity ($L^2T^{-1}$) where dynamic viscosity ($ML^{-1}T^{-1}$) is required produces an error naming the parameter, the expected dimension, and the received unit. Domain guards then enforce positivity and finiteness.
+Guarding uses a minimal SI dimension system: every parameter declares its dimension vector over $(M, L, T, \Theta)$, and `Quantity(value, unit)` inputs are checked against it. Passing kinematic viscosity ($L^2T^{-1}$) where dynamic viscosity ($ML^{-1}T^{-1}$) is required produces an error naming the parameter, the expected dimension, and the received unit — exactly the mix-up a hand calculation invites. Plain floats are trusted as SI values; domain guards then enforce positivity and finiteness.
 
 The property table transcribes five anchors from Incropera 7th ed. Tables A.4 (air, 300–400 K) and A.6 (water, 300–320 K), cross-checkable against the NIST Chemistry WebBook. Lookup is exact at anchors, piecewise-linear between them, and refuses to extrapolate.
+
+## Iteration: making the identity test able to fail
+
+The headline check is the identity $Ra = Gr\cdot Pr$ over 500 seeded random draws. That check is vacuous if both sides share the computation: implement $Ra$ as $Gr\cdot Pr$ and the test compares a number with itself, passing at 0.0 error while proving nothing. $Ra$ is therefore implemented from its expanded defining equation, so the identity test is a genuine algebraic check that can fail. It passes at a worst relative error of $4.4\times10^{-16}$.
+
+The same suspicion applies to the property table. Transcription errors are the realistic failure mode for a hand-copied table, so the runner checks more than the anchors: tabulated Prandtl numbers must agree with $\mu c_p/k$ computed from the transcribed $\mu$, $c_p$, $k$. They agree to within 0.19%, which bounds transcription coherence rather than trusting it.
 
 ## Validation
 
@@ -47,7 +55,7 @@ Four predeclared gates, all passing:
 | Invalid calls rejected | 10 of 10 | 10 of 10 |
 | Property anchors exact | 20 of 20 values | 20 of 20 |
 
-The reference case is hand-checkable: $Re = 1.225 \times 15 \times 0.3 / 1.81\times10^{-5} \approx 3.05\times10^{5}$. A valid control call passes the same guards, so rejection is not over-firing, and tabulated Prandtl numbers agree with $\mu c_p/k$ to within 0.19% as a transcription-coherence check.
+The reference case is hand-checkable: $Re = 1.225 \times 15 \times 0.3 / 1.81\times10^{-5} \approx 3.05\times10^{5}$. A valid control call passes the same guards untouched, so rejection is not over-firing.
 
 ## Quantitative results
 
@@ -55,11 +63,11 @@ At sea level ($\rho=1.225$ kg/m³, $\mu=1.81\times10^{-5}$ Pa·s), the front-win
 
 ![Reynolds number vs velocity for three characteristic lengths](/images/projects/dimensionless-numbers/reynolds-sweep.svg)
 
-The horizontal annotations — flat-plate transition near $5\times10^{5}$ and a fully-turbulent order of magnitude near $10^{7}$ — are regime intuition, not predictions: real transition depends on roughness, pressure gradient, and free-stream turbulence, none of which a dimensionless group models.
+The horizontal annotations — flat-plate transition near $5\times10^{5}$ and a fully-turbulent order of magnitude near $10^{7}$ — are regime intuition: real transition depends on roughness, pressure gradient, and free-stream turbulence, none of which a dimensionless group models.
 
 ## Limitations
 
-The property table is a constant-property approximation: five anchors, linear interpolation, narrow temperature ranges, and ideal-gas $\beta = 1/T$ for air. The toolkit's scope is the incompressible regime; the only compressibility present is the Mach definition and the perfect-gas speed of sound — there are no real-gas effects. The figure's regime limits are textbook intuition, not transition predictions for any specific surface.
+The property table is a constant-property approximation: five anchors, linear interpolation, narrow temperature ranges, ideal-gas $\beta = 1/T$ for air, and coverage of air and water only. The toolkit's scope is the incompressible regime; compressibility appears as the Mach definition and the perfect-gas speed of sound, with no real-gas effects. The figure's regime limits are textbook intuition, and a specific surface needs a specific transition model.
 
 ## Reproduce
 

@@ -21,13 +21,13 @@ keyOutputs:
 featured: true
 sample: false
 order: 7
-studySequence: 6
+studySequence: 7
 heroImage: /images/projects/airfoil-methods/lift-validation.svg
 ---
 
 ## Context & objective
 
-More model complexity does not guarantee a better answer. This study builds a low-order hierarchy for the NACA 0012, verifies each implementation step, then tests the hierarchy against one internally consistent public wind-tunnel series.
+Against one public NASA wind-tunnel series, thin-airfoil theory predicts the NACA 0012's measured lift slope to 3.81% error while a geometry-resolved panel method misses by 13.83%. This study builds that low-order hierarchy, verifies each implementation step, and maps where each level earns and loses trust.
 
 The selected source is Table I of Charles L. Ladson's [NASA TM-4074](https://ntrs.nasa.gov/citations/19880019495): free-transition measurements at $M=0.15$ and $Re=5.97\times10^6$. Sixteen values are transcribed directly from the public table. No plotted curve was digitised and no Reynolds numbers or transition conditions were mixed.
 
@@ -99,7 +99,7 @@ Cosine spacing concentrates panels at the leading and trailing edges without cha
 
 $$C_p=1-\left(V_t/V_\infty\right)^2.$$
 
-Twelve-point Gauss–Legendre integration is used for non-self panel influence, and analytical half-jump terms handle the singular self contribution. This separation is important: increasing panel count cannot repair an incorrect singular term or trailing-edge condition.
+Non-self panel influence uses twelve-point Gauss–Legendre integration; analytical half-jump terms handle the singular self contribution. More panels cannot repair a wrong singular term or Kutta condition: those are correctness questions, not convergence questions.
 
 ## Verification, validation, and capability
 
