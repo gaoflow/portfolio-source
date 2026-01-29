@@ -35,3 +35,13 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .reveal { animation: none; }
 }
+
+/* Prose robustness on narrow viewports: long paths/code must wrap, tables scroll */
+.prose :where(code):not(pre code) {
+  overflow-wrap: anywhere;
+}
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
