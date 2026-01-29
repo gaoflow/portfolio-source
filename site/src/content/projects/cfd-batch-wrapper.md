@@ -27,7 +27,7 @@ order: 9
 
 Start with the manual workflow being replaced. Name the repeated decisions, the handoffs that create errors, and the operator time being consumed. The opening sentence belongs to the engineering bottleneck; "I wrote a Python wrapper" is not one.
 
-An acceptable publication states which stages are automated — case generation, geometry staging, meshing, decomposition, solver launch, monitoring, post-processing, report generation — and which decisions still require an engineer.
+State which stages are automated — case generation, geometry staging, meshing, decomposition, solver launch, monitoring, post-processing, report generation — and which decisions still require an engineer.
 
 ## 2. Public architecture
 
@@ -41,7 +41,7 @@ case materialisation → mesh gate → solver gate → result gate
  run manifest        quality JSON   field checks   report/artifacts
 ```
 
-The article should name the configuration schema, state machine, process-isolation boundary, and output contract. It should not publish customer or team paths, CAD, map values, setup-specific coefficients, or screenshots that reveal protected geometry.
+Name the configuration schema, state machine, process-isolation boundary, and output contract. Keep customer or team paths, CAD, map values, setup-specific coefficients, and screenshots that reveal protected geometry out of the article.
 
 ## 3. Configuration contract
 
@@ -59,7 +59,7 @@ Every default shown in the article must come from a public example or carry an i
 
 ## 4. Execution and failure semantics
 
-A useful automation case explains what happens when a stage fails. Mesh rejection must block solving. A nonzero solver exit, non-finite field, incomplete log, missing coefficient stream, or failed physical gate must remain visible in the run manifest.
+Describe what happens when a stage fails. Mesh rejection must block solving. A nonzero solver exit, non-finite field, incomplete log, missing coefficient stream, or failed physical gate must remain visible in the run manifest.
 
 "Unattended" does not mean "unmonitored." The real evidence shows timeouts, captured exit codes, partial-artifact handling, and deterministic resumption. Automatic retries must never turn a physically invalid case into a green run.
 

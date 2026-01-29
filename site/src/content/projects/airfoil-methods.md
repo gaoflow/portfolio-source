@@ -21,7 +21,7 @@ keyOutputs:
 featured: true
 sample: false
 order: 7
-studySequence: 7
+studySequence: 6
 heroImage: /images/projects/airfoil-methods/lift-validation.svg
 ---
 
@@ -73,6 +73,8 @@ Across all 16 points, panel-model lift RMSE rises to 0.225. NASA measures $C_l=1
 
 The drag comparison is even clearer. NASA wake-survey $C_d$ rises from about 0.0065 near zero lift to 0.0275. Panel pressure drag stays below 0.0008 apart from discretisation error. That is d'Alembert's paradox, not an accurate low-drag prediction.
 
+Cropping either failure would have been easy: truncate the comparison at the declared linear range, omit the drag curve, and the panel method reads as uniformly successful. The evidence pack does the opposite. The acceptance criteria require near-zero inviscid pressure drag and measured drag above 0.02 to coexist in the same output, so the blind spot cannot be edited out silently later.
+
 ![Measured drag beside the inviscid blind spot](/images/projects/airfoil-methods/drag-blind-spot.svg)
 
 ## What this demonstrates
@@ -121,3 +123,7 @@ Beyond the attached-flow range, the error changes category rather than merely in
 ## Engineering use
 
 This hierarchy is useful for geometry checks, sign conventions, linear lift scale, surface-loading inspection, and cheap pre-CFD screening. It is not suitable for ranking high-lift sections by stall margin or drag. The next fidelity step must earn its complexity with transition, wall resolution, and a grid/model sensitivity programme—not simply a denser inviscid discretisation.
+
+## What I took away
+
+The geometry-resolved model lost the scalar comparison I expected it to win: 13.83% slope error against thin-airfoil theory's 3.81%, with panel refinement already at 0.0307%. The gap was model form, so the corrective action was to name the missing physics rather than add panels. The more durable decision was presentational: the stall overshoot (2.085 against a measured 1.660) and the near-zero drag curve stayed in the headline figures, because cropping them would have turned a capability boundary into an apparent validation.

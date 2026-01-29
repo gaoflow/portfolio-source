@@ -21,7 +21,7 @@ keyOutputs:
 featured: true
 sample: false
 order: 5
-studySequence: 14
+studySequence: 13
 heroImage: /images/projects/flowlab/cavity-vorticity.svg
 ---
 
@@ -67,7 +67,7 @@ The recorded 64² validation run sustained 26.3 million lattice updates per seco
 
 ## Failure & correction
 
-The first automated validation stopped at 20,000 iterations with residual $4.80\times10^{-7}$. Its velocity error was already small, but it failed the declared convergence gate. The iteration allowance rose to 23,000 for the automated test; the acceptance criterion stayed fixed.
+The first automated validation stopped at 20,000 iterations with residual $4.80\times10^{-7}$. Its velocity error was already small, but it failed the declared convergence gate. The iteration allowance rose to 23,000 for the automated test, with grid-dependent limits for the report generator; the acceptance criterion stayed fixed.
 
 A direct moving-wall velocity overwrite was also rejected. It would display the requested lid speed without defining consistent incoming populations. Momentum-corrected bounce-back makes the boundary condition part of the distribution update instead.
 
@@ -115,3 +115,7 @@ The measured 26.3 million lattice updates per second is a workstation observatio
 ## Extension gates
 
 Higher Reynolds numbers remain exploratory until they pass an external reference and stability study. Replacing BGK with MRT or a regularised collision operator would require repeating the three-grid benchmark rather than inheriting the current validation. Cylinder wake or aeroacoustic modes would additionally need Strouhal-number and force-history gates before publication.
+
+## What I took away
+
+A run can fail with good numbers: the 20,000-iteration attempt already had small velocity error and still missed the declared convergence gate at a residual of $4.80\times10^{-7}$, so the correction raised the budget and left the criterion untouched. Convergence and agreement are independent properties; both stayed gates. The rejected shortcut taught as much as the accepted fix — overwriting the lid velocity would display the requested speed while leaving the incoming populations undefined, which is why the wall momentum lives in the reflection step.

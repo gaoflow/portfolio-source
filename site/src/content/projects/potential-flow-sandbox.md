@@ -49,7 +49,7 @@ The linearity that permits this superposition is the same linearity the panel an
 
 Two failure modes in this code produce plausible output, so the test suite is built around them explicitly.
 
-**The sign of circulation.** A sign error in the vortex term crashes nothing and fails no residual; it returns a lift vector of the right magnitude pointing down. The sandbox adopts the aerodynamics convention — positive $\Gamma$ clockwise, the convention under which $L' = \rho U \Gamma$ points upward — and a unit test pins the sign so a later refactor cannot flip it quietly. The contour-integral check isolates the same term from the other direction: the uniform and doublet parts contribute zero circulation, so whatever the integral returns at $r = 2.5R$ belongs to the vortex alone.
+**The sign of circulation.** A sign error in the vortex term crashes nothing and fails no residual; it returns a lift vector of the right magnitude pointing down. The sandbox adopts the aerodynamics convention — positive $\Gamma$ clockwise, the convention under which $L' = \rho U \Gamma$ points upward — and a unit test pins the sign so a later refactor cannot flip it quietly. The convention also follows the code into the integration: the trapezoid sum evaluates the contour counter-clockwise, so recovering $\Gamma$ takes a sign flip. One line, easy to get wrong, and invisible to every residual-based check. The contour-integral check isolates the same term from the other direction: the uniform and doublet parts contribute zero circulation, so whatever the integral returns at $r = 2.5R$ belongs to the vortex alone.
 
 **The order of the tracer.** A small streamline drift at one step size would prove little, because a broken integrator can still hug the analytical line at $h = 0.01$. The real check is the halving experiment: drift falls by a factor of 16.0 when the step halves, an observed convergence order of 4.003. That pins the RK4 truncation behaviour, where a single small number would have been luck.
 
@@ -84,6 +84,10 @@ With $U = 1$, $R = 1$, $\rho = 1.225$, and $\Gamma = 2\pi$:
 ## Limitations
 
 The model is inviscid, irrotational, incompressible, and strictly two-dimensional. There is no boundary layer, so the real flow's separation and wake — which dominate an actual cylinder's drag — are absent by construction. Circulation is imposed, not predicted: nothing here explains why a lifting body carries a particular $\Gamma$; that requires the Kutta condition introduced with the airfoil work.
+
+## What I took away
+
+The failures this code invited were all silent: a flipped circulation sign returns a lift of the right magnitude pointing down, and a broken integrator can still hug one streamline at one step size. The two tests that matter — the pinned sign convention and the halving experiment with its factor-16 drift drop — exist because a single plausible-looking number would have proved nothing. Machine-precision agreement was achievable here only because the theory is linear with closed forms; the panel method has no such luxury, which is why I verified this layer before building on it.
 
 ## Reproduce
 

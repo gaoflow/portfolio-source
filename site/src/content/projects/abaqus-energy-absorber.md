@@ -22,7 +22,7 @@ keyOutputs:
 featured: false
 sample: false
 order: 18
-studySequence: 10
+studySequence: 9
 heroImage: /images/projects/abaqus-energy-absorber/force-displacement-preliminary.png
 ---
 
@@ -105,8 +105,22 @@ The FGT section ran under the same 1000 kg impactor at 8333 mm/s, contacting at 
 
 ![FGT striker displacement: free flight until contact at ≈0.023 s, then a 125 mm crush plateau — the striker stops. Group-report figure from the Abaqus XY output.](/images/projects/abaqus-energy-absorber/fgt-displacement-history.png)
 
+## Iteration: V1 to V3, and the numbers that moved
+
+The archived job directories show the campaign restarting once. V1 never produced a result: the input processor stopped on a fatal error — 328 elements with missing property definitions, collected into `ErrElemMissingSection` — on a rail that mixed SC8R continuum shells with C3D8R solids. The `.sta` file is empty; the CAE tree looked finished anyway. V2 rebuilt the deck with C3D8R throughout and the impactor carried as a point mass on its reference point, and all four screening jobs (steel, HSS, aluminium, magnesium) ran to completion. V3 changed the load case to the rigid-wall configuration — R3D4 wall, MASS and ROTARYI on its reference point — which is the barrier-crash setup the report analyzes.
+
+The notes record an energy-quality scare the final table hides. An early aluminium run showed artificial energy ALLAE around $7.5\times10^6$ against an ALLIE of $50\times10^6$ — about 15%, flagged as "at the limit", with a plan to rerun on the school's computers with a finer mesh. The submitted report's jobs all sit under 1%, so the rerun happened; the finer mesh did not, and the limitations above carry that.
+
+The FGT headline itself moved between the working notes and the submitted PDF. The notes and the draft LaTeX carry the first FGT job: 3.397 kg, SEA 9.71 kJ/kg, $F_{max}$ 280 kN, CFE 94.3%. The submitted report carries the rerun: 2.70 kg, 12.30 kJ/kg, 215 kN mean over a 154 mm stroke, 95.6% of the kinetic energy. This article traces only the second set. The draft's comparison table also held a fourth geometry — a uniform 2 mm multi-cell section — whose column was never filled; it was dropped from the comparison instead of being reported.
+
+One detour became a fixture. The quasi-static curved-beam benchmark entered through Workshop 6, which the notes show the group mining for tooling — integrated output sections for load paths, SAE filtering for noisy explicit force traces — before adopting the beam itself as the reference model in the method section.
+
 ## What it demonstrates
 
 Two conclusions survived every stage. Aluminium is the right material for a crush box: it won the screening on weight-normalized SEA, and the independent wall-impact study reproduced the result with the lowest peak force of any metal tested. Geometry then matters more than gauge: the uniform 1.0 mm section proves that adding material evenly loses to the asymmetric baseline, while grading thickness into the hinge regions multiplies absorbed energy by an order of magnitude.
 
 The honest caveats, stated in the report and worth keeping. The FGT section weighs 2.70 kg against 0.727 kg for the classic — nearly four times the mass — so the 2.56× SEA gain is real but the design is heavier, and CFE was not computed for it. The barrier and geometry jobs use different cross-sections, so their absolute SEA values are not directly comparable. Each study ran a single velocity and a single mesh with no convergence sweep, and explicit noise plus mass scaling rides on every force trace. The right next step is a fixed-mass FGT optimization — vary the gradient exponent $n_i$ under a mass constraint — plus a mesh-refinement check before trusting the 95.6% figure past one significant digit.
+
+## What I took away
+
+Assembling the report meant deciding which numbers exist: the working notes and the submitted PDF disagree on the FGT job (9.71 against 12.30 kJ/kg), so every value I typeset was traced to the job that produced it. V1 taught the cheaper lesson — a finished-looking CAE tree ran zero increments, and the `.sta` file, opened before the ODB, is the evidence that a run happened. The result I would put in front of a designer first is the uniform 1.0 mm section losing to the asymmetric classic (SEA 4.09 against 4.81 kJ/kg): spreading material evenly feels conservative, and it was worse at everything we measured.

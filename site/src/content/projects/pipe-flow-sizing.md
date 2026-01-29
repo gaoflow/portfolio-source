@@ -83,6 +83,10 @@ All gates are enforced by the analysis runner, which exits nonzero if any fail.
 
 The model is steady, incompressible, and single-phase; there is no cavitation or NPSH check, so the pump curve is followed wherever the mathematics goes. Minor-loss K coefficients are declared handbook order-of-magnitude values, and published K tables carry wide uncertainty. The pump curve is a declared quadratic; real curves bend near shutoff and free delivery. The laminar/turbulent transition is a hard switch at $Re=2300$ with no transition band, and the network solver handles series topology only; parallel branches were deliberately left for the later cooling study.
 
+## What I took away
+
+A cross-check against an approximation means something only inside that approximation's own fence. Swamee–Jain exceeds its ±3% band near $Re=4\times10^3$ at low roughness; a deviation measured there would have said nothing about my solver. When a check fails, the first question is now whether the code or the check is out of scope. The second habit this study set: verified primitives before capability. Every number the later cooling study consumed traces to an identity, an implicit-equation residual, or a published band.
+
 ## Reproduce
 
 ```bash

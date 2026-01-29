@@ -21,7 +21,7 @@ keyOutputs:
 featured: false
 sample: false
 order: 3
-studySequence: 16
+studySequence: 15
 ---
 
 ## Context & objective
@@ -101,6 +101,12 @@ The current audit covers eleven independently evidenced studies:
 
 The generated `catalog.json` keeps full claim records and SHA-256 values. `coverage.csv` flattens the same data for review or CI ingestion.
 
+## The audit grew with the portfolio
+
+The first published audit covered six projects, 27 claims, and 21 deduplicated artifacts. Five foundational solver studies — dimensionless numbers, 1D conduction, pipe sizing, potential flow, and 2D heat diffusion — then entered the same manifest contract with four claims each. The original six manifests deepened alongside them as the cooling decision and the F1 qualification campaign produced new evidence. The catalog now covers eleven studies, 51 claims, and 38 artifacts.
+
+Growth tested the contract in both directions. Each new study had to express its results as pointer-addressable metrics with typed thresholds and named artifacts before its article numbers could enter the site. Existing claims were re-audited on every run: artifacts are re-hashed, so a silently regenerated figure or JSON file fails the audit instead of drifting.
+
 ## Failure behavior
 
 A failed claim stays in the report. The toolkit writes the observed value and a `FAIL` state into the project page, returns `allClaimsPass: false`, and lets the CLI exit nonzero. Missing artifacts, escaping paths, malformed pointers, duplicate identifiers, unknown sources, and incompatible comparisons are hard errors.
@@ -142,3 +148,7 @@ Interface-level tests cover successful multi-format publication, nested array po
 ## Current boundary
 
 All 51 declared claims pass. That does not make every project a successful engineering design: FSAE Cooling and the F1 qualification campaign intentionally end in NO-GO decisions, and their claims pass because the published decision matches the observed evidence. The audit checks traceability and gate evaluation. Whether the engineering outcome is favourable is a separate question, answered by each study itself.
+
+## What I took away
+
+The manifest contract absorbed five new studies and a near-doubling of claims without a second audit format; the work per study stayed at writing one honest JSON file. The claims I now trust most belong to the projects that failed: the cooling and F1 manifests pass their gates because each claim states the decision the evidence supports, including NO-GO. Writing manifests changed how I write results — a number that cannot name its JSON file, pointer, and threshold does not survive contact with the audit, so it does not reach the article.

@@ -69,6 +69,10 @@ The horizontal annotations — flat-plate transition near $5\times10^{5}$ and a 
 
 The property table is a constant-property approximation: five anchors, linear interpolation, narrow temperature ranges, ideal-gas $\beta = 1/T$ for air, and coverage of air and water only. The toolkit's scope is the incompressible regime; compressibility appears as the Mach definition and the perfect-gas speed of sound, with no real-gas effects. The figure's regime limits are textbook intuition, and a specific surface needs a specific transition model.
 
+## What I took away
+
+A check that cannot fail proves nothing. The $Ra = Gr\cdot Pr$ identity became a real test only once Rayleigh was written from its expanded definition; before that decision the 500-draw sweep would have compared a number with itself at 0.0 error. The viscosity guard — kinematic rejected where dynamic is required, with the error naming parameter, expected dimension, and received unit — is the check my own hand calculations kept inviting. Building the rejection path first (10 invalid calls, all refused, control call untouched) set the pattern for every later study: design the failure modes before the happy path.
+
 ## Reproduce
 
 ```bash

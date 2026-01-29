@@ -22,7 +22,7 @@ keyOutputs:
 featured: false
 sample: false
 order: 15
-studySequence: 12
+studySequence: 11
 heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
 ---
 
@@ -78,3 +78,7 @@ A second identity pins the implementation itself: a discrete cosine mode on the 
 ## Reproduce
 
 `python3 -m unittest discover -s tests -v` runs the thirteen solver contracts. `python3 scripts/analyse.py` regenerates `results/analysis.json` and both figures, exiting nonzero if any gate fails. The committed [technical report](/documents/heat-diffusion-2d-report.html) preserves the derivation, gates, and recorded stability refusal.
+
+## What I took away
+
+The temporal-order study was redesigned before it ran. Deriving the leading truncation term first exposed the $(6r-1)$ coupling, so the planned refinement against the analytical solution would have attributed spatial error to the time integrator; the fix was a fine-time reference ($r=10^{-3}$) on the same grid, where the shared spatial error cancels, and the observed order came out 1.017. The stability gate taught a second lesson: refusing the $r=0.26$ attempt, and logging the refusal, made the solver's failure behaviour part of the deliverable instead of an accident left to the user.

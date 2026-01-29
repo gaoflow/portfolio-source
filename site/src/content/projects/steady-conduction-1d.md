@@ -72,6 +72,10 @@ The exact tip temperature is 360.446 K and the profile peaks at 360.788 K at $x=
 
 The model is one-dimensional and steady with constant properties; temperature-dependent conductivity would make it nonlinear. There is no contact resistance at either boundary, and tip radiation — a nonlinear $T^4$ term — is excluded. The manufactured convergence case is a verification device, not a physical scenario. Nothing here extends to multidimensional spreading, fins of varying section, or transients.
 
+## What I took away
+
+Central differences are exact on quadratics, and my exact solution was quadratic — the convergence study I had planned measured roundoff, $1.34\times10^{-11}$ K of it. The manufactured sinusoidal source exists because of that failure, and it is what produced a genuine observed order of 2.0002. I also stopped treating checks as interchangeable: exactness catches sign and boundary-row assembly errors, the manufactured slope catches truncation behaviour, and the energy residual catches a non-conservative scheme. Each sees a failure the other two cannot.
+
 ## Reproduce
 
 ```bash

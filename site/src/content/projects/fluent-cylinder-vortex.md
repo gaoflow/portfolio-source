@@ -23,7 +23,7 @@ keyOutputs:
 featured: false
 sample: false
 order: 17
-studySequence: 9
+studySequence: 8
 heroImage: /images/projects/fluent-cylinder-vortex/force-history.svg
 ---
 
@@ -94,6 +94,14 @@ The steady case fails the same way. At Re=40 the computed drag is 3.07 N against
 
 Parsing the exports turned up a second, quieter trap. Both force reports imply the same coefficient conversion: $C_D = F_D / 0.6125$, while $\frac{1}{2}\rho U^2 D$ evaluates to 2.0 for the Re=40 run and 0.5 for the Re=150 run. Fluent's reference values were set once and did not follow the run conditions, so comparing the reported *coefficients* against a textbook chart mixes reference definitions. The comparisons above are done on forces, where the reference area cancels — the only defensible level for this data.
 
+## Iteration: how the error estimate converged
+
+The 29.3% figure was not the first answer. The group's Word draft read the experimental chart at $Re=150$ as $C_D \approx 1.2$, put the gap at 23.8%, and explained it with the standard pair: an instantaneous value against a time-averaged chart, and a 2-D simulation against a 3-D experiment. Both explanations are true in general and predicted nothing here. The submitted report re-read the chart at $\approx 1.6$, recomputed the gap from the final-step force (0.5654 N against 0.8 N), and landed on 29.3% with a diagnosis that does make predictions: the deficit lives in pressure drag (78% of the total), and it should repeat at $Re=40$. It does, at 26.9% — which is what promoted dissipation from excuse to explanation.
+
+The steady case failed the same way in miniature. The draft matched the *pressure* coefficient 3.2816 to a chart reading of 3.28, declared agreement, and dismissed the total 5.0146 as a reference-values default. The chart plots total drag, so the agreement was a coincidence of definitions. The fix was structural: compare forces, where the reference values cancel — the rule the rest of this article follows.
+
+The draft also settled the provenance question by accident. Two of its sections quote two different "final" drags for the same run — 0.5654 N in one, 0.5601 N ($C_D = 0.9145$) in the other — because two people read the monitor at different instants of a shedding cycle. The submitted report standardized on the exported final-step force reports, and the digitization gates above exist to hold the figures to that standard.
+
 ## Verification
 
 | Check | Result |
@@ -125,3 +133,7 @@ One mesh, no refinement study, so the 29% bias is diagnosed but not bounded. One
 ## Reproduce
 
 `python3 research/esilv-cfd/plot_vortex_forces.py` parses the two Fluent force reports, digitizes the archived monitor screenshots with automatic tick calibration, runs every verification gate in the table above, writes the digitized histories to CSV, and regenerates the hero figure. It exits nonzero if any gate fails. Sources: `~/Downloads/ESILV/CFD/td2/Forces.Forces`, `~/Downloads/ESILV/CFD/td2/Forces-part2`, and the report figures `image34.png` / `image35.png`.
+
+## What I took away
+
+The first explanation of a discrepancy is usually a list of generic CFD excuses; ours were "instantaneous vs averaged" and "2D vs 3D", and neither survived contact with the force split. The dissipation story did, because it says where the error lives (pressure, 78% of the total) and where else it should appear ($Re=40$, 26.9%). I also learned to treat a matching number as a suspect: pressure $C_D$ of 3.2816 against a chart's 3.28 felt like validation and was a definition error, so comparing forces first — where reference values cancel — is now my default.

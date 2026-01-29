@@ -23,7 +23,7 @@ keyOutputs:
 featured: false
 sample: false
 order: 19
-studySequence: 11
+studySequence: 10
 heroImage: /images/projects/xc48-abaqus-twin/stress-strain.svg
 ---
 
@@ -58,6 +58,14 @@ The geometry that matters is the reduced section: gauge length $l_0 = 70$ mm and
 | Necking | Ø7.99 → 5.77 mm | 47.8% area reduction, ductile range |
 
 UTS sits 9.5% above the 700 MPa handbook value and the area reduction lands in the 40–50% ductile band, so the strength numbers are believable. The curve reads as a normal ductile steel: proportional limit near 730 MPa, plastic flow from $\varepsilon \approx 0.06$, uniform hardening up to the peak at 7.6%, then the load drops as the neck localises and the specimen separates at 13.4%. The modulus is not believable: 12.28 GPa against a textbook 210 GPa for steel. The strain came from crosshead displacement, so machine and grip compliance swamp the specimen's elastic strain, and the reported $E$ is mostly a property of the test rig. We kept it as measured — the twin below inherits it, and the limitations section prices that in.
+
+## Iteration: the numbers that had to be recomputed
+
+The pipeline failed once at full length before it produced a number worth keeping. My first pass ran the whole chain on the placeholder geometry named above and returned a self-consistent, plausible, wrong mini-report: UTS 489.09 MPa, $E = 5.45$ GPa, figures included. Nothing in the curve looked broken; the error lived entirely in the denominator. The fix was one source of truth — $l_0 = 70$ mm and $S_0 = 50.14$ mm² from the test spreadsheet — which moved the UTS to 766.12 MPa.
+
+The group's report drafts carried their own copy of the same bug: gauge length 114.23 mm (the specimen's overall length, not the reduced section), diameter 13.95 mm, area 152 mm². The drafts also lost a decimal point on the 0.2% offset yield — printed as 7583304756 MPa in one version and "7583" in the submitted report — where the value is 758.33 MPa. Both errors survived because the numbers were pasted, not recomputed from the spreadsheet.
+
+The solver switch is visible in the archived input decks. Every explicit iteration in the archive — Job-6 through Job-27, then the final copy27 — carries the identical material card ($E = 12{,}283.5$ MPa, damage initiation at the measured peak, displacement-based evolution), with mesh and damage details changing between them. The Static General deck carries the same elastic–plastic card and no damage keywords at all, so its curve plateaus near 795 MPa true where the explicit runs delete elements and follow the drop. The switch to Explicit changed the solver, never the material.
 
 ## The digital twin
 
@@ -112,3 +120,7 @@ M2 + Dynamic Explicit + Smooth Step: $R^2 = 0.9663$ against the experiment, peak
 ## Reproduce
 
 The experiment side lives in `research/esilv-materials/plot_stress_strain.py`: it reads the pipeline CSV, applies the spreadsheet geometry ($l_0 = 70$ mm, $S_0 = 50.14$ mm²), and regenerates the hero figure — printing UTS 766.12 MPa, true peak 828.4 MPa, and fracture strain 13.4% as a check. The simulation side is the group Abaqus job (`copy27`): the input deck carries the full material card and Smooth Step setup, and a small `odbAccess` script pulls frame-by-frame stress–strain from the ODB for the validation plot.
+
+## What I took away
+
+Stress is a force divided by an area someone typed: the placeholder run returned a clean curve at 489 MPa, wrong by exactly the area ratio, and no plot would have caught it. I now print the geometry next to the first figure, before any analysis. The yield-strength typo — 7583304756 MPa in one draft, "7583" in the submitted report — survived because the number was pasted rather than recomputed against the spreadsheet. M3 losing to M2 (0.9497 against 0.9663) is the table entry I re-checked first, because "refine until converged" would have stopped at the most expensive mesh and the sweep is the only evidence that the middle one wins.

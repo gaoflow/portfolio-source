@@ -22,7 +22,7 @@ keyOutputs:
 featured: false
 sample: false
 order: 16
-studySequence: 8
+studySequence: 7
 heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
 ---
 
@@ -105,6 +105,14 @@ Against the course handout's experimental $C_D$ for a smooth cylinder (used as a
 
 Two things separate the gap into causes. First, grid: Part B runs a smaller domain and half the nodes of the Part A optimum, which alone moves $C_D$ at $Re = 10$ from 2.7973 to 2.85 — so the Part B points sit systematically high. Second, modelling: at $Re \le 1$ a steady 2-D laminar solve is a strong assumption, and the simulated curve lies furthest from experiment exactly there. Lift stays at numerical-noise level ($|C_L| \lesssim 0.11$) as a symmetric steady solution should, except at $Re = 0.1$, where continuity stalls and the velocity residuals reach only $10^{-3}$. That point is the weakest of the six and its 92.4 carries the least weight.
 
+## Iteration: what the working files add
+
+The tables above look like a procedure executed top to bottom; the drafts show the real order. TD1 survives in two versions — the group's shared Word draft and the submitted LaTeX report — plus one archived console log, and they do not describe the same mesh. The draft documents the tutorial's requested 1,000-element grid, built as 100×10 divisions with the sizing behaviour locked to "hard" so Workbench could not re-smooth the count, and quotes a mass imbalance of $-7.704\times10^{-10}$ kg/s. The submitted report kept that description, but the only console log that survives records a 500-cell, 561-node run closing mass at $-2.8\times10^{-10}$ kg/s — the run this article traces. Two passes of the same checks on two meshes; the log, not the prose, decides which run a number belongs to.
+
+The draft also shows the entrance length read off the centreline plot by eye — "approximately 2 m" against the 2.4 m analytical value, excused as the difficulty of seeing where the plateau starts. The report replaced the eyeball with a criterion: 99% of the final velocity, which lands at $x \approx 2.4$ m and turns the row into a check. The draft's answer to "did you use the optimum mesh?" was circular — the mesh is optimal because the results match theory. The report downgraded that to adequate-for-the-checks-run, a claim a review can attack and the data can defend.
+
+TD4's protocol document records the mesh sweep in the order it ran, and the order was bracketing. First attempt: 80 divisions per circle, 12,800 cells, $C_D = 2.7938$. Refine: 120 divisions, 28,800 cells, 2.7953 — a 0.05% move that on its own says nothing. Then the group swept down through 20, 5, 10, and 15 divisions to find the edge, and found it at 50 cells: $C_D = 3.1328$, 12% high. Only then did the 200-division, 40,000-cell run land at 2.7972802 and freeze the reference the table rounds to 2.7973. The domain choice has the same shape: $D_2 = 100$ m started as a rule of thumb quoted from the tutorial brief ("the outer limit of the fluid domain should be far enough to avoid border effects"), and the domain sweep exists because the group verified the rule instead of trusting it.
+
 ## Validation summary
 
 | Gate | Observed | Threshold |
@@ -127,3 +135,7 @@ Two things separate the gap into causes. First, grid: Part B runs a smaller doma
 ## Reproduce
 
 `python3 research/esilv-cfd/plot_vnv_figures.py` regenerates all three figures in this article from the sweep data typeset in the group report (`main.tex` tables and pgfplots coordinates; the same values live in the report's own `scripts/plot_sensitivity.py`). The experimental curve is the course handout's Table 1 as digitised in the report. Fluent itself is not rerun here — the console log (`td1.txt`) and the report tables are the primary artefacts.
+
+## What I took away
+
+A plateau needs both sides: refining 80 to 120 divisions moved $C_D$ by 0.05% and proved nothing until the down-sweep put the 50-cell mesh 12% high. The coarse points are the plateau's evidence, not the fine ones. The second habit came from TD1: an eyeballed entrance length read 2 m against a 2.4 m theory, and the fix was a written criterion — 99% of the final value — rather than a better eye. The draft also taught me what a circular justification looks like, "the mesh is optimal because the results match", because I was the one who had to rewrite it for the report.

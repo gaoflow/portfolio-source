@@ -21,7 +21,7 @@ keyOutputs:
 featured: true
 sample: false
 order: 4
-studySequence: 15
+studySequence: 14
 heroImage: /images/projects/flowrom/pod-modes.svg
 ---
 
@@ -121,3 +121,7 @@ These tests separate decomposition defects from FlowLab data-generation defects.
 The transferable skill is field-data reduction: choosing snapshots, preventing leakage, defining a metric, and preserving the distinction between reconstruction and prediction. Applied to vehicle CFD, the same discipline could compress pressure or wake databases and identify coherent operating modes.
 
 That application would require multiple ride heights, yaw angles, speeds, and geometry states with operating-point holdouts. Until then, this article demonstrates ROM methodology—not a surrogate for turbulent vehicle aerodynamics.
+
+## What I took away
+
+Rank 1 was the failure that organised the study. One mode held 87.05% of training fluctuation energy yet missed 35.97% of the held-out fluctuation, because the response is a quadrature pair: the dominant mode carries the spatial shape, and without its partner it cannot follow the phase. Energy retention alone would have approved that model; the chronological holdout and the rank table — 1.301% at rank 2 — are what rejected it. The denominator lesson followed directly: the same DMD forecast scores 0.100% against the full state and 1.41% against fluctuations, so both numbers ship.

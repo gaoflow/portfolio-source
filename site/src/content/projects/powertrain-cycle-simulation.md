@@ -116,6 +116,10 @@ The failure: my first pandas import of the CSV exports returned all-NaN columns.
 - **The BEV's CO₂ is one assumption.** Dividing the workbook's EV emissions by its energy use implies a grid intensity of roughly 450 g CO₂/kWh. The brief's own reference table lists 250 g/kWh (EU average) and 56 g/kWh (France 2023). On French electricity the BEV's NEDC figure would drop from 67.3 to about 8 g/km; the ranking survives, the margin does not.
 - **Two parameter sets.** The 4×3 comparison uses the brief's reference car; the SOC and dead-weight studies use my 308 parameterisation. Absolute numbers are comparable within a study, not across the boundary.
 
+## What I took away
+
+Excel taught me the model because nothing hides: one formula chain per row, every intermediate force and power inspectable. It broke at the borders — French-locale CSV exports that parsed to NaN columns, manual discretisation, no version control — and that failure is why every number here passes through the summary workbooks as a second check. The dead-weight runs also changed how I read PHEV claims: the 1.43 l/100km headline is a battery-charge assumption, and the same car at 11.32 l/100km is the thirstiest of the four on that lap.
+
 ## Reproduce
 
 `python3 research/esilv-powertrain/plot_cycle_results.py` reads the three summary workbooks in `research/esilv-powertrain/data/` and regenerates all three figures as SVG. The script prints the parsed tables, so the workbook values can be checked against the article without opening Excel. The raw simulator CSV exports (per-point force, power, fuel, and CO₂ along each lap) sit with the course files; the pandas loaders in that directory handle their semicolon/comma locale.

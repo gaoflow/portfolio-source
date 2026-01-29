@@ -27,7 +27,7 @@ keyOutputs:
 featured: true
 sample: false
 order: 2
-studySequence: 17
+studySequence: 16
 heroImage: '/images/projects/fsae-cooling/thermal-screen.svg'
 ---
 
@@ -70,6 +70,16 @@ More radiator optimisation cannot repair a boundary-condition contradiction. The
 | Legacy 10 s peak | 68.18 °C maximum | retained as sensitivity, not validation |
 
 The pump and branch network deliver plausible screening flow, yet the combined system is unacceptable. Sizing each component independently would hide this result, which is why the maps are still evaluated: they show flow capacity is not the blocker and identify which parts a corrected architecture could retain.
+
+## How the NO-GO was reached
+
+The study began as a conventional selection report, and the first iteration was on the document itself. The legacy draft sized hardware from rated power and catalogue prose; the rebuilt workflow replaced that with a claim register in which every decision-critical statement carries one of four statuses — verified, screened, assumption, unknown. Losses computed as rated power times a fixed efficiency were demoted to labelled assumptions: the 3.256 kW continuous and 6.0 kW peak loads survive only as sensitivity inputs.
+
+The decisive claim was screened before any coupled run. AMK's rated KW26 condition asks for coolant at or below 25 °C; the E3 envelope fixes radiator-inlet air at 40 °C. The register recorded that contradiction as a thermodynamic boundary, so the coupled model's job was to quantify the failure, not to discover it.
+
+Two register rows then failed by name. The radiator claim — two Boyd 6310G3 cores rejecting the E3 load — is marked *screened; failed*, with the register's closure note reading "reject current passive concept rather than procure it." The fan claim failed the same way: the nominal 6.56 m³/min operating point loses overlap with the published transformed curve under the adverse reading check. Procurement stopped at those two rows.
+
+Replacement work continued under the same discipline. The E7 branch defined a broad two-temperature assumption envelope; E8 converted it into a public-data steady reference with named catalogue hardware. When E8 adopted the SIERRA03-0982Y3 compressor, the E7 proxy (SIERRA03-0716Y3) was superseded and retained only as historical evidence — superseded rows stay in the register rather than disappearing.
 
 ## Transient energy accounting
 
@@ -115,3 +125,7 @@ Detailed sidepod or duct CFD cannot repair an architecture that fails its system
 - Primary boundaries: AMK `PDK 205481`; component curves: Boyd 6310G3 and SPAL brushless fan catalogue
 
 The result is intentionally bounded: a verified coolant-domain system screen and an auditable no-go decision, short of a finished race-car cooling installation.
+
+## What I took away
+
+The hydraulics passed and the system failed; a per-component sizing exercise would have approved the purchase. The decisive number was never computed by my model — it was a boundary condition, and the claim register forced "40 °C air cannot deliver 25 °C coolant" into the open before the coupled solver ran. I now write rejected claims into the same table as passing ones, because the row marked *screened; failed* is the sentence that stopped a procurement.

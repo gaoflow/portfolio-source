@@ -27,7 +27,7 @@ order: 8
 
 Record what the team owns, what the author produced, and what may be published before any technical writing. Geometry, livery, operating maps, competitor comparisons, wind-tunnel data, and track telemetry can each carry different permissions.
 
-An NDA-safe article may describe method and responsibility while withholding geometry and coefficients. Permission must be explicit; the absence of an NDA does not make team work public.
+Describe method and responsibility while withholding geometry and coefficients. Get permission in writing; the absence of an NDA does not make team work public.
 
 ## 2. Engineering objective
 
@@ -83,11 +83,11 @@ Contour images must answer a mechanism question — pressure recovery, separatio
 
 Correlation gets its own section. State the independent reference, sensor and calibration uncertainty, test repeatability, configuration match, and comparison metric. Track data require speed, ride, yaw, wind, tyre, and control-state context; wind-tunnel data require blockage, Reynolds scaling, moving-ground, and support-system context.
 
-When no physical reference exists, say so. Mesh independence and convergence are verification, not experimental validation.
+When no physical reference exists, write exactly that. Mesh independence and convergence are verification, not experimental validation.
 
 ## 8. Failures and iterations
 
-Retain diverged runs, rejected mesh strategies, geometry simplifications, and concepts that failed the design gate. For each failure, record the symptom, diagnosis, controlled change, and resulting decision. A development history is stronger evidence than a single polished contour.
+Retain diverged runs, rejected mesh strategies, geometry simplifications, and concepts that failed the design gate. For each failure, record the symptom, diagnosis, controlled change, and resulting decision. A documented development history outweighs a single polished contour.
 
 ## 9. Publication gate
 

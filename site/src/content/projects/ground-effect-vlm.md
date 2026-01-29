@@ -20,7 +20,7 @@ keyOutputs:
 featured: true
 sample: false
 order: 6
-studySequence: 13
+studySequence: 12
 heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg
 ---
 
@@ -70,6 +70,8 @@ The 11% lift-slope difference is retained rather than calibrated away: a finite 
 
 The solver is linear, steady, incompressible, inviscid, and zero-thickness. It contains no road boundary layer, tyres, body blockage, finite floor, diffuser, leakage, viscous pressure recovery, or separation. At $h/c=0.25$ the linear model predicts $C_L=0.5419$, more than twice the free-air value, with a span-efficiency indicator of 2.59. That endpoint is a warning, not a design result: the sweep stops there and no data below that bound is published.
 
+That endpoint drove the publication decision. The recorded state at $h/c=0.25$ — $C_L=0.5419$, 2.07 times the free-air lift, span-efficiency indicator 2.59 — is the linearised mechanism amplifying itself. Lower clearances would add magnitude without fidelity, so the endpoint ships as a labelled warning and nothing below it is published.
+
 ## Reproduce
 
 `python3 -m unittest discover -s tests -v` checks the solver contracts. `python3 scripts/analyse.py` regenerates all metrics and figures and exits nonzero if any gate fails. The committed [technical report](/documents/ground-effect-vlm-report.html) preserves the method, checks, interpretation, sources, and negative claims.
@@ -105,3 +107,7 @@ The conventional free-air span-efficiency expression can exceed one here because
 ## What higher fidelity must add
 
 A useful next model would introduce finite thickness and chordwise loading before adding vehicle complexity. A viscous CFD study would then need moving-road boundary layers, ride-height and pitch gradients, wheel interaction, leakage, and a grid-independence check. The low-order result should remain as a sign and scale oracle; it should not be recalibrated after seeing the higher-fidelity answer.
+
+## What I took away
+
+The most instructive output was the one the model could not defend: the $h/c=0.25$ endpoint. Publishing it as a labelled warning, rather than deleting it, turned a model failure into the sweep's lower bound. The 11.01% lift-slope gap to Prandtl's estimate taught the companion lesson: refinement (0.258%) and far-ground recovery (0.00335%) had already boxed the numerics, so the residual difference is model form, and calibrating it away would have concealed that.
