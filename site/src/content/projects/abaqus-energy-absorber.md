@@ -36,7 +36,7 @@ Three indicators drove every comparison, fixed before the runs: specific energy 
 
 ## Method
 
-All jobs use the mm–tonne–s unit system (stress in MPa, density in t/mm³ — steel is $7.85\times10^{-9}$, not 7850). The reference section is a hat profile 220.6 mm wide, 50.0 mm high, 931.6 mm long, closed by a flat plate; dimensions come from the STEP CAD. The dynamic jobs drive a 1000 kg rigid impactor at 8333 mm/s (30 km/h) into the rail with general contact, hard overclosure, and friction $\mu = 0.3$, over a 0.06 s step.
+All jobs use the mm–tonne–s unit system (stress in MPa, density in t/mm³ — steel is $7.85\times10^{-9}$, not 7850). The reference section was built in SolidWorks and exported as STEP: a 220.6 mm-wide, 50.0 mm-high, 931.6 mm-long hat profile closed by a flat plate. The dynamic jobs drive a 1000 kg rigid impactor at 8333 mm/s (30 km/h) into the rail with general contact, hard overclosure, and friction $\mu = 0.3$, over a 0.06 s step.
 
 A preliminary 90 km/h axial crush established the baseline behaviour: an aluminium absorber (286 SC8R continuum shells, 250 MPa yield, 300 MPa at 10% plastic strain) struck by a steel impactor (64 C3D8R solids) at 25,000 mm/s. Energy conservation holds between ALLKE and ALLIE, impactor displacement stays linear to −270 mm at 0.02 s, and the reaction force evolves in three phases: zero during free approach, a first-contact spike near 100 kN, then resistance rising to $F_{max} = 137.6$ kN as the rail folds and densifies. The high-frequency noise on the force trace is explicit-solver oscillation under mass scaling; the underlying trend is what we designed against.
 

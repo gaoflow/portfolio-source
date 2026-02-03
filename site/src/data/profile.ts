@@ -14,8 +14,8 @@ export const profile = {
   // Headline capability rows, Balasko-style (mono, scan in 5 s)
   capabilities: [
     { label: 'Simulation', value: 'Ansys Fluent · OpenFOAM' },
-    { label: 'CAD', value: 'CATIA · SolidWorks' },
-    { label: 'Automation', value: 'Python · MATLAB · Simulink' },
+    { label: 'CAD', value: 'Blender · SolidWorks' },
+    { label: 'Automation', value: 'Python · JavaScript · Bash' },
     { label: 'Software', value: '9 yrs engineering leadership · C++ · Rust · TypeScript' },
   ],
 
