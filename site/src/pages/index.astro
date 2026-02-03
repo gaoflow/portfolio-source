@@ -14,20 +14,19 @@ const featuredNotes = (await getCollection('notes'))
   .sort((a, b) => a.data.order - b.data.order)
   .slice(0, 3);
 
-// ⚠️ Sample pipeline data — replace with your own representative case.
+// Representative evidence from the ESILV Fluent verification series.
 const caseSteps = [
-  { label: 'Geometry', caption: 'Full-car FSAE geometry, cleaned and defeatured for external aero.', metrics: [
-    { label: 'Patch count', value: '184' }, { label: 'Source', value: 'CAD → STL' },
+  { label: 'Analytical check', caption: 'A Re=100 pipe case established signs, mass conservation and Hagen–Poiseuille scale before the cylinder study.', metrics: [
+    { label: 'Vmax error', value: '1.0%' }, { label: 'Mass imbalance', value: '2.8×10⁻¹⁰ kg/s' },
   ]},
-  { label: 'External flow', caption: 'High-Re external aerodynamics, rotating wheels and ground plane.', metrics: [
-    { label: 'Reynolds', value: '1.5×10⁷' }, { label: 'Solver', value: 'simpleFoam' },
+  { label: 'Mesh sweep', caption: 'The cylinder mesh grew from 50 to 40,000 cells. The drag coefficient changed by less than 0.1% beyond the selected grid.', metrics: [
+    { label: 'Cells tested', value: '50 → 40,000' }, { label: 'Cd plateau', value: '<0.1%' },
   ]},
-  { label: 'Mesh', caption: 'Trimmed hexa-dominant mesh with prism layers to wall-resolved y⁺.', metrics: [
-    { label: 'Cells', value: '36.2M' }, { label: 'y⁺ target', value: '0.9' },
-    { label: 'Prism layers', value: '18' }, { label: 'Max skewness', value: '0.62' },
+  { label: 'Domain sweep', caption: 'Far-field distance was swept rather than inherited from the tutorial. Drag changed by less than 1% for D2 ≥ 100 m.', metrics: [
+    { label: 'D2 tested', value: '20 → 200 m' }, { label: 'Selected D2', value: '100 m' },
   ]},
-  { label: 'Results', caption: 'Force breakdown per assembly; decision-ready deltas vs baseline.', metrics: [
-    { label: 'Δ Downforce', value: '+7.3%' }, { label: 'Δ Drag', value: '−1.9%' },
+  { label: 'Validation', caption: 'The final Reynolds sweep kept failed comparisons visible. Only Re=20 met the coursework 5% error gate.', metrics: [
+    { label: 'Cd at Re=10', value: '2.7973' }, { label: 'Error at Re=20', value: '3.83%' },
   ]},
 ];
 ---
@@ -53,7 +52,10 @@ const caseSteps = [
 
   <!-- Representative case -->
   <section class="mt-16 reveal">
-    <CasePipeline steps={caseSteps} sample />
+    <CasePipeline steps={caseSteps} />
+    <a href="/projects/fluent-cyl-vnv" class="mt-4 inline-block font-mono text-xs text-muted hover:text-accent">
+      Read the full verification case →
+    </a>
   </section>
 
   <!-- Featured work -->
