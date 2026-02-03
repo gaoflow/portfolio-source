@@ -188,7 +188,7 @@ Those remain engineering-review questions. The manifest makes the underlying evi
 
 ## A publication gate for a new project
 
-Before removing a "sample" label or presenting a headline metric, require:
+Before presenting a headline metric, require:
 
 1. owned implementation and versioned inputs;
 2. one command that regenerates results and figures;

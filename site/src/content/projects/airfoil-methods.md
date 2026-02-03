@@ -19,7 +19,6 @@ keyOutputs:
   - 'Validated lift only inside a declared attached-flow range; 160-to-240-panel lift changed by 0.0307% at four degrees.'
   - 'Showed the inviscid model beside measured wake drag and stall rather than presenting structurally unavailable outputs as weak predictions.'
 featured: true
-sample: false
 order: 7
 studySequence: 6
 heroImage: /images/projects/airfoil-methods/lift-validation.svg

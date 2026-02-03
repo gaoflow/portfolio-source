@@ -25,7 +25,6 @@ keyOutputs:
   - '20/40/80/160-cell and time-step convergence'
   - 'Replacement-architecture decision gates'
 featured: true
-sample: false
 order: 2
 studySequence: 16
 heroImage: '/images/projects/fsae-cooling/thermal-screen.svg'

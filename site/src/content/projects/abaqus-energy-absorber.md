@@ -20,7 +20,6 @@ keyOutputs:
   - 'Wall-impact study (steel / Al 6061 / Ti-6Al-4V / PP): Al 6061 lowest Fmax at 102 kN and best metal SEA at 50.8 kJ/kg.'
   - 'FGT multi-cell geometry absorbs 33.20 of 34.72 kJ (95.6%) with SEA 12.30 kJ/kg, 2.56× the classic baseline.'
 featured: false
-sample: false
 order: 18
 studySequence: 9
 heroImage: /images/projects/abaqus-energy-absorber/force-displacement-preliminary.png

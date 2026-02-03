@@ -19,7 +19,6 @@ keyOutputs:
   - 'Dogfooded the same module across eleven numerical studies; all 51 declared gates pass against 38 project artifacts.'
   - 'Preserves failed claims in reports and exits nonzero instead of selectively publishing successful metrics.'
 featured: false
-sample: false
 order: 3
 studySequence: 15
 ---

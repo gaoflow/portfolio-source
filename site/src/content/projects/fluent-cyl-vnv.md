@@ -20,7 +20,6 @@ keyOutputs:
   - 'Ran Workbench design-point sweeps at Re=10: drag plateaus past 40,000 cells (<0.1%) and past D2=100 m (<1%), fixing the reference setup at Cd=2.7973.'
   - 'Swept six Reynolds numbers (0.1–20) on one fixed grid, overlaid the handout experimental drag curve, and showed the 5% margin holds only at Re=20 (3.83%) — with the low-Re bias traced to grid and modelling limits rather than tuned away.'
 featured: false
-sample: false
 order: 16
 studySequence: 7
 heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg

@@ -18,7 +18,6 @@ keyOutputs:
   - 'Verified wall tangency, far-ground recovery, span symmetry, finite-wing lift-slope scale, and 64-to-96-panel refinement.'
   - 'Separated the defensible mechanism result from race-car claims the inviscid one-row model cannot support.'
 featured: true
-sample: false
 order: 6
 studySequence: 12
 heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg

@@ -19,7 +19,6 @@ keyOutputs:
   - 'Isolated the empty-battery penalty: a flat PHEV burns 2–9× more fuel than a charged one, depending on the cycle.'
   - 'Post-processed the simulator CSV exports with pandas and regenerated every chart from the summary workbooks.'
 featured: false
-sample: false
 order: 20
 studySequence: 5
 heroImage: /images/projects/powertrain-cycle-simulation/cycle-comparison.svg

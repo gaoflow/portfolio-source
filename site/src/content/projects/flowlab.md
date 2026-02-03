@@ -19,7 +19,6 @@ keyOutputs:
   - 'Reduced streamwise centerline RMSE from 0.00511 to 0.00286 across 32², 48², and 64² grids.'
   - 'Kept one solver core for automated Node.js validation and a live browser experience.'
 featured: true
-sample: false
 order: 5
 studySequence: 13
 heroImage: /images/projects/flowlab/cavity-vorticity.svg

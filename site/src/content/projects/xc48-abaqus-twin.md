@@ -21,7 +21,6 @@ keyOutputs:
   - 'Showed Static General stalls on the softening branch while Dynamic Explicit with Smooth Step loading follows necking to rupture, with ALLKE/ALLIE under 5% before fracture.'
   - 'Kept the measured 12.28 GPa modulus as-is and documented it as a machine-compliance artifact rather than calibrating it away.'
 featured: false
-sample: false
 order: 19
 studySequence: 10
 heroImage: /images/projects/xc48-abaqus-twin/stress-strain.svg

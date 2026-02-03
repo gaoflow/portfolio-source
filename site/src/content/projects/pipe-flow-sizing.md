@@ -19,7 +19,6 @@ keyOutputs:
   - 'Cross-checked turbulent friction factors against the explicit Swamee–Jain formula inside its published ±3% band — observed maximum 2.83% — and restricted the comparison to the declared validity range.'
   - 'Solved a series cooling loop and its pump operating point (26.22 L/min at 51.34 kPa), confirmed against an independent brute-force scan bracket.'
 featured: false
-sample: false
 order: 13
 studySequence: 3
 heroImage: /images/projects/pipe-flow-sizing/moody.svg

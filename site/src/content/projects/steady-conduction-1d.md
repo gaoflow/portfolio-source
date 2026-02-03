@@ -19,7 +19,6 @@ keyOutputs:
   - 'Derived the closed-form exact solution and showed the scheme reproduces it to roundoff — then explained why that makes a manufactured source necessary for a genuine grid-convergence study (observed order 2.0002 over N=20/40/80/160).'
   - 'Closed the global energy balance to a relative residual of 1.59e-12 and cross-checked the tridiagonal solver against a NumPy dense solve at 1.1e-16 on 64 randomized systems.'
 featured: false
-sample: false
 order: 12
 studySequence: 2
 heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg

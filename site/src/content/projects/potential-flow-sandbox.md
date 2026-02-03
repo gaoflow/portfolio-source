@@ -19,7 +19,6 @@ keyOutputs:
   - 'Recovered the imposed circulation from a contour integral of the velocity field to 8.9×10⁻¹⁶ and matched the Kutta–Joukowski lift L′ = ρUΓ exactly in sign and magnitude.'
   - 'Verified fixed-step RK4 streamline tracing against the analytical streamfunction: 2.6×10⁻¹² maximum drift at step 0.01 with observed fourth-order convergence.'
 featured: false
-sample: false
 order: 14
 studySequence: 4
 heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg

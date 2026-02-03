@@ -6,13 +6,12 @@ interface Step {
   caption: string;
   metrics: { label: string; value: string }[];
 }
-interface Props { steps: Step[]; sample?: boolean }
-const { steps, sample = false } = Astro.props;
+interface Props { steps: Step[] }
+const { steps } = Astro.props;
 ---
 <div class="border border-edge bg-surface" data-pipeline>
   <div class="flex items-center justify-between px-5 pt-4">
     <span class="section-label">Representative case</span>
-    {sample && <span class="font-mono text-[10px] tracking-widest uppercase text-accent border border-accent/60 px-2 py-0.5">Sample data</span>}
   </div>
   <div class="grid md:grid-cols-[1fr_2fr]">
     <!-- Step selector -->

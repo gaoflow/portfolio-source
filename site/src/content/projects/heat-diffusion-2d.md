@@ -20,7 +20,6 @@ keyOutputs:
   - 'Isolated first-order time integration (observed order 1.017) and exact energy conservation under full insulation.'
   - 'Made the stability bound a hard contract: an attempted r = 0.26 run is refused and logged before integration.'
 featured: false
-sample: false
 order: 15
 studySequence: 11
 heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg

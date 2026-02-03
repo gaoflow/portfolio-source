@@ -21,7 +21,6 @@ keyOutputs:
   - 'Measured final Cd = 0.923 at Re=150 against an experimental chart value of ~1.6 (29.3% low) and tied the bias to numerical dissipation; the Re=40 case showed the same signature at 26.9% low.'
   - 'Rebuilt the force history by digitizing the archived Fluent monitors, verified the endpoints against the exported force reports, and extracted St = 0.155 from the lift signal.'
 featured: false
-sample: false
 order: 17
 studySequence: 8
 heroImage: /images/projects/fluent-cylinder-vortex/force-history.svg

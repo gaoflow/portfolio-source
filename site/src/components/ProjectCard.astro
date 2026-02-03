@@ -25,7 +25,6 @@ const d = project.data;
     </div>
     <p class="text-sm text-muted leading-relaxed">{d.summary}</p>
     <div class="flex flex-wrap gap-2 font-mono text-[10px] tracking-wider uppercase">
-      {d.sample && <span class="px-2 py-0.5 rounded-full bg-accent/10 text-accent">Sample</span>}
       {d.nda && <span class="px-2 py-0.5 rounded-full bg-surface text-muted">NDA-safe</span>}
       <span class:list={['px-2 py-0.5 rounded-full', d.status === 'active' ? 'bg-ok/10 text-ok' : 'bg-surface text-muted']}>
         {d.status}
