@@ -1,11 +1,11 @@
 ---
 title: 'ESA Space Rider — From Blockout to Blueprint-Exact'
 year: 2026
-date: 2026-08
+date: '2026-08-14'
 status: complete
 categories: [design]
 tags: [Blender, glTF, 3D]
-summary: 'Five version lines, two of them abandoned, took a first Blender blockout to a blueprint-exact ESA Space Rider model (±6 mm side view, zero dents) and onto this page as a 579 KB GLB.'
+summary: 'Five version lines—two abandoned—turned a Blender blockout into a ±6 mm Space Rider reconstruction and a 579 KB interactive GLB.'
 methodLine: 'Blender · bpy/bmesh pipeline · blueprint-calibrated remapping · glTF/Draco'
 role: 'Modeller'
 duration: '1 semester'
@@ -18,7 +18,7 @@ keyOutputs:
   - 'Reduced transfer size from 14.05 MB to 579 KB with non-simplifying Draco compression.'
 featured: true
 order: 8
-studySequence: 17
+studySequence: 13
 model3d: /models/space-rider.glb
 heroImage: /images/projects/space-rider-blueprint.png
 ---

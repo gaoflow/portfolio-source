@@ -1,7 +1,7 @@
 ---
 title: 'FSAE Cooling System — Coupled Screening Study'
 year: 2026
-date: 2026-07
+date: '2026-08-09'
 status: complete
 categories: [fsae, validation]
 tags: [Python, finite volume, thermal, hydraulics]
@@ -24,9 +24,9 @@ keyOutputs:
   - '80-cell transient coolant finite-volume model'
   - '20/40/80/160-cell and time-step convergence'
   - 'Replacement-architecture decision gates'
-featured: true
+featured: false
 order: 2
-studySequence: 16
+studySequence: 7
 heroImage: '/images/projects/fsae-cooling/thermal-screen.svg'
 ---
 
@@ -92,7 +92,24 @@ The 80-cell result is checked against 20, 40, 80, and 160 cells and three time s
 
 ![Mesh and time-step sensitivity of the peak result](/images/projects/fsae-cooling/transient-convergence.svg)
 
-The repository also runs **22 zero-dimensional / finite-volume tests** and **8 OpenFOAM preflight / result-evaluation tests**. These defend energy balance, map interpolation boundaries, flow gates, transfer-package checksums, systematic mesh families, mass conservation, and the rule that a qualification matrix cannot be promoted to production evidence.
+The maintained source repository now runs **59 reduced-order/admission tests** and **21 OpenFOAM tests**. They defend energy balance, map interpolation, acquisition manifests, branch-flow gates, deterministic four-mesh generation, transfer checksums, mass conservation and the rule that a qualification matrix cannot become production evidence.
+
+## Positive result: the OpenFOAM method gate passed
+
+The passive vehicle concept failed, but one narrower CFD question succeeded. I isolated the fan/core coupling in a three-dimensional shrouded duct: a full-face fan-pressure jump, an isotropic Darcy–Forchheimer radiator zone and four systematically refined meshes. The case tests the numerical method without pretending the proxy is our sidepod.
+
+| Mesh | Cells | Core-face flow (m³/s) | Core loss (Pa) |
+|---|---:|---:|---:|
+| Coarse | 7,440 | 0.143580 | 32.654 |
+| Medium | 53,940 | 0.134869 | 34.961 |
+| Fine | 431,520 | 0.130726 | 36.073 |
+| Extra fine | 3,481,920 | 0.129484 | 36.078 |
+
+The fine-to-extra-fine flow change is 0.95%; pressure-loss change is 0.0145%. All four meshes pass integrity, fan-curve-domain, mass-balance and settled-window gates. The extra-fine run's global mass imbalance is $1.39\times10^{-5}$% and its final-window quantity drift is $3.24\times10^{-5}$%.
+
+![Four-grid OpenFOAM qualification of the fan/core surrogate](/images/projects/fsae-cooling/openfoam-mesh-qualification.svg)
+
+This is the positive CFD result I can defend today: the discretisation and fan/porous-core coupling converge for the declared surrogate. It does not validate installed-vehicle airflow, heat transfer, recirculation or the rejected E3 architecture. Those claims still need frozen sidepod/duct geometry and measured boundaries.
 
 ## Architecture branches
 

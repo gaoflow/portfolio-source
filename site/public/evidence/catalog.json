@@ -1,11 +1,147 @@
 {
   "schemaVersion": 1,
-  "projectCount": 11,
-  "claimCount": 51,
-  "passedClaimCount": 51,
-  "artifactCount": 38,
+  "projectCount": 16,
+  "claimCount": 72,
+  "passedClaimCount": 72,
+  "artifactCount": 50,
   "allClaimsPass": true,
   "projects": [
+    {
+      "slug": "abaqus-energy-absorber",
+      "title": "Abaqus energy absorber optimization",
+      "summary": "Final-report energy, SEA and artificial-energy claims are separated from conflicting draft values.",
+      "methods": [
+        "Final submitted PDF controls all public values.",
+        "Energy and specific-energy identities are recomputed from the retained table."
+      ],
+      "limitations": [
+        "Binary ODB data remain private and cannot be independently rerun without Abaqus.",
+        "FGT and classic designs differ in mass and section, so absolute comparisons stay bounded."
+      ],
+      "commands": [
+        "python3 scripts/build_esilv_evidence.py --project abaqus-energy-absorber"
+      ],
+      "sources": [
+        {
+          "id": "register",
+          "title": "Final-report hash and metric register",
+          "role": "controlling group report evidence",
+          "artifact": {
+            "path": "source-register.json",
+            "bytes": 504,
+            "sha256": "6aa55023ecbe934c87ae530986e75bd42a004722b22c6da0dda15b3cbe741195"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "absorbed-fraction",
+          "statement": "Reported absorbed energy reproduces the 95.6% fraction.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/energyFractionMatchesReport",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 473,
+              "sha256": "8dcb0b8646bb3bf864a9e4bc00b04053cbcc8fa7f6657f6fb46a576b1a0b6397"
+            },
+            {
+              "path": "source-register.json",
+              "bytes": 504,
+              "sha256": "6aa55023ecbe934c87ae530986e75bd42a004722b22c6da0dda15b3cbe741195"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "specific-energy-gain",
+          "statement": "FGT specific energy exceeds twice the classic baseline.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/specificEnergyGainAboveTwo",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 473,
+              "sha256": "8dcb0b8646bb3bf864a9e4bc00b04053cbcc8fa7f6657f6fb46a576b1a0b6397"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "energy-closure",
+          "statement": "The retained barrier energy closure is within 0.1%.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/energyClosureBelowPointOnePercent",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 473,
+              "sha256": "8dcb0b8646bb3bf864a9e4bc00b04053cbcc8fa7f6657f6fb46a576b1a0b6397"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "artificial-energy",
+          "statement": "Reported artificial energy remains at or below 1% of internal energy.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/artificialEnergyBelowOnePercent",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 473,
+              "sha256": "8dcb0b8646bb3bf864a9e4bc00b04053cbcc8fa7f6657f6fb46a576b1a0b6397"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 473,
+          "sha256": "8dcb0b8646bb3bf864a9e4bc00b04053cbcc8fa7f6657f6fb46a576b1a0b6397"
+        },
+        {
+          "path": "source-register.json",
+          "bytes": 504,
+          "sha256": "6aa55023ecbe934c87ae530986e75bd42a004722b22c6da0dda15b3cbe741195"
+        }
+      ],
+      "manifest": "projects/abaqus-energy-absorber/evidence-manifest.json",
+      "manifestSha256": "e93e0a1b6abe7307b95872a1e0310eb9d14e64716769a0a19ba6d7cdae793b21"
+    },
     {
       "slug": "airfoil-methods",
       "title": "Airfoil method hierarchy validation",
@@ -822,8 +958,8 @@
             },
             {
               "path": "report/technical-report.html",
-              "bytes": 3077,
-              "sha256": "02c571a6cd8fd6a060aecb00d97ab9f9958bbba4d9e09616e77d8c237de538ed"
+              "bytes": 3085,
+              "sha256": "cc1879fc9a62eabc6bcf13c87727e31fd0d9292458599910f8c1de347dfec0d4"
             }
           ],
           "source_ids": [
@@ -838,8 +974,8 @@
       "artifacts": [
         {
           "path": "report/technical-report.html",
-          "bytes": 3077,
-          "sha256": "02c571a6cd8fd6a060aecb00d97ab9f9958bbba4d9e09616e77d8c237de538ed"
+          "bytes": 3085,
+          "sha256": "cc1879fc9a62eabc6bcf13c87727e31fd0d9292458599910f8c1de347dfec0d4"
         },
         {
           "path": "results/cavity-vorticity.svg",
@@ -1048,18 +1184,292 @@
       "manifestSha256": "31ab76b074a4a7688dd4196a7712433f8b633adeba3e4d078c17252ab503cf5b"
     },
     {
+      "slug": "fluent-cyl-vnv",
+      "title": "Fluent cylinder verification and validation",
+      "summary": "Poiseuille, mesh, domain and Reynolds-sweep claims are evaluated from retained course evidence.",
+      "methods": [
+        "Analytical Poiseuille comparison.",
+        "Cylinder mesh/domain sensitivity and experimental drag comparison."
+      ],
+      "limitations": [
+        "Two-dimensional laminar tutorial cases only.",
+        "Original Fluent cases and reports remain in a private source archive."
+      ],
+      "commands": [
+        "python3 scripts/build_esilv_evidence.py --project fluent-cyl-vnv"
+      ],
+      "sources": [
+        {
+          "id": "register",
+          "title": "Private-source hash and metric register",
+          "role": "course report and console evidence",
+          "artifact": {
+            "path": "source-register.json",
+            "bytes": 537,
+            "sha256": "10e456d7374b29b17a287cc711b12eb68432ccb3f43868b9d9a28765bc5cff7f"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "pipe-velocity",
+          "statement": "Pipe centreline velocity is within 1% of Poiseuille theory.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/pipeVelocityWithinOnePercent",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 509,
+              "sha256": "dec6fd85f3b1969d7014e8a36a0a579c9150a0f06599458e2bd83ac23d242950"
+            },
+            {
+              "path": "source-register.json",
+              "bytes": 537,
+              "sha256": "10e456d7374b29b17a287cc711b12eb68432ccb3f43868b9d9a28765bc5cff7f"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "mesh-plateau",
+          "statement": "The selected cylinder mesh lies inside the 0.1% drag plateau.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/meshPlateauBelowPointOnePercent",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 509,
+              "sha256": "dec6fd85f3b1969d7014e8a36a0a579c9150a0f06599458e2bd83ac23d242950"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "domain-plateau",
+          "statement": "The declared far-field sweep remains inside 1% drag change.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/domainPlateauBelowOnePercent",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 509,
+              "sha256": "dec6fd85f3b1969d7014e8a36a0a579c9150a0f06599458e2bd83ac23d242950"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "re20-validation",
+          "statement": "The Re=20 drag point meets the course 5% experimental gate.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/re20WithinFivePercent",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 509,
+              "sha256": "dec6fd85f3b1969d7014e8a36a0a579c9150a0f06599458e2bd83ac23d242950"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 509,
+          "sha256": "dec6fd85f3b1969d7014e8a36a0a579c9150a0f06599458e2bd83ac23d242950"
+        },
+        {
+          "path": "source-register.json",
+          "bytes": 537,
+          "sha256": "10e456d7374b29b17a287cc711b12eb68432ccb3f43868b9d9a28765bc5cff7f"
+        }
+      ],
+      "manifest": "projects/fluent-cyl-vnv/evidence-manifest.json",
+      "manifestSha256": "c33cbc2db259e995b0087718c045b2d32332103e2bff02347406a1b54a59ea03"
+    },
+    {
+      "slug": "fluent-cylinder-vortex",
+      "title": "Fluent cylinder vortex shedding",
+      "summary": "Digitised monitor histories are cross-checked against final Fluent force reports and a bounded Strouhal gate.",
+      "methods": [
+        "Screenshot-axis calibration and force-history digitisation.",
+        "Endpoint cross-check against retained Fluent force reports."
+      ],
+      "limitations": [
+        "Raw time-history export was not retained; histories are digitised from archived monitors.",
+        "Coarse two-dimensional tutorial mesh leaves 29.3% drag error."
+      ],
+      "commands": [
+        "python3 scripts/build_esilv_evidence.py --project fluent-cylinder-vortex"
+      ],
+      "sources": [
+        {
+          "id": "register",
+          "title": "Private-source hash and metric register",
+          "role": "monitor and force-report evidence",
+          "artifact": {
+            "path": "source-register.json",
+            "bytes": 446,
+            "sha256": "df9da4e865a4990fda92c615be18831cb091e5c8fb79b6bdf9be0fb6adea8351"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "strouhal-band",
+          "statement": "Measured Strouhal number lies inside the declared plausibility band.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/strouhalInsideDeclaredBand",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 406,
+              "sha256": "5c5ecbff967b120a2a1d70570f687267f9234624c4c28fda30cf7b33578c2245"
+            },
+            {
+              "path": "source-register.json",
+              "bytes": 446,
+              "sha256": "df9da4e865a4990fda92c615be18831cb091e5c8fb79b6bdf9be0fb6adea8351"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "period-regularity",
+          "statement": "Developed shedding periods pass the 0.15 s spread gate.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/periodStdBelowGate",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 406,
+              "sha256": "5c5ecbff967b120a2a1d70570f687267f9234624c4c28fda30cf7b33578c2245"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "endpoint-crosscheck",
+          "statement": "Digitised final lift agrees with the final force report.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/endpointLiftMatchesReport",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 406,
+              "sha256": "5c5ecbff967b120a2a1d70570f687267f9234624c4c28fda30cf7b33578c2245"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "drag-error-visible",
+          "statement": "The published evidence retains the material drag underprediction.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/dragUnderpredictionRemainsVisible",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 406,
+              "sha256": "5c5ecbff967b120a2a1d70570f687267f9234624c4c28fda30cf7b33578c2245"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 406,
+          "sha256": "5c5ecbff967b120a2a1d70570f687267f9234624c4c28fda30cf7b33578c2245"
+        },
+        {
+          "path": "source-register.json",
+          "bytes": 446,
+          "sha256": "df9da4e865a4990fda92c615be18831cb091e5c8fb79b6bdf9be0fb6adea8351"
+        }
+      ],
+      "manifest": "projects/fluent-cylinder-vortex/evidence-manifest.json",
+      "manifestSha256": "281ceb2e617625b7c43138d9ac2a3e25dbecf10c4166d0ec4efaf649ee417e82"
+    },
+    {
       "slug": "fsae-cooling",
       "title": "FSAE cooling system screen",
       "summary": "Coupled air, hydraulic, and transient thermal models test a candidate FSAE cooling loop and preserve the engineering no-go decision.",
       "methods": [
         "Published component curves are digitised and coupled at matched air and hydraulic operating points.",
         "An 80-cell finite-volume coolant model resolves baseline, 10-second peak, and recovery phases.",
-        "Spatial and time-step studies quantify numerical sensitivity before the system decision is published."
+        "Spatial and time-step studies quantify numerical sensitivity before the system decision is published.",
+        "A four-grid OpenFOAM fan-jump/porous-core surrogate qualifies the numerical coupling without claiming installed-vehicle CFD."
       ],
       "limitations": [
         "The CWA150 curve remains secondary-hosted and is conservatively biased; final approval requires first-party or measured hydraulic data.",
         "Motor liquid heat fraction and KW26 operating-point loss remain uncertain and are swept rather than invented.",
-        "This is a coolant-domain screen, not solid-component conjugate heat transfer or a completed vehicle installation."
+        "This is a coolant-domain screen, not solid-component conjugate heat transfer or a completed vehicle installation.",
+        "The OpenFOAM case is a shrouded proxy with no installed sidepod, wheel, leakage or measured boundary conditions."
       ],
       "commands": [
         "cd ../fsae_cooling_system && python3 -m unittest discover -s sim/zero_d -v",
@@ -1093,6 +1503,16 @@
             "path": "results/analysis.json",
             "bytes": 10789,
             "sha256": "3bcd3f97770193e9beda40b93396b8566b90c83e1b7780ae411497532df98610"
+          }
+        },
+        {
+          "id": "openfoam-qualification",
+          "title": "Four-grid OpenFOAM method qualification",
+          "role": "Fan-jump and porous-core convergence evidence",
+          "artifact": {
+            "path": "results/openfoam-qualification.json",
+            "bytes": 1002,
+            "sha256": "e29e0c896029ad7115c672e0dedd9cf971edbabbba98ff4fb90a7ad6645ad287"
           }
         }
       ],
@@ -1226,16 +1646,54 @@
             "spal-brushless",
             "solver"
           ]
+        },
+        {
+          "identifier": "openfoam-method-qualification",
+          "statement": "All four fan/core surrogate meshes pass and the fine-pair quantity changes remain below 2%.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/openfoam-qualification.json",
+          "metric_pointer": "/acceptance/allMeshesPass",
+          "artifacts": [
+            {
+              "path": "results/openfoam-qualification.json",
+              "bytes": 1002,
+              "sha256": "e29e0c896029ad7115c672e0dedd9cf971edbabbba98ff4fb90a7ad6645ad287"
+            },
+            {
+              "path": "results/openfoam-mesh-qualification.svg",
+              "bytes": 63850,
+              "sha256": "d824e55354097e4e6c3091c26d7ef7eed6570b7740f9bcfe22013c8037d62f51"
+            }
+          ],
+          "source_ids": [
+            "boyd-6310",
+            "spal-brushless",
+            "openfoam-qualification"
+          ]
         }
       ],
-      "claimCount": 5,
-      "passedClaimCount": 5,
-      "artifactCount": 3,
+      "claimCount": 6,
+      "passedClaimCount": 6,
+      "artifactCount": 5,
       "artifacts": [
         {
           "path": "results/analysis.json",
           "bytes": 10789,
           "sha256": "3bcd3f97770193e9beda40b93396b8566b90c83e1b7780ae411497532df98610"
+        },
+        {
+          "path": "results/openfoam-mesh-qualification.svg",
+          "bytes": 63850,
+          "sha256": "d824e55354097e4e6c3091c26d7ef7eed6570b7740f9bcfe22013c8037d62f51"
+        },
+        {
+          "path": "results/openfoam-qualification.json",
+          "bytes": 1002,
+          "sha256": "e29e0c896029ad7115c672e0dedd9cf971edbabbba98ff4fb90a7ad6645ad287"
         },
         {
           "path": "results/thermal-screen.svg",
@@ -1249,7 +1707,7 @@
         }
       ],
       "manifest": "projects/fsae-cooling/evidence-manifest.json",
-      "manifestSha256": "ac28210a2ed73bbaa2d8034d1837fb35992fa2cd39760e0386b67b1053fd80f3"
+      "manifestSha256": "9a3928b6b962929a003a4ceae08c45a972b78aba5678c3971c8c5f7a4619d692"
     },
     {
       "slug": "ground-effect-vlm",
@@ -2031,6 +2489,142 @@
       "manifestSha256": "f25b15d758db83e3d2358b63aac0eee0d29479e5f061cf193ea8e7d267c0ffe0"
     },
     {
+      "slug": "powertrain-cycle-simulation",
+      "title": "Powertrain driving-cycle simulation",
+      "summary": "Retained workbook outputs are reduced to four decision claims covering charged, empty-battery and SOC cases.",
+      "methods": [
+        "Point-by-point longitudinal energy calculation in the supplied course workbooks.",
+        "Cross-workbook fuel and CO2 consistency checks."
+      ],
+      "limitations": [
+        "Instructor Excel simulators are proprietary course tooling.",
+        "Quasi-static cycle accounting omits component transients and real-driver variation."
+      ],
+      "commands": [
+        "python3 scripts/build_esilv_evidence.py --project powertrain-cycle-simulation"
+      ],
+      "sources": [
+        {
+          "id": "register",
+          "title": "Private-source hash and metric register",
+          "role": "retained workbook evidence",
+          "artifact": {
+            "path": "source-register.json",
+            "bytes": 436,
+            "sha256": "3bbd7fa2dba307553a80830d6ed87a0a34f7041769772e7d34744f6bbca353e8"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "charged-phev-below-ice",
+          "statement": "Charged PHEV fuel use is below ICE on Spa ECO.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/chargedPhevBelowIce",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 416,
+              "sha256": "0f32c6efd90e4c174b9bb54d4f844ba47d766b3bc7726ace7a8541c6ae041f2f"
+            },
+            {
+              "path": "source-register.json",
+              "bytes": 436,
+              "sha256": "3bbd7fa2dba307553a80830d6ed87a0a34f7041769772e7d34744f6bbca353e8"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "empty-phev-above-ice",
+          "statement": "An empty-battery PHEV exceeds ICE fuel use on Spa ECO.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/emptyPhevAboveIce",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 416,
+              "sha256": "0f32c6efd90e4c174b9bb54d4f844ba47d766b3bc7726ace7a8541c6ae041f2f"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "soc-sweep-monotonic",
+          "statement": "Fuel use falls monotonically as retained SOC increases.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/socSweepMonotonic",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 416,
+              "sha256": "0f32c6efd90e4c174b9bb54d4f844ba47d766b3bc7726ace7a8541c6ae041f2f"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "co2-factor-consistent",
+          "statement": "Workbook petrol rows retain one CO2 conversion factor.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/co2FactorConsistent",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 416,
+              "sha256": "0f32c6efd90e4c174b9bb54d4f844ba47d766b3bc7726ace7a8541c6ae041f2f"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 416,
+          "sha256": "0f32c6efd90e4c174b9bb54d4f844ba47d766b3bc7726ace7a8541c6ae041f2f"
+        },
+        {
+          "path": "source-register.json",
+          "bytes": 436,
+          "sha256": "3bbd7fa2dba307553a80830d6ed87a0a34f7041769772e7d34744f6bbca353e8"
+        }
+      ],
+      "manifest": "projects/powertrain-cycle-simulation/evidence-manifest.json",
+      "manifestSha256": "912d6b3d4d31b4523511d2821172b076a8cd335cfcd8efd79f21518a1a10203a"
+    },
+    {
       "slug": "steady-conduction-1d",
       "title": "Steady 1-D conduction with finite differences",
       "summary": "The first discretised PDE in the study sequence: a generating rod with a convective tip, solved with a from-scratch Thomas algorithm and verified against closed-form and manufactured solutions.",
@@ -2213,6 +2807,142 @@
       ],
       "manifest": "projects/steady-conduction-1d/evidence-manifest.json",
       "manifestSha256": "62c362b38b7cb0049b06efe4f47fc37fbde1e245a441d99f4466ab537d278cef"
+    },
+    {
+      "slug": "xc48-abaqus-twin",
+      "title": "XC48 tensile digital twin",
+      "summary": "Raw tensile data and final report metrics gate the Abaqus twin, mesh ranking and energy-ratio claims.",
+      "methods": [
+        "Raw force/displacement recomputed with the validated specimen geometry.",
+        "Final report controls mesh and solver comparisons."
+      ],
+      "limitations": [
+        "One specimen and one loading direction.",
+        "Abaqus binary models remain in the private evidence archive."
+      ],
+      "commands": [
+        "python3 scripts/build_esilv_evidence.py --project xc48-abaqus-twin"
+      ],
+      "sources": [
+        {
+          "id": "register",
+          "title": "Private-source hash and metric register",
+          "role": "raw test and group report evidence",
+          "artifact": {
+            "path": "source-register.json",
+            "bytes": 535,
+            "sha256": "3411e8fdc46d689f95dda7c84487badbd6e446d91d212949b162394faefb66aa"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "twin-r2",
+          "statement": "The best Abaqus twin fit exceeds R\u00b2=0.95.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/twinR2AbovePointNineFive",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 491,
+              "sha256": "8055d978127a3e6ad1c175bb8e413916c3cfa8d40067c1bebc133979d5382269"
+            },
+            {
+              "path": "source-register.json",
+              "bytes": 535,
+              "sha256": "3411e8fdc46d689f95dda7c84487badbd6e446d91d212949b162394faefb66aa"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "uts-reproduction",
+          "statement": "Raw-data UTS reproduces the final report value.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/rawUtsMatchesReport",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 491,
+              "sha256": "8055d978127a3e6ad1c175bb8e413916c3cfa8d40067c1bebc133979d5382269"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "mesh-ranking",
+          "statement": "M2 remains the highest-R\u00b2 mesh in the retained sweep.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/m2RanksFirst",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 491,
+              "sha256": "8055d978127a3e6ad1c175bb8e413916c3cfa8d40067c1bebc133979d5382269"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        },
+        {
+          "identifier": "kinetic-energy",
+          "statement": "Pre-fracture kinetic/internal energy ratio stays at or below 5%.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/kineticEnergyBelowFivePercent",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 491,
+              "sha256": "8055d978127a3e6ad1c175bb8e413916c3cfa8d40067c1bebc133979d5382269"
+            }
+          ],
+          "source_ids": [
+            "register"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 491,
+          "sha256": "8055d978127a3e6ad1c175bb8e413916c3cfa8d40067c1bebc133979d5382269"
+        },
+        {
+          "path": "source-register.json",
+          "bytes": 535,
+          "sha256": "3411e8fdc46d689f95dda7c84487badbd6e446d91d212949b162394faefb66aa"
+        }
+      ],
+      "manifest": "projects/xc48-abaqus-twin/evidence-manifest.json",
+      "manifestSha256": "2cb10cac82c26e27db9cb95030291c37f4c11331ee850ec1db92708cfbb045ce"
     }
   ]
 }

@@ -1,11 +1,11 @@
 ---
 title: 'Powertrain Cycles — Energy & CO₂ Simulation'
 year: 2025
-date: '2025-12'
+date: '2025-12-06'
 status: complete
 categories: [tooling, validation]
 tags: [driving cycles, longitudinal dynamics, PHEV, CO₂, Excel, pandas]
-summary: 'Four powertrains over three driving cycles in a point-by-point longitudinal model: a charged PHEV burns 1.43 l/100km on the Spa ECO lap where the ICE burns 10.27, and a flat battery turns the same car into the thirstiest of the four.'
+summary: 'A charged PHEV uses 1.43 l/100km on the Spa ECO lap versus 10.27 for ICE; an empty battery makes it the thirstiest case.'
 methodLine: 'Point-by-point longitudinal dynamics · Excel cycle simulators · Spa ECO/SPORT + NEDC'
 role: 'Solo project'
 duration: '4 weeks'
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Post-processed the simulator CSV exports with pandas and regenerated every chart from the summary workbooks.'
 featured: false
 order: 20
-studySequence: 5
+studySequence: 1
 heroImage: /images/projects/powertrain-cycle-simulation/cycle-comparison.svg
 ---
 

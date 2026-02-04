@@ -1,11 +1,11 @@
 ---
 title: 'Heat Diffusion 2-D — Explicit FTCS with a Hard Stability Gate'
 year: 2026
-date: 2026-03
+date: '2026-08-18'
 status: complete
 categories: [validation]
 tags: [Python, NumPy, heat equation, FTCS, stability, V&V]
-summary: 'First time-dependent PDE solver of the sequence: explicit FTCS heat diffusion on a uniform grid, validated against the analytical slab transient, with a stability gate that refuses unstable runs.'
+summary: 'Explicit FTCS heat diffusion matches the analytical slab transient to 1.38e−5 and refuses any run outside its r≤0.25 stability bound.'
 methodLine: 'FTCS · finite-volume flux form · slab series · stability gate'
 role: 'Numerical methods & validation'
 duration: 'Independent study'
@@ -21,13 +21,13 @@ keyOutputs:
   - 'Made the stability bound a hard contract: an attempted r = 0.26 run is refused and logged before integration.'
 featured: false
 order: 15
-studySequence: 11
+studySequence: 18
 heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
 ---
 
 ## Context & objective
 
-The first time-dependent solver of the sequence matches the analytical slab transient to $L^\infty=1.38\times10^{-5}$, and it refuses to run outside its stability bound. It is the seventh study, seven months after moving from software engineering into mechanics, and the direct precursor to the [FlowLab lattice-Boltzmann work](/projects/flowlab): before trusting a browser LBM solver, I wanted the smallest unsteady solver where stability, temporal order, and conservation could each be checked against something exact.
+This first time-dependent solver matches the analytical slab transient to $L^\infty=1.38\times10^{-5}$, and it refuses to run outside its stability bound. It directly precedes the [FlowLab lattice-Boltzmann work](/projects/flowlab): before trusting a browser LBM solver, I wanted the smallest unsteady solver where stability, temporal order, and conservation could each be checked against an independent result.
 
 The heat equation $\partial_t T=\alpha\nabla^2 T$ is the right vehicle: it has an analytical transient, a textbook stability bound, and a conservation identity. The objective was a verifiable solver, with the gates declared before the numbers were generated.
 

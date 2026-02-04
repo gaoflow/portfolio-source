@@ -1,7 +1,7 @@
 ---
 title: 'Ground Effect VLM — Image-Vortex Ride-Height Study'
 year: 2026
-date: 2026-04
+date: '2026-08-10'
 status: complete
 categories: [validation, tooling]
 tags: [Python, NumPy, VLM, potential flow, ground effect]
@@ -17,7 +17,7 @@ keyOutputs:
   - 'Implemented finite-vortex induction, horseshoe wakes, collocation solve, force integration, and ground-image construction from NumPy primitives.'
   - 'Verified wall tangency, far-ground recovery, span symmetry, finite-wing lift-slope scale, and 64-to-96-panel refinement.'
   - 'Separated the defensible mechanism result from race-car claims the inviscid one-row model cannot support.'
-featured: true
+featured: false
 order: 6
 studySequence: 12
 heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg

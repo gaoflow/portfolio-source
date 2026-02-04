@@ -1,7 +1,7 @@
 ---
 title: 'Airfoil Methods — Low-Order Models vs NASA'
 year: 2026
-date: 2026-02
+date: '2026-08-10'
 status: complete
 categories: [validation, tooling]
 tags: [Python, Hess–Smith, NACA 0012, panel method, NASA]
@@ -18,9 +18,9 @@ keyOutputs:
   - 'Implemented cosine-spaced NACA geometry and a Hess–Smith source/vortex solver with quadrature, self-jump terms, and a Kutta condition.'
   - 'Validated lift only inside a declared attached-flow range; 160-to-240-panel lift changed by 0.0307% at four degrees.'
   - 'Showed the inviscid model beside measured wake drag and stall rather than presenting structurally unavailable outputs as weak predictions.'
-featured: true
+featured: false
 order: 7
-studySequence: 6
+studySequence: 8
 heroImage: /images/projects/airfoil-methods/lift-validation.svg
 ---
 

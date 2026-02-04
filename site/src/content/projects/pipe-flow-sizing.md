@@ -1,11 +1,11 @@
 ---
 title: 'Pipe Flow Sizing — Verified Hydraulics Primitives'
-year: 2025
-date: 2025-11
+year: 2026
+date: '2026-08-18'
 status: complete
 categories: [tooling]
 tags: [Python, hydraulics, Darcy–Weisbach, Colebrook, pump curve]
-summary: 'A third-month study: friction factors, series networks, and pump operating points built from scratch — and verified against identities, residuals, and a published accuracy band before being trusted.'
+summary: 'Colebrook friction, series losses and a pump operating point verified by exact identities, residual gates and the Swamee–Jain accuracy band.'
 methodLine: 'Darcy–Weisbach · Colebrook Newton solve · series networks · pump intersection'
 role: 'Hydraulics & numerical methods'
 duration: 'Independent study'
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Solved a series cooling loop and its pump operating point (26.22 L/min at 51.34 kPa), confirmed against an independent brute-force scan bracket.'
 featured: false
 order: 13
-studySequence: 3
+studySequence: 16
 heroImage: /images/projects/pipe-flow-sizing/moody.svg
 ---
 
@@ -28,7 +28,7 @@ heroImage: /images/projects/pipe-flow-sizing/moody.svg
 
 The representative cooling loop operates at 26.22 L/min against 51.34 kPa, and about 78% of that pressure drop is minor losses — the K coefficients of the radiator core and engine gallery, with straight-pipe friction a minor share at this scale. That conclusion only matters because every primitive behind it was verified before it was allowed to feed anything downstream.
 
-Three months after moving from software engineering into mechanical engineering, I needed hydraulics I could trust for a later FSAE cooling-loop study. The mathematics of pipe sizing is not hard, but it is easy to *almost* get right: a friction factor off by a few percent, a minor-loss coefficient silently dropped, an operating point found by eyeballing two curves. Everything here is steady, incompressible, single-phase pipe flow: Darcy–Weisbach friction, K-coefficient minor losses, a series network, and the intersection of a pump curve with the system resistance curve.
+I needed hydraulics I could trust for the later FSAE cooling-loop study. Pipe sizing is easy to *almost* get right: a friction factor a few percent off, a minor-loss coefficient silently dropped, an operating point found by eyeballing two curves. This study covers steady, incompressible, single-phase pipe flow: Darcy–Weisbach friction, K-coefficient minor losses, a series network, and a quadratic pump/system intersection.
 
 ## Friction factor, verified two ways
 

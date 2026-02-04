@@ -16,12 +16,12 @@ const meta = [
   d.role && { label: 'Role', value: d.role },
   d.team && { label: 'Team', value: d.team },
   d.duration && { label: 'Duration', value: d.duration },
-  d.studySequence && { label: 'Progression', value: `Study ${String(d.studySequence).padStart(2, '0')}` },
-  { label: 'Date', value: new Date(`${d.date}-02`).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) },
+  d.studySequence && { label: 'Chronology', value: `Study ${String(d.studySequence).padStart(2, '0')}` },
+  { label: 'Evidence date', value: new Date(`${d.date}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) },
 ].filter(Boolean) as { label: string; value: string }[];
 ---
 
-<Base title={d.title} description={d.summary}>
+<Base title={d.title} description={d.summary} image={`/og/projects/${project.id}.png`}>
   <article class="mx-auto max-w-3xl px-6 pt-16 pb-24">
     <!-- 1. Hero: quantified one-liner + method stack -->
     <header class="space-y-5 mb-10">

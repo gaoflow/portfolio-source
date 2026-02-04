@@ -1,11 +1,11 @@
 ---
 title: 'XC48 Tensile Twin — Experiment to Abaqus Explicit'
 year: 2026
-date: '2026-03'
+date: '2026-03-28'
 status: complete
 categories: [validation, design]
 tags: [Abaqus, Dynamic Explicit, tensile test, XC48 steel, ductile damage, Python]
-summary: 'A group XC48 tensile test rebuilt as an Abaqus Dynamic Explicit digital twin reaching R²=0.9663 against the measured curve — with the modulus anomaly and the mesh-study upset left in plain sight.'
+summary: 'An XC48 tensile test rebuilt in Abaqus Explicit reaches R²=0.9663; the low measured modulus and failed Static General path remain visible.'
 methodLine: 'Tensile test · engineering→true conversion · Abaqus Explicit · mesh/solver/amplitude sensitivity'
 role: 'Data post-processing & report toolchain'
 team: 'ESILV MMN1 group — Nicolas Chang, Bing Gao, Sabin Karn, Nithor Bhowmik'
@@ -22,7 +22,7 @@ keyOutputs:
   - 'Kept the measured 12.28 GPa modulus as-is and documented it as a machine-compliance artifact rather than calibrating it away.'
 featured: false
 order: 19
-studySequence: 10
+studySequence: 4
 heroImage: /images/projects/xc48-abaqus-twin/stress-strain.svg
 ---
 

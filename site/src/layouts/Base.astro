@@ -11,10 +11,30 @@ import { profile } from '../data/profile';
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
 }
-const { title, description = profile.tagline } = Astro.props;
+const { title, description = profile.tagline, image = '/og-card.png' } = Astro.props;
 const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — ${profile.role}`;
-const socialImage = new URL('/og-card.png', Astro.site ?? Astro.url).toString();
+const socialImage = new URL(image, Astro.site ?? Astro.url).toString();
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      name: profile.name,
+      jobTitle: profile.role,
+      url: Astro.site?.toString(),
+      sameAs: [profile.github, profile.linkedin],
+    },
+    {
+      '@type': 'WebSite',
+      name: `${profile.name} — Engineering Portfolio`,
+      url: Astro.site?.toString(),
+      description,
+      author: { '@type': 'Person', name: profile.name },
+    },
+  ],
+};
 
 const nav = [
   { href: '/', label: 'Home' },
@@ -32,6 +52,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="canonical" href={Astro.url} />
+    <link rel="alternate" type="application/rss+xml" title="Bing Gao — Engineering Notes" href="/rss.xml" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
@@ -41,6 +62,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)}></script>
     <title>{pageTitle}</title>
   </head>
   <body class="min-h-screen">

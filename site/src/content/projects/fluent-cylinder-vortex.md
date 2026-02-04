@@ -1,11 +1,11 @@
 ---
 title: 'Fluent Vortex Shedding — Triggering the Kármán Street'
 year: 2026
-date: '2026-03'
+date: '2026-03-12'
 status: complete
 categories: [component-cfd, validation]
 tags: [ANSYS Fluent, transient CFD, vortex shedding, cylinder flow, V&V]
-summary: 'Steady and transient cylinder flow in ANSYS Fluent: a patched y-velocity kick triggers the Kármán street at Re=150 on demand, and the 29% drag underprediction is traced to numerical dissipation on a coarse tutorial mesh.'
+summary: 'A velocity perturbation triggers the Re=150 Kármán street; the measured St=0.155 passes its gate while coarse-mesh dissipation leaves 29% drag error.'
 methodLine: 'ANSYS Fluent · steady Re=40 · transient Re=150 · symmetry-breaking patch · force monitors'
 role: 'Simulation & report lead'
 team: 'ESILV MMN1 group — Bing Gao, Nicolas Chang, Daphné Baray'
@@ -20,9 +20,9 @@ keyOutputs:
   - 'Ran the steady Re=40 case on a 20,200-node quad mesh to full convergence: 53 iterations, residuals below 1e-6, mass imbalance 5.8e-9 kg/s.'
   - 'Measured final Cd = 0.923 at Re=150 against an experimental chart value of ~1.6 (29.3% low) and tied the bias to numerical dissipation; the Re=40 case showed the same signature at 26.9% low.'
   - 'Rebuilt the force history by digitizing the archived Fluent monitors, verified the endpoints against the exported force reports, and extracted St = 0.155 from the lift signal.'
-featured: false
+featured: true
 order: 17
-studySequence: 8
+studySequence: 2
 heroImage: /images/projects/fluent-cylinder-vortex/force-history.svg
 ---
 

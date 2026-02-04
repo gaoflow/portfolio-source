@@ -1,14 +1,14 @@
 ---
 title: 'Potential Flow Sandbox — Complex Potentials and Circulation'
-year: 2025
-date: 2025-12
+year: 2026
+date: '2026-08-18'
 status: complete
 categories: [component-cfd]
 tags: [Python, NumPy, potential flow, complex potential, circulation, RK4]
 summary: 'The classical elementary flows implemented as complex potentials, superposed into cylinder flow with circulation, and verified against every available analytical identity.'
 methodLine: 'Complex potentials · superposition · circulation · RK4 streamlines'
 role: 'Aerodynamics fundamentals'
-duration: 'Fourth-month study'
+duration: 'Independent build'
 heroMetrics:
   - { label: 'Cp error', value: '2.66e-15' }
   - { label: 'Stagnation error', value: '8.9e-16 rad' }
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Verified fixed-step RK4 streamline tracing against the analytical streamfunction: 2.6×10⁻¹² maximum drift at step 0.01 with observed fourth-order convergence.'
 featured: false
 order: 14
-studySequence: 4
+studySequence: 17
 heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
 ---
 
@@ -28,7 +28,7 @@ heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
 
 Every identity this layer of theory claims checks out at machine precision: surface $C_p$ to $2.66\times10^{-15}$, circulation recovery to $8.9\times10^{-16}$, Kutta–Joukowski lift exact in sign and magnitude. The panel method in [Airfoil Methods](/projects/airfoil-methods) and the vortex-lattice code in [Ground Effect VLM](/projects/ground-effect-vlm) both assume that sources, doublets, and vortices are exact, that superposition is legitimate, and that circulation means lift. Rather than import those assumptions, I built the layer they rest on and verified every identity it claims.
 
-This study belongs to my fourth month after moving from software engineering into mechanical engineering, and it closes the fluids-coursework phase of the ladder. The deliverable is a small sandbox: elementary flows written as complex potentials, superposed into flow past a circular cylinder with and without circulation, with an RK4 streamline tracer checked against the analytical streamfunction.
+This study closes the analytical fluids set before the later panel and vortex-lattice work. The deliverable is a small sandbox: elementary flows written as complex potentials, superposed into flow past a circular cylinder with and without circulation, with an RK4 streamline tracer checked against the analytical streamfunction.
 
 ## Method
 

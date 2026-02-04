@@ -1,11 +1,11 @@
 ---
 title: 'Steady 1-D Conduction — First Discretised PDE'
-year: 2025
-date: 2025-10
+year: 2026
+date: '2026-08-18'
 status: complete
 categories: [validation]
 tags: [Python, NumPy, finite differences, heat conduction, verification]
-summary: 'A generating rod with a convective tip, solved with finite differences and a from-scratch Thomas algorithm, then verified against a closed-form exact solution, a manufactured-solution convergence study, and a machine-precision energy balance.'
+summary: 'A generating rod solved by finite differences and a Thomas algorithm, then checked by an exact solution, second-order MMS convergence and energy closure.'
 methodLine: 'Central differences · half-cell Robin tip · Thomas algorithm · manufactured solutions'
 role: 'Heat transfer & numerical methods'
 duration: 'Independent study'
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Closed the global energy balance to a relative residual of 1.59e-12 and cross-checked the tridiagonal solver against a NumPy dense solve at 1.1e-16 on 64 randomized systems.'
 featured: false
 order: 12
-studySequence: 2
+studySequence: 15
 heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg
 ---
 
@@ -28,7 +28,7 @@ heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg
 
 The scheme is verified, and the interesting part is how close it came to being "verified" vacuously: it reproduces the closed-form solution to $1.34\times10^{-11}$ K, converges at observed order 2.0002 on a manufactured case, and closes the global energy balance to $1.59\times10^{-12}$. Each check exists because one of the others cannot see a particular failure mode.
 
-This is the second study in the sequence, from my second month after moving from software engineering into mechanical engineering. It is the first time I discretise a differential equation rather than evaluate a closed-form correlation, so the point is the workflow every later CFD project depends on: discretise, impose boundary conditions honestly, solve, verify before interpreting. The physics is deliberately simple — a generating rod.
+This study discretises a differential equation instead of evaluating a closed-form correlation. It establishes the workflow every later numerical project depends on: discretise, impose boundary conditions honestly, solve, then verify before interpreting. The physics stays deliberately simple — a generating rod.
 
 The problem: steady conduction in a rod of length $L=0.5$ m with uniform conductivity $k=167$ W/(m·K), uniform volumetric generation $q'''=2\times10^{4}$ W/m³, a fixed temperature $T(0)=350$ K, and a convective tip $-k\,T'(L)=h_c(T(L)-T_\infty)$ with $h_c=25$ W/(m²·K) and $T_\infty=300$ K.
 

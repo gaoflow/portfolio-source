@@ -1,11 +1,11 @@
 ---
 title: 'Fluent Cylinder V&V — Mesh, Domain & Reynolds Sweeps'
 year: 2026
-date: '2026-03'
+date: '2026-03-29'
 status: complete
 categories: [component-cfd, validation]
 tags: [ANSYS Fluent, cylinder drag, mesh independence, domain sensitivity, Poiseuille]
-summary: 'Two course Fluent studies run as one verification exercise: a Poiseuille pipe validated to 1% against the exact solution, then a cylinder drag study where mesh and domain sweeps plateau at Cd 2.7973 and only Re 20 of six passes the 5% experimental margin.'
+summary: 'Poiseuille flow validates within 1%; cylinder mesh and domain sweeps converge at Cd 2.7973, but only Re=20 meets the 5% experimental gate.'
 methodLine: 'ANSYS Fluent · steady laminar · mesh/domain plateaus · handout benchmark'
 role: 'Simulation & report lead'
 team: 'ESILV MMN1 group — Bing Gao, Nicolas Chang, Daphné Baray'
@@ -19,9 +19,9 @@ keyOutputs:
   - 'Validated the Fluent workflow on a Re=100 pipe first: centreline velocity 1.98 vs 2.00 m/s analytical, wall shear 0.08 Pa, and entrance length 2.4 m all matching Poiseuille theory.'
   - 'Ran Workbench design-point sweeps at Re=10: drag plateaus past 40,000 cells (<0.1%) and past D2=100 m (<1%), fixing the reference setup at Cd=2.7973.'
   - 'Swept six Reynolds numbers (0.1–20) on one fixed grid, overlaid the handout experimental drag curve, and showed the 5% margin holds only at Re=20 (3.83%) — with the low-Re bias traced to grid and modelling limits rather than tuned away.'
-featured: false
+featured: true
 order: 16
-studySequence: 7
+studySequence: 5
 heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
 ---
 

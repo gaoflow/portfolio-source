@@ -1,7 +1,7 @@
 ---
 title: 'FlowLab — Browser-Native Lattice-Boltzmann Validation'
 year: 2026
-date: 2026-05
+date: '2026-08-10'
 status: complete
 categories: [tooling, validation]
 tags: [JavaScript, D2Q9, LBM, BGK, V&V]
@@ -18,9 +18,9 @@ keyOutputs:
   - 'Implemented collision, streaming, moving-wall momentum correction, convergence monitoring, and benchmark interpolation without numerical dependencies.'
   - 'Reduced streamwise centerline RMSE from 0.00511 to 0.00286 across 32², 48², and 64² grids.'
   - 'Kept one solver core for automated Node.js validation and a live browser experience.'
-featured: true
+featured: false
 order: 5
-studySequence: 13
+studySequence: 10
 heroImage: /images/projects/flowlab/cavity-vorticity.svg
 ---
 

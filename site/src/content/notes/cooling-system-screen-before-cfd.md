@@ -1,7 +1,7 @@
 ---
-title: 'Screen the Cooling System Before Spending CFD Compute'
-published: 2026-08-16
-summary: 'Why pump, branch, radiator, fan, and transient thermal constraints should be closed as a system before detailed airflow CFD is allowed to optimise the installation.'
+title: 'FSAE Cooling — From Reference Hunting to a NO-GO Decision'
+published: 2026-08-18
+summary: 'How I turned a legacy cooling report, manufacturer limits and incomplete component curves into a traceable model that rejected our passive E3 concept before procurement.'
 tags: [FSAE, cooling, hydraulics, thermal modelling]
 sourceProjects: [fsae-cooling]
 featured: false
@@ -9,6 +9,32 @@ order: 5
 ---
 
 A system-level screen rejected my FSAE cooling architecture before any CFD ran: the hydraulic intersection, radiator map, and transient energy balance together show the passive E3 layout cannot hold its temperature boundary. Detailed radiator CFD cannot rescue an infeasible architecture. Spend inexpensive models to reject bad architectures first, then spend CFD on the surviving installation questions.
+
+## How I researched our team concept
+
+I did not start with a clean specification. I started with a legacy cooling report, a shortlist of hardware and numbers that looked precise: 520 W inverter heat, 2.736 kW for two motors, a generic radiator coefficient, and 40 °C ambient. My first task was to stop treating precision as proof.
+
+I built a claim register before changing the model. Every input became one of four things: **verified** from a primary source, **screened** by a deterministic calculation, **assumption** kept only for sensitivity, or **unknown** that blocks a decision. That simple table changed the project more than any solver.
+
+The source audit overturned two starting assumptions:
+
+1. The 520 W inverter value came from $26\,\mathrm{kVA}\times2\%$. Apparent power is not the vehicle's real-power operating point, and AMK publishes no KW26 loss map versus torque, speed or switching state. I kept 520 W only as a labelled scenario.
+2. The DD5 is rated at 12.3 kW, not 26 kW. AMK's archived 80/100/120 °C workbooks contain total motor-loss maps, but the temperature label is undefined and total loss is not the heat entering our user-designed water jacket. The liquid fraction stayed unknown.
+
+The primary AMK manual gave constraints I could use without interpretation: KW26 coolant supply at or below 25 °C, at least 10 L/min and less than 5 K rise; each DD5 branch at or below 40 °C, at least 4 L/min and less than 5 K rise. Once I put those limits beside our 40 °C radiator-inlet air case, the main contradiction was visible before any component calculation: a passive radiator cannot supply 25 °C coolant from 40 °C air in steady state.
+
+I still ran the component screen because the team needed to know whether hydraulics created a second blocker. Digitised Boyd, SPAL and CWA150 curves gave 10.03 L/min total and 4.16 L/min in the limiting motor branch. Both flow gates pass, but barely. The thermal boundary still fails, so the correct team decision was to reject the passive E3 architecture rather than buy parts that meet isolated catalogue points.
+
+The next branch was not “use a bigger radiator.” I separated the temperature levels: an actively conditioned KW26 loop below ambient and a passive higher-temperature DD5 loop. E7 explored broad COP, humidity, heat-leak and coolant-partition assumptions. E8 replaced part of that envelope with public compressor, plate-heat-exchanger, pump and fan curves. It passes its declared numerical screen, but 36 application inputs remain blocked, so it is a research direction rather than a bill of materials.
+
+## What the references taught me
+
+- A component rating is conditional. The KW26 2 kW cold-plate figure belongs to 25 °C and 10 L/min; it is not an inverter loss map.
+- A motor's total-loss workbook does not define coolant heat. Copper, iron, magnet and mechanical losses need a jacket partition model or calorimetry.
+- Free-flow fan volume is not installed airflow. The operating point comes from the fan and system pressure curves together.
+- Formula Student rules define legality, not the vehicle's thermal duty cycle. Our 40 °C case is an internal design envelope, not an FSG rule.
+- A public curve is usable only with its exact part number, axes, rating condition and interpolation boundary. A product-page maximum cannot support a system decision.
+- Missing data must stay visible. The acquisition plan—calorimetry, branch flow, absolute pressure, duty telemetry and synchronized temperatures—is part of the engineering result.
 
 ## Start with requirements, not a preferred component
 
@@ -154,6 +180,14 @@ Without this handoff, CFD may polish a beautiful duct around a non-viable system
 The cooling screen retains one limitation on purpose: the component curves are secondary-hosted and conservatively biased. That keeps the result below procurement approval. Final component selection needs first-party curves or measured hydraulic and thermal data.
 
 This is the correct authority boundary. A reproducible reduced-order result can support architecture rejection while remaining insufficient for hardware sign-off.
+
+## Source trail
+
+- [Revision 12 engineering report](/documents/fsae-cooling-system-design.pdf) — equations, envelopes, candidate register and rejected paths.
+- [Machine-audited cooling claims](/evidence/fsae-cooling.html) — five public statements tied to JSON metrics and artifacts.
+- AMK PDK 205481, version 2022/15 — KW26 and DD5 cooling conditions, derating and control-electronics boundary ([official PDF](https://www.amk-motion.com/amk-dokucd/dokucd/en/content/resources/pdf-dateien/pdk_205481_kw26-s5-fse-4q_en_.pdf)).
+- Boyd 6310G3, SPAL VA99 and Pierburg CWA150 curves — component-level inputs only; the note keeps their provenance and installation limits separate.
+- Internal claim register — the controlling record for verified, screened, assumed and unknown inputs. It prevents a secondary-hosted curve or legacy calculation from silently becoming a purchase claim.
 
 ## Boundary of this note
 

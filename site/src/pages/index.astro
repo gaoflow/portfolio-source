@@ -7,7 +7,7 @@ import { getCollection } from 'astro:content';
 
 const all = await getCollection('projects');
 const featured = all.filter((p) => p.data.featured).sort(
-  (a, b) => (a.data.studySequence ?? 999) - (b.data.studySequence ?? 999) || a.data.date.localeCompare(b.data.date) || a.data.order - b.data.order,
+  (a, b) => a.data.date.localeCompare(b.data.date) || (a.data.studySequence ?? 999) - (b.data.studySequence ?? 999) || a.data.order - b.data.order,
 );
 const featuredNotes = (await getCollection('notes'))
   .filter((note) => note.data.featured)

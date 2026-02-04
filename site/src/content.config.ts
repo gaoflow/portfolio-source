@@ -6,7 +6,7 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string(),
     year: z.number(),
-    date: z.string().regex(/^\d{4}-\d{2}$/),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     status: z.enum(['active', 'complete']).default('complete'),
     categories: z.array(z.enum(['fsae', 'full-car', 'component-cfd', 'tooling', 'validation', 'design'])),
     tags: z.array(z.string()).default([]),

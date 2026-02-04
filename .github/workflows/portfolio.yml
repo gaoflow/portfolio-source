@@ -27,14 +27,16 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
 
-      - name: Install site dependencies
-        run: npm ci --prefix site
-
-      - name: Test and rebuild evidence catalog
+      - name: Install dependencies
         run: |
-          python3 -m unittest discover -s projects/evidence-kit/tests -v
-          python3 projects/evidence-kit/scripts/audit_portfolio.py
-          python3 projects/evidence-kit/scripts/publish_site.py
+          npm ci --prefix site
+          python3 -m pip install --disable-pip-version-check numpy==2.2.6 matplotlib==3.10.8
+
+      - name: Test every numerical project
+        run: python3 scripts/verify_numerical_projects.py --portfolio-only
+
+      - name: Publish evidence catalog
+        run: python3 projects/evidence-kit/scripts/publish_site.py
 
       - name: Build static site
         run: npm --prefix site run build

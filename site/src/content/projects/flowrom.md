@@ -1,7 +1,7 @@
 ---
 title: 'FlowROM — POD & DMD of Unsteady Flow Fields'
 year: 2026
-date: 2026-06
+date: '2026-08-10'
 status: complete
 categories: [validation, tooling]
 tags: [Python, NumPy, POD, DMD, reduced-order modelling]
@@ -18,9 +18,9 @@ keyOutputs:
   - 'Built POD and exact-DMD routines from NumPy primitives, with synthetic known-rank and known-frequency behavioral tests.'
   - 'Reserved four complete forcing cycles for temporal holdout; rank-8 POD reached 0.123% fluctuation reconstruction error.'
   - 'Recovered the imposed frequency to 0.00093% relative error and forecast the full held-out velocity state to 0.100% error.'
-featured: true
+featured: false
 order: 4
-studySequence: 14
+studySequence: 11
 heroImage: /images/projects/flowrom/pod-modes.svg
 ---
 
