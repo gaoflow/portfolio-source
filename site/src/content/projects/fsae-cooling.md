@@ -36,6 +36,8 @@ heroImage: '/images/projects/fsae-cooling/thermal-screen.svg'
 
 The deliverable is a defensible rejection, reached before procurement and before any production CFD budget is spent.
 
+Vinci Eco Drive approved publication of this bounded system study on 20 August 2026. No team CAD, telemetry or unapproved hardware data appears here.
+
 ## Engineering question
 
 Could this combination satisfy 40 °C ambient while respecting the AMK KW26 and DD5 cooling boundaries? The screen couples four models instead of sizing each component alone:

@@ -20,7 +20,7 @@ keyOutputs:
   - 'Solved a series cooling loop and its pump operating point (26.22 L/min at 51.34 kPa), confirmed against an independent brute-force scan bracket.'
 featured: false
 order: 13
-studySequence: 16
+studySequence: 17
 heroImage: /images/projects/pipe-flow-sizing/moody.svg
 ---
 

@@ -21,7 +21,7 @@ keyOutputs:
   - 'Made the stability bound a hard contract: an attempted r = 0.26 run is refused and logged before integration.'
 featured: false
 order: 15
-studySequence: 18
+studySequence: 19
 heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
 ---
 

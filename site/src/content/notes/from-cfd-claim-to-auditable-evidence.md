@@ -8,7 +8,7 @@ featured: false
 order: 6
 ---
 
-Every public number on this site is backed by a claim record that an audit script resolves, evaluates, and re-checks on demand — 72 claims across 16 projects currently pass. Without that link, prose, figures, JSON, and source code drift independently.
+Every public number on this site is backed by a claim record that an audit script resolves, evaluates, and re-checks on demand — 76 claims across 17 projects currently pass. Without that link, prose, figures, JSON, and source code drift independently.
 
 An evidence manifest makes the claim itself executable.
 
@@ -150,10 +150,10 @@ The aggregate result:
 
 | Measure | Count |
 |---|---:|
-| Projects audited | 16 |
-| Claims declared | 72 |
-| Claims passing | 72 |
-| Project artifacts | 50 |
+| Projects audited | 17 |
+| Claims declared | 76 |
+| Claims passing | 76 |
+| Project artifacts | 52 |
 
 The mix matters. The catalogue includes successful numerical thresholds and explicit rejection decisions — the F1 NO-GO claims pass because the evidence confirms the rejection, not despite it.
 

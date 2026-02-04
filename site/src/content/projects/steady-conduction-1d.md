@@ -20,7 +20,7 @@ keyOutputs:
   - 'Closed the global energy balance to a relative residual of 1.59e-12 and cross-checked the tridiagonal solver against a NumPy dense solve at 1.1e-16 on 64 randomized systems.'
 featured: false
 order: 12
-studySequence: 15
+studySequence: 16
 heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg
 ---
 

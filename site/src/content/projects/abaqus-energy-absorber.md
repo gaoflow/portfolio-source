@@ -19,7 +19,7 @@ keyOutputs:
   - 'Barrier-crash baseline (1 mm Al, 30 km/h): SEA 17.07 kJ/kg, CFE 68%, energy closure 34.70 ± 0.02 kJ.'
   - 'Wall-impact study (steel / Al 6061 / Ti-6Al-4V / PP): Al 6061 lowest Fmax at 102 kN and best metal SEA at 50.8 kJ/kg.'
   - 'FGT multi-cell geometry absorbs 33.20 of 34.72 kJ (95.6%) with SEA 12.30 kJ/kg, 2.56× the classic baseline.'
-featured: true
+featured: false
 order: 18
 studySequence: 3
 heroImage: /images/projects/abaqus-energy-absorber/force-displacement-preliminary.png

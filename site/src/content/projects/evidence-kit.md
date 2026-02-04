@@ -5,18 +5,18 @@ date: '2026-08-10'
 status: complete
 categories: [tooling, validation]
 tags: [Python, JSON Pointer, SHA-256, reporting, reproducibility]
-summary: 'A manifest-driven audit layer tying every public claim to a metric, gate, source and hashed artifact — 72 of 72 claims currently pass.'
+summary: 'A manifest-driven audit layer tying every public claim to a metric, gate, source and hashed artifact — 76 of 76 claims currently pass.'
 methodLine: 'JSON manifests · typed gates · RFC 6901 pointers · SHA-256 · HTML/CSV/JSON'
 role: 'Tooling & technical communication'
 duration: 'Independent build'
 heroMetrics:
-  - { label: 'Studies audited', value: '16' }
-  - { label: 'Claims', value: '72/72' }
-  - { label: 'Artifacts', value: '50' }
+  - { label: 'Studies audited', value: '17' }
+  - { label: 'Claims', value: '76/76' }
+  - { label: 'Artifacts', value: '52' }
   - { label: 'Interface', value: '1 call' }
 keyOutputs:
   - 'Reduced the caller interface to one catalog build while hiding pointer resolution, typed comparisons, path containment, hashing, and multi-format publication.'
-  - 'Dogfooded the same module across sixteen numerical studies; all 72 declared gates pass against 50 project artifacts.'
+  - 'Dogfooded the same module across seventeen numerical studies; all 76 declared gates pass against 52 project artifacts.'
   - 'Preserves failed claims in reports and exits nonzero instead of selectively publishing successful metrics.'
 featured: false
 order: 3
@@ -27,7 +27,7 @@ studySequence: 9
 
 Correct plots can still support weak claims. The metric may not match the sentence, the threshold may have been chosen after the result was known, the reference may be missing, or the displayed file may not be the one the command produced.
 
-Evidence Kit turns those relationships into data. Each study declares claims, JSON-pointer metrics, typed expectations, sources, artifacts, methods, limitations, and reproduction commands. One module audits every manifest and publishes both human- and machine-readable reports. Across sixteen studies, all 72 declared claims currently pass against 50 hashed artifacts.
+Evidence Kit turns those relationships into data. Each study declares claims, JSON-pointer metrics, typed expectations, sources, artifacts, methods, limitations, and reproduction commands. One module audits every manifest and publishes both human- and machine-readable reports. Across seventeen studies, all 76 declared claims currently pass against 52 hashed artifacts.
 
 ## Live evidence catalog
 
@@ -81,7 +81,7 @@ Scope errors become reviewable. A claim cannot silently swap a full-state error 
 
 ## Dogfood result
 
-The current audit covers sixteen independently evidenced studies:
+The current audit covers seventeen independently evidenced studies:
 
 | Study | Claims passing | Project artifacts |
 |---|---:|---:|
@@ -90,7 +90,7 @@ The current audit covers sixteen independently evidenced studies:
 | F1 2026 Aero | 9 / 9 | 5 |
 | FlowLab | 4 / 4 | 4 |
 | FlowROM | 4 / 4 | 4 |
-| FSAE Cooling | 5 / 5 | 3 |
+| FSAE Cooling | 6 / 6 | 5 |
 | Ground Effect VLM | 5 / 5 | 4 |
 | Heat Diffusion 2D | 4 / 4 | 3 |
 | Pipe Flow Sizing | 4 / 4 | 3 |
@@ -101,13 +101,14 @@ The current audit covers sixteen independently evidenced studies:
 | Fluent Vortex Shedding | 4 / 4 | 2 |
 | Abaqus Energy Absorber | 4 / 4 | 2 |
 | XC48 Tensile Twin | 4 / 4 | 2 |
-| **Total** | **72 / 72** | **50** |
+| F1 RANS Pilot Campaign | 4 / 4 | 2 |
+| **Total** | **76 / 76** | **52** |
 
 The generated `catalog.json` keeps full claim records and SHA-256 values. `coverage.csv` flattens the same data for review or CI ingestion.
 
 ## The audit grew with the portfolio
 
-The first published audit covered six projects, 27 claims and 21 deduplicated artifacts. Five foundational solvers then entered with four claims each. The next five manifests admit the ESILV conversions through retained source hashes and source registers. A sixth FSAE Cooling claim now publishes the four-grid OpenFOAM method qualification. The catalog covers sixteen studies, 72 claims and 50 artifacts.
+The first audit covered six projects, 27 claims and 21 artifacts. Five foundational solvers, five ESILV conversions, a cooling OpenFOAM method gate and the retained F1 RANS campaign then entered the same contract. The catalog now covers seventeen studies, 76 claims and 52 artifacts.
 
 Growth tested the contract in both directions. Each new study had to express its results as pointer-addressable metrics with typed thresholds and named artifacts before its article numbers could enter the site. Existing claims were re-audited on every run: artifacts are re-hashed, so a silently regenerated figure or JSON file fails the audit instead of drifting.
 
@@ -151,7 +152,7 @@ Interface-level tests cover successful multi-format publication, nested array po
 
 ## Current boundary
 
-All 72 declared claims pass. That does not make every project a successful engineering design: FSAE Cooling and the F1 qualification campaign intentionally contain NO-GO decisions, while the cooling fan/core surrogate records a narrower passing method gate. The audit checks traceability and gate evaluation; each study still defines the authority of its result.
+All 76 declared claims pass. That does not make every project a successful engineering design: FSAE Cooling and the current topology qualification contain NO-GO decisions, while the cooling surrogate and earlier F1 RANS campaign record narrower passing gates. The audit checks traceability and authority, not whether every outcome is favourable.
 
 ## What I took away
 

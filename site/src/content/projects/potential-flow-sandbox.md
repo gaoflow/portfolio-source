@@ -20,7 +20,7 @@ keyOutputs:
   - 'Verified fixed-step RK4 streamline tracing against the analytical streamfunction: 2.6×10⁻¹² maximum drift at step 0.01 with observed fourth-order convergence.'
 featured: false
 order: 14
-studySequence: 17
+studySequence: 18
 heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
 ---
 

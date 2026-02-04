@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "projectCount": 16,
-  "claimCount": 72,
-  "passedClaimCount": 72,
-  "artifactCount": 50,
+  "projectCount": 17,
+  "claimCount": 76,
+  "passedClaimCount": 76,
+  "artifactCount": 52,
   "allClaimsPass": true,
   "projects": [
     {
@@ -807,6 +807,159 @@
       ],
       "manifest": "projects/f1-2026-aero/evidence-manifest.json",
       "manifestSha256": "e5ccb09272185814721844a935aaf33efc1d4fc98ae8daf36b14952d8c00b370"
+    },
+    {
+      "slug": "f1-rans-campaign",
+      "title": "F1 half-car RANS pilot campaign",
+      "summary": "A 4.35M-cell OpenFOAM pilot produced nine valid sensitivity results while retaining two diverged roughness runs and material mesh uncertainty.",
+      "methods": [
+        "Steady half-car RANS with component force groups and validity files.",
+        "Eight sensitivity dimensions plus interaction and design-loop checks in the wider 23-variant campaign."
+      ],
+      "limitations": [
+        "The pilot mesh family is outside a demonstrated asymptotic GCI region.",
+        "Public geometry and half-car symmetry prohibit team-level absolute predictions, yaw and physical correlation claims."
+      ],
+      "commands": [
+        "python3 projects/f1-rans-campaign/scripts/analyse.py"
+      ],
+      "sources": [
+        {
+          "id": "register",
+          "title": "Private campaign source register",
+          "role": "scope, date and runtime provenance",
+          "artifact": {
+            "path": "source-register.json",
+            "bytes": 524,
+            "sha256": "34b6c3a448e0b69d01f820de4d3b5bc45b36b033971b7e0212776c73769cd705"
+          }
+        },
+        {
+          "id": "analysis",
+          "title": "Campaign validity reduction",
+          "role": "generated coefficient and validity evidence",
+          "artifact": {
+            "path": "results/analysis.json",
+            "bytes": 3928,
+            "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
+          }
+        }
+      ],
+      "claims": [
+        {
+          "identifier": "nine-valid-variants",
+          "statement": "Nine retained pilot variants pass their declared validity gates.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/nineVariantsPass",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3928,
+              "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
+            },
+            {
+              "path": "results/campaign-map.svg",
+              "bytes": 50822,
+              "sha256": "6e63aadbdf8914beb5c5555dbf11a65e29b115723fd91ad8ac41726983654782"
+            }
+          ],
+          "source_ids": [
+            "register",
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "diverged-excluded",
+          "statement": "Both diverged roughness runs remain visible and excluded from comparison.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/twoDivergedRunsExcluded",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3928,
+              "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
+            }
+          ],
+          "source_ids": [
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "baseline-signs",
+          "statement": "The retained baseline has positive drag and negative lift under the published convention.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/baselinePresent",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3928,
+              "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
+            }
+          ],
+          "source_ids": [
+            "analysis"
+          ]
+        },
+        {
+          "identifier": "mesh-uncertainty-visible",
+          "statement": "Pilot mesh sensitivity remains material and blocks production absolute claims.",
+          "value": true,
+          "display_value": "PASS",
+          "operator": "==",
+          "threshold": true,
+          "passed": true,
+          "metric_path": "results/analysis.json",
+          "metric_pointer": "/acceptance/pilotMeshSensitivityRemainsMaterial",
+          "artifacts": [
+            {
+              "path": "results/analysis.json",
+              "bytes": 3928,
+              "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
+            },
+            {
+              "path": "results/campaign-map.svg",
+              "bytes": 50822,
+              "sha256": "6e63aadbdf8914beb5c5555dbf11a65e29b115723fd91ad8ac41726983654782"
+            }
+          ],
+          "source_ids": [
+            "register",
+            "analysis"
+          ]
+        }
+      ],
+      "claimCount": 4,
+      "passedClaimCount": 4,
+      "artifactCount": 2,
+      "artifacts": [
+        {
+          "path": "results/analysis.json",
+          "bytes": 3928,
+          "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
+        },
+        {
+          "path": "results/campaign-map.svg",
+          "bytes": 50822,
+          "sha256": "6e63aadbdf8914beb5c5555dbf11a65e29b115723fd91ad8ac41726983654782"
+        }
+      ],
+      "manifest": "projects/f1-rans-campaign/evidence-manifest.json",
+      "manifestSha256": "ad619fe0768ade1502b74331d24ea6c669f908bd7d9b7d011386c63a80b70e8f"
     },
     {
       "slug": "flowlab",
