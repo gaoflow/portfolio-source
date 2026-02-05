@@ -840,8 +840,8 @@
           "role": "generated coefficient and validity evidence",
           "artifact": {
             "path": "results/analysis.json",
-            "bytes": 3606,
-            "sha256": "91f12b5650c5112091d1d366d7c5eef14b52f00dc69f5daf96f633dadb87251d"
+            "bytes": 3928,
+            "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
           }
         }
       ],
@@ -859,13 +859,13 @@
           "artifacts": [
             {
               "path": "results/analysis.json",
-              "bytes": 3606,
-              "sha256": "91f12b5650c5112091d1d366d7c5eef14b52f00dc69f5daf96f633dadb87251d"
+              "bytes": 3928,
+              "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
             },
             {
               "path": "results/campaign-map.svg",
               "bytes": 50822,
-              "sha256": "aabf400a700f2b643b5bc369a0435fa3ad0eead920c7154705c3f2a1b2e18bb4"
+              "sha256": "6e63aadbdf8914beb5c5555dbf11a65e29b115723fd91ad8ac41726983654782"
             }
           ],
           "source_ids": [
@@ -886,8 +886,8 @@
           "artifacts": [
             {
               "path": "results/analysis.json",
-              "bytes": 3606,
-              "sha256": "91f12b5650c5112091d1d366d7c5eef14b52f00dc69f5daf96f633dadb87251d"
+              "bytes": 3928,
+              "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
             }
           ],
           "source_ids": [
@@ -907,8 +907,8 @@
           "artifacts": [
             {
               "path": "results/analysis.json",
-              "bytes": 3606,
-              "sha256": "91f12b5650c5112091d1d366d7c5eef14b52f00dc69f5daf96f633dadb87251d"
+              "bytes": 3928,
+              "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
             }
           ],
           "source_ids": [
@@ -928,13 +928,13 @@
           "artifacts": [
             {
               "path": "results/analysis.json",
-              "bytes": 3606,
-              "sha256": "91f12b5650c5112091d1d366d7c5eef14b52f00dc69f5daf96f633dadb87251d"
+              "bytes": 3928,
+              "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
             },
             {
               "path": "results/campaign-map.svg",
               "bytes": 50822,
-              "sha256": "aabf400a700f2b643b5bc369a0435fa3ad0eead920c7154705c3f2a1b2e18bb4"
+              "sha256": "6e63aadbdf8914beb5c5555dbf11a65e29b115723fd91ad8ac41726983654782"
             }
           ],
           "source_ids": [
@@ -949,13 +949,13 @@
       "artifacts": [
         {
           "path": "results/analysis.json",
-          "bytes": 3606,
-          "sha256": "91f12b5650c5112091d1d366d7c5eef14b52f00dc69f5daf96f633dadb87251d"
+          "bytes": 3928,
+          "sha256": "c82a39602bdcb195802d172fef7a4ef47c90411d87be06b10e0af82b5d3ff782"
         },
         {
           "path": "results/campaign-map.svg",
           "bytes": 50822,
-          "sha256": "aabf400a700f2b643b5bc369a0435fa3ad0eead920c7154705c3f2a1b2e18bb4"
+          "sha256": "6e63aadbdf8914beb5c5555dbf11a65e29b115723fd91ad8ac41726983654782"
         }
       ],
       "manifest": "projects/f1-rans-campaign/evidence-manifest.json",
