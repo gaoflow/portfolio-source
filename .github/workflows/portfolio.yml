@@ -32,17 +32,17 @@ jobs:
           npm ci --prefix site
           python3 -m pip install --disable-pip-version-check numpy==2.2.6 matplotlib==3.10.8 scipy==1.17.1
 
+      - name: Verify committed evidence catalog
+        run: |
+          python3 projects/evidence-kit/scripts/audit_portfolio.py
+          python3 projects/evidence-kit/scripts/publish_site.py
+          git diff --exit-code -- projects/evidence-kit/results site/public/evidence
+
       - name: Test every numerical project
         run: python3 scripts/verify_numerical_projects.py --portfolio-only
-
-      - name: Publish evidence catalog
-        run: python3 projects/evidence-kit/scripts/publish_site.py
 
       - name: Build static site
         run: npm --prefix site run build
 
       - name: Check local links and assets
         run: python3 site/scripts/check_static_links.py site/dist
-
-      - name: Reject stale generated evidence
-        run: git diff --exit-code -- projects/evidence-kit/results site/public/evidence
