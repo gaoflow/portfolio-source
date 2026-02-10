@@ -12,11 +12,11 @@ duration: 'Independent build'
 heroMetrics:
   - { label: 'Studies audited', value: '17' }
   - { label: 'Claims', value: '76/76' }
-  - { label: 'Artifacts', value: '52' }
+  - { label: 'Artifacts', value: '54' }
   - { label: 'Interface', value: '1 call' }
 keyOutputs:
   - 'Reduced the caller interface to one catalog build while hiding pointer resolution, typed comparisons, path containment, hashing, and multi-format publication.'
-  - 'Dogfooded the same module across seventeen numerical studies; all 76 declared gates pass against 52 project artifacts.'
+  - 'Dogfooded the same module across seventeen numerical studies; all 76 declared gates pass against 54 project artifacts.'
   - 'Preserves failed claims in reports and exits nonzero instead of selectively publishing successful metrics.'
 featured: false
 order: 3
@@ -27,7 +27,7 @@ studySequence: 9
 
 Correct plots can still support weak claims. The metric may not match the sentence, the threshold may have been chosen after the result was known, the reference may be missing, or the displayed file may not be the one the command produced.
 
-Evidence Kit turns those relationships into data. Each study declares claims, JSON-pointer metrics, typed expectations, sources, artifacts, methods, limitations, and reproduction commands. One module audits every manifest and publishes both human- and machine-readable reports. Across seventeen studies, all 76 declared claims currently pass against 52 hashed artifacts.
+Evidence Kit turns those relationships into data. Each study declares claims, JSON-pointer metrics, typed expectations, sources, artifacts, methods, limitations, and reproduction commands. One module audits every manifest and publishes both human- and machine-readable reports. Across seventeen studies, all 76 declared claims currently pass against 54 hashed artifacts.
 
 ## Live evidence catalog
 
@@ -102,13 +102,13 @@ The current audit covers seventeen independently evidenced studies:
 | Abaqus Energy Absorber | 4 / 4 | 2 |
 | XC48 Tensile Twin | 4 / 4 | 2 |
 | F1 RANS Pilot Campaign | 4 / 4 | 2 |
-| **Total** | **76 / 76** | **52** |
+| **Total** | **76 / 76** | **54** |
 
 The generated `catalog.json` keeps full claim records and SHA-256 values. `coverage.csv` flattens the same data for review or CI ingestion.
 
 ## The audit grew with the portfolio
 
-The first audit covered six projects, 27 claims and 21 artifacts. Five foundational solvers, five ESILV conversions, a cooling OpenFOAM method gate and the retained F1 RANS campaign then entered the same contract. The catalog now covers seventeen studies, 76 claims and 52 artifacts.
+The first audit covered six projects, 27 claims and 21 artifacts. Five foundational solvers, five ESILV conversions, a cooling OpenFOAM method gate and the retained F1 RANS campaign then entered the same contract. The public vortex rebuild adds retained CSV histories and a generated verification figure. The catalog covers seventeen studies, 76 claims and 54 artifacts.
 
 Growth tested the contract in both directions. Each new study had to express its results as pointer-addressable metrics with typed thresholds and named artifacts before its article numbers could enter the site. Existing claims were re-audited on every run: artifacts are re-hashed, so a silently regenerated figure or JSON file fails the audit instead of drifting.
 

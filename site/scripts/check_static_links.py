@@ -78,8 +78,9 @@ def main() -> int:
         relative = page.relative_to(root)
         for src in links.missing_alt:
             failures.append(f"{relative}: <img> {src} has no alt text")
-        if "/Users/" in source:
-            failures.append(f"{relative}: leaked absolute local path")
+        leaked_prefixes = ("/Users/", "~/Downloads", "/home/", "C:\\\\Users\\\\", "/var/folders/")
+        if any(prefix in source for prefix in leaked_prefixes):
+            failures.append(f"{relative}: leaked absolute/private local path")
         if "Sample project — replace with yours" in source or "Sample data" in source:
             failures.append(f"{relative}: obsolete sample UI remains")
         for tag, value in links.links:

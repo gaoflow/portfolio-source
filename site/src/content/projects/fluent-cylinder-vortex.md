@@ -168,7 +168,9 @@ The Strouhal estimate rests on six cycles. The laminar solver is the right model
 
 ## Reproduce
 
-`python3 research/esilv-cfd/plot_vortex_forces.py` parses the two Fluent force reports, digitizes the archived monitor screenshots with automatic tick calibration, runs every verification gate in the table above, writes the digitized histories to CSV, and regenerates the hero figure. It exits nonzero if any gate fails. Sources: `~/Downloads/ESILV/CFD/td2/Forces.Forces`, `~/Downloads/ESILV/CFD/td2/Forces-part2`, and the report figures `image34.png` / `image35.png`.
+Run `python3 projects/fluent-cylinder-vortex/scripts/rebuild.py`. It reads the retained public histories in `projects/fluent-cylinder-vortex/data/`, recomputes the shedding period and $St$, checks the final lift against the source register, keeps the 29.3% drag gap visible, writes `results/reproduction.json`, and rebuilds the force-history SVG. It exits nonzero if any gate fails.
+
+The earlier acquisition script (`research/esilv-cfd/plot_vortex_forces.py`) digitised the archived Fluent monitors and cross-checked their endpoints against the private final force reports. Those originals are hashed in the private ESILV archive; they are not required for the public rebuild.
 
 ## What I took away
 

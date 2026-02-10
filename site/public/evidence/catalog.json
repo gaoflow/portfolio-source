@@ -3,7 +3,7 @@
   "projectCount": 17,
   "claimCount": 76,
   "passedClaimCount": 76,
-  "artifactCount": 52,
+  "artifactCount": 54,
   "allClaimsPass": true,
   "projects": [
     {
@@ -1478,14 +1478,16 @@
       "summary": "Digitised monitor histories are cross-checked against final Fluent force reports and a bounded Strouhal gate.",
       "methods": [
         "Screenshot-axis calibration and force-history digitisation.",
-        "Endpoint cross-check against retained Fluent force reports."
+        "Endpoint cross-check against retained Fluent force reports.",
+        "Public rebuild from retained digitised lift/drag CSV histories."
       ],
       "limitations": [
         "Raw time-history export was not retained; histories are digitised from archived monitors.",
         "Coarse two-dimensional tutorial mesh leaves 29.3% drag error."
       ],
       "commands": [
-        "python3 scripts/build_esilv_evidence.py --project fluent-cylinder-vortex"
+        "python3 scripts/build_esilv_evidence.py --project fluent-cylinder-vortex",
+        "python3 projects/fluent-cylinder-vortex/scripts/rebuild.py"
       ],
       "sources": [
         {
@@ -1494,8 +1496,18 @@
           "role": "monitor and force-report evidence",
           "artifact": {
             "path": "source-register.json",
-            "bytes": 446,
-            "sha256": "df9da4e865a4990fda92c615be18831cb091e5c8fb79b6bdf9be0fb6adea8351"
+            "bytes": 504,
+            "sha256": "14db01197698ed2b1056de72f1042b3aca3ec0a45f5211b726f08c6d5f5c721e"
+          }
+        },
+        {
+          "id": "reproduction",
+          "title": "Public retained-history rebuild",
+          "role": "self-contained Strouhal, endpoint and drag-gap verification",
+          "artifact": {
+            "path": "results/reproduction.json",
+            "bytes": 844,
+            "sha256": "2020b6f13e0ce41f5d0953bd4e452b1cf3e3f19ffc27322618d1f5a54642a357"
           }
         }
       ],
@@ -1518,12 +1530,23 @@
             },
             {
               "path": "source-register.json",
-              "bytes": 446,
-              "sha256": "df9da4e865a4990fda92c615be18831cb091e5c8fb79b6bdf9be0fb6adea8351"
+              "bytes": 504,
+              "sha256": "14db01197698ed2b1056de72f1042b3aca3ec0a45f5211b726f08c6d5f5c721e"
+            },
+            {
+              "path": "results/reproduction.json",
+              "bytes": 844,
+              "sha256": "2020b6f13e0ce41f5d0953bd4e452b1cf3e3f19ffc27322618d1f5a54642a357"
+            },
+            {
+              "path": "results/public-force-history.svg",
+              "bytes": 59524,
+              "sha256": "12e1098300f6af5f620c6973e45c5e7a68607861636fdd658fd0e01687d70109"
             }
           ],
           "source_ids": [
-            "register"
+            "register",
+            "reproduction"
           ]
         },
         {
@@ -1592,7 +1615,7 @@
       ],
       "claimCount": 4,
       "passedClaimCount": 4,
-      "artifactCount": 2,
+      "artifactCount": 4,
       "artifacts": [
         {
           "path": "results/analysis.json",
@@ -1600,13 +1623,23 @@
           "sha256": "5c5ecbff967b120a2a1d70570f687267f9234624c4c28fda30cf7b33578c2245"
         },
         {
+          "path": "results/public-force-history.svg",
+          "bytes": 59524,
+          "sha256": "12e1098300f6af5f620c6973e45c5e7a68607861636fdd658fd0e01687d70109"
+        },
+        {
+          "path": "results/reproduction.json",
+          "bytes": 844,
+          "sha256": "2020b6f13e0ce41f5d0953bd4e452b1cf3e3f19ffc27322618d1f5a54642a357"
+        },
+        {
           "path": "source-register.json",
-          "bytes": 446,
-          "sha256": "df9da4e865a4990fda92c615be18831cb091e5c8fb79b6bdf9be0fb6adea8351"
+          "bytes": 504,
+          "sha256": "14db01197698ed2b1056de72f1042b3aca3ec0a45f5211b726f08c6d5f5c721e"
         }
       ],
       "manifest": "projects/fluent-cylinder-vortex/evidence-manifest.json",
-      "manifestSha256": "281ceb2e617625b7c43138d9ac2a3e25dbecf10c4166d0ec4efaf649ee417e82"
+      "manifestSha256": "c3adf45670f4c790031b6938958e32e14acff4c859e9814f22c52e0994d33b48"
     },
     {
       "slug": "fsae-cooling",

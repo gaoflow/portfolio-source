@@ -153,7 +153,7 @@ The aggregate result:
 | Projects audited | 17 |
 | Claims declared | 76 |
 | Claims passing | 76 |
-| Project artifacts | 52 |
+| Project artifacts | 54 |
 
 The mix matters. The catalogue includes successful numerical thresholds and explicit rejection decisions — the F1 NO-GO claims pass because the evidence confirms the rejection, not despite it.
 
