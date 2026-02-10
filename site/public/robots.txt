@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gaoflow.github.io/sitemap.xml
+Sitemap: http://localhost:4321/sitemap.xml
