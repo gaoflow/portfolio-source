@@ -17,6 +17,12 @@ const projects = defineCollection({
     role: z.string().optional(),
     team: z.string().optional(),
     duration: z.string().optional(),
+    academic: z.object({
+      institution: z.string(),
+      course: z.string(),
+      assignment: z.string(),
+      requirements: z.array(z.string()).min(1),
+    }).optional(),
     heroMetrics: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
     keyOutputs: z.array(z.string()).default([]),
     nda: z.boolean().default(false),

@@ -10,6 +10,15 @@ methodLine: 'Tensile test · engineering→true conversion · Abaqus Explicit ·
 role: 'Data post-processing & report toolchain'
 team: 'ESILV MMN1 group — Nicolas Chang, Bing Gao, Sabin Karn, Nithor Bhowmik'
 duration: '8 weeks'
+academic:
+  institution: 'ESILV'
+  course: 'Materials and Behavior'
+  assignment: 'XC48 tensile experiment and Abaqus numerical reconstruction'
+  requirements:
+    - 'Run and post-process an XC48 uniaxial tensile test through fracture.'
+    - 'Derive engineering, true and plastic stress–strain data and identify material properties.'
+    - 'Build an Abaqus model of the specimen and compare simulation with the measured curve.'
+    - 'Study mesh, solver and loading-amplitude sensitivity and explain the selected setup.'
 heroMetrics:
   - { label: 'Twin vs test R²', value: '0.9663' }
   - { label: 'Engineering UTS', value: '766.12 MPa' }

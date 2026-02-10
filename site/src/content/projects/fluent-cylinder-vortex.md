@@ -10,6 +10,15 @@ methodLine: 'ANSYS Fluent · steady Re=40 · transient Re=150 · symmetry-breaki
 role: 'Simulation & report lead'
 team: 'ESILV MMN1 group — Bing Gao, Nicolas Chang, Daphné Baray'
 duration: '4 weeks'
+academic:
+  institution: 'ESILV'
+  course: 'Computational Fluid Dynamics'
+  assignment: 'TD2 steady and transient flow past a cylinder'
+  requirements:
+    - 'Solve steady laminar cylinder flow at Re=40 and check convergence, mass balance and drag.'
+    - 'Run a transient Re=150 case and trigger symmetry breaking with a controlled velocity perturbation.'
+    - 'Record lift and drag histories and identify the Kármán vortex street.'
+    - 'Compare the force result with the supplied experimental reference and discuss the discrepancy.'
 heroMetrics:
   - { label: 'Drag error vs experiment', value: '29.3%' }
   - { label: 'Strouhal, measured', value: '0.155' }

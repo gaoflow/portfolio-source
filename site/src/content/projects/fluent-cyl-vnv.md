@@ -10,6 +10,15 @@ methodLine: 'ANSYS Fluent · steady laminar · mesh/domain plateaus · handout b
 role: 'Simulation & report lead'
 team: 'ESILV MMN1 group — Bing Gao, Nicolas Chang, Daphné Baray'
 duration: '7 weeks (TD1+TD4)'
+academic:
+  institution: 'ESILV'
+  course: 'Computational Fluid Dynamics'
+  assignment: 'TD1 pipe validation + TD4 cylinder verification study'
+  requirements:
+    - 'Validate laminar pipe flow against Poiseuille velocity, wall shear, pressure drop and entrance length.'
+    - 'Establish cylinder mesh independence at Re=10.'
+    - 'Establish far-field domain independence.'
+    - 'Sweep Reynolds number from 0.1 to 20 and compare drag with the supplied experimental table under a 5% course gate.'
 heroMetrics:
   - { label: 'Plateau Cd at Re 10', value: '2.7973' }
   - { label: 'Mesh plateau', value: '<0.1% past 40k cells' }

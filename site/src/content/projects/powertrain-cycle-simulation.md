@@ -9,6 +9,15 @@ summary: 'A charged PHEV uses 1.43 l/100km on the Spa ECO lap versus 10.27 for I
 methodLine: 'Point-by-point longitudinal dynamics · Excel cycle simulators · Spa ECO/SPORT + NEDC'
 role: 'Solo project'
 duration: '4 weeks'
+academic:
+  institution: 'ESILV'
+  course: 'Powertrains & Vehicle Dynamics'
+  assignment: 'Energy consumption and CO₂ simulation across driving cycles'
+  requirements:
+    - 'Run ICE, BEV, HEV and PHEV versions of one vehicle over supplied Spa, NEDC and WLTP-style cycles.'
+    - 'Resolve inertia, rolling resistance, aerodynamic drag and grade at each cycle point.'
+    - 'Report fuel, electrical energy and CO₂ per distance for each architecture.'
+    - 'Complete an individual parameter study; this submission investigates battery SOC and empty-battery dead weight.'
 heroMetrics:
   - { label: 'Powertrains × cycles', value: '4 × 3' }
   - { label: 'PHEV fuel, Spa ECO', value: '1.43 l/100km' }

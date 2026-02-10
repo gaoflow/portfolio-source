@@ -34,6 +34,22 @@ const meta = [
         {d.tags.map((t) => <span class="px-2 py-0.5 rounded-full bg-accent/5 text-accent/80">{t}</span>)}
       </div>
     </header>
+    {d.academic && (
+      <section class="mb-10 border border-accent/30 bg-accent/5 p-6">
+        <p class="font-mono text-[10px] tracking-widest uppercase text-accent">
+          Course project · {d.academic.institution}
+        </p>
+        <h2 class="mt-3 text-2xl font-medium tracking-tight">{d.academic.assignment}</h2>
+        <p class="mt-2 text-sm text-muted">{d.academic.course}</p>
+        <h3 class="mt-6 font-mono text-[10px] tracking-widest uppercase text-muted">Assignment requirements</h3>
+        <ul class="mt-3 space-y-2 text-sm text-muted">
+          {d.academic.requirements.map((requirement) => (
+            <li class="flex gap-3"><span class="text-accent">→</span><span>{requirement}</span></li>
+          ))}
+        </ul>
+      </section>
+    )}
+
 
     <!-- 2. Meta bar -->
     {d.model3d && (

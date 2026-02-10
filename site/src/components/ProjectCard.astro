@@ -7,7 +7,7 @@ const d = project.data;
 ---
 <a
   href={`/projects/${project.id}`}
-  data-categories={d.categories.join(' ')}
+  data-categories={[...d.categories, ...(d.academic ? ['course-project'] : [])].join(' ')}
   class="group block border border-edge bg-surface hover:border-accent/50 transition-colors"
 >
   <!-- Result image (contour/photo) or gradient placeholder until one exists -->
@@ -25,6 +25,7 @@ const d = project.data;
     </div>
     <p class="text-sm text-muted leading-relaxed">{d.summary}</p>
     <div class="flex flex-wrap gap-2 font-mono text-[10px] tracking-wider uppercase">
+      {d.academic && <span class="px-2 py-0.5 rounded-full bg-accent/10 text-accent">Course project</span>}
       {d.nda && <span class="px-2 py-0.5 rounded-full bg-surface text-muted">NDA-safe</span>}
       <span class:list={['px-2 py-0.5 rounded-full', d.status === 'active' ? 'bg-ok/10 text-ok' : 'bg-surface text-muted']}>
         {d.status}

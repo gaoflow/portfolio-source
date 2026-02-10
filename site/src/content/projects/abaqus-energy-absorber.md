@@ -10,6 +10,15 @@ methodLine: 'Abaqus/Explicit · dynamic crush · SEA / Fmax / CFE · functionall
 role: 'Wall-impact study & report assembly'
 team: 'ESILV MMN1 group — Nicolas Chang, Daphné Baray, Bing Gao, Immanuella Castro'
 duration: '6 weeks'
+academic:
+  institution: 'ESILV'
+  course: 'Computational Solid Mechanics'
+  assignment: 'Dynamic impact and optimization of an automotive energy absorber'
+  requirements:
+    - 'Model the axial impact of a longitudinal front rail in Abaqus/Explicit.'
+    - 'Extract and interpret the force–displacement response and energy balance.'
+    - 'Compare candidate materials using peak force, absorbed energy, SEA and CFE.'
+    - 'Modify the geometry to improve crashworthiness while controlling numerical artifacts.'
 heroMetrics:
   - { label: 'KE absorbed (FGT)', value: '95.6%' }
   - { label: 'SEA (FGT)', value: '12.30 kJ/kg' }
