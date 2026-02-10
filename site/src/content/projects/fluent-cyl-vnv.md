@@ -19,6 +19,16 @@ academic:
     - 'Establish cylinder mesh independence at Re=10.'
     - 'Establish far-field domain independence.'
     - 'Sweep Reynolds number from 0.1 to 20 and compare drag with the supplied experimental table under a 5% course gate.'
+  media:
+    - src: '/images/projects/fluent-cyl-vnv/assignment-workflow.svg'
+      alt: 'Workflow from the exact pipe case through mesh and domain sweeps to experimental comparison'
+      caption: 'The assignment was cumulative: verify the solver on an exact problem, bound mesh and domain effects, then interpret the remaining experiment gap.'
+    - src: '/images/projects/fluent-cyl-vnv/velocity-re20.png'
+      alt: 'ANSYS Fluent velocity-magnitude contour around the cylinder at Reynolds number 20'
+      caption: 'At Re=20 the wake is visible and the drag comparison finally enters the assignment’s 5% experimental band.'
+    - src: '/images/projects/fluent-cyl-vnv/pressure-re20.png'
+      alt: 'ANSYS Fluent static-pressure contour around the cylinder at Reynolds number 20'
+      caption: 'Pressure peaks at the upstream stagnation point and falls around the shoulders; this field explains the integrated pressure-drag result.'
 heroMetrics:
   - { label: 'Plateau Cd at Re 10', value: '2.7973' }
   - { label: 'Mesh plateau', value: '<0.1% past 40k cells' }
@@ -65,7 +75,9 @@ One honest caveat carried into the report: the uniform 500-cell mesh was adequat
 
 The configuration is deliberately simple — steady, laminar, 2-D, incompressible — so that every discrepancy can be traced to mesh, domain, or modelling assumption.
 
-A cylinder of $D = 1$ m sits in a circular fluid annulus of outer diameter $D_2$, exposed as a Workbench parameter. Fluid $\rho = 1$ kg/m³, $\mu = 10^{-3}$ Pa·s; the Reynolds number $Re = \rho U_\infty D / \mu$ is set through the inlet velocity. Uniform velocity on the inlet arc, zero gauge pressure on the outlet arc, no slip on the wall. Pressure-based steady solver with the laminar model, residuals driven below $10^{-6}$ (about 50 iterations at $Re = 10$). The mesh is quad-dominant with edge divisions on both circles and a radial bias of 500 packing cells at the wall, where separation and the boundary layer live. Coefficients come from Fluent surface integrals, $C_D = F_D / (\tfrac{1}{2}\rho U_\infty^2 D)$.
+A cylinder of $D = 1$ m sits in a circular fluid annulus of outer diameter $D_2$, exposed as a Workbench parameter. Fluid $\rho = 1$ kg/m³, $\mu = 10^{-3}$ Pa·s; the Reynolds number $Re = \rho U_\infty D / \mu$ is set through the inlet velocity. Uniform velocity on the inlet arc, zero gauge pressure on the outlet arc, no slip on the wall.
+
+Pressure-based steady solver with the laminar model, residuals driven below $10^{-6}$ (about 50 iterations at $Re = 10$). The mesh is quad-dominant with edge divisions on both circles and a radial bias of 500 packing cells at the wall, where separation and the boundary layer live. Coefficients come from Fluent surface integrals, $C_D = F_D / (\tfrac{1}{2}\rho U_\infty^2 D)$.
 
 ## Part A: mesh and domain plateaus at Re=10
 
@@ -111,15 +123,23 @@ Against the course handout's experimental $C_D$ for a smooth cylinder (used as a
 | Error vs handout | 81.2% | 51.1% | 48.9% | 32.4% | 17.5% | 3.83% |
 | Within 5%? | no | no | no | no | no | yes |
 
-Two things separate the gap into causes. First, grid: Part B runs a smaller domain and half the nodes of the Part A optimum, which alone moves $C_D$ at $Re = 10$ from 2.7973 to 2.85 — so the Part B points sit systematically high. Second, modelling: at $Re \le 1$ a steady 2-D laminar solve is a strong assumption, and the simulated curve lies furthest from experiment exactly there. Lift stays at numerical-noise level ($|C_L| \lesssim 0.11$) as a symmetric steady solution should, except at $Re = 0.1$, where continuity stalls and the velocity residuals reach only $10^{-3}$. That point is the weakest of the six and its 92.4 carries the least weight.
+Two things separate the gap into causes. First, grid: Part B runs a smaller domain and half the nodes of the Part A optimum, which alone moves $C_D$ at $Re = 10$ from 2.7973 to 2.85 — so the Part B points sit systematically high. Second, modelling: at $Re \le 1$ a steady 2-D laminar solve is a strong assumption, and the simulated curve lies furthest from experiment exactly there.
+
+Lift stays at numerical-noise level ($|C_L| \lesssim 0.11$) as a symmetric steady solution should, except at $Re = 0.1$, where continuity stalls and the velocity residuals reach only $10^{-3}$. That point is the weakest of the six and its 92.4 carries the least weight.
 
 ## Iteration: what the working files add
 
-The tables above look like a procedure executed top to bottom; the drafts show the real order. TD1 survives in two versions — the group's shared Word draft and the submitted LaTeX report — plus one archived console log, and they do not describe the same mesh. The draft documents the tutorial's requested 1,000-element grid, built as 100×10 divisions with the sizing behaviour locked to "hard" so Workbench could not re-smooth the count, and quotes a mass imbalance of $-7.704\times10^{-10}$ kg/s. The submitted report kept that description, but the only console log that survives records a 500-cell, 561-node run closing mass at $-2.8\times10^{-10}$ kg/s — the run this article traces. Two passes of the same checks on two meshes; the log, not the prose, decides which run a number belongs to.
+The tables above look like a procedure executed top to bottom; the drafts show the real order. TD1 survives in two versions — the group's shared Word draft and the submitted LaTeX report — plus one archived console log, and they do not describe the same mesh. The draft documents the tutorial's requested 1,000-element grid, built as 100×10 divisions with the sizing behaviour locked to "hard" so Workbench could not re-smooth the count, and quotes a mass imbalance of $-7.704\times10^{-10}$ kg/s.
 
-The draft also shows the entrance length read off the centreline plot by eye — "approximately 2 m" against the 2.4 m analytical value, excused as the difficulty of seeing where the plateau starts. The report replaced the eyeball with a criterion: 99% of the final velocity, which lands at $x \approx 2.4$ m and turns the row into a check. The draft's answer to "did you use the optimum mesh?" was circular — the mesh is optimal because the results match theory. The report downgraded that to adequate-for-the-checks-run, a claim a review can attack and the data can defend.
+The submitted report kept that description, but the only console log that survives records a 500-cell, 561-node run closing mass at $-2.8\times10^{-10}$ kg/s — the run this article traces. Two passes of the same checks on two meshes; the log, not the prose, decides which run a number belongs to.
 
-TD4's protocol document records the mesh sweep in the order it ran, and the order was bracketing. First attempt: 80 divisions per circle, 12,800 cells, $C_D = 2.7938$. Refine: 120 divisions, 28,800 cells, 2.7953 — a 0.05% move that on its own says nothing. Then the group swept down through 20, 5, 10, and 15 divisions to find the edge, and found it at 50 cells: $C_D = 3.1328$, 12% high. Only then did the 200-division, 40,000-cell run land at 2.7972802 and freeze the reference the table rounds to 2.7973. The domain choice has the same shape: $D_2 = 100$ m started as a rule of thumb quoted from the tutorial brief ("the outer limit of the fluid domain should be far enough to avoid border effects"), and the domain sweep exists because the group verified the rule instead of trusting it.
+The draft also shows the entrance length read off the centreline plot by eye — "approximately 2 m" against the 2.4 m analytical value, excused as the difficulty of seeing where the plateau starts. The report replaced the eyeball with a criterion: 99% of the final velocity, which lands at $x \approx 2.4$ m and turns the row into a check.
+
+The draft's answer to "did you use the optimum mesh?" was circular — the mesh is optimal because the results match theory. The report downgraded that to adequate-for-the-checks-run, a claim a review can attack and the data can defend.
+
+TD4's protocol document records the mesh sweep in the order it ran, and the order was bracketing. First attempt: 80 divisions per circle, 12,800 cells, $C_D = 2.7938$. Refine: 120 divisions, 28,800 cells, 2.7953 — a 0.05% move that on its own says nothing. Then the group swept down through 20, 5, 10, and 15 divisions to find the edge, and found it at 50 cells: $C_D = 3.1328$, 12% high.
+
+Only then did the 200-division, 40,000-cell run land at 2.7972802 and freeze the reference the table rounds to 2.7973. The domain choice has the same shape: $D_2 = 100$ m started as a rule of thumb quoted from the tutorial brief ("the outer limit of the fluid domain should be far enough to avoid border effects"), and the domain sweep exists because the group verified the rule instead of trusting it.
 
 ## Validation summary
 
@@ -146,4 +166,6 @@ TD4's protocol document records the mesh sweep in the order it ran, and the orde
 
 ## What I took away
 
-A plateau needs both sides: refining 80 to 120 divisions moved $C_D$ by 0.05% and proved nothing until the down-sweep put the 50-cell mesh 12% high. The coarse points are the plateau's evidence, not the fine ones. The second habit came from TD1: an eyeballed entrance length read 2 m against a 2.4 m theory, and the fix was a written criterion — 99% of the final value — rather than a better eye. The draft also taught me what a circular justification looks like, "the mesh is optimal because the results match", because I was the one who had to rewrite it for the report.
+A plateau needs both sides: refining 80 to 120 divisions moved $C_D$ by 0.05% and proved nothing until the down-sweep put the 50-cell mesh 12% high. The coarse points are the plateau's evidence, not the fine ones. The second habit came from TD1: an eyeballed entrance length read 2 m against a 2.4 m theory, and the fix was a written criterion — 99% of the final value — rather than a better eye.
+
+The draft also taught me what a circular justification looks like, "the mesh is optimal because the results match", because I was the one who had to rewrite it for the report.

@@ -22,6 +22,11 @@ const projects = defineCollection({
       course: z.string(),
       assignment: z.string(),
       requirements: z.array(z.string()).min(1),
+      media: z.array(z.object({
+        src: z.string(),
+        alt: z.string(),
+        caption: z.string(),
+      })).default([]),
     }).optional(),
     heroMetrics: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
     keyOutputs: z.array(z.string()).default([]),

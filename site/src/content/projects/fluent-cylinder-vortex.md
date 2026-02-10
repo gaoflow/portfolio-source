@@ -19,6 +19,13 @@ academic:
     - 'Run a transient Re=150 case and trigger symmetry breaking with a controlled velocity perturbation.'
     - 'Record lift and drag histories and identify the Kármán vortex street.'
     - 'Compare the force result with the supplied experimental reference and discuss the discrepancy.'
+  media:
+    - src: '/images/projects/fluent-cylinder-vortex/assignment-workflow.svg'
+      alt: 'Workflow from steady cylinder flow to a perturbed transient case and Strouhal extraction'
+      caption: 'The brief becomes a controlled experiment: establish the steady case, perturb symmetry, monitor forces, then extract St and error.'
+    - src: '/images/projects/fluent-cylinder-vortex/vortex-evolution.gif'
+      alt: 'Animated sequence of the cylinder wake developing into a staggered vortex street'
+      caption: 'Four retained Fluent frames show the imposed asymmetry growing into the developed Kármán street.'
 heroMetrics:
   - { label: 'Drag error vs experiment', value: '29.3%' }
   - { label: 'Strouhal, measured', value: '0.155' }
@@ -62,7 +69,9 @@ This is the piece of the setup I would defend in a review. The perturbation is l
 
 ## Steady Re=40: the symmetric baseline
 
-The steady case is the control experiment. At Re=40 the flow is steady and perfectly symmetric about the centerline: the streamlines close into two stationary recirculation loops behind the cylinder, the vorticity field is antisymmetric (positive on top, negative on the bottom), and the lift is zero by symmetry — the pressure on the upper half cancels the lower half exactly. The centerline velocity profile confirms the setup mechanically: velocity falls to zero at the front stagnation point, goes negative through the recirculation zone, and recovers to the 2 m/s free stream downstream.
+The steady case is the control experiment. At Re=40 the flow is steady and perfectly symmetric about the centerline: the streamlines close into two stationary recirculation loops behind the cylinder, the vorticity field is antisymmetric (positive on top, negative on the bottom), and the lift is zero by symmetry — the pressure on the upper half cancels the lower half exactly.
+
+The centerline velocity profile confirms the setup mechanically: velocity falls to zero at the front stagnation point, goes negative through the recirculation zone, and recovers to the 2 m/s free stream downstream.
 
 The drag split at this Reynolds number:
 
@@ -78,7 +87,9 @@ Pressure already dominates, and that dominance is exactly where the error will l
 
 ![Lift and drag coefficient histories at Re=150, digitized from the archived Fluent monitors and verified against the exported force reports](/images/projects/fluent-cylinder-vortex/force-history.svg)
 
-The lift history is the street's fingerprint. For an unsteady wake the number that matters is the Strouhal number, $St = fD/U$ — shedding frequency made non-dimensional — so the point of the history is to extract a period from it. After the impulsive start, $C_L$ grows through a short transient and locks into a regular oscillation about zero with amplitude $\pm 0.117$ — vortices shedding alternately from the top and bottom surfaces. Counting upward zero-crossings in the developed regime ($t > 40$ s) gives a mean period of 6.44 s over six cycles, so $f = 0.155$ Hz and $St = 0.155$.
+The lift history is the street's fingerprint. For an unsteady wake the number that matters is the Strouhal number, $St = fD/U$ — shedding frequency made non-dimensional — so the point of the history is to extract a period from it. After the impulsive start, $C_L$ grows through a short transient and locks into a regular oscillation about zero with amplitude $\pm 0.117$ — vortices shedding alternately from the top and bottom surfaces.
+
+Counting upward zero-crossings in the developed regime ($t > 40$ s) gives a mean period of 6.44 s over six cycles, so $f = 0.155$ Hz and $St = 0.155$.
 
 The drag history shows the start-up spike (an artifact of the impulsive start), then settles to a mean near 0.9. In the full-resolution Fluent monitor the drag oscillates at twice the lift frequency — each lift cycle passes two vortices — but the archived drag screenshot spans 0–7 N and the ripple is roughly 0.01 N, below the pixel scale of the image. The regenerated figure therefore shows the settled mean rather than the 2× ripple; I flag that rather than redraw what the pixels cannot support.
 
@@ -98,13 +109,17 @@ The featured result is a failure, quantified. At the final time step Fluent repo
 
 The experimental chart value at Re=150 is $C_D \approx 1.6$, a drag force of 0.8 N under the run conditions. The simulation lands 29.3% low. Pressure drag is 78% of the total, so the shortfall lives in the pressure field: base suction behind the cylinder is too shallow.
 
-The steady case fails the same way. At Re=40 the computed drag is 3.07 N against 4.2 N from the chart ($C_D \approx 2.1$), an error of 26.9%. Two Reynolds numbers, same direction, same magnitude of error — that is a systematic bias, so the explanation has to live in the discretization. It does: a coarse mesh with a loose transient tolerance ($10^{-3}$, and the continuity residual plateaued just above it) dissipates. The shedding vortices lose strength as they form, the low-pressure cores in the wake fill in, and the pressure difference across the cylinder shrinks. A converged residual history is evidence the solver finished; the 29% gap is evidence the mesh and tolerances were not good enough.
+The steady case fails the same way. At Re=40 the computed drag is 3.07 N against 4.2 N from the chart ($C_D \approx 2.1$), an error of 26.9%. Two Reynolds numbers, same direction, same magnitude of error — that is a systematic bias, so the explanation has to live in the discretization. It does: a coarse mesh with a loose transient tolerance ($10^{-3}$, and the continuity residual plateaued just above it) dissipates.
+
+The shedding vortices lose strength as they form, the low-pressure cores in the wake fill in, and the pressure difference across the cylinder shrinks. A converged residual history is evidence the solver finished; the 29% gap is evidence the mesh and tolerances were not good enough.
 
 Parsing the exports turned up a second, quieter trap. Both force reports imply the same coefficient conversion: $C_D = F_D / 0.6125$, while $\frac{1}{2}\rho U^2 D$ evaluates to 2.0 for the Re=40 run and 0.5 for the Re=150 run. Fluent's reference values were set once and did not follow the run conditions, so comparing the reported *coefficients* against a textbook chart mixes reference definitions. The comparisons above are done on forces, where the reference area cancels — the only defensible level for this data.
 
 ## Iteration: how the error estimate converged
 
-The 29.3% figure was not the first answer. The group's Word draft read the experimental chart at $Re=150$ as $C_D \approx 1.2$, put the gap at 23.8%, and explained it with the standard pair: an instantaneous value against a time-averaged chart, and a 2-D simulation against a 3-D experiment. Both explanations are true in general and predicted nothing here. The submitted report re-read the chart at $\approx 1.6$, recomputed the gap from the final-step force (0.5654 N against 0.8 N), and landed on 29.3% with a diagnosis that does make predictions: the deficit lives in pressure drag (78% of the total), and it should repeat at $Re=40$. It does, at 26.9% — which is what promoted dissipation from excuse to explanation.
+The 29.3% figure was not the first answer. The group's Word draft read the experimental chart at $Re=150$ as $C_D \approx 1.2$, put the gap at 23.8%, and explained it with the standard pair: an instantaneous value against a time-averaged chart, and a 2-D simulation against a 3-D experiment. Both explanations are true in general and predicted nothing here. The submitted report re-read the chart at $\approx 1.6$, recomputed the gap from the final-step force (0.5654 N against 0.8 N), and landed on 29.3% with a diagnosis that does make predictions: the deficit lives in pressure drag (78% of the total), and it should repeat at $Re=40$.
+
+It does, at 26.9% — which is what promoted dissipation from excuse to explanation.
 
 The steady case failed the same way in miniature. The draft matched the *pressure* coefficient 3.2816 to a chart reading of 3.28, declared agreement, and dismissed the total 5.0146 as a reference-values default. The chart plots total drag, so the agreement was a coincidence of definitions. The fix was structural: compare forces, where the reference values cancel — the rule the rest of this article follows.
 
@@ -126,17 +141,30 @@ The draft also settled the provenance question by accident. Two of its sections 
 
 Four frames from the report's y-velocity animation show the sequence the force history compresses into curves. Report figures, copied as archived. One caveat carried over from the report: the vorticity contours in the original document plot magnitude, so clockwise and counter-clockwise cores render in the same colors — the alternating arrangement is visible, the opposite rotation directions are masked.
 
-![Frame 1 — initial transient: symmetric separation right after the impulsive start](/images/projects/fluent-cylinder-vortex/animation-0001.png)
-
-![Frame 2 — the patched asymmetry takes hold and the wake starts to roll up unevenly](/images/projects/fluent-cylinder-vortex/animation-0002.png)
-
-![Frame 3 — alternating positive and negative y-velocity patches detach as the street develops](/images/projects/fluent-cylinder-vortex/animation-0003.png)
-
-![Frame 4 — developed periodic regime: a staggered vortex train convecting downstream](/images/projects/fluent-cylinder-vortex/animation-0004.png)
+<div class="grid gap-3 sm:grid-cols-2">
+  <figure>
+    <img src="/images/projects/fluent-cylinder-vortex/animation-0001.png" alt="Initial nearly symmetric cylinder wake after the impulsive start" loading="lazy">
+    <figcaption>1. Initial transient: separation is still nearly symmetric.</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/fluent-cylinder-vortex/animation-0002.png" alt="Cylinder wake beginning to roll up after the imposed asymmetry" loading="lazy">
+    <figcaption>2. The velocity kick seeds the first uneven roll-up.</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/fluent-cylinder-vortex/animation-0003.png" alt="Alternating cylinder-wake structures detaching downstream" loading="lazy">
+    <figcaption>3. Alternating structures detach from each side.</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/fluent-cylinder-vortex/animation-0004.png" alt="Developed staggered Karman vortex street" loading="lazy">
+    <figcaption>4. The wake reaches a developed staggered street.</figcaption>
+  </figure>
+</div>
 
 ## Limitations
 
-One mesh, no refinement study, so the 29% bias is diagnosed but not bounded. One time step (0.2 s, about 32 steps per shedding period), no temporal refinement check. The continuity residual plateaued above the $10^{-3}$ target; I accepted it because the maxima stayed bounded and periodic, but a tighter run would cost little and answer more. The force history is digitized from screenshots because the raw monitor exports were not kept — endpoints match the force reports, but sub-pixel features like the 2× drag ripple are lost. The Strouhal estimate rests on six cycles. The laminar solver is the right model at Re=150 — the wake is laminar — but the mesh does not resolve the boundary layer that sets the separation points.
+One mesh, no refinement study, so the 29% bias is diagnosed but not bounded. One time step (0.2 s, about 32 steps per shedding period), no temporal refinement check. The continuity residual plateaued above the $10^{-3}$ target; I accepted it because the maxima stayed bounded and periodic, but a tighter run would cost little and answer more. The force history is digitized from screenshots because the raw monitor exports were not kept — endpoints match the force reports, but sub-pixel features like the 2× drag ripple are lost.
+
+The Strouhal estimate rests on six cycles. The laminar solver is the right model at Re=150 — the wake is laminar — but the mesh does not resolve the boundary layer that sets the separation points.
 
 ## Reproduce
 
@@ -144,4 +172,6 @@ One mesh, no refinement study, so the 29% bias is diagnosed but not bounded. One
 
 ## What I took away
 
-The first explanation of a discrepancy is usually a list of generic CFD excuses; ours were "instantaneous vs averaged" and "2D vs 3D", and neither survived contact with the force split. The dissipation story did, because it says where the error lives (pressure, 78% of the total) and where else it should appear ($Re=40$, 26.9%). I also learned to treat a matching number as a suspect: pressure $C_D$ of 3.2816 against a chart's 3.28 felt like validation and was a definition error, so comparing forces first — where reference values cancel — is now my default.
+The first explanation of a discrepancy is usually a list of generic CFD excuses; ours were "instantaneous vs averaged" and "2D vs 3D", and neither survived contact with the force split. The dissipation story did, because it says where the error lives (pressure, 78% of the total) and where else it should appear ($Re=40$, 26.9%).
+
+I also learned to treat a matching number as a suspect: pressure $C_D$ of 3.2816 against a chart's 3.28 felt like validation and was a definition error, so comparing forces first — where reference values cancel — is now my default.

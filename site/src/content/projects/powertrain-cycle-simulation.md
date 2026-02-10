@@ -18,6 +18,13 @@ academic:
     - 'Resolve inertia, rolling resistance, aerodynamic drag and grade at each cycle point.'
     - 'Report fuel, electrical energy and CO₂ per distance for each architecture.'
     - 'Complete an individual parameter study; this submission investigates battery SOC and empty-battery dead weight.'
+  media:
+    - src: '/images/projects/powertrain-cycle-simulation/assignment-workflow.svg'
+      alt: 'Cycle inputs passing through road-load and powertrain calculations to energy and carbon dioxide outputs'
+      caption: 'The assignment chain: speed, grade and distance become road-load forces, then wheel power, powertrain energy and CO₂.'
+    - src: '/images/projects/powertrain-cycle-simulation/spa-eco-profile.svg'
+      alt: 'Spa ECO speed and elevation profiles plotted against lap distance'
+      caption: 'The actual Spa input is highly nonuniform. Every acceleration, braking zone and elevation change feeds the point-by-point model.'
 heroMetrics:
   - { label: 'Powertrains × cycles', value: '4 × 3' }
   - { label: 'PHEV fuel, Spa ECO', value: '1.43 l/100km' }
@@ -57,7 +64,9 @@ $$F = \underbrace{m\,a}_{\text{inertia}} + \underbrace{f\,m\,g}_{\text{rolling}}
 
 Wheel power is $F \cdot v$; engine power divides by the transmission efficiency (95%). Fuel flow follows from engine efficiency and the fuel's lower heating value; CO₂ follows at 2392 g per litre of petrol. Hybrid variants add an electric machine and battery with their own efficiency chain (battery 0.95, motor 0.90 in my parameterisation), and the PHEV draws the battery down before calling the engine.
 
-**Vehicles.** The reference ICE is a 1300 kg compact (Cx 0.31, 2.69 m², 115 CV, five gears). The BEV carries a 125 kW peak motor and a 22 kWh battery at 1460 kg. The hybrids share the ICE car's engine and body, plus an electric machine and battery sized per the brief: roughly 1.5 kWh for the HEV, 10–20 kWh for the PHEV. My parameterisation used the 308 data: 1280 kg for the petrol car, the hybrid adding a 50 kg machine and a 110 kg, 12.4 kWh battery with an 81 kW motor.
+**Vehicles.** The reference ICE is a 1300 kg compact (Cx 0.31, 2.69 m², 115 CV, five gears). The BEV carries a 125 kW peak motor and a 22 kWh battery at 1460 kg. The hybrids share the ICE car's engine and body, plus an electric machine and battery sized per the brief: roughly 1.5 kWh for the HEV, 10–20 kWh for the PHEV.
+
+My parameterisation used the 308 data: 1280 kg for the petrol car, the hybrid adding a 50 kg machine and a 110 kg, 12.4 kWh battery with an 81 kW motor.
 
 ## Results: four powertrains, three cycles
 

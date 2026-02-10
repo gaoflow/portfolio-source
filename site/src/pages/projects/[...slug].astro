@@ -47,6 +47,23 @@ const meta = [
             <li class="flex gap-3"><span class="text-accent">→</span><span>{requirement}</span></li>
           ))}
         </ul>
+        {d.academic.media.length > 0 && (
+          <div class="mt-6 grid gap-4 sm:grid-cols-2">
+            {d.academic.media.map((media) => (
+              <figure class="overflow-hidden border border-edge bg-bg">
+                <img
+                  src={media.src}
+                  alt={media.alt}
+                  class="h-56 w-full object-contain"
+                  loading="lazy"
+                />
+                <figcaption class="border-t border-edge p-3 font-mono text-[10px] leading-relaxed text-muted">
+                  {media.caption}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
       </section>
     )}
 
