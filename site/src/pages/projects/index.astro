@@ -1,6 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 
 const projects = (await getCollection('projects')).sort(
@@ -17,18 +16,22 @@ const filters = [
   { key: 'validation', label: 'Validation' },
   { key: 'design', label: 'Design & CAD' },
 ];
+
+const codeOf = (id: string) => {
+  const pair = id.split('-').slice(0, 2).join('-').toUpperCase();
+  return pair.length > 12 ? id.split('-')[0].toUpperCase() : pair;
+};
 ---
 
 <Base title="Projects">
-  <section class="mx-auto max-w-5xl px-6 pt-16 pb-20">
-    <h1 class="section-label mb-2">Projects</h1>
-    <p class="text-muted mb-10">Oldest first, using evidence-backed completion or publication dates. Study numbers record chronology; they no longer imply a manufactured month-by-month learning history.</p>
-
-    <div class="flex flex-wrap gap-2 mb-10" data-filters>
+  <section class="pt-4 pb-20">
+    <h1 class="section-label mb-2">Projects · full catalogue</h1>
+    <p class="mb-10 max-w-2xl text-muted">Oldest first, using evidence-backed completion or publication dates. Study numbers record chronology; they no longer imply a manufactured month-by-month learning history.</p>
+    <div class="mb-8 flex flex-wrap gap-2" data-filters>
       {filters.map((f, i) => (
         <button
           data-filter={f.key}
-          class="filter-btn font-mono text-xs tracking-wider uppercase px-3 py-1.5 border border-edge text-muted hover:text-ink transition-colors data-[on]:border-accent data-[on]:text-accent"
+          class="filter-btn font-mono text-xs uppercase tracking-wider px-3 py-1.5 border border-edge text-muted transition-colors hover:text-ink data-[on]:border-accent data-[on]:text-accent"
           {...(i === 0 ? { 'data-on': '' } : {})}
         >
           {f.label}
@@ -36,21 +39,41 @@ const filters = [
       ))}
     </div>
 
-    <div class="grid sm:grid-cols-2 gap-6" data-grid>
-      {projects.map((p) => <ProjectCard project={p} />)}
+    <div class="border border-edge bg-surface/40" data-grid>
+      {projects.map((p, i) => (
+        <a
+          href={`/projects/${p.id}`}
+          data-categories={[...p.data.categories, ...(p.data.academic ? ['course-project'] : [])].join(' ')}
+          class="group grid grid-cols-[36px_1fr_auto] items-center gap-4 border-b border-edge px-4 py-4 transition-colors last:border-b-0 hover:bg-white/[0.03] sm:grid-cols-[44px_104px_1fr_150px]"
+        >
+          <span class="font-mono text-xs text-muted tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+          <span class="hidden font-mono text-[11px] uppercase tracking-wider text-best sm:block">{codeOf(p.id)}</span>
+          <span class="min-w-0">
+            <span class="flex flex-wrap items-baseline gap-x-3">
+              <span class="font-medium leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
+              {p.data.academic && <span class="rounded-full bg-accent/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-accent">Course</span>}
+              {p.data.status === 'active' && <span class="rounded-full bg-ok/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-ok">Active</span>}
+            </span>
+            <span class="mt-1 hidden text-sm leading-relaxed text-muted sm:block">{p.data.summary}</span>
+          </span>
+          <span class="text-right font-mono text-[11px] uppercase tracking-wider text-muted tabular-nums">
+            {new Date(`${p.data.date}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+          </span>
+        </a>
+      ))}
     </div>
   </section>
 
   <script>
     const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-    const cards = document.querySelectorAll<HTMLAnchorElement>('[data-grid] > [data-categories]');
+    const rows = document.querySelectorAll<HTMLAnchorElement>('[data-grid] > [data-categories]');
     btns.forEach((btn) => {
       btn.addEventListener('click', () => {
         const key = btn.dataset.filter!;
         btns.forEach((b) => (b === btn ? b.setAttribute('data-on', '') : b.removeAttribute('data-on')));
-        cards.forEach((c) => {
-          const show = key === 'all' || (c.dataset.categories ?? '').split(' ').includes(key);
-          c.classList.toggle('hidden', !show);
+        rows.forEach((r) => {
+          const show = key === 'all' || (r.dataset.categories ?? '').split(' ').includes(key);
+          r.classList.toggle('hidden', !show);
         });
       });
     });

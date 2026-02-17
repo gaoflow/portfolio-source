@@ -2,13 +2,15 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-bg: #0f172a;
-  --color-surface: #16213a;
-  --color-edge: #1e293b;
-  --color-ink: #e2e8f0;
-  --color-muted: #94a3b8;
-  --color-accent: #5eead4;
-  --color-ok: #34d399;
+  /* Pit Wall palette — near-black instrument field; color carries state, never decoration */
+  --color-bg: #0b0b0e;
+  --color-surface: #141419;
+  --color-edge: #26262c;
+  --color-ink: #e4e4e7;
+  --color-muted: #a1a1aa;
+  --color-accent: #2dd4bf; /* teal — validated / improvement */
+  --color-ok: #fbbf24;     /* amber — live / in progress */
+  --color-best: #a78bfa;   /* violet — best result */
 
   --font-sans: "Inter Tight", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
@@ -19,12 +21,44 @@ body {
   font-feature-settings: "ss01";
 }
 
+::selection {
+  background: rgba(45, 212, 191, 0.25);
+}
+
 /* Editorial section label, mono caps */
 .section-label {
   @apply font-mono text-xs tracking-[0.2em] text-muted uppercase;
 }
 
-/* Subtle scroll reveal — the only global animation (Balasko, dialed back) */
+/* Live indicator (status bar) */
+.dot-live {
+  @apply inline-block size-1.5 rounded-full bg-ok;
+  animation: pulse-live 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse-live {
+  50% { opacity: 0.35; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dot-live { animation: none; }
+}
+
+/* Phase strip — mini-sector segments (project rows) */
+.strip {
+  display: flex;
+  gap: 4px;
+  min-width: 96px;
+}
+.strip .seg {
+  height: 5px;
+  flex: 1;
+  border-radius: 2px;
+  background: #3f3f46;
+}
+.strip .seg-ok { background: var(--color-accent); }
+.strip .seg-live { background: var(--color-ok); }
+.strip .seg-best { background: var(--color-best); }
+
+/* Subtle scroll reveal — the only global animation */
 @keyframes rise {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }

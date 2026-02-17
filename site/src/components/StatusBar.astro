@@ -1,9 +1,0 @@
----
-// Lobaton's HUD status idea, dialed back to a single mono bar.
-interface Props { line: string; ok?: boolean }
-const { line, ok = true } = Astro.props;
----
-<div class="flex items-center gap-3 font-mono text-xs tracking-wider text-muted">
-  <span class:list={['inline-block size-2 rounded-full', ok ? 'bg-ok' : 'bg-muted']}></span>
-  <span class="uppercase">{line}</span>
-</div>
