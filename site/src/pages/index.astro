@@ -4,144 +4,110 @@ import CasePipeline from '../components/CasePipeline.astro';
 import { profile } from '../data/profile';
 import { getCollection } from 'astro:content';
 
-const all = await getCollection('projects');
-const featured = all.filter((p) => p.data.featured).sort(
+const projects = (await getCollection('projects')).sort(
   (a, b) => a.data.date.localeCompare(b.data.date) || (a.data.studySequence ?? 999) - (b.data.studySequence ?? 999) || a.data.order - b.data.order,
 );
-const featuredNotes = (await getCollection('notes'))
-  .filter((note) => note.data.featured)
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 3);
-
-// Representative evidence from the ESILV Fluent verification series.
-const caseSteps = [
-  { label: 'Analytical check', caption: 'A Re=100 pipe case established signs, mass conservation and Hagen–Poiseuille scale before the cylinder study.', metrics: [
-    { label: 'Vmax error', value: '1.0%' }, { label: 'Mass imbalance', value: '2.8×10⁻¹⁰ kg/s' },
-  ]},
-  { label: 'Mesh sweep', caption: 'The cylinder mesh grew from 50 to 40,000 cells. The drag coefficient changed by less than 0.1% beyond the selected grid.', metrics: [
-    { label: 'Cells tested', value: '50 → 40,000' }, { label: 'Cd plateau', value: '<0.1%' },
-  ]},
-  { label: 'Domain sweep', caption: 'Far-field distance was swept rather than inherited from the tutorial. Drag changed by less than 1% for D2 ≥ 100 m.', metrics: [
-    { label: 'D2 tested', value: '20 → 200 m' }, { label: 'Selected D2', value: '100 m' },
-  ]},
-  { label: 'Validation', caption: 'The final Reynolds sweep kept failed comparisons visible. Only Re=20 met the coursework 5% error gate.', metrics: [
-    { label: 'Cd at Re=10', value: '2.7973' }, { label: 'Error at Re=20', value: '3.83%' },
-  ]},
-];
-
-// Timing-table metadata for featured projects — every number evidenced on its project page.
-const tableMeta: Record<string, { code: string; delta: string; deltaTone: 'accent' | 'best' | 'ok'; phases: string[] }> = {
-  'fluent-cyl-vnv': { code: 'VNV', delta: '3.83% @ Re20', deltaTone: 'accent', phases: ['ok', 'ok', 'ok', 'ok'] },
-  'fluent-cylinder-vortex': { code: 'VORTEX', delta: 'St 0.155', deltaTone: 'best', phases: ['ok', 'ok', 'best', 'ok'] },
-  'f1-rans-campaign': { code: 'F1-RANS', delta: '9/23 valid', deltaTone: 'accent', phases: ['ok', 'ok', 'ok', 'best'] },
-  'space-rider': { code: 'RIDER', delta: 'v1→v5', deltaTone: 'accent', phases: ['ok', 'ok', 'ok', 'ok'] },
-  'f1-2026-aero': { code: 'F1-26', delta: 'WIP', deltaTone: 'ok', phases: ['live', '', '', ''] },
-};
-
-const stats = [
-  { label: 'Campaign variants', value: '23', sub: '9 valid · F1 RANS pilot', tone: 'ink' },
-  { label: 'Evidence gates', value: '76/76', sub: 'claims · 54 artifacts', tone: 'best' },
-  { label: 'Vortex shedding', value: 'St 0.155', sub: 'public rebuild bundle', tone: 'accent' },
-  { label: 'V&V error gate', value: '3.83%', sub: '@ Re20 · ≤ 5% gate', tone: 'accent' },
-] as const;
-
-const feedTones = ['bg-accent', 'bg-ok', 'bg-edge'];
+const notes = (await getCollection('notes')).sort(
+  (a, b) => a.data.published.valueOf() - b.data.published.valueOf() || a.data.order - b.data.order,
+);
+const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 ---
 
-<Base>
-  <!-- Hero -->
-  <section class="reveal">
-    <p class="font-mono text-[11px] uppercase tracking-[0.22em] text-accent">External aerodynamics · Methodology · Tooling</p>
-    <h1 class="mt-5 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight text-ink lg:text-5xl">
-      CFD setups engineers can trust.
+<Base title="Home">
+  {/* 1. Hero — one pitch line + capability strip */}
+  <section class="max-w-3xl">
+    <h1 class="text-4xl font-bold leading-[1.05] tracking-tight text-ink sm:text-5xl">
+      External-aerodynamics CFD{' '}
+      <span class="text-muted">with auditable numbers.</span>
     </h1>
-    <p class="mt-6 max-w-2xl text-lg leading-relaxed text-muted">
-      From geometry cleanup to validated results — every number traceable to a gate.
-      Nine years of software engineering leadership, now aimed at racing aerodynamics.
+    <p class="mt-6 text-lg leading-relaxed text-muted">
+      {profile.pitch}
     </p>
-    <dl class="mt-9 grid gap-x-10 gap-y-3 font-mono text-[13px] sm:grid-cols-2">
+    <dl class="mt-10 space-y-3 border-l border-edge pl-4">
       {profile.capabilities.map((c) => (
-        <div class="flex gap-4">
-          <dt class="w-24 shrink-0 pt-0.5 text-[10px] uppercase tracking-widest text-muted">{c.label}</dt>
-          <dd class="text-ink/90">{c.value}</dd>
+        <div>
+          <dt class="font-mono text-[10px] uppercase tracking-widest text-muted">{c.label}</dt>
+          <dd class="text-sm text-ink/85">{c.value}</dd>
         </div>
       ))}
     </dl>
   </section>
 
-  <!-- Stat panels -->
-  <section class="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 reveal">
-    {stats.map((s) => (
-      <div class="border border-edge bg-surface p-5">
-        <div class="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">{s.label}</div>
-        <div class:list={['mt-2 font-mono text-[26px] font-medium leading-none tabular-nums', s.tone === 'accent' ? 'text-accent' : s.tone === 'best' ? 'text-best' : 'text-ink']}>
-          {s.value}
-        </div>
-        <div class="mt-2 text-xs text-muted">{s.sub}</div>
-      </div>
-    ))}
+  {/* 2. Representative case — one honest verification chain */}
+  <section class="mt-16 max-w-4xl">
+    <CasePipeline steps={profile.caseSteps} />
   </section>
 
-  <!-- Representative case -->
-  <section class="mt-14 reveal">
-    <CasePipeline steps={caseSteps} />
-    <a href="/projects/fluent-cyl-vnv" class="mt-4 inline-block font-mono text-xs text-muted hover:text-accent">
-      Read the full verification case →
-    </a>
-  </section>
-
-  <!-- Featured work — timing table -->
+  {/* 3. Projects — the full catalogue, oldest first */}
   <section class="mt-20">
-    <div class="flex items-baseline justify-between mb-6">
-      <h2 class="section-label">Projects · timing</h2>
-      <a href="/projects" class="font-mono text-xs text-muted hover:text-accent">Every project →</a>
+    <div class="mb-5 flex items-baseline justify-between">
+      <h2 class="section-label">Projects</h2>
+      <span class="font-mono text-xs text-muted tabular-nums">{projects.length}</span>
     </div>
     <div class="border border-edge bg-surface/40">
-      {featured.map((p, i) => {
-        const meta = tableMeta[p.id] ?? { code: p.id.slice(0, 8).toUpperCase(), delta: '—', deltaTone: 'accent' as const, phases: ['', '', '', ''] };
-        return (
-          <a
-            href={`/projects/${p.id}`}
-            class="group grid grid-cols-[36px_1fr_auto] items-center gap-4 border-b border-edge px-4 py-4 transition-colors last:border-b-0 hover:bg-white/[0.03] sm:grid-cols-[44px_88px_1fr_120px_110px] sm:px-5"
-          >
-            <span class="font-mono text-xs text-muted tabular-nums">{String(i + 1).padStart(2, '0')}</span>
-            <span class="hidden font-mono text-[11px] uppercase tracking-wider text-best sm:block">{meta.code}</span>
-            <span class="min-w-0">
-              <span class="block font-medium leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
-              <span class="mt-1 hidden text-sm leading-relaxed text-muted sm:block">{p.data.summary}</span>
+      {projects.map((p, i) => (
+        <a
+          href={`/projects/${p.id}`}
+          class="group grid grid-cols-[28px_1fr] items-center gap-4 border-b border-edge px-4 py-4 transition-colors last:border-b-0 hover:bg-white/[0.03] sm:grid-cols-[36px_144px_1fr_auto]"
+        >
+          <span class="font-mono text-xs text-muted tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+          {p.data.heroImage ? (
+            <img
+              src={p.data.heroImage}
+              alt={p.data.title}
+              loading="lazy"
+              decoding="async"
+              class="hidden aspect-video w-full border border-edge bg-surface object-cover sm:block"
+            />
+          ) : (
+            <span class="hidden aspect-video w-full items-center justify-center border border-edge bg-surface font-mono text-[10px] uppercase tracking-widest text-muted sm:flex">
+              {p.data.methodLine.split('·')[0].trim()}
             </span>
-            <span class:list={[
-              'hidden text-right font-mono text-[13px] tabular-nums sm:block',
-              meta.deltaTone === 'best' ? 'text-best' : meta.deltaTone === 'ok' ? 'text-ok' : 'text-accent',
-            ]}>{meta.delta}</span>
-            <span class="strip justify-self-end" aria-hidden="true">
-              {meta.phases.map((seg) => <span class:list={['seg', seg && `seg-${seg}`]}></span>)}
-            </span>
-          </a>
-        );
-      })}
-    </div>
-  </section>
-
-  <!-- Engineering notes — race control feed -->
-  <section class="mt-20">
-    <div class="flex items-baseline justify-between mb-6">
-      <h2 class="section-label">Race control · notes</h2>
-      <a href="/notes" class="font-mono text-xs text-muted hover:text-accent">Every note →</a>
-    </div>
-    <div class="border border-edge bg-surface">
-      {featuredNotes.map((note, i) => (
-        <a href={`/notes/${note.id}`} class="group flex items-baseline gap-4 border-b border-edge px-5 py-4 transition-colors last:border-b-0 hover:bg-white/[0.03]">
-          <span class:list={['size-2 shrink-0 self-center rounded-sm', feedTones[i]]} aria-hidden="true"></span>
-          <time class="font-mono text-[11px] tabular-nums text-muted" datetime={note.data.published.toISOString()}>
-            {note.data.published.toISOString().slice(5, 10).replace('-', '-')}
-          </time>
+          )}
           <span class="min-w-0">
-            <span class="block font-medium leading-snug transition-colors group-hover:text-accent">{note.data.title}</span>
-            <span class="mt-1 hidden text-sm leading-relaxed text-muted sm:block">{note.data.summary}</span>
+            <span class="flex flex-wrap items-baseline gap-x-3">
+              <span class="font-medium leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
+              {p.data.academic && <span class="rounded-full bg-accent/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-accent">Course</span>}
+              {p.data.status === 'active' && <span class="rounded-full bg-ok/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-ok">Active</span>}
+            </span>
+            <span class="mt-1 line-clamp-2 block text-sm leading-relaxed text-muted">{p.data.summary}</span>
           </span>
+          <span class="hidden font-mono text-xs text-muted whitespace-nowrap sm:block">{fmt(p.data.date)}</span>
         </a>
       ))}
     </div>
   </section>
+
+  {/* 4. Engineering notes — writing feed */}
+  {notes.length > 0 && (
+    <section class="mt-20">
+      <div class="mb-5 flex items-baseline justify-between">
+        <h2 class="section-label">Engineering notes</h2>
+        <a href="/notes/" class="font-mono text-xs uppercase tracking-wider text-muted transition-colors hover:text-accent">All notes →</a>
+      </div>
+      <div class="border border-edge bg-surface/40">
+        {notes.map((n) => (
+          <a
+            href={`/notes/${n.id}`}
+            class="group grid grid-cols-[1fr] items-center gap-4 border-b border-edge px-4 py-4 transition-colors last:border-b-0 hover:bg-white/[0.03] sm:grid-cols-[144px_1fr_auto]"
+          >
+            <img
+              src={n.data.image}
+              alt={n.data.title}
+              loading="lazy"
+              decoding="async"
+              class="hidden aspect-video w-full border border-edge bg-surface object-cover sm:block"
+            />
+            <span class="min-w-0">
+              <span class="block font-medium leading-snug text-ink transition-colors group-hover:text-accent">{n.data.title}</span>
+              <span class="mt-1 line-clamp-2 block text-sm leading-relaxed text-muted">{n.data.summary}</span>
+            </span>
+            <span class="hidden font-mono text-xs text-muted whitespace-nowrap sm:block">
+              {n.data.published.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
 </Base>

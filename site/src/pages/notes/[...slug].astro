@@ -19,8 +19,9 @@ const { Content } = await render(note);
       <a href="/notes" class="font-mono text-xs text-muted hover:text-accent">← Engineering Notes</a>
       <p class="font-mono text-[10px] tracking-widest uppercase text-accent">Technical note</p>
       <h1 class="text-3xl font-medium leading-tight tracking-tight md:text-5xl">{d.title}</h1>
-      <p class="text-lg leading-relaxed text-muted">{d.summary}</p>
-      <div class="flex flex-wrap items-center gap-3 border-y border-edge py-4 font-mono text-[10px] tracking-wider uppercase text-muted">
+              <p class="text-lg leading-relaxed text-muted">{d.summary}</p>
+        {d.image && <img src={d.image} alt={d.title} class="aspect-video w-full border border-edge object-cover" />}
+        <div class="flex flex-wrap items-center gap-3 border-y border-edge py-4 font-mono text-[10px] tracking-wider uppercase text-muted">
         <span class="text-ink/80">{profile.name}</span>
         <span aria-hidden="true">·</span>
         <time datetime={d.published.toISOString()}>{d.published.toISOString().slice(0, 10)}</time>

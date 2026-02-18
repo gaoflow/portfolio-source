@@ -71,10 +71,6 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
       <div class="mx-auto flex h-14 max-w-6xl items-center gap-5 px-6 font-mono text-[11px] uppercase tracking-[0.14em] lg:px-8">
         <a href="/" class="font-semibold tracking-[0.2em] text-ink">{profile.name}</a>
         <span class="hidden text-muted sm:inline">{profile.role}</span>
-        <span class="hidden items-center gap-2 text-ok md:inline-flex">
-          <span class="dot-live"></span>
-          {profile.statusLine}
-        </span>
         <nav class="ml-auto flex items-center gap-4 sm:gap-5">
           {nav.map((n) => (
             <a href={n.href} class:list={['transition-colors', path === n.href ? 'text-accent' : 'text-muted hover:text-ink']}>

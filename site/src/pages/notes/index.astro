@@ -18,6 +18,9 @@ const notes = (await getCollection('notes')).sort(
     <div class="grid gap-5">
       {notes.map((note, index) => (
         <a href={`/notes/${note.id}`} class="group border border-edge bg-surface/40 p-6 transition-colors hover:border-accent/50">
+          {note.data.image && (
+            <img src={note.data.image} alt={note.data.title} loading="lazy" decoding="async" class="mb-5 aspect-video w-full border border-edge object-cover" />
+          )}
           <div class="flex flex-wrap items-center justify-between gap-3 font-mono text-[10px] tracking-widest uppercase text-muted">
             <span>Note {String(index + 1).padStart(2, '0')}</span>
             <span>{profile.name} · <time datetime={note.data.published.toISOString()}>{note.data.published.toISOString().slice(0, 10)}</time></span>

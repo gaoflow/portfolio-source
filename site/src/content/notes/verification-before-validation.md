@@ -1,5 +1,6 @@
 ---
 title: 'Verification Before Validation: A Practical CFD Evidence Ladder'
+image: /images/notes/covers/verification-before-validation.svg
 published: 2026-08-18
 summary: 'A decision-oriented method for separating code checks, numerical verification, physical validation, and production readiness before aerodynamic numbers are trusted.'
 tags: [CFD verification, validation, mesh convergence, decision gates]

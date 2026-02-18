@@ -41,6 +41,7 @@ const notes = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/notes' }),
   schema: z.object({
     title: z.string(),
+    image: z.string().optional(),
     published: z.coerce.date(),
     summary: z.string(),
     tags: z.array(z.string()).default([]),

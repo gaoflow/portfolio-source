@@ -1,5 +1,6 @@
 ---
 title: 'From CFD Claim to Auditable Evidence'
+image: /images/notes/covers/from-cfd-claim-to-auditable-evidence.svg
 published: 2026-08-18
 summary: 'A small evidence-manifest pattern that connects every public engineering number to generated data, an explicit acceptance rule, provenance, and a reproducible command.'
 tags: [reproducibility, evidence manifest, automation, technical portfolio]
