@@ -5,7 +5,7 @@ date: '2026-03-12'
 status: complete
 categories: [component-cfd, validation]
 tags: [ANSYS Fluent, transient CFD, vortex shedding, cylinder flow, V&V]
-summary: 'A velocity perturbation triggers the Re=150 Kármán street; the measured St=0.155 passes its gate while coarse-mesh dissipation leaves 29% drag error.'
+summary: 'I triggered the Re=150 Kármán street with a velocity perturbation; the measured St=0.155 passes its gate while coarse-mesh dissipation leaves 29% drag error.'
 methodLine: 'ANSYS Fluent · steady Re=40 · transient Re=150 · symmetry-breaking patch · force monitors'
 role: 'Simulation & report lead'
 team: 'ESILV MMN1 group — Bing Gao, Nicolas Chang, Daphné Baray'
@@ -14,6 +14,7 @@ academic:
   institution: 'ESILV'
   course: 'Computational Fluid Dynamics'
   assignment: 'TD2 steady and transient flow past a cylinder'
+  note: 'The second tutorial of the same ESILV CFD module, again as a group of three. I set up the steady and transient cylinder cases, triggered the vortex street with a deliberate velocity patch, and wrote the report. Later I rebuilt the force histories by digitising the archived Fluent monitors, verified the endpoints against the exported force reports, and packaged the result as a self-contained reproduction bundle.'
   requirements:
     - 'Solve steady laminar cylinder flow at Re=40 and check convergence, mass balance and drag.'
     - 'Run a transient Re=150 case and trigger symmetry breaking with a controlled velocity perturbation.'

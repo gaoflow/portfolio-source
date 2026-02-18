@@ -5,7 +5,7 @@ date: '2026-08-14'
 status: complete
 categories: [design]
 tags: [Blender, glTF, 3D]
-summary: 'Five version lines—two abandoned—turned a Blender blockout into a ±6 mm Space Rider reconstruction and a 579 KB interactive GLB.'
+summary: 'Five version lines — two abandoned — turned my Blender blockout into a ±6 mm Space Rider reconstruction and a 579 KB interactive GLB.'
 methodLine: 'Blender · bpy/bmesh pipeline · blueprint-calibrated remapping · glTF/Draco'
 role: 'Modeller'
 duration: '1 semester'

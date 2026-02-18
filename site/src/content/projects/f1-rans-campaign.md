@@ -5,7 +5,7 @@ date: '2026-08-16'
 status: complete
 categories: [full-car, validation]
 tags: [OpenFOAM, RANS, k-omega SST, sensitivity, HPC]
-summary: 'A 4.35M-cell OpenFOAM pilot campaign completed 23 variants and retained nine valid sensitivity results, while mesh uncertainty and two diverged roughness runs stayed visible.'
+summary: 'My 4.35M-cell OpenFOAM pilot campaign completed 23 variants and retained nine valid sensitivity results, with mesh uncertainty and two diverged roughness runs kept visible.'
 methodLine: 'Half-car RANS · moving ground · rotating wheels · component forces · validity gates'
 role: 'Sole engineer'
 duration: 'Pilot campaign complete'

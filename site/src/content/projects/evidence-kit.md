@@ -5,7 +5,7 @@ date: '2026-08-10'
 status: complete
 categories: [tooling, validation]
 tags: [Python, JSON Pointer, SHA-256, reporting, reproducibility]
-summary: 'A manifest-driven audit layer tying every public claim to a metric, gate, source and hashed artifact — 76 of 76 claims currently pass.'
+summary: 'I built a manifest-driven audit layer tying every public claim on this site to a metric, gate, source and hashed artifact — 76 of 76 claims currently pass.'
 methodLine: 'JSON manifests · typed gates · RFC 6901 pointers · SHA-256 · HTML/CSV/JSON'
 role: 'Tooling & technical communication'
 duration: 'Independent build'

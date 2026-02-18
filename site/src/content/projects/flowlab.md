@@ -5,7 +5,7 @@ date: '2026-08-10'
 status: complete
 categories: [tooling, validation]
 tags: [JavaScript, D2Q9, LBM, BGK, V&V]
-summary: 'A dependency-free lattice-Boltzmann solver that runs in Node.js and the browser, validated against canonical lid-driven-cavity data on three grids.'
+summary: 'I wrote a dependency-free lattice-Boltzmann solver that runs in Node.js and the browser, validated against canonical lid-driven-cavity data on three grids.'
 methodLine: 'D2Q9 · BGK collision · halfway bounce-back · Ghia et al. benchmark'
 role: 'Numerical methods & software engineering'
 duration: 'Independent study'

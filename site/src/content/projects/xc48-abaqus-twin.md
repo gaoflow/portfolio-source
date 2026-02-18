@@ -5,7 +5,7 @@ date: '2026-03-28'
 status: complete
 categories: [validation, design]
 tags: [Abaqus, Dynamic Explicit, tensile test, XC48 steel, ductile damage, Python]
-summary: 'An XC48 tensile test rebuilt in Abaqus Explicit reaches R²=0.9663; the low measured modulus and failed Static General path remain visible.'
+summary: 'We rebuilt an XC48 tensile test in Abaqus Explicit to R²=0.9663; the low measured modulus and the failed Static General path remain visible.'
 methodLine: 'Tensile test · engineering→true conversion · Abaqus Explicit · mesh/solver/amplitude sensitivity'
 role: 'Data post-processing & report toolchain'
 team: 'ESILV MMN1 group — Nicolas Chang, Bing Gao, Sabin Karn, Nithor Bhowmik'
@@ -14,6 +14,7 @@ academic:
   institution: 'ESILV'
   course: 'Materials and Behavior'
   assignment: 'XC48 tensile experiment and Abaqus numerical reconstruction'
+  note: 'An eight-week Materials and Behavior project at ESILV, in a group of four with Nicolas Chang, Sabin Karn and Nithor Bhowmik. The group ran the physical tensile test and built the Abaqus models; I owned the data side — the Python pipeline from raw machine output to the material card, the ODB post-processing, and the report toolchain.'
   requirements:
     - 'Run and post-process an XC48 uniaxial tensile test through fracture.'
     - 'Derive engineering, true and plastic stress–strain data and identify material properties.'

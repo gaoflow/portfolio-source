@@ -5,7 +5,7 @@ date: '2026-08-18'
 status: complete
 categories: [validation]
 tags: [Python, NumPy, heat equation, FTCS, stability, V&V]
-summary: 'Explicit FTCS heat diffusion matches the analytical slab transient to 1.38e−5 and refuses any run outside its r≤0.25 stability bound.'
+summary: 'My explicit FTCS heat-diffusion solver matches the analytical slab transient to 1.38e−5 and refuses any run outside its r≤0.25 stability bound.'
 methodLine: 'FTCS · finite-volume flux form · slab series · stability gate'
 role: 'Numerical methods & validation'
 duration: 'Independent study'

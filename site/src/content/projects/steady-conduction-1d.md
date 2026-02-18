@@ -5,7 +5,7 @@ date: '2026-08-18'
 status: complete
 categories: [validation]
 tags: [Python, NumPy, finite differences, heat conduction, verification]
-summary: 'A generating rod solved by finite differences and a Thomas algorithm, then checked by an exact solution, second-order MMS convergence and energy closure.'
+summary: 'I solved a generating rod by finite differences and a Thomas algorithm, then checked it with an exact solution, second-order MMS convergence and energy closure.'
 methodLine: 'Central differences · half-cell Robin tip · Thomas algorithm · manufactured solutions'
 role: 'Heat transfer & numerical methods'
 duration: 'Independent study'

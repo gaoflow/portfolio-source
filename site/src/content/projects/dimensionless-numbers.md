@@ -5,7 +5,7 @@ date: '2026-08-18'
 status: complete
 categories: [tooling]
 tags: [Python, dimensionless groups, Reynolds, unit checking, CLI]
-summary: 'Reynolds, Mach, Prandtl, Nusselt, Grashof and Rayleigh calculators with SI dimension guards and a property table anchored to cited textbook data.'
+summary: 'I built Reynolds, Mach, Prandtl, Nusselt, Grashof and Rayleigh calculators with SI dimension guards and a property table anchored to cited textbook data.'
 methodLine: 'Defining equations · SI dimension-vector guards · anchored property table'
 role: 'Solo study project'
 duration: 'Independent build'

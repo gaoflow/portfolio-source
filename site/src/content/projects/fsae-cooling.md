@@ -5,7 +5,7 @@ date: '2026-08-09'
 status: complete
 categories: [fsae, validation]
 tags: [Python, finite volume, thermal, hydraulics]
-summary: 'Coupled fan, radiator, pump, and transient coolant models reject the shortlisted E3 cooling hardware before procurement or production CFD: hydraulics pass, the inverter temperature boundary fails.'
+summary: 'I coupled fan, radiator, pump and transient coolant models and rejected our shortlisted E3 cooling hardware before procurement or production CFD: hydraulics pass, the inverter temperature boundary fails.'
 methodLine: 'System curves · transient finite volume · numerical convergence'
 role: 'Thermal Systems & Numerical Modelling'
 team: 'Vinci Eco Drive — ESILV FSAE'

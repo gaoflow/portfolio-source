@@ -5,7 +5,7 @@ date: '2026-08-10'
 status: complete
 categories: [validation, tooling]
 tags: [Python, NumPy, VLM, potential flow, ground effect]
-summary: 'A from-primitives horseshoe-vortex solver that isolates ground-image effects, sweeps ride height, and exposes exactly where the linear model stops earning trust.'
+summary: 'I wrote a from-primitives horseshoe-vortex solver that isolates ground-image effects, sweeps ride height, and exposes exactly where the linear model stops earning trust.'
 methodLine: 'Biot–Savart · horseshoe vortices · image system · refinement study'
 role: 'Aerodynamics & numerical methods'
 duration: 'Independent study'

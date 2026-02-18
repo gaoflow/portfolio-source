@@ -5,7 +5,7 @@ date: '2026-08-10'
 status: complete
 categories: [validation, tooling]
 tags: [Python, Hess–Smith, NACA 0012, panel method, NASA]
-summary: 'Thin-airfoil and geometry-resolved panel methods tested against a single traceable NASA wind-tunnel series—with stall and drag failures left visible.'
+summary: 'I tested thin-airfoil and geometry-resolved panel methods against a single traceable NASA wind-tunnel series, and left the stall and drag failures visible.'
 methodLine: 'Thin-airfoil theory · Prandtl–Glauert · Hess–Smith · NASA TM-4074'
 role: 'Aerodynamic methods & validation'
 duration: 'Independent study'

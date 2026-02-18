@@ -5,7 +5,7 @@ date: '2026-08-18'
 status: complete
 categories: [component-cfd]
 tags: [Python, NumPy, potential flow, complex potential, circulation, RK4]
-summary: 'The classical elementary flows implemented as complex potentials, superposed into cylinder flow with circulation, and verified against every available analytical identity.'
+summary: 'I implemented the classical elementary flows as complex potentials, superposed them into cylinder flow with circulation, and verified every available analytical identity.'
 methodLine: 'Complex potentials · superposition · circulation · RK4 streamlines'
 role: 'Aerodynamics fundamentals'
 duration: 'Independent build'

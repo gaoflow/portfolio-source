@@ -21,6 +21,7 @@ const projects = defineCollection({
       institution: z.string(),
       course: z.string(),
       assignment: z.string(),
+      note: z.string().optional(),
       requirements: z.array(z.string()).min(1),
       media: z.array(z.object({
         src: z.string(),

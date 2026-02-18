@@ -5,7 +5,7 @@ date: '2025-12-06'
 status: complete
 categories: [tooling, validation]
 tags: [driving cycles, longitudinal dynamics, PHEV, CO₂, Excel, pandas]
-summary: 'A charged PHEV uses 1.43 l/100km on the Spa ECO lap versus 10.27 for ICE; an empty battery makes it the thirstiest case.'
+summary: 'In my simulation a charged PHEV uses 1.43 l/100km on the Spa ECO lap versus 10.27 for the ICE; an empty battery makes it the thirstiest case.'
 methodLine: 'Point-by-point longitudinal dynamics · Excel cycle simulators · Spa ECO/SPORT + NEDC'
 role: 'Solo project'
 duration: '4 weeks'
@@ -13,6 +13,7 @@ academic:
   institution: 'ESILV'
   course: 'Powertrains & Vehicle Dynamics'
   assignment: 'Energy consumption and CO₂ simulation across driving cycles'
+  note: 'A solo four-week assignment for the Powertrains & Vehicle Dynamics course at ESILV. I parameterised the course-provided Excel simulators, built the Spa speed profiles from the track geometry, ran all four powertrain architectures over each cycle, and post-processed the exports with pandas. The individual parameter study — battery charge and the empty-battery dead-weight penalty — was my own choice of investigation.'
   requirements:
     - 'Run ICE, BEV, HEV and PHEV versions of one vehicle over supplied Spa, NEDC and WLTP-style cycles.'
     - 'Resolve inertia, rolling resistance, aerodynamic drag and grade at each cycle point.'

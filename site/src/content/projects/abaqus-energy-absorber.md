@@ -5,7 +5,7 @@ date: '2026-03-28'
 status: complete
 categories: [design, validation]
 tags: [Abaqus, Explicit dynamics, crashworthiness, FGT, energy absorption]
-summary: 'An Abaqus/Explicit front-rail campaign: aluminium wins the material screen, and an FGT multi-cell layout absorbs 95.6% of impact energy at 2.56× the classic section''s SEA.'
+summary: 'In our Abaqus/Explicit front-rail campaign, aluminium won the material screen, and an FGT multi-cell layout absorbed 95.6% of impact energy at 2.56× the classic section''s SEA.'
 methodLine: 'Abaqus/Explicit · dynamic crush · SEA / Fmax / CFE · functionally graded thickness'
 role: 'Wall-impact study & report assembly'
 team: 'ESILV MMN1 group — Nicolas Chang, Daphné Baray, Bing Gao, Immanuella Castro'
@@ -14,6 +14,7 @@ academic:
   institution: 'ESILV'
   course: 'Computational Solid Mechanics'
   assignment: 'Dynamic impact and optimization of an automotive energy absorber'
+  note: 'A six-week Computational Solid Mechanics project at ESILV, in a group of four with Nicolas Chang, Daphné Baray and Immanuella Castro. My teammates ran the preliminary crush, the material screening, the barrier crash and the FGT geometry jobs; I ran the wall-impact study and assembled the final report. Every number shown here traces to that report.'
   requirements:
     - 'Model the axial impact of a longitudinal front rail in Abaqus/Explicit.'
     - 'Extract and interpret the force–displacement response and energy balance.'

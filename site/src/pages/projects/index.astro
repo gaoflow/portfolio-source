@@ -49,12 +49,8 @@ const codeOf = (id: string) => {
           <span class="font-mono text-xs text-muted tabular-nums">{String(i + 1).padStart(2, '0')}</span>
           <span class="hidden font-mono text-[11px] uppercase tracking-wider text-best sm:block">{codeOf(p.id)}</span>
           <span class="min-w-0">
-            <span class="flex flex-wrap items-baseline gap-x-3">
-              <span class="font-medium leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
-              {p.data.academic && <span class="bg-tag px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-accent">Course</span>}
-              {p.data.status === 'active' && <span class="bg-ok-bg px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-ok">Active</span>}
-            </span>
-            <span class="mt-1 hidden text-sm leading-relaxed text-muted sm:block">{p.data.summary}</span>
+            <span class="font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
+            <span class="mt-1 hidden text-base leading-relaxed text-muted sm:block">{p.data.summary}</span>
           </span>
           <span class="text-right font-mono text-[11px] uppercase tracking-wider text-muted tabular-nums">
             {new Date(`${p.data.date}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}

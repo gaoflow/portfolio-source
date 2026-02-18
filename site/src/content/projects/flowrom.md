@@ -5,7 +5,7 @@ date: '2026-08-10'
 status: complete
 categories: [validation, tooling]
 tags: [Python, NumPy, POD, DMD, reduced-order modelling]
-summary: 'A reproducible reduced-order modelling study: 480 independently generated velocity fields, held-out reconstruction, and four-cycle frequency forecast.'
+summary: 'A reproducible reduced-order modelling study I ran on FlowLab snapshots: 480 independently generated velocity fields, held-out reconstruction, and a four-cycle frequency forecast.'
 methodLine: 'FlowLab snapshots · POD/SVD · exact DMD · temporal holdout'
 role: 'Numerical methods & software engineering'
 duration: 'Independent study'

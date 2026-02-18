@@ -12,13 +12,6 @@ const { project } = Astro.props;
 const d = project.data;
 const { Content } = await render(project);
 
-const meta = [
-  d.role && { label: 'Role', value: d.role },
-  d.team && { label: 'Team', value: d.team },
-  d.duration && { label: 'Duration', value: d.duration },
-  d.studySequence && { label: 'Chronology', value: `Study ${String(d.studySequence).padStart(2, '0')}` },
-  { label: 'Evidence date', value: new Date(`${d.date}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) },
-].filter(Boolean) as { label: string; value: string }[];
 ---
 
 <Base title={d.title} description={d.summary} image={`/og/projects/${project.id}.png`}>
@@ -28,43 +21,24 @@ const meta = [
       <a href="/projects" class="font-mono text-xs text-muted hover:text-accent">← Projects</a>
       <h1 class="text-3xl md:text-5xl font-medium leading-tight tracking-tight">{d.title}</h1>
       <p class="font-mono text-xs tracking-wider uppercase text-muted">{d.methodLine}</p>
-      <p class="text-lg text-muted leading-relaxed">{d.summary}</p>
+      <p class="text-xl text-warm leading-relaxed">{d.summary}</p>
       <div class="flex flex-wrap gap-2 font-mono text-[10px] tracking-wider uppercase">
         {d.nda && <span class="px-2 py-0.5 rounded-full bg-surface text-muted">NDA-safe write-up</span>}
         {d.tags.map((t) => <span class="px-2 py-0.5 rounded-full bg-accent/5 text-accent/80">{t}</span>)}
       </div>
     </header>
-    {d.academic && (
-      <section class="mb-10 border border-accent/30 bg-accent/5 p-6">
-        <p class="font-mono text-[10px] tracking-widest uppercase text-accent">
-          Course project · {d.academic.institution}
-        </p>
-        <h2 class="mt-3 text-2xl font-medium tracking-tight">{d.academic.assignment}</h2>
-        <p class="mt-2 text-sm text-muted">{d.academic.course}</p>
-        <h3 class="mt-6 font-mono text-[10px] tracking-widest uppercase text-muted">Assignment requirements</h3>
-        <ul class="mt-3 space-y-2 text-sm text-muted">
-          {d.academic.requirements.map((requirement) => (
-            <li class="flex gap-3"><span class="text-accent">→</span><span>{requirement}</span></li>
-          ))}
-        </ul>
-        {d.academic.media.length > 0 && (
-          <div class="mt-6 grid gap-4 sm:grid-cols-2">
-            {d.academic.media.map((media) => (
-              <figure class="overflow-hidden border border-edge bg-bg">
-                <img
-                  src={media.src}
-                  alt={media.alt}
-                  class="h-56 w-full object-contain"
-                  loading="lazy"
-                />
-                <figcaption class="border-t border-edge p-3 font-mono text-[10px] leading-relaxed text-muted">
-                  {media.caption}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        )}
-      </section>
+    {d.academic?.note && (
+      <p class="mb-10 border-l-2 border-accent pl-5 text-lg leading-relaxed text-muted">{d.academic.note}</p>
+    )}
+    {d.academic && d.academic.media.length > 0 && (
+      <div class="mb-10 space-y-10">
+        {d.academic.media.map((media) => (
+          <figure>
+            <img src={media.src} alt={media.alt} class="w-full border border-edge bg-white" loading="lazy" />
+            <figcaption class="mt-2 font-mono text-xs leading-relaxed text-stone">{media.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
     )}
 
 
@@ -75,35 +49,15 @@ const meta = [
     {d.heroImage && (
       <img src={d.heroImage} alt={d.title} class="w-full border border-edge mb-10" loading="lazy" />
     )}
-    <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 border-y border-edge py-5 mb-10">
-      {meta.map((m) => (
-        <div>
-          <dt class="font-mono text-[10px] tracking-widest uppercase text-muted">{m.label}</dt>
-          <dd class="text-sm mt-1">{m.value}</dd>
-        </div>
-      ))}
-    </dl>
-
-    <!-- 3. Hero metrics -->
-    {d.heroMetrics.length > 0 && (
-      <dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12">
-        {d.heroMetrics.map((m) => (
-          <div class="border border-edge bg-surface p-4">
-            <dt class="font-mono text-[10px] tracking-widest uppercase text-muted">{m.label}</dt>
-            <dd class="font-mono text-2xl text-accent mt-1">{m.value}</dd>
-          </div>
-        ))}
-      </dl>
-    )}
 
     <!-- 4-8. Body: Context / Methodology / Results / Validation / Iterations (markdown) -->
-    <div class="prose prose-neutral max-w-none
+    <div class="prose prose-neutral prose-lg max-w-none
       prose-headings:font-medium prose-headings:tracking-tight
-      prose-h2:mt-12 prose-h2:text-2xl
-      prose-p:text-muted prose-li:text-muted
+      prose-h2:mt-12 prose-h2:text-3xl
+      prose-p:leading-[1.6] prose-li:leading-[1.6]
       prose-strong:text-ink prose-a:text-accent
       prose-table:block prose-table:max-w-full prose-table:overflow-x-auto
-      prose-table:font-mono prose-table:text-sm">
+      prose-table:font-mono prose-table:text-base">
       <Content />
     </div>
 

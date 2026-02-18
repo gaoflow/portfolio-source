@@ -5,7 +5,7 @@ date: '2026-08-18'
 status: complete
 categories: [tooling]
 tags: [Python, hydraulics, Darcy–Weisbach, Colebrook, pump curve]
-summary: 'Colebrook friction, series losses and a pump operating point verified by exact identities, residual gates and the Swamee–Jain accuracy band.'
+summary: 'I implemented Colebrook friction, series losses and a pump operating point, verified by exact identities, residual gates and the Swamee–Jain accuracy band.'
 methodLine: 'Darcy–Weisbach · Colebrook Newton solve · series networks · pump intersection'
 role: 'Hydraulics & numerical methods'
 duration: 'Independent study'
