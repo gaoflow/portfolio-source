@@ -51,7 +51,9 @@ The model is backward-facing and quasi-static. The speed profile is fixed first;
 
 **Point-by-point dynamics.** The trajectory is discretised into points (the Spa lap covers 7.0 km of trajectory points in the export). At each point the model sums four resistances:
 
-$$F = \underbrace{m\,a}_{\text{inertia}} + \underbrace{f\,m\,g}_{\text{rolling}} + \underbrace{\tfrac{1}{2}\rho\, C_x S\, v^2}_{\text{aero}} + \underbrace{m\,g\sin\theta}_{\text{grade}}$$
+$$
+\begin{aligned} F &= \underbrace{m\,a}_{\text{inertia}} + \underbrace{f\,m\,g}_{\text{rolling}} \\ &\quad + \underbrace{\tfrac{1}{2}\rho\, C_x S\, v^2}_{\text{aero}} + \underbrace{m\,g\sin\theta}_{\text{grade}} \end{aligned}
+$$
 
 Wheel power is $F \cdot v$; engine power divides by the transmission efficiency (95%). Fuel flow follows from engine efficiency and the fuel's lower heating value; CO₂ follows at 2392 g per litre of petrol. Hybrid variants add an electric machine and battery with their own efficiency chain (battery 0.95, motor 0.90 in my parameterisation), and the PHEV draws the battery down before calling the engine.
 

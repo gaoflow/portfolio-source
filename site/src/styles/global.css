@@ -118,6 +118,10 @@ body {
   overflow-y: hidden;
   padding-block: 0.25rem;
 }
+/* long display math scrolls horizontally instead of wrapping mid-bracket */
+.katex-display > .katex {
+  white-space: nowrap;
+}
 
 /* Lists — Kami ul.dash: brand-coloured markers */
 .prose :where(ul > li)::marker {

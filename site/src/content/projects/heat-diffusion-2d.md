@@ -24,7 +24,9 @@ The heat equation $\partial_t T=\alpha\nabla^2 T$ is the right vehicle: it has a
 
 The domain is a uniform grid of square cells with temperatures at cell centres. The update is explicit FTCS written in face-flux form,
 
-$$T_{j,i}^{n+1}=T_{j,i}^{n}+r\,\big[\Delta T_{x,\,i+1/2}-\Delta T_{x,\,i-1/2}+\Delta T_{y,\,j+1/2}-\Delta T_{y,\,j-1/2}\big],\qquad r=\frac{\alpha\Delta t}{\Delta x^2},$$
+$$
+\begin{aligned} T_{j,i}^{n+1} &= T_{j,i}^{n}+r\,\big[\Delta T_{x,\,i+1/2}-\Delta T_{x,\,i-1/2}\\ &\quad+\Delta T_{y,\,j+1/2}-\Delta T_{y,\,j-1/2}\big], \qquad r=\frac{\alpha\,\Delta t}{\Delta x^2},\end{aligned}
+$$
 
 which makes the conservation property structural: with all boundaries zero-flux, every interior face difference is added to one cell and subtracted from its neighbour as the same floating-point value, so cell-integrated energy is conserved to round-off. Dirichlet boundaries use a linear ghost cell; Neumann boundaries have exactly zero face difference.
 
@@ -34,7 +36,9 @@ Von Neumann analysis gives the amplification factor $g=1-4r(\sin^2\tfrac{k_x\Del
 
 The analytical reference is the transient in a slab with one fixed-temperature face and one insulated face, initialised uniform:
 
-$$\theta(x,t)=\sum_{n=0}^{\infty}\frac{4}{(2n+1)\pi}\sin(\lambda_n x)\,e^{-\alpha\lambda_n^2 t},\qquad \lambda_n=\frac{(2n+1)\pi}{2L},$$
+$$
+\begin{aligned} \theta(x,t)&=\sum_{n=0}^{\infty}\frac{4}{(2n+1)\pi}\sin(\lambda_n x)\,e^{-\alpha\lambda_n^2 t},\\ \lambda_n&=\frac{(2n+1)\pi}{2L},\end{aligned}
+$$
 
 truncated when the term envelope falls below $10^{-14}$, which bounds the neglected tail since $|\sin|\leq1$. The 2-D solve is run quasi-1-D: west face Dirichlet, the other three insulated, on a $100\times20$ grid at $r=0.2$.
 

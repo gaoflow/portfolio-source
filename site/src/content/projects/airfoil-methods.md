@@ -79,7 +79,9 @@ Keeping all 16 points in one test condition prevents an apparently smooth polar 
 
 Cosine spacing concentrates panels at the leading and trailing edges without changing the physical geometry. The Hess–Smith system solves one source strength per panel and one global circulation unknown. Collocation enforces no penetration, while the trailing-edge equation supplies the Kutta condition. Surface tangential velocity then gives
 
-$$C_p=1-\left(V_t/V_\infty\right)^2.$$
+$$
+C_p=1-\left(V_t/V_\infty\right)^2.
+$$
 
 Non-self panel influence uses twelve-point Gauss–Legendre integration; analytical half-jump terms handle the singular self contribution. More panels cannot repair a wrong singular term or Kutta condition: those are correctness questions, not convergence questions.
 

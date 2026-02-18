@@ -78,7 +78,9 @@ The energy audit closes. Initial kinetic energy is $\frac{1}{2}mv^2 = 34.72$ kJ;
 
 The force response shows a first peak near 63 kN and a global peak of about 72.6 kN, then folding oscillations between 26 and 50 kN. Dividing internal energy by crush travel gives the mean crush force:
 
-$$F_{mean} = \frac{\mathrm{ALLIE}}{\Delta x_{crush}} = \frac{11\,952\,000\ \mathrm{N\cdot mm}}{241.8\ \mathrm{mm}} \approx 49.4\ \mathrm{kN}$$
+$$
+\begin{aligned} F_{\text{mean}} &= \frac{\mathrm{ALLIE}}{\Delta x_{\text{crush}}} \\ &= \frac{11\,952\,000\ \mathrm{N\cdot mm}}{241.8\ \mathrm{mm}} \approx 49.4\ \mathrm{kN} \end{aligned}
+$$
 
 That yields SEA = 17.07 kJ/kg and CFE = 68.0% — the reference the geometry stage had to beat. Against the uniform reference geometry run later under the same nominal impact ($F_{max} = 32.5$ kN, $F_{mean} = 7.7$ kN, SEA = 4.09 kJ/kg), this assembly absorbs far more energy in less travel; the report attributes the difference to a different cross-section and folding mode, so we treated the comparison as context rather than a like-for-like verdict.
 

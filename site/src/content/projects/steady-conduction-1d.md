@@ -28,7 +28,9 @@ The rod is split into $N$ uniform cells. Interior nodes use central differences 
 
 The governing equation integrates twice to a closed form,
 
-$$T(x)=T_\text{left}+C_1x-\frac{q'''x^2}{2k},\qquad C_1=\frac{q'''L+\dfrac{h_cq'''L^2}{2k}-h_c(T_\text{left}-T_\infty)}{k+h_cL},$$
+$$
+\begin{aligned} T(x)&=T_{\text{left}}+C_1x-\frac{q'''x^2}{2k},\\ C_1&=\frac{q'''L+\dfrac{h_c\,q'''L^2}{2k}-h_c\,(T_{\text{left}}-T_\infty)}{k+h_cL},\end{aligned}
+$$
 
 derived in the [technical report](/documents/steady-conduction-1d-report.html). That exact solution is the primary validation reference.
 

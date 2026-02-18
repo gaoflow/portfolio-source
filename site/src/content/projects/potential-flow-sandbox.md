@@ -24,11 +24,15 @@ This study closes the analytical fluids set before the later panel and vortex-la
 
 Each elementary flow is a complex potential $W(z)$, $z = x + iy$, with the physical velocity from $dW/dz = u - iv$:
 
-$$W_{\text{uniform}} = Uz, \quad W_{\text{source}} = \frac{m}{2\pi}\ln z, \quad W_{\text{doublet}} = \frac{\mu}{2\pi z}, \quad W_{\text{vortex}} = \frac{i\Gamma}{2\pi}\ln z .$$
+$$
+\begin{aligned} W_{\text{uniform}} &= Uz, & W_{\text{source}} &= \frac{m}{2\pi}\ln z,\\ W_{\text{doublet}} &= \frac{\mu}{2\pi z}, & W_{\text{vortex}} &= \frac{i\Gamma}{2\pi}\ln z.\end{aligned}
+$$
 
 Superposing the stream, a doublet of moment $\mu = 2\pi U R^2$, and the vortex gives cylinder flow with circulation:
 
-$$W(z) = U\!\left(z + \frac{R^2}{z}\right) + \frac{i\Gamma}{2\pi}\ln z .$$
+$$
+W(z) = U\!\left(z + \frac{R^2}{z}\right) + \frac{i\Gamma}{2\pi}\ln z .
+$$
 
 The linearity that permits this superposition is the same linearity the panel and vortex-lattice methods exploit; the difference is that here the superposed field has a closed form, so the implementation can be tested to machine precision rather than to experimental scatter.
 
