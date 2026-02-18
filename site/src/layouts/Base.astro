@@ -1,8 +1,6 @@
 ---
-import '../styles/global.css';
 import 'katex/dist/katex.min.css';
-import katexMainWoff2 from 'katex/dist/fonts/KaTeX_Main-Regular.woff2?url';
-import katexMathWoff2 from 'katex/dist/fonts/KaTeX_Math-Italic.woff2?url';
+import '../styles/global.css'; /* after KaTeX: our @font-face overrides win */
 import '@fontsource/source-serif-4/400.css';
 import '@fontsource/source-serif-4/500.css';
 import '@fontsource/source-serif-4/600.css';
@@ -55,8 +53,8 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta name="description" content={description} />
     <link rel="canonical" href={Astro.url} />
     <link rel="icon" type="image/png" href="/avatar_cats1.png" />
-    <link rel="preload" href={katexMainWoff2} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={katexMathWoff2} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="apple-touch-icon" href="/avatar_cats1.png" />
     <link rel="alternate" type="application/rss+xml" title="Bing Gao — Engineering Notes" href="/rss.xml" />
     <meta property="og:type" content="website" />
