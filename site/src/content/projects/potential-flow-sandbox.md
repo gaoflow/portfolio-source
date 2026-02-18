@@ -25,7 +25,7 @@ This study closes the analytical fluids set before the later panel and vortex-la
 Each elementary flow is a complex potential $W(z)$, $z = x + iy$, with the physical velocity from $dW/dz = u - iv$:
 
 $$
-\begin{aligned} W_{\text{uniform}} &= Uz, & W_{\text{source}} &= \frac{m}{2\pi}\ln z,\\ W_{\text{doublet}} &= \frac{\mu}{2\pi z}, & W_{\text{vortex}} &= \frac{i\Gamma}{2\pi}\ln z.\end{aligned}
+\begin{aligned} W_{\text{uniform}} &= Uz, & W_{\text{source}} &= \frac{m}{2\pi}\ln z,\\[0.5em] W_{\text{doublet}} &= \frac{\mu}{2\pi z}, & W_{\text{vortex}} &= \frac{i\Gamma}{2\pi}\ln z.\end{aligned}
 $$
 
 Superposing the stream, a doublet of moment $\mu = 2\pi U R^2$, and the vortex gives cylinder flow with circulation:
