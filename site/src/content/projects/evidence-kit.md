@@ -4,20 +4,10 @@ year: 2026
 date: '2026-08-20'
 status: complete
 categories: [tooling, validation]
-tags: [Python, JSON Pointer, SHA-256, reporting, reproducibility]
+tags: [Coding]
 summary: 'I built a manifest-driven audit layer tying every public claim on this site to a metric, gate, source and hashed artifact — 76 of 76 claims currently pass.'
-methodLine: 'JSON manifests · typed gates · RFC 6901 pointers · SHA-256 · HTML/CSV/JSON'
 role: 'Tooling & technical communication'
 duration: 'Independent build'
-heroMetrics:
-  - { label: 'Studies audited', value: '17' }
-  - { label: 'Claims', value: '76/76' }
-  - { label: 'Artifacts', value: '54' }
-  - { label: 'Interface', value: '1 call' }
-keyOutputs:
-  - 'Reduced the caller interface to one catalog build while hiding pointer resolution, typed comparisons, path containment, hashing, and multi-format publication.'
-  - 'Dogfooded the same module across seventeen numerical studies; all 76 declared gates pass against 54 project artifacts.'
-  - 'Preserves failed claims in reports and exits nonzero instead of selectively publishing successful metrics.'
 featured: false
 order: 3
 studySequence: 19
@@ -33,7 +23,7 @@ Evidence Kit turns those relationships into data. Each study declares claims, JS
 
 This dashboard is generated from the same manifests that gate publication. Open any study to inspect observed values, thresholds, source roles, artifact sizes, and SHA-256 fingerprints.
 
-<iframe src="/evidence/" title="Portfolio evidence catalog" style="width:100%;height:760px;border:1px solid #233226;background:#08111f" loading="lazy"></iframe>
+<iframe src="/evidence/" title="Portfolio evidence catalog" style="width:100%;height:760px;border:1px solid #d9d2c4;background:#f5efe2" loading="lazy"></iframe>
 
 ## One public call
 

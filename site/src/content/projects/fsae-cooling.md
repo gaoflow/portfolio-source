@@ -4,26 +4,11 @@ year: 2025
 date: '2025-12-20'
 status: complete
 categories: [fsae, validation]
-tags: [Python, finite volume, thermal, hydraulics]
+tags: [Thermal]
 summary: 'I coupled fan, radiator, pump and transient coolant models and rejected our shortlisted E3 cooling hardware before procurement or production CFD: hydraulics pass, the inverter temperature boundary fails.'
-methodLine: 'System curves · transient finite volume · numerical convergence'
 role: 'Thermal Systems & Numerical Modelling'
 team: 'Vinci Eco Drive — ESILV FSAE'
 duration: 'Independent study'
-heroMetrics:
-  - label: 'Loop flow'
-    value: '10.03 L/min'
-  - label: 'Motor branch'
-    value: '4.16 L/min'
-  - label: 'Baseline KW26 inlet'
-    value: '59.45 °C'
-  - label: 'Decision'
-    value: 'NO-GO'
-keyOutputs:
-  - 'Coupled air-side and liquid-side operating points'
-  - '80-cell transient coolant finite-volume model'
-  - '20/40/80/160-cell and time-step convergence'
-  - 'Replacement-architecture decision gates'
 featured: false
 order: 2
 studySequence: 5

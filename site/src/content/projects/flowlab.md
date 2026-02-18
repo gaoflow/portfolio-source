@@ -4,20 +4,10 @@ year: 2026
 date: '2026-05-16'
 status: complete
 categories: [tooling, validation]
-tags: [JavaScript, D2Q9, LBM, BGK, V&V]
+tags: [CFD]
 summary: 'I wrote a dependency-free lattice-Boltzmann solver that runs in Node.js and the browser, validated against canonical lid-driven-cavity data on three grids.'
-methodLine: 'D2Q9 · BGK collision · halfway bounce-back · Ghia et al. benchmark'
 role: 'Numerical methods & software engineering'
 duration: 'Independent study'
-heroMetrics:
-  - { label: 'Finest grid', value: '64²' }
-  - { label: 'u RMSE', value: '0.00286' }
-  - { label: 'v RMSE', value: '0.00202' }
-  - { label: 'Mass drift', value: '2.56e−12' }
-keyOutputs:
-  - 'Implemented collision, streaming, moving-wall momentum correction, convergence monitoring, and benchmark interpolation without numerical dependencies.'
-  - 'Reduced streamwise centerline RMSE from 0.00511 to 0.00286 across 32², 48², and 64² grids.'
-  - 'Kept one solver core for automated Node.js validation and a live browser experience.'
 featured: false
 order: 5
 studySequence: 14
@@ -34,7 +24,7 @@ The publication gates were fixed before release: three converged grids, less tha
 
 The upper boundary moves to the right and transfers momentum into the cavity. Change Reynolds number or switch between speed and vorticity. The higher-Reynolds-number options are exploratory; the published quantitative validation is restricted to $Re=100$.
 
-<iframe src="/labs/flowlab/" title="Interactive FlowLab lattice-Boltzmann solver" style="width:100%;height:720px;border:1px solid #233226;background:#0f172a" loading="lazy"></iframe>
+<iframe src="/labs/flowlab/" title="Interactive FlowLab lattice-Boltzmann solver" style="width:100%;height:720px;border:1px solid #d9d2c4;background:#f5efe2" loading="lazy"></iframe>
 
 ## Methodology
 

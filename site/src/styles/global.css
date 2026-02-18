@@ -28,28 +28,69 @@
 
 body {
   @apply bg-bg text-ink font-sans antialiased;
+  line-height: 1.55;
 }
 
 ::selection {
   background: #d7e1ee; /* ink blue at ~12% over parchment, solid */
 }
 
-/* Editorial section label, mono caps */
+/* Section label — Kami eyebrow: serif 12px / 500 / +1.2px / stone / caps */
 .section-label {
-  @apply font-mono text-xs tracking-[0.2em] uppercase;
+  @apply font-serif text-xs font-medium tracking-[0.1em] uppercase;
   color: var(--color-stone);
 }
 
-/* Subtle scroll reveal — the only global animation */
-@keyframes rise {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: none; }
+/* Section number — Kami .section-num: serif 500, ink blue */
+.section-num {
+  @apply font-serif text-sm font-medium;
+  color: var(--color-accent);
+  letter-spacing: 0.4px;
 }
-.reveal {
-  animation: rise 0.5s ease both;
+
+/* Solid tag swatch — Kami forbids rgba tag fills */
+.tag {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  color: var(--color-accent);
+  background: var(--color-tag);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+/* Buttons — Kami .btn */
+.btn {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: box-shadow 0.2s;
+}
+.btn-secondary {
+  background: var(--color-sand);
+  color: var(--color-warm);
+  box-shadow: 0 0 0 1px var(--color-edge);
+}
+.btn-secondary:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* Page entrance — Kami fadeIn, the only global animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: fadeIn 0.4s ease-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  .reveal { animation: none; }
+  .page-enter { animation: none; }
 }
 
 /* Figures: every article image takes its own row, full width, hairline frame */
@@ -64,10 +105,10 @@ body {
   margin-block: 2rem;
 }
 .prose :where(figcaption) {
-  font-family: var(--font-mono);
+  font-family: var(--font-serif);
   font-size: 12px;
-  line-height: 1.5;
-  color: var(--color-stone);
+  line-height: 1.45;
+  color: var(--color-olive, var(--color-muted));
   margin-top: 0.5rem;
 }
 
@@ -78,10 +119,93 @@ body {
   padding-block: 0.25rem;
 }
 
-/* Prose robustness on narrow viewports: long paths/code must wrap, tables scroll */
+/* Lists — Kami ul.dash: brand-coloured markers */
+.prose :where(ul > li)::marker {
+  color: var(--color-accent);
+}
+.prose :where(ol > li)::marker {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+/* Blockquote — Kami .quote: 2px brand rule, olive, never italic */
+.prose :where(blockquote) {
+  border-left: 2px solid var(--color-accent);
+  padding: 4px 0 4px 14px;
+  color: var(--color-muted);
+  font-style: normal;
+  quotes: none;
+}
+.prose :where(blockquote p)::before,
+.prose :where(blockquote p)::after {
+  content: none;
+}
+
+/* Tables — Kami decision table: serif body, uppercase stone heads, soft rules */
+.prose :where(table) {
+  font-family: var(--font-serif);
+  font-size: 0.95em;
+}
+.prose :where(thead th) {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--color-stone);
+  border-bottom: 1px solid var(--color-edge);
+}
+.prose :where(tbody td) {
+  border-bottom: 1px solid var(--color-edge-soft);
+}
+.prose :where(tbody tr:last-child td) {
+  border-bottom: none;
+}
+
+/* Inline code — Kami .prose code: ivory swatch, hairline, radius 4px */
 .prose :where(code):not(pre code) {
   overflow-wrap: anywhere;
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--color-warm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-edge-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-weight: 400;
 }
+.prose :where(code):not(pre code)::before,
+.prose :where(code):not(pre code)::after {
+  content: none;
+}
+
+/* Code blocks — Kami .code: ivory card, hairline, radius 6px; keep Shiki
+   github-light token colours, override only the canvas */
+.prose :where(pre), .astro-code {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-edge);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* Links — Kami .prose a: brand, medium, underline on hover */
+.prose :where(a):not(:where(.not-prose a)) {
+  color: var(--color-accent);
+  font-weight: 500;
+  text-decoration: none;
+}
+.prose :where(a):hover:not(:where(.not-prose a)) {
+  text-decoration: underline;
+}
+
+/* Strong locked to W05 — no synthetic bold */
+.prose :where(strong) {
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+/* Prose robustness on narrow viewports: tables scroll */
 .prose table {
   display: block;
   max-width: 100%;

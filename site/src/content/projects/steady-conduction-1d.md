@@ -4,20 +4,10 @@ year: 2026
 date: '2026-01-17'
 status: complete
 categories: [validation]
-tags: [Python, NumPy, finite differences, heat conduction, verification]
+tags: [CFD]
 summary: 'I solved a generating rod by finite differences and a Thomas algorithm, then checked it with an exact solution, second-order MMS convergence and energy closure.'
-methodLine: 'Central differences · half-cell Robin tip · Thomas algorithm · manufactured solutions'
 role: 'Heat transfer & numerical methods'
 duration: 'Independent study'
-heroMetrics:
-  - { label: 'Nodal error, N=160', value: '1.34e-11 K' }
-  - { label: 'Observed order', value: '2.0002' }
-  - { label: 'Energy residual', value: '1.59e-12' }
-  - { label: 'Thomas vs dense', value: '1.1e-16' }
-keyOutputs:
-  - 'Discretised the steady 1-D conduction equation with a Dirichlet wall, a half-control-volume convective tip, and uniform volumetric generation, and solved the tridiagonal system with a Thomas algorithm written from scratch.'
-  - 'Derived the closed-form exact solution and showed the scheme reproduces it to roundoff — then explained why that makes a manufactured source necessary for a genuine grid-convergence study (observed order 2.0002 over N=20/40/80/160).'
-  - 'Closed the global energy balance to a relative residual of 1.59e-12 and cross-checked the tridiagonal solver against a NumPy dense solve at 1.1e-16 on 64 randomized systems.'
 featured: false
 order: 12
 studySequence: 6

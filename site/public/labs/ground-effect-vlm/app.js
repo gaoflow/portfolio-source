@@ -35,13 +35,13 @@ function drawScene() {
   const halfSpan = width * 0.31;
   const chord = Math.max(18, width * 0.055);
 
-  ctx.strokeStyle = '#16283d'; ctx.lineWidth = 1;
+  ctx.strokeStyle = '#eef1f5'; ctx.lineWidth = 1;
   for (let x = 0; x < width; x += 42) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); }
   for (let y = 0; y < height; y += 42) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
 
-  ctx.strokeStyle = '#fb923c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(width, groundY); ctx.stroke();
-  ctx.fillStyle = 'rgba(251,146,60,.06)'; ctx.fillRect(0, groundY, width, height - groundY);
-  ctx.fillStyle = '#8190a5'; ctx.font = '11px ui-monospace, monospace'; ctx.fillText('z = 0 / MOVING GROUND', 10, groundY - 10);
+  ctx.strokeStyle = '#c2410c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(width, groundY); ctx.stroke();
+  ctx.fillStyle = 'rgba(194,65,12,.08)'; ctx.fillRect(0, groundY, width, height - groundY);
+  ctx.fillStyle = '#57534a'; ctx.font = '11px ui-monospace, monospace'; ctx.fillText('z = 0 / MOVING GROUND', 10, groundY - 10);
 
   function wing(y, colour, alpha, image = false) {
     ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = colour; ctx.strokeStyle = colour; ctx.lineWidth = 1.5;
@@ -52,11 +52,11 @@ function drawScene() {
     ctx.fillStyle = colour; ctx.font = '10px ui-monospace, monospace'; ctx.fillText(image ? '−Γ IMAGE' : '+Γ REAL', centreX - 24, y - chord - 7);
     ctx.restore();
   }
-  wing(wingY, '#5eead4', 0.95, false); wing(imageY, '#fb923c', 0.26, true);
+  wing(wingY, '#1b365d', 0.95, false); wing(imageY, '#c2410c', 0.26, true);
 
-  ctx.setLineDash([5, 5]); ctx.strokeStyle = '#8190a5'; ctx.beginPath(); ctx.moveTo(centreX, wingY); ctx.lineTo(centreX, groundY); ctx.stroke(); ctx.setLineDash([]);
-  ctx.fillStyle = '#e5edf6'; ctx.font = '12px ui-monospace, monospace'; ctx.fillText(`h/c ${currentCase.height.toFixed(currentCase.height < 1 ? 2 : 1)}`, centreX + 8, (wingY + groundY) / 2);
-  ctx.fillStyle = '#8190a5'; ctx.font = '10px ui-monospace, monospace'; ctx.fillText('IMAGE CONSTRUCTION — NOT TO SCALE', 10, height - 12);
+  ctx.setLineDash([5, 5]); ctx.strokeStyle = '#57534a'; ctx.beginPath(); ctx.moveTo(centreX, wingY); ctx.lineTo(centreX, groundY); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle = '#1a1a18'; ctx.font = '12px ui-monospace, monospace'; ctx.fillText(`h/c ${currentCase.height.toFixed(currentCase.height < 1 ? 2 : 1)}`, centreX + 8, (wingY + groundY) / 2);
+  ctx.fillStyle = '#57534a'; ctx.font = '10px ui-monospace, monospace'; ctx.fillText('IMAGE CONSTRUCTION — NOT TO SCALE', 10, height - 12);
 }
 
 function drawChart() {
@@ -64,7 +64,7 @@ function drawChart() {
   ctx.clearRect(0, 0, width, height);
   const margin = { left: 45, right: 16, top: 20, bottom: 38 };
   const plotWidth = width - margin.left - margin.right; const plotHeight = height - margin.top - margin.bottom;
-  ctx.strokeStyle = '#213147'; ctx.lineWidth = 1; ctx.fillStyle = '#8190a5'; ctx.font = '10px ui-monospace, monospace';
+  ctx.strokeStyle = '#e5e3d8'; ctx.lineWidth = 1; ctx.fillStyle = '#57534a'; ctx.font = '10px ui-monospace, monospace';
   for (let i = 0; i <= 4; i++) {
     const y = margin.top + plotHeight * i / 4; ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(width - margin.right, y); ctx.stroke();
     ctx.fillText((1 - i / 4).toFixed(2), 7, y + 3);
@@ -73,13 +73,13 @@ function drawChart() {
     const x = margin.left + (tick + .5) * plotWidth; ctx.beginPath(); ctx.moveTo(x, margin.top); ctx.lineTo(x, height - margin.bottom); ctx.stroke();
     ctx.fillText(tick.toFixed(2), x - 14, height - 15);
   }
-  ctx.strokeStyle = '#5eead4'; ctx.lineWidth = 2.2; ctx.beginPath();
+  ctx.strokeStyle = '#1b365d'; ctx.lineWidth = 2.2; ctx.beginPath();
   currentCase.span.forEach((span, index) => {
     const x = margin.left + (span + .5) * plotWidth;
     const y = margin.top + (1 - currentCase.circulation[index]) * plotHeight;
     index ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
   }); ctx.stroke();
-  ctx.fillStyle = '#8190a5'; ctx.fillText('y/b', width - 38, height - 15); ctx.save(); ctx.translate(12, 90); ctx.rotate(-Math.PI / 2); ctx.fillText('Γ / Γmax', 0, 0); ctx.restore();
+  ctx.fillStyle = '#57534a'; ctx.fillText('y/b', width - 38, height - 15); ctx.save(); ctx.translate(12, 90); ctx.rotate(-Math.PI / 2); ctx.fillText('Γ / Γmax', 0, 0); ctx.restore();
 }
 
 function update() {

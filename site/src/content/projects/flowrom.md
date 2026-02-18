@@ -4,20 +4,10 @@ year: 2026
 date: '2026-05-30'
 status: complete
 categories: [validation, tooling]
-tags: [Python, NumPy, POD, DMD, reduced-order modelling]
+tags: [CFD]
 summary: 'A reproducible reduced-order modelling study I ran on FlowLab snapshots: 480 independently generated velocity fields, held-out reconstruction, and a four-cycle frequency forecast.'
-methodLine: 'FlowLab snapshots · POD/SVD · exact DMD · temporal holdout'
 role: 'Numerical methods & software engineering'
 duration: 'Independent study'
-heroMetrics:
-  - { label: 'Snapshots', value: '480' }
-  - { label: 'POD rank 8', value: '0.123%' }
-  - { label: 'Compression', value: '48.8×' }
-  - { label: 'DMD forecast', value: '0.100%' }
-keyOutputs:
-  - 'Built POD and exact-DMD routines from NumPy primitives, with synthetic known-rank and known-frequency behavioral tests.'
-  - 'Reserved four complete forcing cycles for temporal holdout; rank-8 POD reached 0.123% fluctuation reconstruction error.'
-  - 'Recovered the imposed frequency to 0.00093% relative error and forecast the full held-out velocity state to 0.100% error.'
 featured: false
 order: 4
 studySequence: 15
@@ -34,7 +24,7 @@ The parent data source is the [FlowLab lattice-Boltzmann solver](/projects/flowl
 
 Choose a retained POD rank and scrub from the training interval into the held-out cycles. Both canvases share one fixed speed scale; the frame error is computed on the full two-component velocity field, not on the displayed downsampled magnitude.
 
-<iframe src="/labs/flowrom/?v=1" title="Interactive FlowROM POD rank explorer" style="width:100%;height:620px;border:1px solid #233226;background:#08111f" loading="lazy"></iframe>
+<iframe src="/labs/flowrom/?v=1" title="Interactive FlowROM POD rank explorer" style="width:100%;height:620px;border:1px solid #d9d2c4;background:#f5efe2" loading="lazy"></iframe>
 
 ## Data and split
 

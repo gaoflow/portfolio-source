@@ -4,21 +4,10 @@ year: 2026
 date: '2026-02-07'
 status: complete
 categories: [validation]
-tags: [Python, NumPy, heat equation, FTCS, stability, V&V]
+tags: [CFD]
 summary: 'My explicit FTCS heat-diffusion solver matches the analytical slab transient to 1.38e−5 and refuses any run outside its r≤0.25 stability bound.'
-methodLine: 'FTCS · finite-volume flux form · slab series · stability gate'
 role: 'Numerical methods & validation'
 duration: 'Independent study'
-heroMetrics:
-  - { label: 'L∞ error vs series', value: '1.38e−5' }
-  - { label: 'Temporal order', value: '1.017' }
-  - { label: 'Energy drift', value: '0.0' }
-  - { label: 'Stability limit', value: 'r ≤ 0.25' }
-keyOutputs:
-  - 'Implemented a cell-centred finite-volume FTCS solver with Dirichlet and zero-flux Neumann boundaries on uniform square grids.'
-  - 'Validated the quasi-1-D transient against the analytical slab series: L∞ error 1.38e−5 against a 5e−5 gate.'
-  - 'Isolated first-order time integration (observed order 1.017) and exact energy conservation under full insulation.'
-  - 'Made the stability bound a hard contract: an attempted r = 0.26 run is refused and logged before integration.'
 featured: false
 order: 15
 studySequence: 7

@@ -16,17 +16,17 @@ const { Content } = await render(note);
 <Base title={d.title} description={d.summary}>
   <article class="mx-auto max-w-3xl px-6 pt-16 pb-24">
     <header class="mb-10 space-y-5">
-      <a href="/notes" class="font-mono text-xs text-muted hover:text-accent">← Engineering Notes</a>
-      <p class="font-mono text-[10px] tracking-widest uppercase text-accent">Technical note</p>
+      <a href="/notes" class="font-serif text-xs text-stone transition-colors hover:text-accent">← Engineering Notes</a>
+      <p class="section-label">Technical note</p>
       <h1 class="text-3xl font-medium leading-tight tracking-tight md:text-5xl">{d.title}</h1>
               <p class="text-lg leading-relaxed text-muted">{d.summary}</p>
         {d.image && <img src={d.image} alt={d.title} class="aspect-video w-full border border-edge object-cover" />}
-        <div class="flex flex-wrap items-center gap-3 border-y border-edge py-4 font-mono text-[10px] tracking-wider uppercase text-muted">
+        <div class="flex flex-wrap items-center gap-3 border-y border-edge-soft py-4 font-serif text-xs text-stone">
         <span class="text-ink/80">{profile.name}</span>
         <span aria-hidden="true">·</span>
         <time datetime={d.published.toISOString()}>{d.published.toISOString().slice(0, 10)}</time>
         <span aria-hidden="true">·</span>
-        {d.tags.map((tag) => <span class="text-accent/80">{tag}</span>)}
+        {d.tags.map((tag) => <span class="tag">{tag}</span>)}
       </div>
     </header>
 
@@ -34,9 +34,7 @@ const { Content } = await render(note);
       prose-headings:font-medium prose-headings:tracking-tight
       prose-h2:mt-12 prose-h2:text-2xl
       prose-p:text-muted prose-li:text-muted
-      prose-strong:text-ink prose-a:text-accent
-      prose-table:block prose-table:max-w-full prose-table:overflow-x-auto
-      prose-table:font-mono prose-table:text-sm">
+      prose-strong:text-ink ">
       <Content />
     </div>
 

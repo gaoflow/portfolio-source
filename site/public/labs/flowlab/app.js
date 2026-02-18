@@ -57,7 +57,7 @@ function render() {
   offscreenContext.putImageData(pixels, 0, 0);
   context.imageSmoothingEnabled = false;
   context.drawImage(offscreen, 0, 0, canvas.width, canvas.height);
-  context.strokeStyle = '#5eead4';
+  context.strokeStyle = '#1b365d';
   context.lineWidth = 3;
   context.beginPath();
   context.moveTo(24, 16);

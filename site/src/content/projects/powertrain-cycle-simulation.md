@@ -4,9 +4,8 @@ year: 2025
 date: '2025-12-06'
 status: complete
 categories: [tooling, validation]
-tags: [driving cycles, longitudinal dynamics, PHEV, CO₂, Excel, pandas]
+tags: [Coding]
 summary: 'In my simulation a charged PHEV uses 1.43 l/100km on the Spa ECO lap versus 10.27 for the ICE; an empty battery makes it the thirstiest case.'
-methodLine: 'Point-by-point longitudinal dynamics · Excel cycle simulators · Spa ECO/SPORT + NEDC'
 role: 'Solo project'
 duration: '4 weeks'
 academic:
@@ -26,15 +25,6 @@ academic:
     - src: '/images/projects/powertrain-cycle-simulation/spa-eco-profile.svg'
       alt: 'Spa ECO speed and elevation profiles plotted against lap distance'
       caption: 'The actual Spa input is highly nonuniform. Every acceleration, braking zone and elevation change feeds the point-by-point model.'
-heroMetrics:
-  - { label: 'Powertrains × cycles', value: '4 × 3' }
-  - { label: 'PHEV fuel, Spa ECO', value: '1.43 l/100km' }
-  - { label: 'Empty-battery PHEV', value: '11.32 l/100km' }
-keyOutputs:
-  - 'Ran ICE, HEV, PHEV, and BEV variants of one reference car over Spa-Francorchamps ECO/SPORT and NEDC speed profiles in the instructor-provided Excel simulators.'
-  - 'Measured PHEV fuel use against initial battery charge on Spa ECO: 0 l/100km full, 10.9 l/100km empty.'
-  - 'Isolated the empty-battery penalty: a flat PHEV burns 2–9× more fuel than a charged one, depending on the cycle.'
-  - 'Post-processed the simulator CSV exports with pandas and regenerated every chart from the summary workbooks.'
 featured: false
 order: 20
 studySequence: 4

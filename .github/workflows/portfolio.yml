@@ -47,5 +47,11 @@ jobs:
       - name: Check local links and assets
         run: python3 site/scripts/check_static_links.py site/dist
 
-      - name: Check every math expression rendered
-        run: python3 site/scripts/check_math.py site/dist
+      - name: Check nothing leaked through markdown rendering
+        run: python3 site/scripts/check_rendering.py site/dist
+
+      - name: Check no dark-background images ship
+        run: python3 site/scripts/check_assets.py site/public/images
+
+      - name: Check no dark UI blocks ship
+        run: python3 site/scripts/check_dark_ui.py site/dist

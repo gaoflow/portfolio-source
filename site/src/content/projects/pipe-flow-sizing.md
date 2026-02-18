@@ -4,20 +4,10 @@ year: 2025
 date: '2025-11-29'
 status: complete
 categories: [tooling]
-tags: [Python, hydraulics, Darcy–Weisbach, Colebrook, pump curve]
+tags: [CFD]
 summary: 'I implemented Colebrook friction, series losses and a pump operating point, verified by exact identities, residual gates and the Swamee–Jain accuracy band.'
-methodLine: 'Darcy–Weisbach · Colebrook Newton solve · series networks · pump intersection'
 role: 'Hydraulics & numerical methods'
 duration: 'Independent study'
-heroMetrics:
-  - { label: 'Colebrook residual', value: '<3.6e-15' }
-  - { label: 'Swamee–Jain deviation', value: '2.83%' }
-  - { label: 'Loop operating flow', value: '26.22 L/min' }
-  - { label: 'Intersection residual', value: '2.2e-11 Pa' }
-keyOutputs:
-  - 'Implemented the laminar 64/Re branch and a Newton Colebrook solver with a Haaland initial guess; 150-point residual grid peaks at 3.6e-15.'
-  - 'Cross-checked turbulent friction factors against the explicit Swamee–Jain formula inside its published ±3% band — observed maximum 2.83% — and restricted the comparison to the declared validity range.'
-  - 'Solved a series cooling loop and its pump operating point (26.22 L/min at 51.34 kPa), confirmed against an independent brute-force scan bracket.'
 featured: false
 order: 13
 studySequence: 3

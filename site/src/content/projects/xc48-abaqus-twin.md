@@ -4,9 +4,8 @@ year: 2026
 date: '2026-04-04'
 status: complete
 categories: [validation, design]
-tags: [Abaqus, Dynamic Explicit, tensile test, XC48 steel, ductile damage, Python]
+tags: [FEA]
 summary: 'We rebuilt an XC48 tensile test in Abaqus Explicit to R²=0.9663; the low measured modulus and the failed Static General path remain visible.'
-methodLine: 'Tensile test · engineering→true conversion · Abaqus Explicit · mesh/solver/amplitude sensitivity'
 role: 'Data post-processing & report toolchain'
 team: 'ESILV MMN1 group — Nicolas Chang, Bing Gao, Sabin Karn, Nithor Bhowmik'
 duration: '8 weeks'
@@ -30,16 +29,6 @@ academic:
     - src: '/images/projects/xc48-abaqus-twin/solver-comparison.svg'
       alt: 'R squared comparison across four meshes and the Static General solver'
       caption: 'The middle-density M2 mesh gives the best retained fit. More mesh or a nominally simpler static solve does not improve agreement.'
-heroMetrics:
-  - { label: 'Twin vs test R²', value: '0.9663' }
-  - { label: 'Engineering UTS', value: '766.12 MPa' }
-  - { label: 'Necking area reduction', value: '47.8%' }
-  - { label: 'Explicit run', value: '71,965 incr / 77 s' }
-keyOutputs:
-  - 'Built the data pipeline from raw machine output to the Abaqus material card: engineering → true → plastic stress-strain, in pandas.'
-  - 'Ranked four meshes, two solvers, and three loading amplitudes by R² against the experiment; the mid-density M2 mesh won at 0.9663.'
-  - 'Showed Static General stalls on the softening branch while Dynamic Explicit with Smooth Step loading follows necking to rupture, with ALLKE/ALLIE under 5% before fracture.'
-  - 'Kept the measured 12.28 GPa modulus as-is and documented it as a machine-compliance artifact rather than calibrating it away.'
 featured: false
 order: 19
 studySequence: 11

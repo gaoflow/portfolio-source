@@ -4,9 +4,8 @@ year: 2026
 date: '2026-03-12'
 status: complete
 categories: [component-cfd, validation]
-tags: [ANSYS Fluent, transient CFD, vortex shedding, cylinder flow, V&V]
+tags: [CFD]
 summary: 'I triggered the Re=150 Kármán street with a velocity perturbation; the measured St=0.155 passes its gate while coarse-mesh dissipation leaves 29% drag error.'
-methodLine: 'ANSYS Fluent · steady Re=40 · transient Re=150 · symmetry-breaking patch · force monitors'
 role: 'Simulation & report lead'
 team: 'ESILV MMN1 group — Bing Gao, Nicolas Chang, Daphné Baray'
 duration: '4 weeks'
@@ -27,16 +26,6 @@ academic:
     - src: '/images/projects/fluent-cylinder-vortex/vortex-evolution.gif'
       alt: 'Animated sequence of the cylinder wake developing into a staggered vortex street'
       caption: 'Four retained Fluent frames show the imposed asymmetry growing into the developed Kármán street.'
-heroMetrics:
-  - { label: 'Drag error vs experiment', value: '29.3%' }
-  - { label: 'Strouhal, measured', value: '0.155' }
-  - { label: 'Final Cd, Re=150', value: '0.923' }
-  - { label: 'Shedding period', value: '6.44 s' }
-keyOutputs:
-  - 'Triggered the Kármán street on demand by patching a +0.2 m/s y-velocity into the downstream quadrant, breaking the symmetry that otherwise delays shedding.'
-  - 'Ran the steady Re=40 case on a 20,200-node quad mesh to full convergence: 53 iterations, residuals below 1e-6, mass imbalance 5.8e-9 kg/s.'
-  - 'Measured final Cd = 0.923 at Re=150 against an experimental chart value of ~1.6 (29.3% low) and tied the bias to numerical dissipation; the Re=40 case showed the same signature at 26.9% low.'
-  - 'Rebuilt the force history by digitizing the archived Fluent monitors, verified the endpoints against the exported force reports, and extracted St = 0.155 from the lift signal.'
 featured: true
 order: 17
 studySequence: 9

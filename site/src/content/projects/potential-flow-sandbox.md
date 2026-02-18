@@ -4,20 +4,10 @@ year: 2025
 date: '2025-11-08'
 status: complete
 categories: [component-cfd]
-tags: [Python, NumPy, potential flow, complex potential, circulation, RK4]
+tags: [CFD]
 summary: 'I implemented the classical elementary flows as complex potentials, superposed them into cylinder flow with circulation, and verified every available analytical identity.'
-methodLine: 'Complex potentials · superposition · circulation · RK4 streamlines'
 role: 'Aerodynamics fundamentals'
 duration: 'Independent build'
-heroMetrics:
-  - { label: 'Cp error', value: '2.66e-15' }
-  - { label: 'Stagnation error', value: '8.9e-16 rad' }
-  - { label: 'Γ recovery error', value: '8.9e-16' }
-  - { label: 'RK4 order', value: '4.003' }
-keyOutputs:
-  - 'Implemented uniform, source/sink, doublet, and vortex complex potentials and superposed cylinder flow with circulation; surface Cp matches 1 − 4 sin²θ to 2.7×10⁻¹⁵.'
-  - 'Recovered the imposed circulation from a contour integral of the velocity field to 8.9×10⁻¹⁶ and matched the Kutta–Joukowski lift L′ = ρUΓ exactly in sign and magnitude.'
-  - 'Verified fixed-step RK4 streamline tracing against the analytical streamfunction: 2.6×10⁻¹² maximum drift at step 0.01 with observed fourth-order convergence.'
 featured: false
 order: 14
 studySequence: 2

@@ -4,20 +4,10 @@ year: 2026
 date: '2026-02-28'
 status: complete
 categories: [validation, tooling]
-tags: [Python, Hess–Smith, NACA 0012, panel method, NASA]
+tags: [CFD]
 summary: 'I tested thin-airfoil and geometry-resolved panel methods against a single traceable NASA wind-tunnel series, and left the stall and drag failures visible.'
-methodLine: 'Thin-airfoil theory · Prandtl–Glauert · Hess–Smith · NASA TM-4074'
 role: 'Aerodynamic methods & validation'
 duration: 'Independent study'
-heroMetrics:
-  - { label: 'NASA points', value: '16' }
-  - { label: 'Linear Cl RMSE', value: '0.0824' }
-  - { label: 'Panel convergence', value: '0.0307%' }
-  - { label: 'Public source', value: 'TM-4074' }
-keyOutputs:
-  - 'Implemented cosine-spaced NACA geometry and a Hess–Smith source/vortex solver with quadrature, self-jump terms, and a Kutta condition.'
-  - 'Validated lift only inside a declared attached-flow range; 160-to-240-panel lift changed by 0.0307% at four degrees.'
-  - 'Showed the inviscid model beside measured wake drag and stall rather than presenting structurally unavailable outputs as weak predictions.'
 featured: false
 order: 7
 studySequence: 8
@@ -34,7 +24,7 @@ The selected source is Table I of Charles L. Ladson's [NASA TM-4074](https://ntr
 
 Move from the linear range toward stall. The upper view maps Hess–Smith surface pressure; the lower view keeps NASA measurements, the panel result, and thin-airfoil theory on one set of axes.
 
-<iframe src="/labs/airfoil-methods/" title="Interactive NACA 0012 airfoil model hierarchy" style="width:100%;height:760px;border:1px solid #233226;background:#08111f" loading="lazy"></iframe>
+<iframe src="/labs/airfoil-methods/" title="Interactive NACA 0012 airfoil model hierarchy" style="width:100%;height:760px;border:1px solid #d9d2c4;background:#f5efe2" loading="lazy"></iframe>
 
 ## Three levels, three capability boundaries
 
@@ -75,15 +65,6 @@ The drag comparison is even clearer. NASA wake-survey $C_d$ rises from about 0.0
 Cropping either failure would have been easy: truncate the comparison at the declared linear range, omit the drag curve, and the panel method reads as uniformly successful. The evidence pack does the opposite. The acceptance criteria require near-zero inviscid pressure drag and measured drag above 0.02 to coexist in the same output, so the blind spot cannot be edited out silently later.
 
 ![Measured drag beside the inviscid blind spot](/images/projects/airfoil-methods/drag-blind-spot.svg)
-
-## What this demonstrates
-
-- choosing one traceable experimental series before interpreting errors;
-- separating code verification, discretisation evidence, and measurement validation;
-- matching claims to the governing model rather than to the requested plot;
-- recognising when a simpler model better predicts one integral quantity;
-- stating what requires a boundary-layer model or viscous CFD next.
-
 ## Reproduce
 
 `python3 -m unittest discover -s tests -v` exercises the geometry and solver contracts. `python3 scripts/analyse.py` regenerates every metric and figure and exits nonzero if any acceptance gate fails. The [technical report](/documents/airfoil-methods-report.html) records equations, provenance, interpretation, and limitations.

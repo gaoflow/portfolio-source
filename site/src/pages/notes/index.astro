@@ -17,18 +17,18 @@ const notes = (await getCollection('notes')).sort(
 
     <div class="grid gap-5">
       {notes.map((note, index) => (
-        <a href={`/notes/${note.id}`} class="group border border-edge bg-surface/40 p-6 transition-colors hover:border-accent/50">
+        <a href={`/notes/${note.id}`} class="group border border-edge bg-surface p-6 transition-shadow hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)]">
           {note.data.image && (
             <img src={note.data.image} alt={note.data.title} loading="lazy" decoding="async" class="mb-5 aspect-video w-full border border-edge object-cover" />
           )}
-          <div class="flex flex-wrap items-center justify-between gap-3 font-mono text-[10px] tracking-widest uppercase text-muted">
-            <span>Note {String(index + 1).padStart(2, '0')}</span>
+          <div class="flex flex-wrap items-center justify-between gap-3 font-serif text-xs text-stone">
+            <span><span class="section-num">{String(index + 1).padStart(2, '0')}</span></span>
             <span>{profile.name} · <time datetime={note.data.published.toISOString()}>{note.data.published.toISOString().slice(0, 10)}</time></span>
           </div>
           <h2 class="mt-4 text-2xl font-medium tracking-tight group-hover:text-accent">{note.data.title}</h2>
           <p class="mt-3 max-w-3xl text-lg leading-relaxed text-muted">{note.data.summary}</p>
-          <div class="mt-5 flex flex-wrap gap-2 font-mono text-[10px] tracking-wider uppercase text-accent/80">
-            {note.data.tags.map((tag) => <span>{tag}</span>)}
+          <div class="mt-5 flex flex-wrap gap-2">
+            {note.data.tags.map((tag) => <span class="tag">{tag}</span>)}
           </div>
         </a>
       ))}

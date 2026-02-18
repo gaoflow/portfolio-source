@@ -31,7 +31,7 @@ const codeOf = (id: string) => {
       {filters.map((f, i) => (
         <button
           data-filter={f.key}
-          class="filter-btn font-mono text-xs uppercase tracking-wider px-3 py-1.5 border border-edge text-muted transition-colors hover:text-ink data-[on]:border-accent data-[on]:text-accent"
+          class="filter-btn font-serif text-xs px-3 py-1.5 border border-edge text-muted transition-colors hover:text-ink data-[on]:border-accent data-[on]:text-accent"
           {...(i === 0 ? { 'data-on': '' } : {})}
         >
           {f.label}
@@ -39,20 +39,20 @@ const codeOf = (id: string) => {
       ))}
     </div>
 
-    <div class="border border-edge bg-surface/40" data-grid>
+    <div class="border border-edge bg-surface" data-grid>
       {projects.map((p, i) => (
         <a
           href={`/projects/${p.id}`}
           data-categories={[...p.data.categories, ...(p.data.academic ? ['course-project'] : [])].join(' ')}
-          class="group grid grid-cols-[36px_1fr_auto] items-center gap-4 border-b border-edge px-4 py-4 transition-colors last:border-b-0 hover:bg-white/[0.03] sm:grid-cols-[44px_104px_1fr_150px]"
+          class="group grid grid-cols-[36px_1fr_auto] items-center gap-4 border-b border-edge-soft px-4 py-4 transition-shadow last:border-b-0 hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)] sm:grid-cols-[44px_104px_1fr_150px]"
         >
-          <span class="font-mono text-xs text-muted tabular-nums">{String(i + 1).padStart(2, '0')}</span>
-          <span class="hidden font-mono text-[11px] uppercase tracking-wider text-best sm:block">{codeOf(p.id)}</span>
+          <span class="font-serif text-sm font-medium text-accent tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+          <span class="hidden font-serif text-xs text-stone sm:block">{codeOf(p.id)}</span>
           <span class="min-w-0">
             <span class="font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
             <span class="mt-1 hidden text-base leading-relaxed text-muted sm:block">{p.data.summary}</span>
           </span>
-          <span class="text-right font-mono text-[11px] uppercase tracking-wider text-muted tabular-nums">
+          <span class="text-right font-serif text-xs text-stone tabular-nums">
             {new Date(`${p.data.date}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
           </span>
         </a>

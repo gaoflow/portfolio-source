@@ -4,9 +4,8 @@ year: 2026
 date: '2026-03-28'
 status: complete
 categories: [design, validation]
-tags: [Abaqus, Explicit dynamics, crashworthiness, FGT, energy absorption]
+tags: [FEA]
 summary: 'In our Abaqus/Explicit front-rail campaign, aluminium won the material screen, and an FGT multi-cell layout absorbed 95.6% of impact energy at 2.56× the classic section''s SEA.'
-methodLine: 'Abaqus/Explicit · dynamic crush · SEA / Fmax / CFE · functionally graded thickness'
 role: 'Wall-impact study & report assembly'
 team: 'ESILV MMN1 group — Nicolas Chang, Daphné Baray, Bing Gao, Immanuella Castro'
 duration: '6 weeks'
@@ -30,15 +29,6 @@ academic:
     - src: '/images/projects/abaqus-energy-absorber/geometry-comparison.svg'
       alt: 'Specific and total absorbed energy for classic uniform and functionally graded absorber geometries'
       caption: 'The uniform redesign fails; the FGT multi-cell concept is the only geometry that materially increases SEA and total absorbed energy.'
-heroMetrics:
-  - { label: 'KE absorbed (FGT)', value: '95.6%' }
-  - { label: 'SEA (FGT)', value: '12.30 kJ/kg' }
-  - { label: 'Mean crush force', value: '215 kN' }
-keyOutputs:
-  - 'Material screening across steel, HSS, aluminium, and magnesium; aluminium selected on peak force and weight-normalized SEA.'
-  - 'Barrier-crash baseline (1 mm Al, 30 km/h): SEA 17.07 kJ/kg, CFE 68%, energy closure 34.70 ± 0.02 kJ.'
-  - 'Wall-impact study (steel / Al 6061 / Ti-6Al-4V / PP): Al 6061 lowest Fmax at 102 kN and best metal SEA at 50.8 kJ/kg.'
-  - 'FGT multi-cell geometry absorbs 33.20 of 34.72 kJ (95.6%) with SEA 12.30 kJ/kg, 2.56× the classic baseline.'
 featured: false
 order: 18
 studySequence: 10

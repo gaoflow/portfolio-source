@@ -11,20 +11,20 @@ const elements = {
   nasaCl: document.querySelector('#nasa-cl'),
   regime: document.querySelector('#regime'),
 };
-const colours = { grid: '#26364d', text: '#94a3b8', panel: '#5eead4', nasa: '#fb923c', thin: '#94a3b8' };
+const colours = { grid: '#d9d2c4', text: '#57534a', panel: '#1b365d', nasa: '#c2410c', thin: '#57534a' };
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const mix = (a, b, amount) => a.map((value, index) => Math.round(value + (b[index] - value) * amount));
 function cpColour(cp) {
   if (cp < 0) {
-    const value = mix([30, 41, 78], [94, 234, 212], clamp(-cp / 2.5, 0, 1));
+    const value = mix([255, 255, 255], [94, 234, 212], clamp(-cp / 2.5, 0, 1));
     return `rgb(${value.join(',')})`;
   }
-  const value = mix([30, 41, 78], [251, 146, 60], clamp(cp / 1.1, 0, 1));
+  const value = mix([255, 255, 255], [251, 146, 60], clamp(cp / 1.1, 0, 1));
   return `rgb(${value.join(',')})`;
 }
 function frame(context, width, height) {
   context.clearRect(0, 0, width, height);
-  context.fillStyle = '#0b1424';
+  context.fillStyle = '#ffffff';
   context.fillRect(0, 0, width, height);
 }
 function drawSurface(index) {
@@ -59,11 +59,11 @@ function drawSurface(index) {
   context.fillRect(margin + 102, 19, 100, 14);
   context.fillStyle = colours.text;
   context.fillText('0', margin + 224, 34);
-  context.fillStyle = '#1e294e';
+  context.fillStyle = '#e8e6dc';
   context.fillRect(margin + 246, 19, 65, 14);
   context.fillStyle = colours.text;
   context.fillText('+1.1', margin + 334, 34);
-  context.fillStyle = '#fb923c';
+  context.fillStyle = '#c2410c';
   context.fillRect(margin + 398, 19, 100, 14);
 }
 function drawLift(index) {
@@ -104,12 +104,12 @@ function drawLift(index) {
     context.beginPath(); context.arc(x(point.alpha), y(point.cl), 6, 0, Math.PI * 2); context.fill();
   }
   const alpha = data.alphas[index];
-  context.strokeStyle = '#f8fafc';
+  context.strokeStyle = '#1a1a18';
   context.lineWidth = 2;
   context.setLineDash([6, 7]);
   context.beginPath(); context.moveTo(x(alpha), plot.top); context.lineTo(x(alpha), plot.bottom); context.stroke();
   context.setLineDash([]);
-  context.fillStyle = '#f8fafc';
+  context.fillStyle = '#1a1a18';
   context.beginPath(); context.arc(x(alpha), y(data.panelLift[index]), 7, 0, Math.PI * 2); context.fill();
   context.fillStyle = colours.text;
   context.fillText('α [deg]', plot.right - 70, canvas.height - 12);

@@ -3,7 +3,7 @@ title: 'A Failed Mesh Is Engineering Data, Not a Missing Screenshot'
 image: /images/notes/covers/mesh-failure-is-engineering-data.svg
 published: 2026-07-30
 summary: 'How to turn repeated full-car meshing failures into a bounded diagnosis, reject unsafe solver launches, and specify the topology change required for the next campaign.'
-tags: [OpenFOAM, snappyHexMesh, topology, NO-GO]
+tags: [OpenFOAM]
 sourceProjects: [f1-2026-aero]
 featured: true
 order: 3

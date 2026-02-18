@@ -26,7 +26,7 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
     <dl class="mt-10 space-y-3 border-l border-edge pl-4">
       {profile.capabilities.map((c) => (
         <div>
-          <dt class="font-mono text-[10px] uppercase tracking-widest text-muted">{c.label}</dt>
+          <dt class="font-serif text-xs font-medium uppercase tracking-[0.1em] text-stone">{c.label}</dt>
           <dd class="text-base text-ink/85">{c.value}</dd>
         </div>
       ))}
@@ -41,16 +41,16 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
   {/* 3. Projects — the full catalogue, oldest first */}
   <section class="mt-20">
     <div class="mb-5 flex items-baseline justify-between">
-      <h2 class="section-label">Projects</h2>
-      <span class="font-mono text-xs text-muted tabular-nums">{projects.length}</span>
+      <h2 class="section-label"><span class="section-num mr-2">01</span>Projects</h2>
+      <span class="font-serif text-xs text-stone tabular-nums">{projects.length}</span>
     </div>
-    <div class="border border-edge bg-surface/40">
+    <div class="border border-edge bg-surface">
       {projects.map((p, i) => (
         <a
           href={`/projects/${p.id}`}
-          class="group grid grid-cols-[28px_1fr] items-center gap-4 border-b border-edge px-4 py-4 transition-colors last:border-b-0 hover:bg-white/[0.03] sm:grid-cols-[36px_144px_1fr_auto]"
+          class="group grid grid-cols-[28px_1fr] items-center gap-4 border-b border-edge-soft px-4 py-4 transition-shadow last:border-b-0 hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)] sm:grid-cols-[36px_144px_1fr_auto]"
         >
-          <span class="font-mono text-xs text-muted tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+          <span class="font-serif text-sm font-medium text-accent tabular-nums">{String(i + 1).padStart(2, '0')}</span>
           {p.data.heroImage ? (
             <img
               src={p.data.heroImage}
@@ -61,14 +61,14 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
             />
           ) : (
             <span class="hidden aspect-video w-full items-center justify-center border border-edge bg-surface font-mono text-[10px] uppercase tracking-widest text-muted sm:flex">
-              {p.data.methodLine.split('·')[0].trim()}
+              {p.data.tags[0]}
             </span>
           )}
           <span class="min-w-0">
             <span class="font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
             <span class="mt-1 line-clamp-2 block text-base leading-relaxed text-muted">{p.data.summary}</span>
           </span>
-          <span class="hidden font-mono text-xs text-muted whitespace-nowrap sm:block">{fmt(p.data.date)}</span>
+          <span class="hidden font-serif text-xs text-stone whitespace-nowrap tabular-nums sm:block">{fmt(p.data.date)}</span>
         </a>
       ))}
     </div>
@@ -78,14 +78,14 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
   {notes.length > 0 && (
     <section class="mt-20">
       <div class="mb-5 flex items-baseline justify-between">
-        <h2 class="section-label">Engineering notes</h2>
-        <a href="/notes/" class="font-mono text-xs uppercase tracking-wider text-muted transition-colors hover:text-accent">All notes →</a>
+        <h2 class="section-label"><span class="section-num mr-2">02</span>Engineering notes</h2>
+        <a href="/notes/" class="font-serif text-xs text-stone transition-colors hover:text-accent transition-colors hover:text-accent">All notes →</a>
       </div>
-      <div class="border border-edge bg-surface/40">
+      <div class="border border-edge bg-surface">
         {notes.map((n) => (
           <a
             href={`/notes/${n.id}`}
-            class="group grid grid-cols-[1fr] items-center gap-4 border-b border-edge px-4 py-4 transition-colors last:border-b-0 hover:bg-white/[0.03] sm:grid-cols-[144px_1fr_auto]"
+            class="group grid grid-cols-[1fr] items-center gap-4 border-b border-edge-soft px-4 py-4 transition-shadow last:border-b-0 hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)] sm:grid-cols-[144px_1fr_auto]"
           >
             <img
               src={n.data.image}
@@ -98,7 +98,7 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
               <span class="block font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{n.data.title}</span>
               <span class="mt-1 line-clamp-2 block text-base leading-relaxed text-muted">{n.data.summary}</span>
             </span>
-            <span class="hidden font-mono text-xs text-muted whitespace-nowrap sm:block">
+            <span class="hidden font-serif text-xs text-stone whitespace-nowrap tabular-nums sm:block">
               {n.data.published.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
             </span>
           </a>

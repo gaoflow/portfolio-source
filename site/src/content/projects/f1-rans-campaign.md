@@ -4,20 +4,10 @@ year: 2026
 date: '2026-08-09'
 status: complete
 categories: [full-car, validation]
-tags: [OpenFOAM, RANS, k-omega SST, sensitivity, HPC]
+tags: [CFD]
 summary: 'My 4.35M-cell OpenFOAM pilot campaign completed 23 variants and retained nine valid sensitivity results, with mesh uncertainty and two diverged roughness runs kept visible.'
-methodLine: 'Half-car RANS · moving ground · rotating wheels · component forces · validity gates'
 role: 'Sole engineer'
 duration: 'Pilot campaign complete'
-heroMetrics:
-  - { label: 'Campaign variants', value: '23' }
-  - { label: 'Valid comparison set', value: '9' }
-  - { label: 'Pilot mesh', value: '4.35M cells' }
-  - { label: 'Runtime / variant', value: '2.5–3 h' }
-keyOutputs:
-  - 'Automated STEP-to-result queue with mesh, mass-balance, force-window and failure-retention gates.'
-  - 'Nine valid variants across mesh, turbulence, roughness, wall-resolution and tyre-layer sensitivity.'
-  - 'Retained two diverged roughness cases and an OOM fine mesh instead of folding them into comparisons.'
 featured: true
 order: 21
 studySequence: 18

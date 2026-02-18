@@ -4,18 +4,10 @@ year: 2026
 date: '2026-06-15'
 status: complete
 categories: [design]
-tags: [Blender, glTF, 3D]
+tags: [Design]
 summary: 'Five version lines — two abandoned — turned my Blender blockout into a ±6 mm Space Rider reconstruction and a 579 KB interactive GLB.'
-methodLine: 'Blender · bpy/bmesh pipeline · blueprint-calibrated remapping · glTF/Draco'
 role: 'Modeller'
 duration: '1 semester'
-heroMetrics:
-  - { label: 'Format', value: 'glTF/GLB' }
-  - { label: 'Web bundle', value: '579 KB' }
-keyOutputs:
-  - 'Reconstructed a real aerospace vehicle from public blueprint views and the ESA payload guide.'
-  - 'Published the v5.051 model as a web-native GLB with a verified blue solar-array PBR material.'
-  - 'Reduced transfer size from 14.05 MB to 579 KB with non-simplifying Draco compression.'
 featured: true
 order: 8
 studySequence: 16

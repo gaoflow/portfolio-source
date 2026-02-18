@@ -68,25 +68,25 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   <body class="min-h-screen">
     <!-- Pit Wall top status bar -->
     <div class="sticky top-0 z-40 border-b border-edge bg-bg/90 backdrop-blur">
-      <div class="mx-auto flex h-14 max-w-6xl items-center gap-5 px-6 font-mono text-[11px] uppercase tracking-[0.14em] lg:px-8">
-        <a href="/" class="font-semibold tracking-[0.2em] text-ink">{profile.name}</a>
+      <div class="mx-auto flex h-14 max-w-6xl items-center gap-5 px-6 text-sm lg:px-8">
+        <a href="/" class="font-medium text-ink">{profile.name}</a>
         <span class="hidden text-muted sm:inline">{profile.role}</span>
         <nav class="ml-auto flex items-center gap-4 sm:gap-5">
           {nav.map((n) => (
-            <a href={n.href} class:list={['transition-colors', path === n.href ? 'text-accent' : 'text-muted hover:text-ink']}>
+            <a href={n.href} class:list={['transition-colors', path === n.href ? 'text-accent' : 'text-stone hover:text-accent']}>
               {n.label}
             </a>
           ))}
-          <a href={profile.cvUrl} class="border border-edge px-2.5 py-1 text-muted transition-colors hover:border-accent/50 hover:text-accent">CV</a>
+          <a href={profile.cvUrl} class="btn btn-secondary">CV</a>
         </nav>
       </div>
     </div>
 
-    <main class="mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
+    <main class="page-enter mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
       <slot />
-      <footer class="mt-20 flex flex-wrap justify-between gap-3 border-t border-edge pt-6 font-mono text-[11px] tracking-wider text-muted">
+      <footer class="mt-20 flex flex-wrap justify-between gap-3 border-t border-edge-soft pt-6 text-xs text-stone">
         <span>{profile.name} · {profile.role}</span>
-        <span>Built with Astro</span>
+        <span>UI design thanks to <a href="https://github.com/tw93/Kami" target="_blank" rel="noopener noreferrer" class="text-warm transition-colors hover:text-accent">Kami</a></span>
       </footer>
     </main>
   </body>

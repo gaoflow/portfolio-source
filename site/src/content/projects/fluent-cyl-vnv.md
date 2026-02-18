@@ -4,9 +4,8 @@ year: 2026
 date: '2026-04-11'
 status: complete
 categories: [component-cfd, validation]
-tags: [ANSYS Fluent, cylinder drag, mesh independence, domain sensitivity, Poiseuille]
+tags: [CFD]
 summary: 'Poiseuille flow validated within 1%; my cylinder mesh and domain sweeps converged at Cd 2.7973, but only Re=20 met the 5% experimental gate.'
-methodLine: 'ANSYS Fluent · steady laminar · mesh/domain plateaus · handout benchmark'
 role: 'Simulation & report lead'
 team: 'ESILV MMN1 group — Bing Gao, Nicolas Chang, Daphné Baray'
 duration: '7 weeks (TD1+TD4)'
@@ -30,15 +29,6 @@ academic:
     - src: '/images/projects/fluent-cyl-vnv/pressure-re20.png'
       alt: 'ANSYS Fluent static-pressure contour around the cylinder at Reynolds number 20'
       caption: 'Pressure peaks at the upstream stagnation point and falls around the shoulders; this field explains the integrated pressure-drag result.'
-heroMetrics:
-  - { label: 'Plateau Cd at Re 10', value: '2.7973' }
-  - { label: 'Mesh plateau', value: '<0.1% past 40k cells' }
-  - { label: 'Domain plateau', value: '<1% at D2 ≥ 100 m' }
-  - { label: 'Handout gap at Re 20', value: '3.83%' }
-keyOutputs:
-  - 'Validated the Fluent workflow on a Re=100 pipe first: centreline velocity 1.98 vs 2.00 m/s analytical, wall shear 0.08 Pa, and entrance length 2.4 m all matching Poiseuille theory.'
-  - 'Ran Workbench design-point sweeps at Re=10: drag plateaus past 40,000 cells (<0.1%) and past D2=100 m (<1%), fixing the reference setup at Cd=2.7973.'
-  - 'Swept six Reynolds numbers (0.1–20) on one fixed grid, overlaid the handout experimental drag curve, and showed the 5% margin holds only at Re=20 (3.83%) — with the low-Re bias traced to grid and modelling limits rather than tuned away.'
 featured: true
 order: 16
 studySequence: 12

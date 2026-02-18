@@ -3,7 +3,7 @@ title: 'Ground Effect Needs a Fidelity Ladder, Not One Impressive Contour'
 image: /images/notes/covers/ground-effect-fidelity-ladder.svg
 published: 2026-08-05
 summary: 'A model-selection guide from image vortices to moving-ground RANS, showing which ground-effect questions each rung can answer and where its authority ends.'
-tags: [ground effect, VLM, RANS, model hierarchy]
+tags: [CFD]
 sourceProjects: [ground-effect-vlm, airfoil-methods, f1-2026-aero]
 featured: false
 order: 4

@@ -3,7 +3,7 @@ title: 'Combustion Course Notes — Jet Combustor Thermochemistry'
 image: /images/notes/covers/jet-combustor-thermochemistry.svg
 published: 2026-05-21
 summary: 'First-principles thermochemistry of a jet combustor burning n-dodecane: stoichiometry, Hess-law heating values, and adiabatic flame temperatures at lambda = 1 and lambda = 2 with 700 K compressor preheat, every figure verified against NIST data by a script.'
-tags: [combustion, thermochemistry, jet engine, course notes]
+tags: [Combustion]
 sourceProjects: []
 featured: false
 order: 7

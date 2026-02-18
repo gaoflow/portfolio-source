@@ -3,7 +3,7 @@ title: 'From CFD Claim to Auditable Evidence'
 image: /images/notes/covers/from-cfd-claim-to-auditable-evidence.svg
 published: 2026-08-22
 summary: 'A small evidence-manifest pattern that connects every public engineering number to generated data, an explicit acceptance rule, provenance, and a reproducible command.'
-tags: [reproducibility, evidence manifest, automation, technical portfolio]
+tags: [Coding]
 sourceProjects: [evidence-kit, flowlab, flowrom, airfoil-methods, ground-effect-vlm, fsae-cooling, f1-2026-aero]
 featured: false
 order: 6
