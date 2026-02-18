@@ -1,7 +1,7 @@
 ---
 title: 'XC48 Tensile Twin — Experiment to Abaqus Explicit'
 year: 2026
-date: '2026-03-28'
+date: '2026-04-04'
 status: complete
 categories: [validation, design]
 tags: [Abaqus, Dynamic Explicit, tensile test, XC48 steel, ductile damage, Python]
@@ -42,7 +42,7 @@ keyOutputs:
   - 'Kept the measured 12.28 GPa modulus as-is and documented it as a machine-compliance artifact rather than calibrating it away.'
 featured: false
 order: 19
-studySequence: 4
+studySequence: 11
 heroImage: /images/projects/xc48-abaqus-twin/stress-strain.svg
 ---
 

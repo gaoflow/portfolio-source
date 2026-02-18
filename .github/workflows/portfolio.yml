@@ -46,3 +46,6 @@ jobs:
 
       - name: Check local links and assets
         run: python3 site/scripts/check_static_links.py site/dist
+
+      - name: Check every math expression rendered
+        run: python3 site/scripts/check_math.py site/dist

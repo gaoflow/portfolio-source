@@ -1,7 +1,7 @@
 ---
 title: 'Ground Effect VLM — Image-Vortex Ride-Height Study'
 year: 2026
-date: '2026-08-10'
+date: '2026-04-25'
 status: complete
 categories: [validation, tooling]
 tags: [Python, NumPy, VLM, potential flow, ground effect]
@@ -19,7 +19,7 @@ keyOutputs:
   - 'Separated the defensible mechanism result from race-car claims the inviscid one-row model cannot support.'
 featured: false
 order: 6
-studySequence: 12
+studySequence: 13
 heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg
 ---
 

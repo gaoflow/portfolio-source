@@ -1,7 +1,7 @@
 ---
 title: 'Steady 1-D Conduction — First Discretised PDE'
 year: 2026
-date: '2026-08-18'
+date: '2026-01-17'
 status: complete
 categories: [validation]
 tags: [Python, NumPy, finite differences, heat conduction, verification]
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Closed the global energy balance to a relative residual of 1.59e-12 and cross-checked the tridiagonal solver against a NumPy dense solve at 1.1e-16 on 64 randomized systems.'
 featured: false
 order: 12
-studySequence: 16
+studySequence: 6
 heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg
 ---
 

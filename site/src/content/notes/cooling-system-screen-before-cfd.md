@@ -1,7 +1,7 @@
 ---
 title: 'FSAE Cooling — From Reference Hunting to a NO-GO Decision'
 image: /images/notes/covers/cooling-system-screen-before-cfd.svg
-published: 2026-08-18
+published: 2025-12-28
 summary: 'How I turned a legacy cooling report, manufacturer limits and incomplete component curves into a traceable model that rejected our passive E3 concept before procurement.'
 tags: [FSAE, cooling, hydraulics, thermal modelling]
 sourceProjects: [fsae-cooling]

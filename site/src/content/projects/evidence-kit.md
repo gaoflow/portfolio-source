@@ -1,7 +1,7 @@
 ---
 title: 'Evidence Kit — Claims, Gates & Artifact Hashes'
 year: 2026
-date: '2026-08-10'
+date: '2026-08-20'
 status: complete
 categories: [tooling, validation]
 tags: [Python, JSON Pointer, SHA-256, reporting, reproducibility]
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Preserves failed claims in reports and exits nonzero instead of selectively publishing successful metrics.'
 featured: false
 order: 3
-studySequence: 9
+studySequence: 19
 ---
 
 ## Context & objective

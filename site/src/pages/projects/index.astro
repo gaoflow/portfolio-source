@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
 const projects = (await getCollection('projects')).sort(
-  (a, b) => a.data.date.localeCompare(b.data.date) || (a.data.studySequence ?? 999) - (b.data.studySequence ?? 999) || a.data.order - b.data.order,
+  (a, b) => b.data.date.localeCompare(a.data.date) || (b.data.studySequence ?? 0) - (a.data.studySequence ?? 0) || a.data.order - b.data.order,
 );
 
 const filters = [
@@ -26,7 +26,7 @@ const codeOf = (id: string) => {
 <Base title="Projects">
   <section class="pt-4 pb-20">
     <h1 class="section-label mb-2">Projects · full catalogue</h1>
-    <p class="mb-10 max-w-2xl text-muted">Oldest first, using evidence-backed completion or publication dates. Study numbers record chronology; they no longer imply a manufactured month-by-month learning history.</p>
+    <p class="mb-10 max-w-2xl text-muted">Newest first — from the current F1 campaign back to my first-semester toolkit, September 2025.</p>
     <div class="mb-8 flex flex-wrap gap-2" data-filters>
       {filters.map((f, i) => (
         <button

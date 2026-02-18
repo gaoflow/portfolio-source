@@ -1,7 +1,7 @@
 ---
 title: 'Pipe Flow Sizing — Verified Hydraulics Primitives'
-year: 2026
-date: '2026-08-18'
+year: 2025
+date: '2025-11-29'
 status: complete
 categories: [tooling]
 tags: [Python, hydraulics, Darcy–Weisbach, Colebrook, pump curve]
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Solved a series cooling loop and its pump operating point (26.22 L/min at 51.34 kPa), confirmed against an independent brute-force scan bracket.'
 featured: false
 order: 13
-studySequence: 17
+studySequence: 3
 heroImage: /images/projects/pipe-flow-sizing/moody.svg
 ---
 

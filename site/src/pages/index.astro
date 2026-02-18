@@ -5,10 +5,10 @@ import { profile } from '../data/profile';
 import { getCollection } from 'astro:content';
 
 const projects = (await getCollection('projects')).sort(
-  (a, b) => a.data.date.localeCompare(b.data.date) || (a.data.studySequence ?? 999) - (b.data.studySequence ?? 999) || a.data.order - b.data.order,
+  (a, b) => b.data.date.localeCompare(a.data.date) || (b.data.studySequence ?? 0) - (a.data.studySequence ?? 0) || a.data.order - b.data.order,
 );
 const notes = (await getCollection('notes')).sort(
-  (a, b) => a.data.published.valueOf() - b.data.published.valueOf() || a.data.order - b.data.order,
+  (a, b) => b.data.published.valueOf() - a.data.published.valueOf() || a.data.order - b.data.order,
 );
 const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 ---

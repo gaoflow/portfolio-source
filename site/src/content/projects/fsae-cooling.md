@@ -1,7 +1,7 @@
 ---
 title: 'FSAE Cooling System — Coupled Screening Study'
-year: 2026
-date: '2026-08-09'
+year: 2025
+date: '2025-12-20'
 status: complete
 categories: [fsae, validation]
 tags: [Python, finite volume, thermal, hydraulics]
@@ -26,7 +26,7 @@ keyOutputs:
   - 'Replacement-architecture decision gates'
 featured: false
 order: 2
-studySequence: 7
+studySequence: 5
 heroImage: '/images/projects/fsae-cooling/thermal-screen.svg'
 ---
 

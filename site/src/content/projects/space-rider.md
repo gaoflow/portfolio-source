@@ -1,7 +1,7 @@
 ---
 title: 'ESA Space Rider — From Blockout to Blueprint-Exact'
 year: 2026
-date: '2026-08-14'
+date: '2026-06-15'
 status: complete
 categories: [design]
 tags: [Blender, glTF, 3D]
@@ -18,7 +18,7 @@ keyOutputs:
   - 'Reduced transfer size from 14.05 MB to 579 KB with non-simplifying Draco compression.'
 featured: true
 order: 8
-studySequence: 13
+studySequence: 16
 model3d: /models/space-rider.glb
 heroImage: /images/projects/space-rider-blueprint.png
 ---

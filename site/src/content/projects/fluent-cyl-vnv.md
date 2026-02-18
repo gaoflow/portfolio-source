@@ -1,7 +1,7 @@
 ---
 title: 'Fluent Cylinder V&V — Mesh, Domain & Reynolds Sweeps'
 year: 2026
-date: '2026-03-29'
+date: '2026-04-11'
 status: complete
 categories: [component-cfd, validation]
 tags: [ANSYS Fluent, cylinder drag, mesh independence, domain sensitivity, Poiseuille]
@@ -41,7 +41,7 @@ keyOutputs:
   - 'Swept six Reynolds numbers (0.1–20) on one fixed grid, overlaid the handout experimental drag curve, and showed the 5% margin holds only at Re=20 (3.83%) — with the low-Re bias traced to grid and modelling limits rather than tuned away.'
 featured: true
 order: 16
-studySequence: 5
+studySequence: 12
 heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
 ---
 

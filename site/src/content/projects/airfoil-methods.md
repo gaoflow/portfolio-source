@@ -1,7 +1,7 @@
 ---
 title: 'Airfoil Methods — Low-Order Models vs NASA'
 year: 2026
-date: '2026-08-10'
+date: '2026-02-28'
 status: complete
 categories: [validation, tooling]
 tags: [Python, Hess–Smith, NACA 0012, panel method, NASA]

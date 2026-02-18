@@ -39,7 +39,7 @@ keyOutputs:
   - 'Rebuilt the force history by digitizing the archived Fluent monitors, verified the endpoints against the exported force reports, and extracted St = 0.155 from the lift signal.'
 featured: true
 order: 17
-studySequence: 2
+studySequence: 9
 heroImage: /images/projects/fluent-cylinder-vortex/force-history.svg
 ---
 

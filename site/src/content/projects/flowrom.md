@@ -1,7 +1,7 @@
 ---
 title: 'FlowROM — POD & DMD of Unsteady Flow Fields'
 year: 2026
-date: '2026-08-10'
+date: '2026-05-30'
 status: complete
 categories: [validation, tooling]
 tags: [Python, NumPy, POD, DMD, reduced-order modelling]
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Recovered the imposed frequency to 0.00093% relative error and forecast the full held-out velocity state to 0.100% error.'
 featured: false
 order: 4
-studySequence: 11
+studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg
 ---
 

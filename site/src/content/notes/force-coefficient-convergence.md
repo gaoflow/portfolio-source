@@ -1,7 +1,7 @@
 ---
 title: 'When Is a Force Coefficient Actually Converged?'
 image: /images/notes/covers/force-coefficient-convergence.svg
-published: 2026-08-18
+published: 2026-08-02
 summary: 'A reproducible route from raw OpenFOAM force histories to a declared averaging window, uncertainty interval, and an honest decision about what the coefficients can support.'
 tags: [OpenFOAM, forceCoeffs, uncertainty, batch means]
 sourceProjects: [f1-2026-aero]

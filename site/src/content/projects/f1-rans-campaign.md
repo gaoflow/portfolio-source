@@ -1,7 +1,7 @@
 ---
 title: 'F1 RANS Pilot — 23 Variants, 9 Valid Sensitivity Results'
 year: 2026
-date: '2026-08-16'
+date: '2026-08-09'
 status: complete
 categories: [full-car, validation]
 tags: [OpenFOAM, RANS, k-omega SST, sensitivity, HPC]
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Retained two diverged roughness cases and an OOM fine mesh instead of folding them into comparisons.'
 featured: true
 order: 21
-studySequence: 14
+studySequence: 18
 heroImage: /images/projects/f1-rans-campaign/campaign-map.svg
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: 'Heat Diffusion 2-D — Explicit FTCS with a Hard Stability Gate'
 year: 2026
-date: '2026-08-18'
+date: '2026-02-07'
 status: complete
 categories: [validation]
 tags: [Python, NumPy, heat equation, FTCS, stability, V&V]
@@ -21,7 +21,7 @@ keyOutputs:
   - 'Made the stability bound a hard contract: an attempted r = 0.26 run is refused and logged before integration.'
 featured: false
 order: 15
-studySequence: 19
+studySequence: 7
 heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
 ---
 

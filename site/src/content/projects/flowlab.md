@@ -1,7 +1,7 @@
 ---
 title: 'FlowLab — Browser-Native Lattice-Boltzmann Validation'
 year: 2026
-date: '2026-08-10'
+date: '2026-05-16'
 status: complete
 categories: [tooling, validation]
 tags: [JavaScript, D2Q9, LBM, BGK, V&V]
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Kept one solver core for automated Node.js validation and a live browser experience.'
 featured: false
 order: 5
-studySequence: 10
+studySequence: 14
 heroImage: /images/projects/flowlab/cavity-vorticity.svg
 ---
 

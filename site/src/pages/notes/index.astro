@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 import { profile } from '../../data/profile';
 
 const notes = (await getCollection('notes')).sort(
-  (a, b) => a.data.order - b.data.order || b.data.published.getTime() - a.data.published.getTime(),
+  (a, b) => b.data.published.getTime() - a.data.published.getTime() || a.data.order - b.data.order,
 );
 ---
 

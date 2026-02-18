@@ -37,7 +37,7 @@ keyOutputs:
   - 'Post-processed the simulator CSV exports with pandas and regenerated every chart from the summary workbooks.'
 featured: false
 order: 20
-studySequence: 1
+studySequence: 4
 heroImage: /images/projects/powertrain-cycle-simulation/cycle-comparison.svg
 ---
 

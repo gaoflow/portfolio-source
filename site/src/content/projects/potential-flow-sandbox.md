@@ -1,7 +1,7 @@
 ---
 title: 'Potential Flow Sandbox — Complex Potentials and Circulation'
-year: 2026
-date: '2026-08-18'
+year: 2025
+date: '2025-11-08'
 status: complete
 categories: [component-cfd]
 tags: [Python, NumPy, potential flow, complex potential, circulation, RK4]
@@ -20,7 +20,7 @@ keyOutputs:
   - 'Verified fixed-step RK4 streamline tracing against the analytical streamfunction: 2.6×10⁻¹² maximum drift at step 0.01 with observed fourth-order convergence.'
 featured: false
 order: 14
-studySequence: 18
+studySequence: 2
 heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
 ---
 

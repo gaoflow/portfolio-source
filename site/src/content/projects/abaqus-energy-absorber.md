@@ -41,7 +41,7 @@ keyOutputs:
   - 'FGT multi-cell geometry absorbs 33.20 of 34.72 kJ (95.6%) with SEA 12.30 kJ/kg, 2.56× the classic baseline.'
 featured: false
 order: 18
-studySequence: 3
+studySequence: 10
 heroImage: /images/projects/abaqus-energy-absorber/force-displacement-preliminary.png
 ---
 
