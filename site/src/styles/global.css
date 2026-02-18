@@ -2,32 +2,42 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  /* Pit Wall palette — near-black instrument field; color carries state, never decoration */
-  --color-bg: #0b0b0e;
-  --color-surface: #141419;
-  --color-edge: #26262c;
-  --color-ink: #e4e4e7;
-  --color-muted: #a1a1aa;
-  --color-accent: #2dd4bf; /* teal — validated / improvement */
-  --color-ok: #fbbf24;     /* amber — live / in progress */
-  --color-best: #a78bfa;   /* violet — best result */
+  /* Kami palette — warm parchment canvas, single ink-blue accent, warm grays only.
+     Tokens from github.com/tw93/Kami references/design.md */
+  --color-bg: #f5f4ed;        /* parchment — page canvas, never pure white */
+  --color-surface: #faf9f5;   /* ivory — lifted cards */
+  --color-sand: #e8e6dc;      /* warm sand — interactive surfaces */
+  --color-edge: #e8e6dc;      /* primary hairline */
+  --color-edge-soft: #e5e3d8; /* row separators */
+  --color-ink: #141413;       /* near-black, warm olive undertone */
+  --color-warm: #3d3d3a;      /* secondary text */
+  --color-muted: #504e49;     /* olive — descriptions */
+  --color-stone: #6b6a64;     /* tertiary — dates, metadata */
+  --color-accent: #1b365d;    /* ink blue — the only chromatic color */
+  --color-accent-light: #2d5a8a;
+  --color-tag: #e4ecf5;       /* solid tag swatch (ink blue on parchment) */
+  --color-tint: #eef2f7;      /* lightest ink-blue fill */
+  --color-ok: #8b4513;        /* warm brown — active/caution (Kami breaking accent) */
+  --color-ok-bg: #f0e0d8;     /* warm peach */
+  --color-best: #6b6a64;      /* stone — no second chromatic color */
 
-  --font-sans: "Inter Tight", system-ui, sans-serif;
+  --font-serif: "Source Serif 4", Charter, Georgia, "Times New Roman", serif;
+  --font-sans: "Source Serif 4", Charter, Georgia, "Times New Roman", serif; /* Kami EN: serif for everything */
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 body {
   @apply bg-bg text-ink font-sans antialiased;
-  font-feature-settings: "ss01";
 }
 
 ::selection {
-  background: rgba(45, 212, 191, 0.25);
+  background: #d7e1ee; /* ink blue at ~12% over parchment, solid */
 }
 
 /* Editorial section label, mono caps */
 .section-label {
-  @apply font-mono text-xs tracking-[0.2em] text-muted uppercase;
+  @apply font-mono text-xs tracking-[0.2em] uppercase;
+  color: var(--color-stone);
 }
 
 /* Subtle scroll reveal — the only global animation */
