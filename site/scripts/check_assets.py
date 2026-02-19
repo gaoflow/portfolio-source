@@ -58,6 +58,11 @@ def svg_bg_lum(path):
     text = path.read_text(encoding='utf-8', errors='replace')
     if 'darkreader' in text.lower():
         return 0.0  # darkreader lock means a dark background we missed
+        # matplotlib paints the figure patch as a full-canvas <path> in
+    # <g id="patch_1">, not a <rect> — check it first
+    m = re.search(r'<g id="patch_1">\s*<path[^>]*?fill:\s*(#[0-9a-fA-F]{3,6})', text)
+    if m:
+        return lum(hexes(m.group(1))[0])
     vb = re.search(r'viewBox="[\d.\-]+\s+[\d.\-]+\s+([\d.]+)\s+([\d.]+)"', text)
     canvas = float(vb.group(1)) * float(vb.group(2)) if vb else None
     best_area, best_fill = -1.0, None

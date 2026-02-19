@@ -117,6 +117,7 @@ body {
 .prose :where(img):not(:where(.not-prose img)) {
   display: block;
   width: 100%;
+  height: auto;
   margin-inline: auto;
   border: 1px solid var(--color-edge);
   background: #fff;
