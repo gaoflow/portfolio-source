@@ -30,13 +30,7 @@ $$
 
 which makes the conservation property structural: with all boundaries zero-flux, every interior face difference is added to one cell and subtracted from its neighbour as the same floating-point value, so cell-integrated energy is conserved to round-off. Dirichlet boundaries use a linear ghost cell; Neumann boundaries have exactly zero face difference.
 
-Von Neumann analysis gives the amplification factor 
-
-$$
-g=1-4r\big[\sin^2(k_x\Delta x/2)+\sin^2(k_y\Delta y/2)\big],
-$$
-
- hence the stability bound $r\leq 1/4$ on a square grid. The solver enforces this as a contract, not a warning: `check_stability` raises `StabilityError` and logs the refusal before any integration. A solver that diverges silently is worse than one that refuses to run.
+Von Neumann analysis gives the amplification factor $g=1-4r\big[\sin^2(k_x\Delta x/2)+\sin^2(k_y\Delta y/2)\big]$, hence the stability bound $r\leq\tfrac14$ on a square grid. The solver enforces this as a contract, not a warning: `check_stability` raises `StabilityError` and logs the refusal before any integration. A solver that diverges silently is worse than one that refuses to run.
 
 ## Validation
 
@@ -60,7 +54,7 @@ Five predeclared gates, all passing:
 | Attempted $r=0.26$ run | refused and logged | refused |
 | Cross-direction variation, series-initialised 2-D field | $0.0$ | $<10^{-14}$ |
 
-The obvious temporal-refinement plan fails on paper. FTCS applied to the heat equation carries the combined leading truncation term $(\alpha\Delta x^2/12)\,(6r-1)\,\partial_x^4T$: temporal and spatial errors couple, so refining $\Delta t$ against the analytical solution at fixed grid cannot show order one. The temporal order is therefore isolated by comparing four runs at $r\in\{0.20,0.10,0.05,0.025\}$ against a fine-time reference ($r=10^{-3}$) on the *same* grid, where the shared spatial error cancels in the difference. The observed slope is 1.017.
+The obvious temporal-refinement plan fails on paper. FTCS applied to the heat equation carries the combined leading truncation term $\tfrac{\alpha\Delta x^2}{12}(6r-1)\,\partial_x^4T$: temporal and spatial errors couple, so refining $\Delta t$ against the analytical solution at fixed grid cannot show order one. The temporal order is therefore isolated by comparing four runs at $r\in\{0.20,0.10,0.05,0.025\}$ against a fine-time reference ($r=10^{-3}$) on the *same* grid, where the shared spatial error cancels in the difference. The observed slope is 1.017.
 
 ![Error versus time step with slope-1 reference](/images/projects/heat-diffusion-2d/temporal-refinement.svg)
 

@@ -68,7 +68,7 @@ The configuration is deliberately simple — steady, laminar, 2-D, incompressibl
 
 A cylinder of $D = 1$ m sits in a circular fluid annulus of outer diameter $D_2$, exposed as a Workbench parameter. Fluid $\rho = 1$ kg/m³, $\mu = 10^{-3}$ Pa·s; the Reynolds number $Re = \rho U_\infty D / \mu$ is set through the inlet velocity. Uniform velocity on the inlet arc, zero gauge pressure on the outlet arc, no slip on the wall.
 
-Pressure-based steady solver with the laminar model, residuals driven below $10^{-6}$ (about 50 iterations at $Re = 10$). The mesh is quad-dominant with edge divisions on both circles and a radial bias of 500 packing cells at the wall, where separation and the boundary layer live. Coefficients come from Fluent surface integrals, $C_D = 2F_D/(\rho U_\infty^2 D)$.
+Pressure-based steady solver with the laminar model, residuals driven below $10^{-6}$ (about 50 iterations at $Re = 10$). The mesh is quad-dominant with edge divisions on both circles and a radial bias of 500 packing cells at the wall, where separation and the boundary layer live. Coefficients come from Fluent surface integrals, $C_D = F_D / (\tfrac{1}{2}\rho U_\infty^2 D)$.
 
 ## Part A: mesh and domain plateaus at Re=10
 

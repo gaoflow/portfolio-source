@@ -74,7 +74,7 @@ Steel absorbs the most absolute energy but weighs three times more than aluminiu
 
 The realistic scenario: a 1.0 mm uniform aluminium absorber (U-channel of 351 C3D8R elements tied to a 54-element closing plate, 405 deformable elements total, mass 0.70 kg) struck by a 1000 kg rigid wall at 30 km/h. The step ran 470,678 increments at a stable increment near $1.22\times10^{-7}$ s.
 
-The energy audit closes. Initial kinetic energy is $mv^2/2 = 34.72$ kJ; total energy holds at $34.70 \pm 0.02$ kJ for the full step. Contact begins at $t \approx 0.027$ s after 224.7 mm of free travel. At 0.06 s the split is 22.65 kJ kinetic, 11.95 kJ internal, with 241.8 mm of crush.
+The energy audit closes. Initial kinetic energy is $\frac{1}{2}mv^2 = 34.72$ kJ; total energy holds at $34.70 \pm 0.02$ kJ for the full step. Contact begins at $t \approx 0.027$ s after 224.7 mm of free travel. At 0.06 s the split is 22.65 kJ kinetic, 11.95 kJ internal, with 241.8 mm of crush.
 
 The force response shows a first peak near 63 kN and a global peak of about 72.6 kN, then folding oscillations between 26 and 50 kN. Dividing internal energy by crush travel gives the mean crush force:
 
