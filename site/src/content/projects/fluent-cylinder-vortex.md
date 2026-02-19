@@ -103,7 +103,7 @@ The steady case fails the same way. At Re=40 the computed drag is 3.07 N against
 
 The shedding vortices lose strength as they form, the low-pressure cores in the wake fill in, and the pressure difference across the cylinder shrinks. A converged residual history is evidence the solver finished; the 29% gap is evidence the mesh and tolerances were not good enough.
 
-Parsing the exports turned up a second, quieter trap. Both force reports imply the same coefficient conversion: $C_D = F_D / 0.6125$, while $\frac{1}{2}\rho U^2 D$ evaluates to 2.0 for the Re=40 run and 0.5 for the Re=150 run. Fluent's reference values were set once and did not follow the run conditions, so comparing the reported *coefficients* against a textbook chart mixes reference definitions. The comparisons above are done on forces, where the reference area cancels — the only defensible level for this data.
+Parsing the exports turned up a second, quieter trap. Both force reports imply the same coefficient conversion: $C_D = F_D / 0.6125$, while $\rho U^2 D/2$ evaluates to 2.0 for the Re=40 run and 0.5 for the Re=150 run. Fluent's reference values were set once and did not follow the run conditions, so comparing the reported *coefficients* against a textbook chart mixes reference definitions. The comparisons above are done on forces, where the reference area cancels — the only defensible level for this data.
 
 ## Iteration: how the error estimate converged
 
