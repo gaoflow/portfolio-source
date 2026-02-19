@@ -1,5 +1,5 @@
 ---
-title: 'Powertrain Cycles — Energy & CO₂ Simulation'
+title: 'Coursework: Powertrain Cycles — Energy & CO₂ Simulation'
 year: 2025
 date: '2025-12-06'
 status: complete

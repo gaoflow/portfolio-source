@@ -1,5 +1,5 @@
 ---
-title: 'Abaqus Energy Absorber — Crashworthiness Optimization'
+title: 'Coursework: Abaqus Energy Absorber — Crashworthiness Optimization'
 year: 2026
 date: '2026-03-28'
 status: complete

@@ -1,5 +1,5 @@
 ---
-title: 'Fluent Vortex Shedding — Triggering the Kármán Street'
+title: 'Coursework: Fluent Vortex Shedding — Triggering the Kármán Street'
 year: 2026
 date: '2026-03-12'
 status: complete

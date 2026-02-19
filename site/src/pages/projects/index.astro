@@ -17,10 +17,6 @@ const filters = [
   { key: 'design', label: 'Design & CAD' },
 ];
 
-const codeOf = (id: string) => {
-  const pair = id.split('-').slice(0, 2).join('-').toUpperCase();
-  return pair.length > 12 ? id.split('-')[0].toUpperCase() : pair;
-};
 ---
 
 <Base title="Projects">
@@ -39,21 +35,35 @@ const codeOf = (id: string) => {
       ))}
     </div>
 
-    <div class="border border-edge bg-surface" data-grid>
+    <div class="grid gap-5 sm:grid-cols-2" data-grid>
       {projects.map((p, i) => (
         <a
           href={`/projects/${p.id}`}
           data-categories={[...p.data.categories, ...(p.data.academic ? ['course-project'] : [])].join(' ')}
-          class="group grid grid-cols-[36px_1fr_auto] items-center gap-4 border-b border-edge-soft px-4 py-4 transition-shadow last:border-b-0 hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)] sm:grid-cols-[44px_104px_1fr_150px]"
+          class="group border border-edge bg-surface transition-shadow hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
         >
-          <span class="font-serif text-sm font-medium text-accent tabular-nums">{String(i + 1).padStart(2, '0')}</span>
-          <span class="hidden font-serif text-xs text-stone sm:block">{codeOf(p.id)}</span>
-          <span class="min-w-0">
-            <span class="font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
-            <span class="mt-1 hidden text-base leading-relaxed text-muted sm:block">{p.data.summary}</span>
-          </span>
-          <span class="text-right font-serif text-xs text-stone tabular-nums">
-            {new Date(`${p.data.date}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+          {p.data.heroImage ? (
+            <img
+              src={p.data.heroImage}
+              alt={p.data.title}
+              loading="lazy"
+              decoding="async"
+              class="aspect-[2/1] w-full border-b border-edge bg-white object-cover"
+            />
+          ) : (
+            <span class="flex aspect-[2/1] w-full items-center justify-center border-b border-edge bg-tint">
+              <span class="tag">{p.data.tags[0]}</span>
+            </span>
+          )}
+          <span class="block p-5">
+            <span class="flex items-baseline justify-between gap-3">
+              <span class="section-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="font-serif text-xs text-stone tabular-nums">
+                {new Date(`${p.data.date}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </span>
+            </span>
+            <span class="mt-2 block font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
+            <span class="mt-2 line-clamp-3 block text-sm leading-relaxed text-muted">{p.data.summary}</span>
           </span>
         </a>
       ))}

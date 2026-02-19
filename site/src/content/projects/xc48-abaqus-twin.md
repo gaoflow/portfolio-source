@@ -1,5 +1,5 @@
 ---
-title: 'XC48 Tensile Twin — Experiment to Abaqus Explicit'
+title: 'Coursework: XC48 Tensile Twin — Experiment to Abaqus Explicit'
 year: 2026
 date: '2026-04-04'
 status: complete

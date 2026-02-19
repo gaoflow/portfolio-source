@@ -44,31 +44,33 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
       <h2 class="section-label"><span class="section-num mr-2">01</span>Projects</h2>
       <span class="font-serif text-xs text-stone tabular-nums">{projects.length}</span>
     </div>
-    <div class="border border-edge bg-surface">
+    <div class="grid gap-5 sm:grid-cols-2">
       {projects.map((p, i) => (
         <a
           href={`/projects/${p.id}`}
-          class="group grid grid-cols-[28px_1fr] items-center gap-4 border-b border-edge-soft px-4 py-4 transition-shadow last:border-b-0 hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)] sm:grid-cols-[36px_144px_1fr_auto]"
+          class="group border border-edge bg-surface transition-shadow hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
         >
-          <span class="font-serif text-sm font-medium text-accent tabular-nums">{String(i + 1).padStart(2, '0')}</span>
           {p.data.heroImage ? (
             <img
               src={p.data.heroImage}
               alt={p.data.title}
               loading="lazy"
               decoding="async"
-              class="hidden aspect-video w-full border border-edge bg-surface object-cover sm:block"
+              class="aspect-[2/1] w-full border-b border-edge bg-white object-cover"
             />
           ) : (
-            <span class="hidden aspect-video w-full items-center justify-center border border-edge bg-surface font-mono text-[10px] uppercase tracking-widest text-muted sm:flex">
-              {p.data.tags[0]}
+            <span class="flex aspect-[2/1] w-full items-center justify-center border-b border-edge bg-tint">
+              <span class="tag">{p.data.tags[0]}</span>
             </span>
           )}
-          <span class="min-w-0">
-            <span class="font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
-            <span class="mt-1 line-clamp-2 block text-base leading-relaxed text-muted">{p.data.summary}</span>
+          <span class="block p-5">
+            <span class="flex items-baseline justify-between gap-3">
+              <span class="section-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="font-serif text-xs text-stone tabular-nums">{fmt(p.data.date)}</span>
+            </span>
+            <span class="mt-2 block font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
+            <span class="mt-2 line-clamp-3 block text-sm leading-relaxed text-muted">{p.data.summary}</span>
           </span>
-          <span class="hidden font-serif text-xs text-stone whitespace-nowrap tabular-nums sm:block">{fmt(p.data.date)}</span>
         </a>
       ))}
     </div>
