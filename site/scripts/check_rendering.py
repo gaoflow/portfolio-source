@@ -43,6 +43,21 @@ for page in pages:
             sample = [h if isinstance(h, str) else h[0] for h in hits[:2]]
             bad.append(f'{page.relative_to(DIST)}: {label}: {sample}')
 
+# KaTeX HTML/CSS version alignment: rehype-katex (build-time) and the shipped
+# katex.min.css must agree on the sizing class family — 0.16 emits `sizing`,
+# 0.17+ emits `katex-sizing`. A mismatch silently drops all scriptstyle size
+# reductions (superscripts and fraction parts render full-size and collide).
+css_files = sorted(DIST.glob('_astro/*.css'))
+css_text = ''.join(c.read_text(encoding='utf-8') for c in css_files)
+html_text = ''.join(p.read_text(encoding='utf-8') for p in pages)
+html_legacy = 'class="sizing reset' in html_text
+html_modern = 'class="katex-sizing reset' in html_text
+css_legacy = '.sizing.reset' in css_text
+css_modern = '.katex-sizing.reset' in css_text
+if (html_legacy or html_modern) and not ((html_legacy and css_legacy) or (html_modern and css_modern)):
+    bad.append('KaTeX version mismatch: HTML sizing classes vs shipped CSS '
+               f'(html legacy={html_legacy} modern={html_modern}, css legacy={css_legacy} modern={css_modern})')
+
 if bad:
     print('Render leaks found:')
     print('\n'.join(bad))
