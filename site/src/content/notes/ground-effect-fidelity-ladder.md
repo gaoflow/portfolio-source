@@ -1,146 +1,94 @@
 ---
-title: 'Ground Effect Needs a Fidelity Ladder, Not One Impressive Contour'
+title: 'Why I Built a Ground-Effect Ladder Before Running Full-Car CFD'
 image: /images/notes/covers/ground-effect-fidelity-ladder.svg
 published: 2026-08-05
-summary: 'A model-selection guide from image vortices to moving-ground RANS, showing which ground-effect questions each rung can answer and where its authority ends.'
+summary: 'I wanted one simple way to decide when an image-vortex model is enough, when I need viscous CFD, and when only a tunnel or track comparison can answer the question.'
 tags: [CFD]
 sourceProjects: [ground-effect-vlm, airfoil-methods, f1-2026-aero]
 featured: false
 order: 4
 ---
 
-Pick the ground-effect model by the mechanism and the decision, and each rung earns a bounded, checkable answer. Pick it by the most detailed tool available and you get an impressive contour with no authority behind it. A finite wing near a plane, an inverted multi-element front wing, and a full underfloor with leakage and rotating tyres share a boundary condition. They do not share dominant physics.
+Ground effect is easy to make look impressive. Put a wing near a floor, colour the pressure field, and almost any image starts to feel like an explanation.
 
-## Rung 0 — dimensional and sign checks
+I wanted a way to stop myself from trusting the prettiest picture. So I wrote a ladder: start with the cheapest model that contains the mechanism I care about, and climb only when the next question requires more physics.
 
-Before solving a flow field, freeze:
+## I begin with signs and definitions
 
-- span, chord, reference area, and aspect ratio;
-- ride-height definition and reference point;
-- angle-of-attack sign;
-- lift/downforce sign;
-- freestream and ground reference frame;
-- coefficient normalisation;
-- the quantity being swept.
+Before solving anything, I write down the span, chord, reference area, ride-height definition, angle-of-attack sign, downforce sign, ground reference frame, and coefficient normalisation.
 
-Many apparent ground-effect disagreements are coordinate or normalisation disagreements. A result normalised by planform area cannot be compared with one using frontal area; quarter-chord height is not interchangeable with minimum floor clearance.
+This sounds boring, but ground-effect comparisons often disagree because one person measured minimum floor clearance and another used quarter-chord height, or because one coefficient used planform area and another used frontal area.
 
-## Rung 1 — the image-vortex mechanism
+If those definitions are wrong, a more expensive solver only gives me a more expensive disagreement.
 
-For inviscid flow above an impermeable plane, a mirrored vortex system enforces zero normal velocity at the ground. Each real horseshoe-vortex segment above the road is paired with an image below it, circulation reversed.
+## My first useful model was just a mirrored vortex
 
-This rung isolates one mechanism: how the plane changes circulation, induced velocity, lift, and induced drag for a finite lifting surface.
+For inviscid flow above a solid plane, a mirrored vortex below the plane can enforce zero normal velocity at the ground. It is a small model with one clear job: show how the floor changes induced velocity and circulation for a finite wing.
 
-It can answer:
+This model can tell me whether the sign is plausible, whether the solution returns to free-air behaviour as height increases, and whether symmetry and ground tangency are implemented correctly.
 
-- whether the implemented ground-effect sign is plausible;
-- whether the solution returns toward free-air behaviour as height increases;
-- whether span symmetry and wall tangency hold;
-- the scale of a controlled ride-height trend for one idealised wing.
+It cannot tell me about separation, diffuser pumping, tyre wakes, leakage, or moving-ground boundary layers. I keep that list beside the result so I do not accidentally turn a wing model into a floor claim.
 
-Separation, viscous drag, diffuser pumping, tyre wakes, leakage, and moving-ground boundary layers all live above this rung.
+## The VLM sweep gave me numbers I could check
 
-## Rung 2 — a verified VLM sweep
+In the [Ground Effect VLM project](/projects/ground-effect-vlm), I used an aspect-ratio-4 rectangular wing at $4°$ angle of attack, 64 spanwise panels, and an 80-chord wake. I swept 14 heights from $h/c=0.25$ to 50.
 
-A vortex-lattice model distributes bound circulation across panels and solves a linear no-penetration system. The [Ground Effect VLM study](/projects/ground-effect-vlm) models an aspect-ratio-4 rectangular wing at $\alpha = 4°$ with 64 uniform spanwise panels and an 80-chord wake, sweeping 14 heights from $h/c = 0.25$ to $50$.
+At $h/c=0.5$:
 
-At $h/c = 0.5$, fixed incidence:
-
-| Quantity | Change relative to free air |
+| Quantity | Change from free air |
 |---|---:|
-| Lift coefficient (0.2615 → 0.3461) | +32.4% |
-| $C_{D_i}/C_L^2$ | -41.9% |
+| Lift coefficient, 0.2615 → 0.3461 | +32.4% |
+| $C_{D_i}/C_L^2$ | −41.9% |
 
-These values are an auditable result of the image-vortex model. They are not estimates for a race-car floor. At $h/c = 0.25$ the same linear model predicts $C_L = 0.5419$ — twice free air. That endpoint is a warning, because every mechanism that would cap it (thickness, separation, leakage) is absent from the formulation.
+Those numbers tell me what the image-vortex model predicts. They do not tell me what a race-car underfloor will do.
 
-The verification gates make the sweep trustworthy within its class. The ground-plane normal-velocity residual is 0.0 at 257 sample points, lift at $h/c = 50$ sits within 0.00335% of free air, spanwise symmetry error is $1.9\times10^{-16}$, and a 64-to-96-panel refinement changes lift by 0.258%. The free-air lift slope sits 11.01% from the Prandtl finite-wing estimate, inside a deliberately loose 12% gate. A single chordwise row and the classical lifting-line model are not the same model; exact agreement would be suspicious.
+The model also warns me when it is being pushed too far. At $h/c=0.25$, it predicts $C_L=0.5419$, roughly twice the free-air value. Thickness, separation, and leakage are missing, so the runaway trend is a reason to climb the ladder—not a dramatic design result.
 
-## Rung 3 — geometry-resolved potential flow
+I kept several checks around the sweep:
 
-Panel methods add surface geometry and pressure distribution. They can inspect loading shifts, stagnation regions, and geometry-induced circulation while retaining an inviscid formulation.
+- ground-normal velocity was 0.0 at 257 sample points;
+- the $h/c=50$ result returned within 0.00335% of free air;
+- spanwise symmetry error was $1.9\times10^{-16}$;
+- 64 to 96 panels changed lift by 0.258%.
 
-The [Airfoil Methods project](/projects/airfoil-methods) shows the corresponding authority boundary in free air. Pressure-derived lift and moment are useful; wake drag and stall stay structurally unavailable. The panel model returns pressure drag below 0.0008 where the wind tunnel measured 0.0065 to 0.0275, and it answers 2.085 where the measured $C_l$ stalls at 1.66. Adding ground images creates no viscosity.
+That gave me confidence in the code inside its own assumptions.
 
-Use this rung when the decision concerns inviscid loading or geometric consistency. When the mechanism depends on boundary-layer growth or separation, it cannot decide.
+## Surface geometry adds detail, not viscosity
 
-## Rung 4 — simplified viscous CFD
+A panel method can put the actual surface shape into the calculation and give me a pressure distribution. That is useful for checking loading and circulation.
 
-A two-dimensional or simplified three-dimensional RANS model can introduce:
+My [Airfoil Methods project](/projects/airfoil-methods) made the limit obvious. The panel model produced pressure-derived lift and moment, but pressure drag stayed below 0.0008 while the wind tunnel measured 0.0065 to 0.0275. It also kept increasing lift after the real airfoil stalled.
 
-- viscosity and wall shear;
-- turbulence closure;
-- moving-ground boundary conditions;
-- pressure recovery and separation;
-- local geometry details.
+Adding a ground image does not fix that. An inviscid model remains inviscid.
 
-It also introduces new obligations: wall resolution, turbulence inlet quantities, domain and blockage checks, grid sensitivity, model sensitivity, and a credible validation reference.
+## I climb to RANS only when the question needs it
 
-A 2-D diffuser slice can isolate pressure recovery, but it inherits no full-car authority. The missing side-edge leakage and tyre interaction may be the mechanism that sets the real design ranking.
+A simplified RANS case adds viscosity, wall shear, turbulence closure, moving-ground treatment, pressure recovery, and separation. It also creates new work: wall resolution, domain size, turbulence inputs, grid sensitivity, model sensitivity, and validation.
 
-## Rung 5 — component CFD with relevant interference
+A two-dimensional diffuser slice can help me understand pressure recovery. It cannot tell me how tyre wakes or side-edge leakage rank two full floors.
 
-For a front wing or floor study, the minimum useful context may include:
+For a front wing or floor, the useful model may need the ground, rotating tyres, suspension, realistic ride and yaw, and the actual leakage paths. For full-car balance, I need the whole car and a qualified mesh.
 
-- ground motion;
-- rotating or translated tyre surfaces;
-- nearby suspension or bodywork;
-- realistic ride, pitch, yaw, and steering states;
-- leakage paths and edge-vortex development;
-- wake-sensitive refinement.
+The [F1 2026 project](/projects/f1-2026-aero) is where this ladder stopped me. I had the intended 50 m/s inlet, moving ground, rotating wheels, seven force groups, and $k$–$\omega$ SST setup. The production mesh still failed its gate. Writing the boundary conditions did not make the full-car answer real.
 
-This rung supports component design only if the omitted vehicle parts are shown to leave the mechanism under study untouched.
+## The last rung is physical correlation
 
-## Rung 6 — full-car moving-ground RANS
+A tunnel or track result is not a decorative line on the final plot. I still need matched geometry, Reynolds and Mach numbers, ground and wheel treatment, ride, yaw, tyre state, sensor uncertainty, and a declared comparison metric.
 
-A full-car case connects component loads, balance, wheel wakes, floor pressure recovery, cooling exits, and body interactions. It is also where geometry and meshing risk dominate.
+Track data add even more context: driver controls, transient vehicle state, weather, and alignment. A force delta without a matched state is not a clean validation point.
 
-The [F1 2026 project](/projects/f1-2026-aero) illustrates the readiness requirement. The target setup specifies 50 m/s inlet flow, moving ground, rotating wheels, seven component force groups, and k–ω SST. The production solve remains blocked because the volume-mesh gate has not passed.
+## The ladder I use now
 
-Writing the intended boundary conditions is not the same as obtaining a qualified full-car result.
-
-## Rung 7 — physical correlation
-
-Wind-tunnel or track correlation is a separate rung, not a decorative final plot. It needs:
-
-- configuration matching;
-- Reynolds and Mach context;
-- tunnel blockage and support corrections;
-- moving-ground and wheel treatment;
-- ride, yaw, steering, and tyre state;
-- sensor calibration and repeatability;
-- environmental and operational uncertainty;
-- a pre-declared comparison metric.
-
-Track correlation adds control-state and transient reconstruction problems. A force delta without a matched vehicle state is not a clean CFD validation point.
-
-## Match the rung to the decision
-
-| Engineering question | Lowest potentially useful rung |
+| Question | Lowest model I would try first |
 |---|---|
-| Is the ground-image sign implemented correctly? | image-vortex check |
-| Does a finite wing recover toward free air with height? | verified VLM sweep |
-| How does inviscid surface loading move? | geometry-resolved panel method |
-| Does a simplified diffuser separate? | viscous CFD with grid/model checks |
-| How does tyre wake alter front-wing loading? | component CFD with rotating tyre context |
-| How does a package shift full-car balance? | qualified full-car RANS |
-| Does the model represent the physical vehicle? | matched experimental correlation |
+| Is the ground-image sign correct? | image-vortex check |
+| Does a finite wing recover toward free air? | verified VLM sweep |
+| How does inviscid surface loading move? | panel method |
+| Does a diffuser separate? | viscous CFD with mesh checks |
+| How does tyre wake change front-wing loading? | component CFD with rotating tyre |
+| How does a package change full-car balance? | qualified full-car RANS |
+| Does the model represent the car? | matched experiment |
 
-Starting above the minimum rung is justified when the lower model omits the controlling mechanism. Starting below it cannot be repaired by confident language.
+I do not climb the ladder because a higher rung looks more professional. I climb when the lower model is missing the mechanism that decides the question.
 
-## A useful escalation contract
-
-Move to the next rung only when it adds a required mechanism and passes a new check:
-
-1. analytical sign and far-field limits;
-2. discretisation sensitivity;
-3. geometry and pressure consistency;
-4. viscous wall and separation verification;
-5. interference and operating-state coverage;
-6. full-car mesh, balance, and component accounting;
-7. independent physical correlation.
-
-Each higher rung should preserve the lower rung as an oracle where their assumptions overlap. If a full RANS setup reverses an analytical sign or breaks far-field recovery, the complexity is hiding a defect.
-
-## Boundary of this note
-
-Model fidelity does not rise monotonically with compute cost. A poorly qualified RANS case can be less trustworthy than a verified low-order model for a bounded question. Authority comes from matching assumptions to the mechanism, then validating the output the decision requires.
+A verified low-order model can be more trustworthy than an unqualified RANS case. The authority comes from asking a question the model can actually answer.

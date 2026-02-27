@@ -2,169 +2,133 @@
 title: 'When 90% Coverage Became an Infinite Interval'
 image: /images/notes/covers/airfrans-conformal-ood.svg
 published: 2026-08-24
-summary: 'How I turned a question about reliable CFD surrogates into a falsifiable AirfRANS audit—and why the negative result taught me more about calibration budgets, physical groups, predictor error, and data lineage than a cleaner success would have.'
+summary: 'I went looking for a practical way to make CFD surrogate predictions safer. I ended up with an infinite interval, a failed hypothesis, and a much clearer idea of what uncertainty estimates can and cannot do.'
 tags: [CFD]
 sourceProjects: []
 featured: true
 order: 7
 ---
 
-My first paper began with a result I did not want: the most theoretically careful groupwise interval was infinite.
+I thought my first paper would end with a better uncertainty method. Instead, it ended with an infinite interval.
 
-That refusal became the centre of the work. It forced me to separate four questions that I had initially treated as one: Is the point predictor good enough? Does its uncertainty rank difficult cases? Are the physical groups large enough for conformal calibration? Does the evaluation design support the claim I want to make?
+That sounds like a failed calculation. It was not. The calculation was doing exactly what it should. I had asked for a 90% groupwise conformal interval, but one physical group contained only eight calibration labels. The method needed at least nine. The only honest answer was: **refuse to give a finite interval**.
 
-The finished paper is titled *Auditing target-labeled conformal prediction intervals for AirfRANS aerodynamic coefficients under physical shift*. This is the personal record behind it: how I found the question, why it held my attention, how the study changed one audit at a time, and what survived after the original hypothesis failed.
+That refusal changed the paper. It also changed the way I think about reliability in CFD machine learning.
 
 ## How I found the question
 
-I did not begin by choosing a favourite neural network. I began with a shortlist of five AI-native CFD research directions and asked which one a single researcher could make falsifiable, reproducible, and useful without generating a new DNS, LES, or large three-dimensional campaign.
+I did not start from AirfRANS. I first compared five research ideas that I could realistically do on one workstation: uncertainty under distribution shift, active learning, conservation correction, symbolic turbulence closure, and OpenFOAM mutation testing.
 
-The shortlist contained conformal uncertainty under distribution shift, goal-driven active learning, conservation projection, symbolic turbulence closure, and OpenFOAM mutation testing. The first idea ranked highest because it joined three things I cared about:
+The uncertainty idea came first because it matched a problem I already cared about. A surrogate can look accurate on average and still become overconfident on a new airfoil, a different Reynolds number, or an angle of attack outside its training range. In an aerodynamic design loop, those edge cases are often the cases that matter.
 
-- a real aerodynamic failure mode—geometry, Reynolds number, or angle of attack leaving the training regime;
-- a precise statistical claim that could be accepted or rejected; and
-- public predictions that made a workstation-scale audit possible.
+[AirfRANS](https://arxiv.org/abs/2212.07564) gave me a practical way to test this. It contains 1,000 two-dimensional RANS simulations around NACA airfoils. More importantly, the official score archive already included drag and lift truth plus predictions from MLP, GraphSAGE, PointNet, and Graph U-Net models. I could audit the uncertainty behaviour before spending weeks retraining networks.
 
-The practical opening came from [AirfRANS](https://arxiv.org/abs/2212.07564), a public set of 1,000 two-dimensional RANS simulations around parameterised NACA airfoils. Its official score archive already contained drag and lift truth, prediction means, and model-to-model spread for MLP, GraphSAGE, PointNet, and Graph U-Net baselines. That meant I could study interval behaviour before committing to expensive retraining.
+The question I wrote down was simple:
 
-The question became narrow enough to test:
+> Can group-aware calibration improve the worst physical group without making the intervals wider than ordinary split conformal or throwing away more than half the cases?
 
-> Under physically defined target shifts, can group-aware conformal calibration and a fixed abstention rule improve worst-group empirical coverage without making intervals wider than ordinary split conformal or rejecting more than half of a group?
+I wanted a question that could tell me “no.”
 
-I was deliberately asking for a result that could fail.
+## Why I became interested
 
-## Why it became interesting to me
+A narrow uncertainty interval looks reassuring, but that alone tells me nothing. It might miss the truth. A wide interval might cover everything but be useless for a design decision. A selector might keep only the easy cases and quietly reject the ones I actually need.
 
-A surrogate that reports a low average error is not automatically trustworthy in a design loop. A racing or aerodynamic workflow cares about the cases near the edge of the envelope: a new wing geometry, a different ride height, a higher Reynolds number, or an angle of attack that was sparse in training. A point prediction can remain smooth while its error grows silently.
+I therefore kept three things together from the start:
 
-Uncertainty intervals look like a solution, but the interval itself can fail in less obvious ways. It can be too narrow. It can achieve nominal coverage only by becoming too wide to guide a decision. It can look balanced on average while one physical group remains exposed. It can reject so many cases that the retained set is no longer operationally useful.
+- coverage near the declared 90%;
+- interval width; and
+- how many cases remained after abstention.
 
-That trade-off interested me more than another accuracy leaderboard. I wanted to know whether a simple reliability layer could survive three engineering constraints at once:
+I also kept the claim modest. This experiment used labels from a deployment-like target pool. It was not proof that a model calibrated on source data stays valid under any future shift.
 
-1. coverage near the declared 90% level;
-2. finite, competitive interval width; and
-3. useful retention after abstention.
+## The first real work was a data audit
 
-The attraction was also methodological. Conformal prediction has a clean finite-sample story under exchangeability, but an aerodynamic extrapolation task is exactly where exchangeability becomes difficult to defend. I had to keep the claim modest: this was a target-pool empirical audit using target labels, not a theorem that source-calibrated intervals remain valid after arbitrary deployment shift.
+The raw OpenFOAM archive was 66.40 GiB. The processed dataset was 9.34 GiB compressed. The coefficient score archive was only 36.46 MB.
 
-## I audited the data before writing the method
+I began with the small archive and read the large archive's manifest remotely. That saved disk space, but the more important result was conceptual: every one of the 1,000 geometry parameter tuples was unique. “Unseen geometry” could not simply mean “a different simulation ID.” I had to define a real held-out region of geometry space.
 
-The first useful decision was about storage, not statistics. The processed AirfRANS archive was 9.34 GiB compressed; the raw OpenFOAM archive was 66.40 GiB and outside my disk envelope. The coefficient score archive was only 36.46 MB.
+The compact prediction files linked 673 unique cases. I did not reconstruct the other 327, so I limited every custom claim to those 673 cases.
 
-I range-read the processed archive's central directory and manifest instead of downloading everything. That audit established the official split counts and exposed a subtle point: all 1,000 geometry parameter tuples were unique. “Unseen geometry” could not mean “a different simulation ID”—that condition was vacuous. I needed a frozen region of geometry space.
+I then froze two difficult target shifts:
 
-The compact score lineage exposed 673 unique identities across the full, Reynolds, and angle-of-attack test artifacts. The remaining 327 catalog cases were not reconstructed. I therefore limited every custom claim to the 673-case artifact-linked subset instead of pretending it represented the entire catalog.
+- a thickness shift with 463 source cases and 210 target cases;
+- a joint Reynolds–angle-of-attack shift with 78 source cases and 97 target corner cases.
 
-Two custom shifts followed:
+For every physical group, I split the target pool into 20% for setting a label-free threshold, 40% for conformal calibration, and the rest for evaluation. I fixed the seeds, groups, predictors, 90% target coverage, and the rule that minimum group retention had to stay above 50%.
 
-- **Thickness extrapolation:** 463 source cases and 210 target cases, split into thin-near, thin-far, thick-near, and thick-far groups.
-- **Joint Reynolds–AoA extrapolation:** 78 source cases and 97 corner target cases, split into four low/high Reynolds and low/high angle-of-attack groups. Another 498 cases belonged to neither side of this exact contract.
+The point of freezing this early was to stop myself from moving the goalposts later.
 
-That data audit changed the study before any final outcome was inspected. It also set a pattern I kept through the paper: define identities, units, boundaries, exclusions, and group counts before interpreting a metric.
+## Then I ran the experiment
 
-## I froze a rule that could stop me
+The full run produced 57,200 detailed group rows, 884 summaries, and 260 split-wise worst-group summaries.
 
-The primary protocol used a group-stratified 20/40/40 target partition:
+The first result was encouraging. Ordinary target-labelled conformal calibration repaired much of the bad undercoverage of the raw spread diagnostic:
 
-- 20% to set a label-free uncertainty threshold;
-- 40% for conformal calibration; and
-- the remainder for evaluation.
-
-Nominal coverage was 90%. The custom predictor was a 300-tree random forest with five fixed outer seeds; each custom task used 20 target-split seeds. Official AirfRANS contexts used four released architectures, two coefficients, and 50 target-split seeds.
-
-The stop rule mattered more than any individual method. A group-aware candidate had to improve the coverage–width frontier over pooled absolute split conformal on both custom tasks. Required intervals had to be finite, and minimum group retention had to stay at or above 50%. Splits, seeds, groups, targets, and surrogates could not be selected after seeing outcomes.
-
-This constraint prevented the most tempting form of overfitting: changing the research question after the preferred method lost.
-
-## The run produced a negative paper
-
-The frozen experiment produced 57,200 detailed group rows, 884 method/group summaries, and 260 split-wise worst-group summaries.
-
-Target-labeled pooled calibration repaired much of the severe undercoverage of the uncalibrated spread diagnostic:
-
-| Target shift | Spread diagnostic marginal coverage | Pooled absolute marginal coverage |
+| Shift | Raw spread | Pooled absolute calibration |
 |---|---:|---:|
-| Official AoA | 0.585 | 0.910 |
-| Official Reynolds | 0.554 | 0.904 |
+| AoA | 0.585 | 0.910 |
+| Reynolds | 0.554 | 0.904 |
 | Thickness | 0.736 | 0.904 |
 | Joint Reynolds–AoA | 0.510 | 0.923 |
 
-That was the encouraging part. The harder result was that no group-aware method produced a finite coverage–width improvement on both custom tasks while satisfying the retention rule. Normalising by released spread often widened the intervals. Equal-group weighting did not rescue the frontier. Selection reduced width in some official-task settings but did not create a reliable custom-task improvement.
+But the stronger idea did not survive. Group-aware methods did not give me a finite, narrower, better result on both custom tasks. Normalising by the model spread often made intervals wider. Equal-group weighting did not rescue the comparison. Abstention helped some official-task widths, but it did not produce a useful custom-task win.
 
 ![Primary AirfRANS operating points across official and custom shifts.](/images/notes/airfrans-conformal-ood/primary-operating-points.png)
 
-*The internally recorded primary operating points. Squares show macro-average group coverage; triangles show split-wise group minima. The joint Mondrian-normalised cell is marked as refusal rather than plotted as ordinary finite coverage.*
+*This is the figure where the story stopped being a clean success. The joint Mondrian result says REFUSAL instead of pretending that infinity is a normal operating point.*
 
-## The moment that changed the paper: eight labels
+## Eight labels changed the paper
 
-At 90% nominal coverage, a finite corrected conformal rank needs at least
+At 90% nominal coverage, a corrected groupwise conformal interval needs at least
 
 $$
 n_{\min}(\delta)=\left\lceil\frac{1-\delta}{\delta}\right\rceil=9
 $$
 
-calibration cases in a group.
+calibration cases.
 
-One joint-shift group had only eight calibration labels under the recorded 40% allocation. The corrected rank exceeded the available scores. The theorem-compatible interval radius was therefore infinite.
+One joint-shift group had eight.
 
-This was not a numerical crash and not a plotting inconvenience. It was the correct refusal for the design I had chosen. Replacing infinity with an uncorrected empirical quantile would have produced a nicer chart and a weaker claim.
+The tempting response would have been to use an uncorrected quantile, change the split, or redefine the group. I did none of those because the stop rule had already been written. I kept the infinity and marked the main hypothesis as failed.
 
-The failure taught me that the calibration split is not bookkeeping. Label allocation controls rank feasibility, evaluation resolution, and whether the method has a finite operating point at all.
-
-A post-primary fixed-evaluation sensitivity made that mechanism visible. Raising the calibration fraction from 40% to 60% increased the smallest joint-group calibration count from 8 to 13 and removed every Mondrian-absolute refusal for both predictors. The price was a smaller evaluation set; the smallest evaluation group then had only four cases.
+Later, I ran a separate sensitivity check without changing the original decision. Moving from 40% to 60% calibration increased the smallest group from 8 to 13 labels and made every Mondrian-absolute interval finite. The trade-off was obvious: more calibration labels meant fewer cases left to evaluate, and the smallest evaluation group fell to four cases.
 
 ![Calibration-fraction sensitivity for the joint physical shift.](/images/notes/airfrans-conformal-ood/calibration-fraction-sensitivity.png)
 
-*At 40% calibration, Mondrian cells refuse. At 60%, finite operating points appear. This is a budget effect, not evidence that 60% is uniformly optimal.*
+*Changing the label budget removes the refusal. It does not make 60% a universally better split.*
 
-## I did not “repair” the failed hypothesis
+This was the result I kept thinking about after the run: **the calibration budget is part of the method**. It is not an administrative detail chosen after the model is finished.
 
-Once the primary rule failed, the honest next step was diagnosis, not replacement. I kept the negative decision and added analyses with explicit post-primary labels.
+## I looked for what else was hiding inside the failure
 
-Three diagnoses mattered most.
+I did not tune a replacement method on the inspected results. I added clearly labelled follow-up checks to understand why the result looked the way it did.
 
-### 1. The minimum statistic was biased downward
+First, taking the minimum coverage over several small groups is biased downward. I built simple binomial references so I could separate ordinary small-sample wobble from a real group problem.
 
-Taking the minimum empirical coverage across several small evaluation groups creates downward bias even when every case has the same true 90% coverage probability. I added a common-nominal binomial reference and a rank-aware Mondrian reference so that a low observed minimum was not automatically blamed on the method.
-
-The common expected group minimum was 0.883 for Reynolds, 0.873 for AoA, 0.830 for thickness, and 0.801 for the joint task. The joint result still could not be treated as a finite comparison because every recorded split contained rank refusal.
-
-### 2. Predictor failure and calibration failure were mixed
-
-The custom analysis initially used a random forest. I added a separate bootstrap polynomial-ridge predictor as a sensitivity, without changing the primary verdict.
+Second, I tested another predictor. The original custom model was a random forest; the follow-up used bootstrap polynomial ridge. The joint-shift lift error changed sharply:
 
 ![Predictor error sensitivity under thickness and joint shifts.](/images/notes/airfrans-conformal-ood/predictor-sensitivity.png)
 
-*The random-forest joint-shift failure was not shared by bootstrap ridge. Joint lift range-normalised RMSE fell from 0.125 to 0.037; joint drag fell from 0.225 to 0.125.*
+*For the joint shift, range-normalised lift RMSE fell from 0.125 with the random forest to 0.037 with bootstrap ridge. Drag fell from 0.225 to 0.125.*
 
-This result stopped me from attributing every bad interval to the conformal layer. Calibration wraps a predictor; it does not erase predictor bias or manufacture a useful difficulty ranking.
+That stopped me from blaming the conformal layer for everything. Calibration wraps the predictor; it cannot remove point-prediction bias or invent a useful uncertainty ranking.
 
-### 3. Identity reuse can hide inside a “reference” task
+Third, I checked simulation identities. The so-called full-test reference pool reused 41 AoA target cases and 103 Reynolds target cases. After removing them, the transfer intervals remained wide and group-imbalanced. The check did not reverse the conclusion, but it showed how easily label reuse can hide behind a different task name.
 
-The full-test reference pool overlapped 41 identities with the AoA target and 103 with the Reynolds target. I reran the residual-transfer analysis after removing those identities, leaving reference pools of 159 and 97 cases.
+## What I actually learned
 
-The disjoint rerun preserved the main interpretation: normalised transfer retained higher coverage but at extreme target-range-normalised width, especially for Reynolds. Removing overlap materially worsened Reynolds absolute transfer. A reference dataset is not independent merely because it has a different task name.
+I began with the idea that a better calibration scheme might make a CFD surrogate safer. I finished with a less glamorous but more useful list:
 
-## What I concluded
+1. Target labels can repair severe undercoverage.
+2. Good marginal coverage does not guarantee a useful worst group.
+3. A method can be correct and still refuse because the group is too small.
+4. The number of calibration labels changes the method's feasibility.
+5. Predictor error and uncertainty ranking still matter after calibration.
+6. Case identities must be checked before any transfer experiment.
+7. An infinite interval is information, not an inconvenient plotting value.
 
-The paper's result is not “conformal prediction works” or “conformal prediction fails.” The conclusions are narrower and more useful:
+The negative result was more useful than a tuned success would have been. It made me keep the split contract, the missing field endpoint, the identity overlap, and the failed method visible.
 
-1. **Target labels can repair severe empirical undercoverage.** Pooled absolute calibration moved marginal coverage close to 0.90 in all four audited shifts.
-2. **Marginal coverage does not guarantee a useful worst-group operating point.** Group balance, width, and finite availability must be reported separately.
-3. **Calibration budget is part of the method.** At 90% nominal coverage, eight labels force refusal; thirteen can make the same groupwise construction finite.
-4. **Infinity is a valid result.** It should not be converted into a coverage marker or hidden with an uncorrected quantile.
-5. **The predictor remains in the loop.** Point error and spread–error ranking can dominate what calibration is able to recover.
-6. **Identity lineage must be audited before transfer.** Different arrays or task names can still reuse the same physical cases.
-7. **This is not source-to-OOD validity.** Calibration consumed labels from deployment-like target pools; the results are empirical benchmarks on a fixed, physically grouped subset.
+If I continue this work, I will start with a fresh untouched target pool and plan the label budget before comparing methods. The next question is no longer “Which interval method wins?” It is “What evidence has to exist before an interval deserves to guide an engineering decision?”
 
-## What the work changed in me
-
-I started the project looking for a reliability layer. I ended it thinking more about experimental contracts.
-
-The most important decisions happened before and after the main run: auditing the 71 GB raw archive out of scope; replacing a vacuous identity-based geometry split with a thickness-region contract; freezing a stop rule; retaining infinity; separating primary from post-primary analyses; and checking case identities before transfer.
-
-The paper became stronger when I stopped trying to make every figure look like success. A negative result can still support a concrete engineering recommendation: design calibration budgets against conformal-rank requirements, expose refusal, and test the predictor before interpreting its interval.
-
-If I continue this line of work, I would start with a fresh untouched target and a method that states its shift or selection assumptions explicitly. I would also plan label allocation before any model comparison. The next question is no longer “Which interval method wins?” It is “What evidence and budget are required before an interval can be trusted as an engineering object?”
-
-The reproducibility package, source manifests, tests, figures, tables, and archived release are available in the [Paper 1 repository](https://github.com/gaoflow/airfrans-conformal-ood-audit). The public package identifies release `v1.0.2` and fixed commit `12c42a582f3190591ac7f5fcdc19c1bfb93355e5`.
+The code, data lineage, tests, figures, and archived paper package are in the [Paper 1 repository](https://github.com/gaoflow/airfrans-conformal-ood-audit), release `v1.0.2`, commit `12c42a582f3190591ac7f5fcdc19c1bfb93355e5`.

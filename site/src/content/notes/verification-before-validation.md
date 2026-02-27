@@ -1,110 +1,103 @@
 ---
-title: 'Verification Before Validation: A Practical CFD Evidence Ladder'
+title: 'I Stopped Calling Every CFD Check “Validation”'
 image: /images/notes/covers/verification-before-validation.svg
 published: 2026-07-26
-summary: 'A decision-oriented method for separating code checks, numerical verification, physical validation, and production readiness before aerodynamic numbers are trusted.'
+summary: 'A habit I learned across airfoil, cooling, and full-car projects: first check the code, then the numerics, then the physics, and only then decide whether the workflow is ready for design work.'
 tags: [CFD]
 sourceProjects: [airfoil-methods, fsae-cooling, f1-2026-aero]
 featured: true
 order: 1
 ---
 
-One question decides everything downstream: **what did this run establish, what checked it, and what may I now decide?** Keeping four claim layers separate let my F1 2026 campaign publish a verified coefficient pipeline and a NO-GO production decision at the same time. A converged solver can still compute the wrong physics; a simulation that matches one experiment can still sit on an unresolved grid.
+I used to put too many things under the word “validation.” A solver ran, residuals dropped, a curve looked sensible—validation.
 
-## Four claims that must stay separate
+That shortcut became dangerous once my projects grew. A correct implementation can use the wrong physics. A numerically stable result can sit on a bad mesh. A model can match one experiment and still be unsafe for a different geometry.
 
-| Layer | Question | Typical evidence | What it does not prove |
-|---|---|---|---|
-| Implementation | Does the code execute the intended equations and conventions? | unit tests, manufactured or analytical cases, conservation checks | that the model represents the real vehicle |
-| Numerical verification | Is the reported result sufficiently insensitive to numerical choices? | grid/time-step studies, iteration histories, boundedness, mass balance | that the turbulence and boundary models are physically adequate |
-| Validation | Does the model reproduce an independent physical reference within stated uncertainty? | wind-tunnel, track, rig, or published benchmark comparison | that it extrapolates to every geometry and operating point |
-| Production readiness | Is the full workflow safe to use for the intended design decision? | frozen inputs, passing gates, repeatable automation, cost and uncertainty bounds | that every future run is trustworthy without review |
+I now ask a simpler question after every result:
 
-Calling all four layers "validation" hides where the risk sits. Each layer can fail while the others look healthy.
+> What did this run actually prove, and what am I allowed to decide from it?
 
-## Gate 1 — freeze the claim before inspecting the result
+## The four checks I keep separate
 
-A verification programme starts with the output and tolerance, not with a mesh count. For an aerodynamic comparison this means fixing:
+| Step | What I am asking |
+|---|---|
+| Code check | Did I implement the equations, signs, units, and conventions correctly? |
+| Numerical check | Is the answer stable enough against mesh, time step, and sampling choices? |
+| Physical comparison | Does the model match an independent experiment or trusted benchmark? |
+| Production readiness | Is the whole workflow safe enough for the design decision I want to make? |
 
-- geometry revision and component grouping;
-- reference area, length, moment origin, axes, and coefficient signs;
-- speed, density, ground motion, wheel rotation, ride, pitch, yaw, and steering state;
-- the decision metric: load delta, balance, cooling margin, or sensitivity;
-- the averaging rule and acceptable numerical uncertainty.
+These steps can disagree. My F1 campaign is the clearest example: the coefficient pipeline works, but the production mesh does not pass. Both statements are true at the same time.
 
-Without this contract, a later change in reference area or sampling window can masquerade as an aerodynamic improvement.
+## I now write the claim before looking at the number
 
-## Gate 2 — check implementation on a problem with a known answer
+Before a sweep, I freeze the geometry revision, reference area, axes, force signs, operating point, and the output that will decide the case. I also write the tolerance and averaging rule.
 
-The best implementation check is smaller than the target CFD problem.
+This stops a later reference-area change or a convenient averaging window from looking like an aerodynamic improvement.
 
-The [Airfoil Methods project](/projects/airfoil-methods) separates three rungs: thin-airfoil theory, a Prandtl lifting-line model, and a Hess–Smith panel method. Symmetry, closure, thickness, sign conventions, and linear lift scale are all checked before any comparison with the NASA wind-tunnel series. The hierarchy exposes structural limits with numbers attached. Against the measured lift slope, thin-airfoil theory errs by 3.81% and the panel method by 13.83%. Measured stall ($C_l = 1.66$ at $17.35°$) stays invisible to both; the inviscid model answers 2.085 and keeps rising. More panels cannot fix that.
+It also makes a failed result easier to accept. If the gate was written first, I do not have to negotiate with it after seeing a result I like.
 
-The same principle applies to finite-volume work. A cavity, channel, manufactured solution, or closed energy balance reveals implementation errors that a complex vehicle case will conceal.
+## Small problems catch mistakes that a car will hide
 
-## Gate 3 — verify the exact quantity used in the decision
+My [Airfoil Methods project](/projects/airfoil-methods) became my favourite example of this.
 
-Residuals diagnose the solve; they do not accept the result. Numerical verification should follow the decision output:
+Thin-airfoil theory, lifting-line theory, and a panel method are all cheap. That is their advantage. I can check symmetry, signs, closure, lift slope, and pressure integration before touching a complex vehicle.
 
-1. **Conservation:** mass, momentum, or energy imbalance within a declared limit.
-2. **Iteration or sampling stability:** forces and moments reach a defensible steady window or statistical interval.
-3. **Spatial sensitivity:** the coefficient or temperature used for the decision is compared across a controlled refinement family.
-4. **Temporal sensitivity:** transient results are checked against time-step or sampling changes.
-5. **Model sensitivity:** alternative turbulence or wall treatments are tested only after the numerical gates pass.
+The numbers also show where the models stop. Against the measured lift slope, thin-airfoil theory misses by 3.81% and the panel method by 13.83%. The wind tunnel stalls at $C_l=1.66$ near $17.35°$. The inviscid panel model keeps climbing to 2.085.
 
-The [FSAE Cooling study](/projects/fsae-cooling) follows this order. Its 80-cell transient coolant model differs by 0.029 K from the 160-cell case and by 0.018 K under a halved time step, both inside the declared 0.1 K gate. Those checks qualify the numerical screen. They do not turn secondary-hosted component curves into first-party validation data.
+More panels will not create viscosity or stall. The model is not “bad”; I was asking it a question it cannot answer.
 
-## Grid independence is more than a cell-count comparison
+## Residuals are not the final result
 
-Three meshes form a grid study only when the refinement variable is controlled. A defensible comparison states:
+A residual plot tells me whether the algebraic solve is progressing. It does not tell me whether the force, temperature, or flow rate I care about is stable.
 
-- what was refined and by what ratio;
-- whether geometry, layers, schemes, convergence criteria, and averaging rules stayed fixed;
-- which scalar output is assessed;
-- whether the sequence is monotonic or oscillatory;
-- the observed order, or the reason it cannot be estimated;
-- the uncertainty attached to the published result.
+For the output used in the decision, I now check:
 
-Comparing unrelated "coarse", "medium", and "fine" meshes mixes topology changes, wall treatment, and local resolution into one uninterpretable delta.
+1. conservation;
+2. a stable averaging or sampling window;
+3. mesh sensitivity;
+4. time-step sensitivity when the problem is transient; and
+5. model sensitivity only after the numerical checks pass.
 
-## Gate 4 — validation needs an independent reference
+The [FSAE Cooling study](/projects/fsae-cooling) follows that order. Its selected transient model changes by 0.029 K under spatial refinement and 0.018 K when the time step is halved. Both sit inside the 0.1 K numerical gate.
 
-Validation asks a physical question, so the reference needs its own provenance and uncertainty:
+That makes the screen numerically trustworthy at its intended scale. It does not turn incomplete manufacturer data into a physical validation dataset.
 
-- configuration and geometry match;
-- Reynolds and Mach numbers;
-- ground and wheel treatment;
-- support, blockage, and wall corrections;
-- sensor calibration and repeatability;
-- alignment, ride, yaw, tyre, and environmental state;
-- the exact comparison metric.
+## I stopped treating “coarse, medium, fine” as a method
 
-When these conditions do not match, the result may still be a useful trend comparison. Call it that.
+Three meshes only form a useful grid study if I know what changed. Geometry, layers, schemes, convergence criteria, and averaging rules need to stay fixed while one controlled refinement variable moves.
 
-The Airfoil Methods study uses one traceable series: NASA TM-4074, NACA 0012, $M = 0.15$, $Re = 5.97\times10^6$, free transition. It retains the measured wake drag and stall beside the inviscid prediction precisely to show what the model cannot reproduce.
+Otherwise, the difference between “medium” and “fine” mixes too many causes. I get a delta, but I do not know what it means.
 
-## A failed mesh blocks downstream claims
+The output I care about also has to be named. A lower residual is not a substitute for checking the coefficient or temperature that drives the engineering decision.
 
-The [F1 2026 full-car project](/projects/f1-2026-aero) shows the gate doing its job. Twenty bounded meshing paths were examined: nineteen OpenFOAM outcomes and one external topology route. The best mesh still carried eight highly skew faces, so none met the zero-failure volume-mesh contract. The production decision was **NO-GO**.
+## Physical validation needs an independent reference
 
-A solver history from a rejected coarse mesh can still test coefficient plumbing and sign conventions. It cannot be promoted into a production aerodynamic prediction. Numerical calm downstream does not repair invalid topology upstream.
+When I compare with a wind-tunnel or rig result, I now check whether the geometry, Reynolds number, Mach number, ground treatment, wheels, support, blockage correction, ride, yaw, and measured quantity actually match.
 
-## A compact publication checklist
+If they do not, I may still have a useful trend comparison. I call it a trend comparison.
 
-Before a CFD number appears in a portfolio or design review, the reader should be able to recover:
+The Airfoil Methods page keeps the NASA NACA 0012 data beside the inviscid prediction for exactly this reason. The agreement in the linear range is useful. The missing wake drag and stall remain visible.
 
-1. the engineering decision and frozen operating point;
-2. geometry and reference-quantity provenance;
-3. boundary conditions and model choices with reasons;
-4. complete mesh-quality and conservation gates;
-5. force, moment, temperature, or pressure histories;
-6. spatial and temporal sensitivity for the decision metric;
-7. the independent physical reference, or an explicit statement that none exists;
-8. failed cases and the decisions they changed;
-9. a reproducible command and machine-readable evidence.
+## A failed mesh taught me where the ladder stops
 
-The payoff is a shorter path from simulation output to a bounded engineering decision.
+In the [F1 2026 full-car project](/projects/f1-2026-aero), I tried twenty bounded meshing routes. The best volume mesh still had eight failed skew faces. The mesh gate therefore said NO-GO.
 
-## Boundary of this note
+An earlier coarse case still helped me check force signs and output plumbing. It could not become a production aerodynamic prediction just because its force trace looked calm.
 
-This is a workflow for structuring evidence, not a universal tolerance table. Acceptable mesh quality, uncertainty, sampling duration, and correlation error depend on solver formulation, geometry, operating regime, and the cost of the decision. Declare those limits before using them as gates.
+That distinction saved the project from making a bigger claim than the evidence supported.
+
+## The checklist I use now
+
+Before I publish a CFD number, I want to be able to answer:
+
+- What decision is this number meant to support?
+- Which geometry and operating point produced it?
+- Did the implementation pass a known-answer check?
+- Did mesh, time step, and sampling choices move the actual decision metric?
+- Is there an independent physical reference?
+- Which failed cases changed the plan?
+- Can I regenerate the number and the figure from the same data?
+
+I do not use one universal tolerance table. The limits depend on the solver, model, geometry, and cost of being wrong.
+
+The habit I am keeping is the order: **code first, numerics second, physics third, production decision last.**

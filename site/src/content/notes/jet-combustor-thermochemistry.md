@@ -1,81 +1,81 @@
 ---
-title: 'Combustion Course Notes — Jet Combustor Thermochemistry'
+title: 'Working Through a Jet Combustor by Hand'
 image: /images/notes/covers/jet-combustor-thermochemistry.svg
 published: 2026-05-21
-summary: 'First-principles thermochemistry of a jet combustor burning n-dodecane: stoichiometry, Hess-law heating values, and adiabatic flame temperatures at lambda = 1 and lambda = 2 with 700 K compressor preheat, every figure verified against NIST data by a script.'
+summary: 'My combustion class left me with one number I wanted to understand properly: why a lean, preheated dodecane flame lands near a turbine inlet temperature instead of melting everything behind it.'
 tags: [Combustion]
 sourceProjects: []
 featured: false
 order: 7
 ---
 
-Burn n-dodecane with twice the stoichiometric air and 700 K compressor-delivery air, and the adiabatic flame temperature settles at 1832 K. That sits inside the 1700–2000 K band where modern turbines accept their inlet gas. This note rebuilds that number from first principles, and every figure in it is printed by a verification script that checks itself against NIST data and exits nonzero on failure.
+This note started with one number from my combustion class: **1832 K**.
 
-## The course in six tools
+That is the adiabatic flame temperature I get when n-dodecane burns with twice the stoichiometric air and the compressor delivers that air at 700 K. The number sits close to a realistic turbine inlet temperature. I wanted to understand how it came out of the chemistry instead of treating it as something a software package prints.
 
-The ESILV *Chemical Reaction & Combustion* course (MMN1, 2025–2026) assembles combustor arithmetic from six pieces. The worked chain below uses each of them once.
+So I rebuilt the calculation from scratch and wrote a small Python script to check every step.
 
-- **Stoichiometry.** Fix the fuel coefficient at 1 and balance atoms: C_xH_yO_z + (x + y/4 − z/2) O₂ → x CO₂ + (y/2) H₂O. For dodecane that gives 18.5 mol O₂ per mole of fuel.
-- **Air factor.** λ = real air ÷ stoichiometric air. Combustion in air writes the oxidiser as O₂ + 3.76 N₂, and with λ > 1 the excess (λ − 1) × 18.5 mol O₂ survives into the exhaust.
-- **Hess's law.** The reaction enthalpy at 298 K is a sum of standard formation enthalpies, products minus reactants.
-- **LHV vs HHV.** Water vapour in the products gives the lower heating value, liquid water the higher one. A turbine never condenses its exhaust, so LHV is the working number.
-- **Kirchhoff and the flame temperature.** Assume adiabatic, constant-pressure, complete combustion: the 298 K reaction enthalpy plus the reactants' sensible enthalpy heats the products. With Cp(T) laws the balance becomes an equation in the flame temperature.
-- **Equilibrium.** K(T), the reaction quotient, Le Chatelier's law: the machinery for dissociation and partial equilibria. I did not use it here — the boundary section prices that omission.
+## My first pass was just atom counting
 
-## Why a jet combustor runs lean
+I used n-dodecane, $C_{12}H_{26}$, as a simple stand-in for kerosene. Balancing one mole of fuel gives 18.5 moles of oxygen. With nitrogen included, that becomes about 88.1 moles of stoichiometric air, or 14.9 kg of air per kilogram of fuel.
 
-A stoichiometric kerosene flame would destroy the turbine behind it. The combustor's architecture exists to hold a stable flame while diluting its exhaust down to a temperature the blades survive.
+The air factor $\lambda$ is simply real air divided by stoichiometric air. At $\lambda=2$, the combustor gets twice the minimum air. The excess oxygen stays in the exhaust instead of taking part in the main reaction.
 
-The binding constraint is the turbine inlet temperature. MIT's Unified Engineering propulsion notes let it range up to 2000 K and work an example at 1800 K. The blades survive above their alloy's melting point because compressor air is pumped through them and out through surface holes as a cooling film. The course says the same from the combustor side: the chamber is built from nickel or cobalt alloys, sometimes ceramics, and its exit temperature is controlled with wall cooling and fuel flow.
+That immediately explained something from the lecture that had sounded like a design detail: a jet combustor cannot send all of its air through one intense flame zone. The primary zone stays near the mixture needed for a stable flame. More air enters later to cool the liner and dilute the gas before the turbine.
 
-My computed adiabatic flame temperature at λ = 1 is 2410 K — several hundred kelvin above the turbine limit even after discounting the model's known overestimation. So the combustor must run lean overall. Routing all of that air through the flame zone would blow the flame off its holder, and the course treats flame blowing as a real failure mode. The resolution is staged air, and the slides state it in one sentence: "The air is in strong excess to avoid damaging the blades of the turbine. But that much air would blow the flame, consequently only a fraction of the air is introduced for the ignition of the flame. The rest of the air comes later." A primary zone burns near stoichiometry where the flame is strongest; dilution and liner-cooling air enter downstream and mix the gas down toward the turbine limit.
+## Then I checked the heat release
 
-The flame itself is a diffusion flame in the classical chamber. Fuel and air enter separately, so flashback into the injector is structurally impossible; the price is soot formed in the fuel-rich core, which must be oxidised before the exit. Premix burners mix cleanly and need minimal excess air, but they can flash back. The course assigns each architecture its failure mode, and the choice between them is a choice of which failure you manage.
+I used NIST formation enthalpies for liquid dodecane, carbon dioxide, and water. Hess's law gave:
 
-The excess air never goes to waste. At λ = 2 the dry exhaust still carries 10.9 mol% O₂. That leftover oxygen is what an afterburner burns: the course describes extra fuel injected downstream of the turbine, ignited by the excess air the main combustion left behind. Part of the staged air also films the liner walls, keeping the metal below its limit while the core gas stays hot.
+| Result | Value |
+|---|---:|
+| Lower heating value | 44.1 MJ/kg |
+| Higher heating value | 47.5 MJ/kg |
+| NIST combustion enthalpy check | within 0.2 kJ/mol |
 
-## Worked numbers, verified against NIST
+The last line mattered to me. My calculated higher heating value was $-8085.8$ kJ/mol; the NIST measurement is $-8086.0\pm1.2$ kJ/mol. That agreement told me I had not made a silent sign or phase mistake before moving on to temperature.
 
-Every number in this section is printed by `research/combustion-thermo/verify_thermo.py`. The script asserts each value against an expected magnitude within a stated tolerance and exits nonzero if any check fails.
+## The flame-temperature result finally made physical sense
 
-The data are published values from the NIST Chemistry WebBook (SRD 69, fetched 2026-08-18), the source the course slides point to. Formation enthalpies at 298 K: C₁₂H₂₆(l) −352.1, CO₂(g) −393.51, H₂O(g) −241.826, H₂O(l) −285.830 kJ/mol. Heat capacities come from the NIST-JANAF Shomate fits (Chase 1998); the script collapses each into a linear law Cp = a + b·T by least squares over 300–3000 K:
+I fitted simple temperature-dependent heat-capacity laws to NIST Shomate data and solved the adiabatic energy balance. The script produced:
 
-| Species | a (J/mol/K) | b (J/mol/K²) |
-|---|---|---|
-| N₂ | 29.293 | 0.00304 |
-| O₂ | 30.696 | 0.00338 |
-| CO₂ | 44.989 | 0.00701 |
-| H₂O(g) | 33.230 | 0.00835 |
+| Case | Adiabatic temperature |
+|---|---:|
+| $\lambda=1$, reactants at 298 K | 2410 K |
+| $\lambda=2$, reactants at 298 K | 1505 K |
+| $\lambda=1$, air at 700 K | 2683 K |
+| $\lambda=2$, air at 700 K | 1832 K |
 
-Before trusting any flame temperature, the script cross-checks the enthalpy chain itself: the Hess-law HHV computes to −8085.8 kJ/mol against NIST's directly measured combustion enthalpy of −8086.0 ± 1.2 kJ/mol for liquid dodecane. Agreement inside 0.2 kJ/mol means the formation-enthalpy inputs are consistent, so the flame-temperature results inherit that confidence.
+A stoichiometric, preheated flame reaches 2683 K in this simple model. That is far beyond the temperature I would want to hand to a turbine. Doubling the air brings it down to 1832 K. Solving the calculation backwards gives $\lambda\approx2.07$ for a target of 1800 K.
 
-The verified table, copied from the script output:
+This was the moment the combustor layout stopped looking arbitrary. The primary zone exists to keep the flame alive. The dilution air exists to make the turbine survive. The two needs fight each other, so the chamber stages the air instead of mixing everything at the inlet.
 
-| Quantity                             |    Value | Unit   |
-|--------------------------------------|----------|--------|
-| Stoich. O2 per mol fuel              |     18.5 | mol    |
-| Stoich. air per mol fuel             |     88.1 | mol    |
-| Stoich. air-fuel ratio (mass)        |     14.9 | kg/kg  |
-| Reaction enthalpy 298 K, LHV basis   |    -7514 | kJ/mol |
-| LHV (water vapour)                   |     44.1 | MJ/kg  |
-| HHV (water liquid)                   |     47.5 | MJ/kg  |
-| Fuel vaporisation enthalpy           |     61.2 | kJ/mol |
-| T_ad, lambda=1, reactants 298 K      |     2410 | K      |
-| T_ad, lambda=2, reactants 298 K      |     1505 | K      |
-| T_ad, lambda=1, air preheat 700 K    |     2683 | K      |
-| T_ad, lambda=2, air preheat 700 K    |     1832 | K      |
-| lambda for 1800 K exit, air 700 K    |     2.07 | -      |
-| O2 in dry exhaust, lambda=2          |     10.9 | mol%   |
-| CO2 in dry exhaust, lambda=2         |      7.1 | mol%   |
-| Exhaust per kg fuel, lambda=2        |     30.8 | kg/kg  |
+## The leftover oxygen also explained the afterburner
 
-Three reads on these numbers. First, preheat is worth real temperature: raising the air from 298 to 700 K adds 327 K at λ = 2, because 176 mol of air per mole of fuel carries a large sensible enthalpy. 700 K is a plausible compressor delivery; MIT's turbojet example at pressure ratio 25 lands near 750 K from a 300 K inlet. Second, λ = 2 with that preheat produces 1832 K, and the inverse solve puts λ = 2.07 exactly on 1800 K. That is the sizing arithmetic a combustor designer runs when setting the dilution-air split against a turbine limit. Third, the exhaust is 30.8 kg per kilogram of fuel, so a small fuel flow trims the temperature of a large air stream. That is why the course lists fuel-flow modulation as the combustor's temperature control.
+At $\lambda=2$, the dry exhaust still contains about 10.9 mol% oxygen. That is why an afterburner can inject more fuel downstream of the turbine and still burn it. The main combustor deliberately leaves oxygen unused.
 
-## Boundary of the model
+The same calculation says the exhaust flow is about 30.8 kg per kilogram of fuel. A relatively small change in fuel flow therefore changes the temperature of a very large air stream. That made the course note about fuel-flow temperature control much easier to remember.
 
-- **Linear Cp.** Against the full Shomate curves, the linear laws misprice the sensible-enthalpy integral from 298 to 2500 K by 1.1% in the worst case (CO₂). The script checks the integral because that is the quantity the energy balance consumes. Pointwise, CO₂'s curvature costs about 5% near 1500 K.
-- **No dissociation.** Above roughly 2000 K, CO₂ and H₂O partially dissociate and absorb energy, and the course is explicit that adiabatic flame temperatures overestimate real flames, which also radiate. Treat 2410 K at λ = 1 as an upper bound. The λ = 2 results sit below 1900 K, where the error is smaller, and the equilibrium tools from the course map are the way to do better.
-- **Idealised balance.** Complete combustion, adiabatic walls, ideal gases, air as O₂ + 3.76 N₂, fuel as liquid at 298 K with vaporisation folded into the LHV basis (61.2 kJ/mol, 0.8% of the heat release).
-- **Surrogate fuel.** Kerosene is a blend; I used n-dodecane as a single-component stand-in, a standard choice in combustion coursework. For scale, MIT's notes use 42.8 MJ/kg for a conventional hydrocarbon fuel where the script computes 44.1 MJ/kg for pure C₁₂H₂₆.
+## What I had to keep honest
 
-Reproduce: `python3 research/combustion-thermo/verify_thermo.py` prints the table above and runs 21 checks; it exits 0 only if every value sits within its stated tolerance.
+The neat numbers are still an idealised model.
+
+- I used linear heat-capacity fits. The integrated enthalpy error stays around 1.1% in the worst species check, but the real curves are not straight.
+- I ignored dissociation. Above about 2000 K, carbon dioxide and water start taking energy back into chemical bonds. The 2410 K and 2683 K values are therefore upper-bound-type numbers, not measured flame temperatures.
+- I assumed complete combustion, adiabatic walls, ideal gases, and air as $O_2+3.76N_2$.
+- Kerosene is a blend; n-dodecane is only a single-component stand-in.
+
+These limits do not make the exercise useless. They tell me which conclusions are safe. The lean, preheated case explains the right temperature scale and the role of staged air. The stoichiometric high-temperature cases tell me where equilibrium chemistry and heat loss must enter next.
+
+## What I kept from the exercise
+
+The most useful part was not memorising 1832 K. It was learning a chain I can rebuild:
+
+1. balance the reaction;
+2. check the heat release against a primary data source;
+3. add the sensible enthalpy carried by hot compressor air;
+4. solve for flame temperature;
+5. compare it with the turbine limit; and
+6. state what the simplified chemistry leaves out.
+
+The calculation now lives in `research/combustion-thermo/verify_thermo.py`. It runs 21 checks and prints the table, so I can change an assumption without losing track of the arithmetic.

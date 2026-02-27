@@ -1,207 +1,129 @@
 ---
-title: 'From CFD Claim to Auditable Evidence'
+title: 'I Got Tired of Copying Numbers into Markdown'
 image: /images/notes/covers/from-cfd-claim-to-auditable-evidence.svg
 published: 2026-08-22
-summary: 'A small evidence-manifest pattern that connects every public engineering number to generated data, an explicit acceptance rule, provenance, and a reproducible command.'
+summary: 'A small tooling habit that stopped my figures, JSON files, and project pages from disagreeing every time I reran an analysis.'
 tags: [Coding]
 sourceProjects: [evidence-kit, flowlab, flowrom, airfoil-methods, ground-effect-vlm, fsae-cooling, f1-2026-aero]
 featured: false
 order: 6
 ---
 
-Every public number on this site is backed by a claim record that an audit script resolves, evaluates, and re-checks on demand — 76 claims across 17 projects currently pass. Without that link, prose, figures, JSON, and source code drift independently.
+The same number kept appearing in four places: a JSON file, a figure, a report, and a project page.
 
-An evidence manifest makes the claim itself executable.
+Then I reran the analysis.
 
-## Treat the claim as a typed record
+The JSON changed. The figure changed. The sentence in Markdown did not.
 
-A useful claim contains more than a sentence. It identifies:
+After enough of these small mismatches, I stopped trusting myself to keep every copy in sync. I built a tiny evidence manifest instead.
 
-- a stable claim ID;
-- the exact public statement;
-- a machine-readable metric location;
-- an operator and expected value or limit;
-- every artifact required to inspect it;
-- source and method provenance;
-- the result observed by the audit;
-- pass or fail state.
+## I wanted every public number to point somewhere
 
-A real record from the FlowLab manifest:
+A sentence on the site can still sound natural, but the number inside it should come from one machine-readable location.
+
+For each quantitative claim, I now record:
+
+- a stable ID;
+- the sentence I am trying to support;
+- the JSON file and exact path to the value;
+- the comparison that should pass;
+- the files needed to inspect the result; and
+- the sources or scripts that produced it.
+
+One FlowLab record looks like this:
 
 ```json
 {
   "id": "u-centerline-rmse",
-  "statement": "The finest-grid streamwise centerline RMSE is below 1% of lid speed.",
+  "statement": "The finest-grid centerline RMSE is below 1% of lid speed.",
   "metric": {
     "path": "results/validation.json",
     "pointer": "/cases/2/uCenterlineRmse"
   },
-  "expectation": {
-    "operator": "<=",
-    "value": 0.01
-  },
+  "expectation": { "operator": "<=", "value": 0.01 },
   "artifacts": [
     "results/validation.json",
     "results/centerline-validation.svg"
-  ],
-  "sourceIds": ["ghia-1982", "solver", "validator"]
+  ]
 }
 ```
 
-The article may paraphrase the result. The manifest defines the auditable boundary.
+The article can paraphrase the result. The manifest tells me which value the sentence depends on.
 
-## Why a JSON pointer beats copying a number
+## A pointer is safer than another copied number
 
-Copying `0.00286` into Markdown creates a second source of truth. Pointing to `/cases/2/uCenterlineRmse` in generated JSON lets the audit:
+If I paste `0.00286` directly into Markdown, I have created a second source of truth.
 
-1. load the published result;
-2. resolve the exact nested value;
-3. apply the declared comparison;
-4. record the observed value;
-5. fail if the data or schema changes.
+If I point to `/cases/2/uCenterlineRmse`, the audit can load the JSON, find the exact value, compare it with 0.01, and fail if the file or schema changes.
 
-The prose still gets reviewed for meaning. The number no longer depends on manual synchronisation.
+I still have to judge whether RMSE is the right metric and whether 1% is a sensible gate. The script only stops the publication surfaces from drifting apart.
 
-## Expectations must represent the published decision
+## A passing audit does not mean the design succeeded
 
-A passed claim means the published statement matches the evidence — it says nothing about whether the engineering design succeeded.
+This distinction mattered in my F1 project.
 
-For a successful validation metric:
+One claim says the 25–35 million-cell production baseline has **not** completed. The expected value is `false`. The claim passes because the page honestly reports the NO-GO state.
 
-```json
-{ "operator": "<=", "value": 0.01 }
-```
+That changed how I thought about automated checks. The test should not reward only good outcomes. It should reward agreement between the public statement and the evidence.
 
-For a deliberate production rejection, the F1 manifest carries:
+A failed mesh, rejected architecture, or infinite interval can all pass the publication audit if the page says exactly that.
 
-```json
-{
-  "id": "baseline-boundary",
-  "metric": { "path": "results/pilot-analysis.json", "pointer": "/baseline/completed" },
-  "expectation": { "operator": "==", "value": false }
-}
-```
+## I now treat files as part of the claim
 
-The 25–35 million-cell baseline has not completed, the article says so, and the claim passes. Rewriting the audit so only favourable outcomes can pass would destroy the value of failure evidence.
+A screenshot proves that a plot rendered. It does not let me recompute the number.
 
-## Artifacts are part of the claim
+For an important result, I keep the minimally processed data, JSON or CSV summary, generated figure, relevant logs, source identifiers, and regeneration command together. The audit checks that the files exist, stay inside the project, and have not been silently replaced.
 
-A manifest should list every file needed to interpret the result:
+This also stopped another bad habit: hand-editing a figure in `public/` because it looked slightly better. The project now generates the publication copy only after the source result passes.
 
-- raw or minimally processed histories;
-- machine-readable summary JSON or CSV;
-- the generated figure shown in the article;
-- mesh-quality or solver logs;
-- methodology report;
-- source data or source identifiers;
-- scripts or commands that regenerate the output.
-
-The audit rejects missing files, paths that escape the project root, and unsupported references. It hashes artifacts so silent replacement becomes visible.
-
-A valid artifact path is not automatically sufficient evidence. A screenshot proves a plot rendered; it cannot replace the underlying data needed to recompute the metric.
-
-## Source provenance has different forms
-
-A source record can point to:
-
-- a public paper, report, or dataset with URL and citation metadata;
-- a repository file with a content hash;
-- first-party measured data with calibration and permission records;
-- a generated internal artifact with the command that produced it;
-- an explicitly unavailable private source, when publication rights prevent release.
-
-Unknown or inaccessible sources stay visible as limitations. The manifest never invents a public citation to make the graph look complete.
-
-## One build should generate every publication surface
-
-The safest publication flow is:
+My preferred flow is:
 
 ```text
 owned inputs
-  → deterministic analysis
-  → machine-readable results
+  → analysis
+  → JSON / CSV results
   → figures and report
-  → evidence audit
-  → site publication copy
+  → claim audit
+  → portfolio copy
 ```
 
-The website receives generated copies only after the project output passes. Hand-editing a figure or JSON file inside `public/` creates an unaudited fork.
+One command per project makes the route repeatable.
 
-A project-level command regenerates the complete payload. The portfolio-level command then audits all project manifests and builds the aggregate catalogue.
+## Dogfooding it on my own portfolio
 
-## Dogfood result from this portfolio
+The [Evidence Kit project](/projects/evidence-kit) currently checks 76 claims across 17 projects and 54 project artifacts.
 
-The [Evidence Kit project](/projects/evidence-kit) audits eleven numerical studies:
+Those claims include successful numerical checks and deliberate rejections. The F1 NO-GO statements pass because the evidence confirms the rejection. The cooling page passes because the hydraulic numbers and temperature failure match the published text. The Airfoil Methods page passes because its measured and predicted values resolve to the same generated tables used by the figures.
 
-| Project | Class | Claims |
-|---|---|---:|
-| Airfoil Methods | analytical and panel validation | 4 |
-| F1 2026 Aero | full-car workflow and NO-GO gate | 9 |
-| FlowLab | lattice-Boltzmann cavity validation | 4 |
-| FlowROM | reduced-order modelling | 4 |
-| Ground Effect VLM | ground-effect low-order model | 5 |
-| FSAE Cooling | hydraulic and thermal screening | 5 |
-| Dimensionless Numbers | dimensionless-number toolkit with dimensional guards | 4 |
-| Steady Conduction 1-D | finite differences vs analytical | 4 |
-| Heat Diffusion 2-D | explicit FTCS vs analytical | 4 |
-| Pipe Flow Sizing | verified friction and pump intersection | 4 |
-| Potential Flow Sandbox | complex-potential verification | 4 |
+The audit checks a narrow set of things:
 
-The aggregate result:
+- the manifest is well formed;
+- the metric path exists;
+- the comparison gives the recorded result;
+- the required files exist;
+- duplicate or malformed claims are rejected; and
+- the aggregate JSON, CSV, and HTML can be rebuilt.
 
-| Measure | Count |
-|---|---:|
-| Projects audited | 17 |
-| Claims declared | 76 |
-| Claims passing | 76 |
-| Project artifacts | 54 |
+That narrowness is intentional. Solvers and analysis scripts do not need to understand the website.
 
-The mix matters. The catalogue includes successful numerical thresholds and explicit rejection decisions — the F1 NO-GO claims pass because the evidence confirms the rejection, not despite it.
+## What the script cannot decide for me
 
-## What the audit checks
+The manifest cannot tell me whether a turbulence model is appropriate, a tunnel case really matches my geometry, a sensor is trustworthy, or an NDA allows publication.
 
-The current small-interface audit verifies:
+It also cannot catch an important negative result I chose not to include.
 
-- manifest schema and project identity;
-- metric pointer resolution;
-- numeric, Boolean, and equality comparisons;
-- required artifacts and root containment;
-- content hashing;
-- duplicate and malformed claims;
-- source references;
-- retention of failed claim states;
-- aggregate JSON, CSV, and HTML publication.
+Those are engineering and judgement problems. The tool only makes the evidence easier to inspect and harder to miscopy.
 
-The interface is deliberately narrow: one project manifest in, one observed audit record out. Project solvers never need to know the portfolio rendering system.
+## The habit I am keeping
 
-## What the audit cannot establish
+Before I put a headline number on a project page, I now ask:
 
-Automation cannot decide whether:
+1. Can one command recreate it?
+2. Is the result stored in JSON or CSV instead of only in prose?
+3. Does the claim point to that exact value?
+4. Are the figure and report built from the same data?
+5. Will the audit fail if I rerun the project and forget to update the page?
 
-- a turbulence model is physically appropriate;
-- a validation reference matches the configuration;
-- the chosen uncertainty limit is sufficient for the design decision;
-- a sensor or source dataset is trustworthy;
-- an NDA permits publication;
-- an attractive result omitted an important negative case.
+This is a small amount of structure, not a grand data platform. It exists because I know I will forget a manual copy eventually.
 
-Those remain engineering-review questions. The manifest makes the underlying evidence inspectable; judgement still has to be supplied.
-
-## A publication gate for a new project
-
-Before presenting a headline metric, require:
-
-1. owned implementation and versioned inputs;
-2. one command that regenerates results and figures;
-3. explicit numerical acceptance criteria;
-4. a manifest for every public quantitative statement;
-5. raw failure retention;
-6. traceable sources and publication permission;
-7. an honest limitations section;
-8. a portfolio-level audit with nonzero exit on mismatch.
-
-This gate is stricter than visual review and cheaper than reconstructing provenance after publication.
-
-## Boundary of this note
-
-An evidence manifest is a compact control for keeping a technical portfolio internally consistent and making claims cheap to challenge. It is no regulated data-management system, cryptographic attestation service, or substitute for independent replication.
+The best part is that challenging a number is now cheap. I can open the claim, follow the pointer, rerun the command, and see whether the sentence still deserves to be there.
