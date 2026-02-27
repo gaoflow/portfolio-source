@@ -35,18 +35,25 @@ const projects = defineCollection({
   }),
 });
 
-const notes = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/notes' }),
-  schema: z.object({
-    title: z.string(),
-    image: z.string().optional(),
-    published: z.coerce.date(),
-    summary: z.string(),
-    tags: z.array(z.string()).default([]),
-    sourceProjects: z.array(z.string()).default([]),
-    featured: z.boolean().default(false),
-    order: z.number().default(99),
-  }),
+const noteSchema = z.object({
+  title: z.string(),
+  image: z.string().optional(),
+  published: z.coerce.date(),
+  summary: z.string(),
+  tags: z.array(z.string()).default([]),
+  sourceProjects: z.array(z.string()).default([]),
+  featured: z.boolean().default(false),
+  order: z.number().default(99),
 });
 
-export const collections = { projects, notes };
+const notes = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/notes' }),
+  schema: noteSchema,
+});
+
+const notesCn = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/notes-cn' }),
+  schema: noteSchema,
+});
+
+export const collections = { projects, notes, notesCn };

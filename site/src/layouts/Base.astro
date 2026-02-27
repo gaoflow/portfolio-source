@@ -12,8 +12,21 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  locale?: 'en' | 'cn';
+  alternatePath?: string;
 }
-const { title, description = profile.tagline, image = '/og-card.png' } = Astro.props;
+const {
+  title,
+  description = profile.tagline,
+  image = '/og-card.png',
+  locale = 'en',
+  alternatePath,
+} = Astro.props;
+const isChinese = locale === 'cn';
+const htmlLang = isChinese ? 'zh-CN' : 'en';
+const alternateUrl = alternatePath
+  ? new URL(alternatePath, Astro.site ?? Astro.url).toString()
+  : undefined;
 const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — ${profile.role}`;
 const socialImage = new URL(image, Astro.site ?? Astro.url).toString();
 const structuredData = {
@@ -36,22 +49,25 @@ const structuredData = {
   ],
 };
 
+const notesHref = isChinese ? '/cn/notes' : '/notes';
 const nav = [
   { href: '/', label: 'Home' },
   { href: '/projects', label: 'Projects' },
-  { href: '/notes', label: 'Notes' },
+  { href: notesHref, label: 'Notes' },
   { href: '/about', label: 'About' },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={htmlLang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="canonical" href={Astro.url} />
+    <link rel="alternate" hreflang={htmlLang} href={Astro.url} />
+    {alternateUrl && <link rel="alternate" hreflang={isChinese ? 'en' : 'zh-CN'} href={alternateUrl} />}
     <link rel="icon" type="image/png" href="/avatar_cats1.png" />
     <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
@@ -81,6 +97,11 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
               {n.label}
             </a>
           ))}
+          {alternatePath && (
+            <a href={alternatePath} class="font-serif text-xs text-stone transition-colors hover:text-accent">
+              {isChinese ? 'EN' : '中文'}
+            </a>
+          )}
           <a href={profile.cvUrl} class="btn btn-secondary">CV</a>
         </nav>
       </div>

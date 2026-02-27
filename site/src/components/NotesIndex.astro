@@ -1,0 +1,59 @@
+---
+import Base from '../layouts/Base.astro';
+import { profile } from '../data/profile';
+import type { CollectionEntry } from 'astro:content';
+
+type Locale = 'en' | 'cn';
+type NoteEntry = CollectionEntry<'notes'> | CollectionEntry<'notesCn'>;
+
+interface Props {
+  notes: NoteEntry[];
+  locale: Locale;
+  hasAlternate: boolean;
+}
+
+const { notes, locale, hasAlternate } = Astro.props;
+const isChinese = locale === 'cn';
+const sortedNotes = [...notes].sort(
+  (a, b) => b.data.published.getTime() - a.data.published.getTime() || a.data.order - b.data.order,
+);
+const basePath = isChinese ? '/cn/notes' : '/notes';
+const title = isChinese ? '文章' : 'Engineering Notes';
+const description = isChinese
+  ? '关于移动开发、后端、工程项目和学习经历的个人记录。'
+  : 'Personal notes from my CFD, coding, and engineering projects—what I tried, what broke, what changed my mind, and what I learned next.';
+const intro = isChinese
+  ? '这些文章记录我做过的项目、遇到的问题、改变判断的证据，以及下一次会采用的做法。'
+  : 'I write these after a project leaves me with something worth remembering: what I tried, where it broke, what changed my mind, and what I would do differently next time.';
+const alternatePath = hasAlternate ? (isChinese ? '/notes' : '/cn/notes') : undefined;
+---
+
+<Base title={title} description={description} locale={locale} alternatePath={alternatePath}>
+  <section class="mx-auto max-w-5xl px-6 pt-16 pb-20">
+    <h1 class="section-label mb-2">{title}</h1>
+    <p class="max-w-2xl text-muted mb-10">{intro}</p>
+
+    {sortedNotes.length === 0 && isChinese ? (
+      <p class="border border-edge bg-surface p-6 text-muted">中文文章尚未加入当前构建。</p>
+    ) : (
+      <div class="grid gap-5">
+        {sortedNotes.map((note, index) => (
+          <a href={`${basePath}/${note.id}`} class="group border border-edge bg-surface p-6 transition-shadow hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)]">
+            {note.data.image && (
+              <img src={note.data.image} alt={note.data.title} loading="lazy" decoding="async" class="mb-5 aspect-video w-full border border-edge object-cover" />
+            )}
+            <div class="flex flex-wrap items-center justify-between gap-3 font-serif text-xs text-stone">
+              <span><span class="section-num">{String(index + 1).padStart(2, '0')}</span></span>
+              <span>{profile.name} · <time datetime={note.data.published.toISOString()}>{note.data.published.toISOString().slice(0, 10)}</time></span>
+            </div>
+            <h2 class="mt-4 text-2xl font-medium tracking-tight group-hover:text-accent">{note.data.title}</h2>
+            <p class="mt-3 max-w-3xl text-lg leading-relaxed text-muted">{note.data.summary}</p>
+            <div class="mt-5 flex flex-wrap gap-2">
+              {note.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+            </div>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+</Base>

@@ -1,0 +1,9 @@
+---
+import NotesIndex from '../../../components/NotesIndex.astro';
+import { getCollection } from 'astro:content';
+
+const notesCn = await getCollection('notesCn');
+const hasEnglish = (await getCollection('notes')).length > 0;
+---
+
+<NotesIndex notes={notesCn} locale="cn" hasAlternate={hasEnglish} />

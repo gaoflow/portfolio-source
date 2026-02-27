@@ -1,52 +1,21 @@
 ---
-import Base from '../../layouts/Base.astro';
-import { getCollection, render } from 'astro:content';
-import { profile } from '../../data/profile';
+import NoteDetail from '../../components/NoteDetail.astro';
+import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const notes = await getCollection('notes');
-  return notes.map((note) => ({ params: { slug: note.id }, props: { note } }));
+  const [notes, notesCn] = await Promise.all([
+    getCollection('notes'),
+    getCollection('notesCn'),
+  ]);
+  const chineseIds = new Set(notesCn.map((note) => note.id));
+
+  return notes.map((note) => ({
+    params: { slug: note.id },
+    props: { note, hasChinese: chineseIds.has(note.id) },
+  }));
 }
 
-const { note } = Astro.props;
-const d = note.data;
-const { Content } = await render(note);
+const { note, hasChinese } = Astro.props;
 ---
 
-<Base title={d.title} description={d.summary}>
-  <article class="mx-auto max-w-3xl px-6 pt-16 pb-24">
-    <header class="mb-10 space-y-5">
-      <a href="/notes" class="font-serif text-xs text-stone transition-colors hover:text-accent">← Engineering Notes</a>
-      <p class="section-label">Project note</p>
-      <h1 class="text-3xl font-medium leading-tight tracking-tight md:text-5xl">{d.title}</h1>
-              <p class="text-lg leading-relaxed text-muted">{d.summary}</p>
-        {d.image && <img src={d.image} alt={d.title} class="aspect-video w-full border border-edge object-cover" />}
-        <div class="flex flex-wrap items-center gap-3 border-y border-edge-soft py-4 font-serif text-xs text-stone">
-        <span class="text-ink/80">{profile.name}</span>
-        <span aria-hidden="true">·</span>
-        <time datetime={d.published.toISOString()}>{d.published.toISOString().slice(0, 10)}</time>
-        <span aria-hidden="true">·</span>
-        {d.tags.map((tag) => <span class="tag">{tag}</span>)}
-      </div>
-    </header>
-
-    <div class="prose prose-neutral max-w-none
-      prose-headings:font-medium prose-headings:tracking-tight
-      prose-h2:mt-12 prose-h2:text-2xl
-      prose-p:text-muted prose-li:text-muted
-      prose-strong:text-ink ">
-      <Content />
-    </div>
-
-    {d.sourceProjects.length > 0 && (
-      <aside class="mt-16 border border-accent/30 bg-accent/5 p-6">
-        <h2 class="section-label mb-4">Project evidence used</h2>
-        <ul class="space-y-2 text-sm">
-          {d.sourceProjects.map((slug) => (
-            <li><a class="text-accent hover:underline" href={`/projects/${slug}`}>{slug}</a></li>
-          ))}
-        </ul>
-      </aside>
-    )}
-  </article>
-</Base>
+<NoteDetail note={note} locale="en" hasAlternate={hasChinese} />
