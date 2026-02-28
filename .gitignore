@@ -11,3 +11,4 @@ __pycache__/
 projects/*/data/generated/*.f32
 
 site/.private/
+.agent-workbench/

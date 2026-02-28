@@ -5,9 +5,9 @@ date: '2026-06-15'
 status: complete
 categories: [design]
 tags: [Design]
-summary: 'Five version lines — two abandoned — turned my Blender blockout into a ±6 mm Space Rider reconstruction and a 579 KB interactive GLB.'
-role: 'Modeller'
-duration: '1 semester'
+summary: 'The client-accepted v5.050 model closed at ±6 mm against the blueprint; a vertex-identical v5.051 derivative then packaged it for animation, Unity, and the 579 KB web viewer.'
+role: '3D modelling intern'
+duration: '17 weeks'
 featured: true
 order: 8
 studySequence: 16
@@ -17,7 +17,7 @@ heroImage: /images/projects/space-rider-blueprint.png
 
 ## Context & objectives
 
-The interactive model above — drag to rotate, scroll to zoom — is the delivered v5.051 build of ESA's Space Rider spaceplane, reconstructed in Blender from public material only. It matches the official blueprint to ±6 mm in the side view and ±8.4 mm in the top view over the 4.88 m body, and its final smoothed mesh carries zero concave dents. The brief asked for about 10 cm.
+The interactive model above — drag to rotate, scroll to zoom — is a web derivative of the animation-ready v5.051 package. The client-accepted modelling master is v5.050; v5.051 reorganises that accepted shape for animation and engine import. The reconstructed body matches the official blueprint to ±6 mm in the side view and ±8.4 mm in the top view over 4.88 m, and its final smoothed mesh carries zero concave dents. The brief asked for about 10 cm.
 
 Getting here took five version lines in four weeks of modelling (mid-May to mid-June 2026), plus a packaging and web-delivery phase in August. Two of the five lines were abandoned and rolled back. This article reconstructs that history from the project's own records: what each version tried, what broke, how the failure was found, and what fixed it.
 
@@ -26,6 +26,19 @@ Getting here took five version lines in four weeks of modelling (mid-May to mid-
 The project was my A4 internship mission at Felisiak Ingénierie & Développement, a small engineering company in Paris, April to August 2026. The company prepares satellite launch campaigns at Europe's Spaceport in Kourou, and it is building a catalogue of 3D models so engineers can review operations interactively instead of in slide shows. The models feed a campaign-review application: pick a scenario, see the launcher, pad, and ground means in 3D.
 
 Space Rider was the catalogue's first need. What the company had, in my tutor's words, was an ugly polygonal shape with roughly real proportions. The need was operational: engineers use the models to check sizes and clearances, so about 10 cm of accuracy would do. The constraints were public reference material only, a clean sealed surface, logical parts that can be animated, and FBX delivery for Unity and Blender.
+
+The catalogue supports launch-campaign preparation at Europe's Spaceport in Kourou. The company's Windows application turns two kinds of background material into an interactive review: the physical launch complex and the operation sequence from payload arrival to launch.
+
+<div class="grid gap-4 sm:grid-cols-2">
+  <figure>
+    <img src="/images/projects/space-rider/report/a6-process.jpg" alt="Ariane 6 launch complex schematic showing integration halls, fueling facilities, and launch pad" loading="lazy" />
+    <figcaption>The launch-complex schematic that inspired the campaign-review application. Source: company documentation reproduced in the Final Submit report.</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/report/a6-campaign-flow.jpg" alt="Payload launch campaign flow from arrival and integration through fueling to launch" loading="lazy" />
+    <figcaption>A typical D−6 to D0 payload campaign: arrival, integration, fueling, and launch. The 3D catalogue lets reviewers inspect these stages spatially.</figcaption>
+  </figure>
+</div>
 
 ## The reference evidence
 
@@ -39,9 +52,34 @@ ESA publishes unusually complete material on Space Rider, and the first task was
 | IXV photos (the predecessor vehicle) | Only for details missing on Space Rider images. Never for shape. |
 | ESA infographic | Cross-check of the main dimensions. |
 
+![Official ESA three-view blueprint used as the sole shape authority for the reconstruction.](/images/projects/space-rider/report/official-blueprint.png)
+
 Two rules came out of this audit. The blueprint alone controls shape, because photographs carry lens distortion and artistic licence. And IXV is not Space Rider: the predecessor wears a different paint scheme, so it could inform details but never silhouette.
 
 The calibration deserves one line of detail. The blueprint is an image, so I measured its own 4.6 m dimension callout: 1274 px, giving 276.96 px/m. The top view produced the same value independently. Every later blueprint comparison inherits that number.
+
+![Calibrated side-view blueprint after cropping and tracing. The 4.6 m dimension spans 1274 px, fixing the scale at 276.96 px/m.](/images/projects/space-rider/report/blueprint-calibration.png)
+
+The report also compares the hand-modelled hardware directly with its references. These images matter because the blueprint controls silhouette, while renders and photographs control details, paint, and materials.
+
+<div class="grid gap-4 sm:grid-cols-2">
+  <figure>
+    <img src="/images/projects/space-rider/report/comparison-tail.png" alt="Reference and reconstructed Space Rider rear structures side by side" loading="lazy" />
+    <figcaption>Rear structures: reference at left, hand-modelled service module and propulsion hardware at right.</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/report/comparison-wings.png" alt="Reference and reconstructed Space Rider solar wings side by side" loading="lazy" />
+    <figcaption>Four-panel solar wings, hinges, latches, and the service-module body.</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/report/comparison-full.png" alt="ESA full vehicle render and reconstructed Space Rider model side by side" loading="lazy" />
+    <figcaption>Full vehicle with both wings deployed: ESA render at left, reconstructed model at right.</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/report/comparison-nose.png" alt="Hardware nose photograph and reconstructed nose and boot paint side by side" loading="lazy" />
+    <figcaption>Nose and boot paint. Rivets and the logo plate are absent by explicit client rule.</figcaption>
+  </figure>
+</div>
 
 ## How the history is documented
 
@@ -89,9 +127,26 @@ Three fixes from this line earned their keep. The right-side decals had rendered
 
 **Artifact:** none on disk. The line's only residue is the rule, and the restored v2.720 baseline that v5 built on.
 
+## What I tried, rejected, and corrected
+
+The Final Submit report retains the unsuccessful work instead of smoothing it into one clean path.
+
+| Attempt | What the evidence showed | Decision |
+|---|---|---|
+| v3 micro-adjustments | Thousands of checked moves improved local scores but had no fixed global target and produced no visible overall progress. | Roll back to v2.720; require one authoritative target. |
+| v4 radial nose rebuild | Removed the wrinkle ring but shortened the nose, relaxed the belly, and shrank the black paint region. | Reject the branch; preserve proportions and paint. |
+| Taubin relaxation on the convex shell | Blended one region while creating 28 concave vertices elsewhere. | Ban inward relaxation; allow one-direction push-out only. |
+| Treating a weld ring as bad geometry | Weighted Normals removed the ring with zero vertex moves. | Check shading and normals before editing geometry. |
+| Reading the nose dent band literally | 82% of the base faces had inverted winding; the concavity metric was measuring the wrong normal direction. | Validate the metric on a known-good case, then recalculate normals. |
+| Repeated local surface patches | The patches accumulated into crease bands. | Replace them with one B-spline × Fourier global refit using 91 coefficients. |
+| A 4 cm grid-based surface constraint | Printed 2.39 mm rms ripples into the shell even though the numeric gate passed. | Use a grid-free analytic constraint; roughness fell to 0.09 mm rms. |
+| Vertex-level nose-tip corrections | The wrinkle remained because the pseudo-pole topology was the cause. | Delete 1,565 faces and rebuild the tip as a clean pole fan. |
+| v5.047 sloped rear terrace | Misread docking structure as part of the capsule. | Rebuild v5.048 with a flat vertical aft face and separate docking structure. |
+| Rivets and panel seams | 280 rivets and six seam curves added visual noise and contradicted the client's clean-shell rule. | Delete the full feature classes. |
+
 ## v5 — smooth, sealed, blueprint-exact (Jun 8–15)
 
-v5.000 restarted from the protected v2.720 with comparison cameras locked to the reference views. This line ran 51 versions in a week and became the delivered model.
+v5.000 restarted from the protected v2.720 with comparison cameras locked to the reference views. This line ran 51 versions in a week and produced the accepted v5.050 geometry plus its v5.051 animation-ready derivative.
 
 ### The nose and the paint
 
@@ -113,31 +168,60 @@ Mid-project, the client promoted the blueprint side view to the single shape sta
 
 Surface finish got the same treatment. A grid-based clamp left 2.39 mm rms ripples on the white shell; a grid-free analytic clamp cut that to 0.09 mm rms. The telling detail: v5.041's numbers had passed, and only a grazing-light render pair showed why the client still saw waves. Perceptual defects need perceptual verification.
 
+![Grazing-light comparison before and after the analytic surface constraint. The grid-printed ripple bands visible above are absent below.](/images/projects/space-rider/report/surface-rake-before-after.png)
+
 ![Final blueprint overlays in the three views: the model against the traced blueprint curves after the v5.035–046 remapping. Side view residual ≤±6 mm, top view ≤±8.4 mm.](/images/projects/space-rider/blueprint-overlay.png)
 
 ### Delivery
 
 Client rules deleted whole feature classes. Two hundred eighty rivets went in across v5.013–015 and came out on request; six panel-seam curves followed them. The tail was rebuilt twice, first misreading the blueprint's sloped terrace as capsule (v5.047), then correctly as a flat vertical aft face with a separate docking structure (v5.048). Finally the client asked to close the gap entirely: 157 service-module objects moved forward 0.2505 m into a zero-gap dock. The model sits 0.24 m shorter than the blueprint as a result — an explicit decision, documented as one.
 
-v5.050 (June 11) is the submission build. An automated cleanup removed 249 draft objects — 176 diagnostic cameras, test lights, old seam geometry — and a pixel-difference check against the previous version returned 0.00000. v5.051 (June 15) merges the 119 visible parts into four logical parts for animation and engine import: capsule, service module, left wing, right wing, vertex-identical to v5.050. The client's acceptance was three words: "shape is very nice."
+![Final flat aft face and zero-gap service-module junction introduced after the v5.047 interpretation was rejected.](/images/projects/space-rider/report/tail-junction.png)
+
+v5.050 (June 11) is the submission build and the client-accepted final source. An automated cleanup removed 249 draft objects — including 176 diagnostic cameras, test lights, and old seam geometry — and a pixel-difference check against the previous accepted render returned 0.00000. v5.051 (June 15) is a separate animation-ready derivative: it applies the modifiers and merges 119 visible parts into four logical parts for animation and engine import — capsule, service module, left wing, right wing — while retaining the v5.050 shape. The client's acceptance was three words: \"shape is very nice.\" The later request was operational: \"Join meshes for animation.\"
 
 ![The delivered v5.050 vehicle with wings deployed: white lifting-body shell, black boot paint, gold AVUM rings, and the four-panel solar wings at 12 m span.](/images/projects/space-rider/final-vehicle.png)
 
+<div class="grid gap-4 sm:grid-cols-3">
+  <figure>
+    <img src="/images/projects/space-rider/report/final-perspective.png" alt="Client-accepted Space Rider v5.050 final model in perspective view" loading="lazy" />
+    <figcaption>v5.050 perspective.</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/report/final-ortho-side.png" alt="Client-accepted Space Rider v5.050 final model in orthographic side view" loading="lazy" />
+    <figcaption>v5.050 orthographic side.</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/report/final-ortho-top.png" alt="Client-accepted Space Rider v5.050 final model in orthographic top view" loading="lazy" />
+    <figcaption>v5.050 orthographic top.</figcaption>
+  </figure>
+</div>
+
+## Final source, animation derivative, and browser model
+
+**v5.050 is the client-accepted final source file.** `space_rider_v5.050.blend` retains its modifiers and 273-object authoring structure; the release package also contains its FBX and GLB exports, five preview renders, and 42 pipeline scripts.
+
+**v5.051 is the animation-ready derivative.** It starts from v5.050, applies the modifiers, converts text and curve decals to mesh, and joins 119 visible parts into four logical components. The reentry module, service module, left wing, and right wing can then be rigged or imported into Unity without changing the accepted outer shape.
+
+![The v5.051 animation-ready derivative: four logical components prepared for rigging and engine import.](/images/projects/space-rider/report/animation-ready.png)
+
+The interactive model on this page comes from the v5.051 Web PBR export because the merged hierarchy is the correct delivery shape for a browser viewer. It is not the modelling master and it does not replace v5.050. Inspection of the uncompressed Web GLB and the published Draco GLB reports the same render vertex count, 1,536,942; their scene bounds differ only at the compression-quantisation scale.
+
 ## The web pipeline
 
-The browser model above is a 579 KB derivative of the 14.05 MB authored export, and getting it here took two real fixes.
+The browser model is a 579 KB derivative of the 14.05 MB v5.051 Web PBR export, itself an animation-ready packaging of the accepted v5.050 shape. Producing it required two additional fixes.
 
-**The solar arrays came out white.** The authored solar cells use procedural Blender shader nodes, and glTF 2.0 has no way to express them. The first web export carried the geometry across and dropped the shading. The fix is a translation that runs in an isolated web-export workspace, so the release blend stays untouched: the build copies the v5.051 source, replaces the procedural shading with a glTF-native Principled PBR material, exports the GLB, then re-imports the exported file and fails unless the `SolarCell_WebPBR` material exists and stays blue-dominant. The check runs on every build. It guarantees colour and broad PBR response; a full material-equivalence claim would need channel-by-channel texture bakes, which remain the identified follow-up.
+**The solar arrays came out white.** The v5.050 authored solar cells use procedural Blender shader nodes, and glTF 2.0 cannot express those nodes. The isolated web-export workflow starts from the v5.051 animation-ready derivative, replaces the procedural shading with a glTF-native Principled PBR material, exports the GLB, then re-imports the file and fails unless `SolarCell_WebPBR` exists and stays blue-dominant. The check guarantees colour and broad PBR response; a full material-equivalence claim would need channel-by-channel texture bakes, which remain the identified follow-up.
 
 **Shipping 579 KB instead of 14.05 MB.** Geometry simplification was the obvious step and I rejected it: simplification creates a second geometric representation, and that representation would need its own fidelity tolerance against the first. This project keeps one source of truth for shape. The site derivative uses gltf-transform's Draco compression with simplification disabled and textures recompressed to WebP at 2048 px, dropping 14,048,124 bytes to 579,460 at the original vertex count. Texture fidelity is the accepted cost. The full blend source, roughly 490 MB with textures, was never a site deliverable.
 
 The release path stays non-destructive end to end:
 
-1. preserve the authored v5.051 release blend;
-2. copy it into the isolated web-export workspace;
-3. replace the procedural solar-cell shading with Principled PBR;
-4. export glTF 2.0 as a binary GLB;
-5. re-import the GLB and verify the blue `SolarCell_WebPBR` material;
+1. preserve `space_rider_v5.050.blend` as the client-accepted authoring source;
+2. derive v5.051 by applying modifiers and joining 119 visible objects into four animation-ready components;
+3. copy v5.051 into the isolated web-export workspace;
+4. replace the procedural solar-cell shading with Principled PBR;
+5. export glTF 2.0 as a binary GLB and re-import it to verify `SolarCell_WebPBR`;
 6. produce the Draco-compressed site derivative without mesh simplification.
 
 ## Publication checks
@@ -145,6 +229,18 @@ The release path stays non-destructive end to end:
 The browser deliverable is accepted only when the model loads without a fallback, orbit and zoom remain usable, the solar arrays render blue, and reduced-motion mode disables automatic rotation. The source release, the web export, and the site derivative remain separate artifacts, so a presentation optimisation cannot silently become the modelling master.
 
 The project closed as an internship deliverable: a written report and a poster for the school defense (stage S11 2026, defense scheduled for September 10), the release package with the 42 pipeline scripts, and the animation-ready variant the client asked for.
+
+## Final verification from the report
+
+| Check | Target | Measured |
+|---|---:|---:|
+| Side view against blueprint | ≤±6 mm | within ±6 mm |
+| Top view | ≤±8.4 mm | within ±8.4 mm |
+| Tail deck | flat | ±0.6 mm |
+| Cross-sections | elliptical | worst 2.1 mm; rms 0.5 mm |
+| Concave dents | 0 | 0 |
+| Surface roughness | — | 0.09 mm rms, reduced from 2.39 mm |
+| Submission cleanup | pixel-identical | 0.00000 |
 
 ## What I took away
 
