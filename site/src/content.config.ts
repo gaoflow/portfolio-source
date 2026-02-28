@@ -1,38 +1,45 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+const projectSchema = z.object({
+  title: z.string(),
+  year: z.number(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  status: z.enum(['active', 'complete']).default('complete'),
+  categories: z.array(z.enum(['fsae', 'full-car', 'component-cfd', 'tooling', 'validation', 'design'])),
+  tags: z.array(z.string()).default([]),
+  summary: z.string(),
+  heroImage: z.string().optional(),
+  model3d: z.string().optional(),
+  role: z.string().optional(),
+  team: z.string().optional(),
+  duration: z.string().optional(),
+  academic: z.object({
+    institution: z.string(),
+    course: z.string(),
+    assignment: z.string(),
+    note: z.string().optional(),
+    requirements: z.array(z.string()).min(1),
+    media: z.array(z.object({
+      src: z.string(),
+      alt: z.string(),
+      caption: z.string(),
+    })).default([]),
+  }).optional(),
+  nda: z.boolean().default(false),
+  featured: z.boolean().default(false),
+  order: z.number().default(99),
+  studySequence: z.number().int().positive().optional(),
+});
+
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
-  schema: z.object({
-    title: z.string(),
-    year: z.number(),
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-    status: z.enum(['active', 'complete']).default('complete'),
-    categories: z.array(z.enum(['fsae', 'full-car', 'component-cfd', 'tooling', 'validation', 'design'])),
-    tags: z.array(z.string()).default([]),
-    summary: z.string(),
-    heroImage: z.string().optional(),
-    model3d: z.string().optional(),
-    role: z.string().optional(),
-    team: z.string().optional(),
-    duration: z.string().optional(),
-    academic: z.object({
-      institution: z.string(),
-      course: z.string(),
-      assignment: z.string(),
-      note: z.string().optional(),
-      requirements: z.array(z.string()).min(1),
-      media: z.array(z.object({
-        src: z.string(),
-        alt: z.string(),
-        caption: z.string(),
-      })).default([]),
-    }).optional(),
-    nda: z.boolean().default(false),
-    featured: z.boolean().default(false),
-    order: z.number().default(99),
-    studySequence: z.number().int().positive().optional(),
-  }),
+  schema: projectSchema,
+});
+
+const projectsCn = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/projects-cn' }),
+  schema: projectSchema,
 });
 
 const noteSchema = z.object({
@@ -56,4 +63,4 @@ const notesCn = defineCollection({
   schema: noteSchema,
 });
 
-export const collections = { projects, notes, notesCn };
+export const collections = { projects, projectsCn, notes, notesCn };

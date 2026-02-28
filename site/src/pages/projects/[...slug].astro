@@ -1,62 +1,21 @@
 ---
-import Base from '../../layouts/Base.astro';
-import ModelViewer from '../../components/ModelViewer.astro';
-import { getCollection, render } from 'astro:content';
+import ProjectDetail from '../../components/ProjectDetail.astro';
+import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+  const [projects, projectsCn] = await Promise.all([
+    getCollection('projects'),
+    getCollection('projectsCn'),
+  ]);
+  const chineseIds = new Set(projectsCn.map((project) => project.id));
+
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project, hasChinese: chineseIds.has(project.id) },
+  }));
 }
 
-const { project } = Astro.props;
-const d = project.data;
-const { Content } = await render(project);
-
+const { project, hasChinese } = Astro.props;
 ---
 
-<Base title={d.title} description={d.summary} image={`/og/projects/${project.id}.png`}>
-  <article class="mx-auto max-w-3xl px-6 pt-16 pb-24">
-    <!-- 1. Hero: quantified one-liner + method stack -->
-    <header class="space-y-5 mb-10">
-      <a href="/projects" class="font-mono text-xs text-muted hover:text-accent">← Projects</a>
-      <h1 class="text-3xl md:text-5xl font-medium leading-tight tracking-tight">{d.title}</h1>
-      <p class="text-xl text-warm leading-relaxed">{d.summary}</p>
-      <div class="flex flex-wrap gap-2">
-        {d.nda && <span class="tag">NDA-safe write-up</span>}
-        {d.tags.map((t) => <span class="tag">{t}</span>)}
-      </div>
-    </header>
-    {d.academic?.note && (
-      <p class="mb-10 border-l-2 border-accent pl-5 text-lg leading-relaxed text-muted">{d.academic.note}</p>
-    )}
-    {d.academic && d.academic.media.length > 0 && (
-      <div class="mb-10 space-y-10">
-        {d.academic.media.map((media) => (
-          <figure>
-            <img src={media.src} alt={media.alt} class="w-full border border-edge bg-white" loading="lazy" />
-            <figcaption class="mt-2 font-mono text-xs leading-relaxed text-stone">{media.caption}</figcaption>
-          </figure>
-        ))}
-      </div>
-    )}
-
-
-    <!-- 2. Meta bar -->
-    {d.model3d && (
-      <ModelViewer src={d.model3d} alt={d.title} poster={d.heroImage} caption="Interactive 3D — load on demand, then drag to rotate and scroll to zoom." />
-    )}
-    {d.heroImage && (
-      <img src={d.heroImage} alt={d.title} class="w-full border border-edge mb-10" loading="lazy" />
-    )}
-
-    <!-- 4-8. Body: Context / Methodology / Results / Validation / Iterations (markdown) -->
-    <div class="prose prose-neutral prose-lg max-w-none
-      prose-headings:font-medium prose-headings:tracking-tight
-      prose-h2:mt-12 prose-h2:text-3xl
-      prose-p:leading-[1.6] prose-li:leading-[1.6]
-      prose-strong:text-ink ">
-      <Content />
-    </div>
-
-  </article>
-</Base>
+<ProjectDetail project={project} locale="en" hasAlternate={hasChinese} />

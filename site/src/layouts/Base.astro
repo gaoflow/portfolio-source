@@ -49,10 +49,11 @@ const structuredData = {
   ],
 };
 
+const projectsHref = isChinese ? '/cn/projects' : '/projects';
 const notesHref = isChinese ? '/cn/notes' : '/notes';
 const nav = [
   { href: '/', label: 'Home' },
-  { href: '/projects', label: 'Projects' },
+  { href: projectsHref, label: 'Projects' },
   { href: notesHref, label: 'Notes' },
   { href: '/about', label: 'About' },
 ];

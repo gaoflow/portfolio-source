@@ -1,0 +1,26 @@
+---
+import ProjectDetail from '../../../components/ProjectDetail.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const [projects, projectsCn] = await Promise.all([
+    getCollection('projects'),
+    getCollection('projectsCn'),
+  ]);
+  const englishIds = new Set(projects.map((project) => project.id));
+  const orphaned = projectsCn.filter((project) => !englishIds.has(project.id));
+
+  if (orphaned.length > 0) {
+    throw new Error(`Chinese projects without English counterparts: ${orphaned.map((project) => project.id).join(', ')}`);
+  }
+
+  return projectsCn.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+---
+
+<ProjectDetail project={project} locale="cn" hasAlternate={true} />
