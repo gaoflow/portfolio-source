@@ -5,19 +5,19 @@ date: '2026-06-15'
 status: complete
 categories: [design]
 tags: [Design]
-summary: 'The client-accepted v5.050 model closed at ±6 mm against the blueprint; a vertex-identical v5.051 derivative then packaged it for animation, Unity, and the 579 KB web viewer.'
+summary: 'The client-accepted v5.050 model closed at ±6 mm against the blueprint and now loads directly as a 639 KB interactive GLB; v5.051 remains a separate animation-ready derivative.'
 role: '3D modelling intern'
 duration: '17 weeks'
 featured: true
 order: 8
 studySequence: 16
-model3d: /models/space-rider.glb
+model3d: /models/space-rider-v5.050.glb
 heroImage: /images/projects/space-rider-blueprint.png
 ---
 
 ## Context & objectives
 
-The interactive model above — drag to rotate, scroll to zoom — is a web derivative of the animation-ready v5.051 package. The client-accepted modelling master is v5.050; v5.051 reorganises that accepted shape for animation and engine import. The reconstructed body matches the official blueprint to ±6 mm in the side view and ±8.4 mm in the top view over 4.88 m, and its final smoothed mesh carries zero concave dents. The brief asked for about 10 cm.
+The interactive model above — drag to rotate, scroll to zoom — is derived directly from the client-accepted v5.050 GLB. It is no longer sourced from the v5.051 Web export. The reconstructed body matches the official blueprint to ±6 mm in the side view and ±8.4 mm in the top view over 4.88 m, and its final smoothed mesh carries zero concave dents. The brief asked for about 10 cm.
 
 Getting here took five version lines in four weeks of modelling (mid-May to mid-June 2026), plus a packaging and web-delivery phase in August. Two of the five lines were abandoned and rolled back. This article reconstructs that history from the project's own records: what each version tried, what broke, how the failure was found, and what fixed it.
 
@@ -205,28 +205,25 @@ v5.050 (June 11) is the submission build and the client-accepted final source. A
 
 ![The v5.051 animation-ready derivative: four logical components prepared for rigging and engine import.](/images/projects/space-rider/report/animation-ready.png)
 
-The interactive model on this page comes from the v5.051 Web PBR export because the merged hierarchy is the correct delivery shape for a browser viewer. It is not the modelling master and it does not replace v5.050. Inspection of the uncompressed Web GLB and the published Draco GLB reports the same render vertex count, 1,536,942; their scene bounds differ only at the compression-quantisation scale.
+The interactive model on this page is derived directly from the client-accepted v5.050 GLB. The versioned URL prevents a browser cache from reusing the retired model. v5.051 remains available as a separate animation-ready deliverable; it is not the source loaded by this page.
 
 ## The web pipeline
 
-The browser model is a 579 KB derivative of the 14.05 MB v5.051 Web PBR export, itself an animation-ready packaging of the accepted v5.050 shape. Producing it required two additional fixes.
+The current browser model starts from `release/space_rider_v5.050.glb`, the portable export beside the client-accepted Blender source. The publication step runs only gltf-transform's Draco command with scene-wide position quantisation. It preserves the source scene hierarchy, meshes, materials, textures, and render vertex count while reducing 11,603,048 bytes to 639,296 bytes.
 
-**The solar arrays came out white.** The v5.050 authored solar cells use procedural Blender shader nodes, and glTF 2.0 cannot express those nodes. The isolated web-export workflow starts from the v5.051 animation-ready derivative, replaces the procedural shading with a glTF-native Principled PBR material, exports the GLB, then re-imports the file and fails unless `SolarCell_WebPBR` exists and stays blue-dominant. The check guarantees colour and broad PBR response; a full material-equivalence claim would need channel-by-channel texture bakes, which remain the identified follow-up.
+An earlier browser experiment used the v5.051 Web PBR path. That path solved a real material problem — procedural Blender solar-cell shaders had exported as white — but it is no longer the model published on this page. The animation-ready package remains useful for rigging and Unity; the portfolio viewer now loads the accepted v5.050 export directly.
 
-**Shipping 579 KB instead of 14.05 MB.** Geometry simplification was the obvious step and I rejected it: simplification creates a second geometric representation, and that representation would need its own fidelity tolerance against the first. This project keeps one source of truth for shape. The site derivative uses gltf-transform's Draco compression with simplification disabled and textures recompressed to WebP at 2048 px, dropping 14,048,124 bytes to 579,460 at the original vertex count. Texture fidelity is the accepted cost. The full blend source, roughly 490 MB with textures, was never a site deliverable.
-
-The release path stays non-destructive end to end:
+The active release path is:
 
 1. preserve `space_rider_v5.050.blend` as the client-accepted authoring source;
-2. derive v5.051 by applying modifiers and joining 119 visible objects into four animation-ready components;
-3. copy v5.051 into the isolated web-export workspace;
-4. replace the procedural solar-cell shading with Principled PBR;
-5. export glTF 2.0 as a binary GLB and re-import it to verify `SolarCell_WebPBR`;
-6. produce the Draco-compressed site derivative without mesh simplification.
+2. take its release-side portable export, `space_rider_v5.050.glb`;
+3. run `gltf-transform draco --quantization-volume scene` without deduplication, instancing, joining, or simplification;
+4. publish the immutable, versioned path `/models/space-rider-v5.050.glb`;
+5. reject the build if the old `/models/space-rider.glb` returns.
 
 ## Publication checks
 
-The browser deliverable is accepted only when the model loads without a fallback, orbit and zoom remain usable, the solar arrays render blue, and reduced-motion mode disables automatic rotation. The source release, the web export, and the site derivative remain separate artifacts, so a presentation optimisation cannot silently become the modelling master.
+The browser artifact is accepted only when the versioned v5.050 file exists, its SHA-256 matches the release gate, the obsolete unversioned model is absent, and the page points to the versioned URL. Orbit and zoom remain part of the runtime smoke test. The v5.050 source, v5.051 animation derivative, and site-compressed v5.050 artifact remain separate deliverables.
 
 The project closed as an internship deliverable: a written report and a poster for the school defense (stage S11 2026, defense scheduled for September 10), the release package with the 42 pipeline scripts, and the animation-ready variant the client asked for.
 
