@@ -9,3 +9,5 @@ __pycache__/
 *.pyc
 .venv/
 projects/*/data/generated/*.f32
+
+site/.private/
