@@ -4,7 +4,7 @@ image: /images/notes/covers/from-cfd-claim-to-auditable-evidence.svg
 published: 2026-08-22
 summary: 'A small tooling habit that stopped my figures, JSON files, and project pages from disagreeing every time I reran an analysis.'
 tags: [Coding]
-sourceProjects: [evidence-kit, flowlab, flowrom, airfoil-methods, ground-effect-vlm, fsae-cooling, f1-2026-aero]
+sourceProjects: [flowlab, flowrom, airfoil-methods, ground-effect-vlm, fsae-cooling, f1-2026-aero]
 featured: false
 order: 6
 ---
@@ -91,7 +91,7 @@ One command per project makes the route repeatable.
 
 ## Dogfooding it on my own portfolio
 
-The [Evidence Kit project](/projects/evidence-kit) currently checks 76 claims across 17 projects and 54 project artifacts.
+The portfolio audit currently checks 76 claims across 17 projects and 54 project artifacts.
 
 Those claims include successful numerical checks and deliberate rejections. The F1 NO-GO statements pass because the evidence confirms the rejection. The cooling page passes because the hydraulic numbers and temperature failure match the published text. The Airfoil Methods page passes because its measured and predicted values resolve to the same generated tables used by the figures.
 
