@@ -8,19 +8,14 @@ export async function getStaticPaths() {
     getCollection('projectsCn'),
   ]);
   const englishIds = new Set(projects.map((project) => project.id));
-  const orphaned = projectsCn.filter((project) => !englishIds.has(project.id));
-
-  if (orphaned.length > 0) {
-    throw new Error(`Chinese projects without English counterparts: ${orphaned.map((project) => project.id).join(', ')}`);
-  }
 
   return projectsCn.map((project) => ({
     params: { slug: project.id },
-    props: { project },
+    props: { project, hasAlternate: englishIds.has(project.id) },
   }));
 }
 
-const { project } = Astro.props;
+const { project, hasAlternate } = Astro.props;
 ---
 
-<ProjectDetail project={project} locale="cn" hasAlternate={true} />
+<ProjectDetail project={project} locale="cn" hasAlternate={hasAlternate} />
