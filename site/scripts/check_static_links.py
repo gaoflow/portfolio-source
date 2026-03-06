@@ -17,11 +17,15 @@ class LinkParser(HTMLParser):
         super().__init__()
         self.links: list[tuple[str, str]] = []
         self.missing_alt: list[str] = []
+        self.missing_src: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         values = dict(attrs)
-        if tag == "img" and not values.get("alt"):
-            self.missing_alt.append(values.get("src") or "(missing src)")
+        if tag == "img":
+            if not values.get("alt"):
+                self.missing_alt.append(values.get("src") or "(missing src)")
+            if not values.get("src"):
+                self.missing_src.append(values.get("alt") or "(missing alt)")
         for name, value in attrs:
             if value and name in {"href", "src"}:
                 self.links.append((tag, value))
@@ -78,6 +82,8 @@ def main() -> int:
         relative = page.relative_to(root)
         for src in links.missing_alt:
             failures.append(f"{relative}: <img> {src} has no alt text")
+        for alt in links.missing_src:
+            failures.append(f"{relative}: <img> {alt!r} has no src")
         leaked_prefixes = ("/Users/", "~/Downloads", "/home/", "C:\\\\Users\\\\", "/var/folders/")
         if any(prefix in source for prefix in leaked_prefixes):
             failures.append(f"{relative}: leaked absolute/private local path")
