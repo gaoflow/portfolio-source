@@ -12,7 +12,7 @@ export const profile = {
   email: 'gaobing1230@gmail.com',
   linkedin: 'https://www.linkedin.com/in/bing-gao/',
   github: 'https://github.com/gaoflow',
-  cvUrl: '/cv.pdf', // drop your PDF into site/public/cv.pdf
+  cvUrl: '/cv-en.pdf',
 
   // Headline capability rows, Balasko-style (mono, scan in 5 s)
   capabilities: [

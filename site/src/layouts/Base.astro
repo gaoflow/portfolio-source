@@ -12,8 +12,9 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
-  locale?: 'en' | 'cn';
+  locale?: 'en' | 'fr' | 'cn';
   alternatePath?: string;
+  alternates?: { hreflang: string; path: string }[];
 }
 const {
   title,
@@ -21,13 +22,56 @@ const {
   image = '/og-card.png',
   locale = 'en',
   alternatePath,
+  alternates,
 } = Astro.props;
 const isChinese = locale === 'cn';
-const htmlLang = isChinese ? 'zh-CN' : 'en';
-const alternateUrl = alternatePath
-  ? new URL(alternatePath, Astro.site ?? Astro.url).toString()
-  : undefined;
-const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — ${profile.role}`;
+const copyByLocale = {
+  en: {
+    htmlLang: 'en',
+    role: profile.role,
+    websiteName: `${profile.name} — Engineering Portfolio`,
+    rssTitle: `${profile.name} — Engineering Notes`,
+    nav: ['Home', 'Projects', 'Notes', 'About'],
+    cv: 'CV',
+    alternate: 'Chinese',
+    avatarAlt: 'Portrait of Bing Gao',
+    credit: 'Interface design based on',
+  },
+  fr: {
+    htmlLang: 'fr',
+    role: 'Ingénieur en mécanique des fluides numérique et développeur',
+    websiteName: `${profile.name} — Portfolio d’ingénierie`,
+    rssTitle: `${profile.name} — Notes d’ingénierie`,
+    nav: ['Accueil', 'Projets', 'Notes', 'À propos'],
+    cv: 'CV',
+    alternate: 'Anglais',
+    avatarAlt: 'Portrait de Bing Gao',
+    credit: 'Interface conçue d’après',
+  },
+  cn: {
+    htmlLang: 'zh-CN',
+    role: '计算流体力学工程师与开发者',
+    websiteName: `${profile.name}——工程作品集`,
+    rssTitle: `${profile.name}——工程笔记`,
+    nav: ['首页', '项目', '笔记', '关于'],
+    cv: '简历',
+    alternate: '英文',
+    avatarAlt: 'Bing Gao 的头像',
+    credit: '界面设计参考',
+  },
+} as const;
+const copy = copyByLocale[locale];
+const htmlLang = copy.htmlLang;
+const alternateLinks = alternates?.map((alternate) => ({
+  hreflang: alternate.hreflang,
+  href: new URL(alternate.path, Astro.site ?? Astro.url).toString(),
+})) ?? [
+  { hreflang: htmlLang, href: Astro.url.toString() },
+  ...(alternatePath
+    ? [{ hreflang: isChinese ? 'en' : 'zh-CN', href: new URL(alternatePath, Astro.site ?? Astro.url).toString() }]
+    : []),
+];
+const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — ${copy.role}`;
 const socialImage = new URL(image, Astro.site ?? Astro.url).toString();
 const structuredData = {
   '@context': 'https://schema.org',
@@ -35,13 +79,13 @@ const structuredData = {
     {
       '@type': 'Person',
       name: profile.name,
-      jobTitle: profile.role,
+      jobTitle: copy.role,
       url: Astro.site?.toString(),
       sameAs: [profile.github, profile.linkedin],
     },
     {
       '@type': 'WebSite',
-      name: `${profile.name} — Engineering Portfolio`,
+      name: copy.websiteName,
       url: Astro.site?.toString(),
       description,
       author: { '@type': 'Person', name: profile.name },
@@ -51,11 +95,12 @@ const structuredData = {
 
 const projectsHref = isChinese ? '/cn/projects' : '/projects';
 const notesHref = isChinese ? '/cn/notes' : '/notes';
+const cvHref = locale === 'cn' ? '/cn/cv' : locale === 'fr' ? '/fr/cv' : '/cv';
 const nav = [
-  { href: '/', label: 'Home' },
-  { href: projectsHref, label: 'Projects' },
-  { href: notesHref, label: 'Notes' },
-  { href: '/about', label: 'About' },
+  { href: '/', label: copy.nav[0] },
+  { href: projectsHref, label: copy.nav[1] },
+  { href: notesHref, label: copy.nav[2] },
+  { href: '/about', label: copy.nav[3] },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
@@ -67,13 +112,12 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <link rel="canonical" href={Astro.url} />
-    <link rel="alternate" hreflang={htmlLang} href={Astro.url} />
-    {alternateUrl && <link rel="alternate" hreflang={isChinese ? 'en' : 'zh-CN'} href={alternateUrl} />}
+    {alternateLinks.map((alternate) => <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />)}
     <link rel="icon" type="image/png" href="/avatar_cats1.png" />
     <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="apple-touch-icon" href="/avatar_cats1.png" />
-    <link rel="alternate" type="application/rss+xml" title="Bing Gao — Engineering Notes" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title={copy.rssTitle} href="/rss.xml" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
@@ -87,11 +131,10 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <title>{pageTitle}</title>
   </head>
   <body class="min-h-screen">
-    <!-- Pit Wall top status bar -->
     <div class="sticky top-0 z-40 border-b border-edge bg-bg/90 backdrop-blur">
       <div class="mx-auto flex h-14 max-w-6xl items-center gap-5 px-6 text-sm lg:px-8">
         <a href="/" class="font-medium text-ink">{profile.name}</a>
-        <span class="hidden text-muted sm:inline">{profile.role}</span>
+        <span class="hidden text-muted sm:inline">{copy.role}</span>
         <nav class="ml-auto flex items-center gap-4 sm:gap-5">
           {nav.map((n) => (
             <a href={n.href} class:list={['transition-colors', path === n.href ? 'text-accent' : 'text-stone hover:text-accent']}>
@@ -100,10 +143,10 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
           ))}
           {alternatePath && (
             <a href={alternatePath} class="font-serif text-xs text-stone transition-colors hover:text-accent">
-              {isChinese ? 'EN' : '中文'}
+              {copy.alternate}
             </a>
           )}
-          <a href="/cv" class="btn btn-secondary">CV</a>
+          <a href={cvHref} class="btn btn-secondary">{copy.cv}</a>
         </nav>
       </div>
     </div>
@@ -111,8 +154,8 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <main class="page-enter mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
       <slot />
       <footer class="mt-20 flex flex-wrap justify-between gap-3 border-t border-edge-soft pt-6 text-xs text-stone">
-        <span class="flex items-center gap-3"><img src="/avatar_cats1.png" alt="Bing Gao's avatar" width="32" height="32" class="h-8 w-8 rounded-full border border-edge" loading="lazy" decoding="async" /><span>{profile.name} · {profile.role}</span></span>
-        <span>UI design thanks to <a href="https://github.com/tw93/Kami" target="_blank" rel="noopener noreferrer" class="text-warm transition-colors hover:text-accent">Kami</a></span>
+        <span class="flex items-center gap-3"><img src="/avatar_cats1.png" alt={copy.avatarAlt} width="32" height="32" class="h-8 w-8 rounded-full border border-edge" loading="lazy" decoding="async" /><span>{profile.name} · {copy.role}</span></span>
+        <span>{copy.credit} <a href="https://github.com/tw93/Kami" target="_blank" rel="noopener noreferrer" class="text-warm transition-colors hover:text-accent">Kami</a></span>
       </footer>
     </main>
   </body>
