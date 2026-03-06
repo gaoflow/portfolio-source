@@ -7,6 +7,7 @@ export interface CvContent {
   description: string;
   eyebrow: string;
   name: string;
+  portraitAlt: string;
   role: string;
   summary: string;
   downloadLabel: string;
@@ -74,6 +75,7 @@ const english: CvContent = {
   description: 'Bing Gao — computational mechanics engineering student working across fluid simulation, thermal systems, numerical verification, and engineering software.',
   eyebrow: 'Professional CV · 2026',
   name: 'Bing Gao',
+  portraitAlt: 'Bing Gao in the Faroe Islands',
   role: 'Computational Mechanics Engineering Student / Fluid Simulation, Thermal Systems & Engineering Software',
   summary: 'Engineer with nearly 7 years in mobile software development and technical leadership, now applying experience from a product serving more than 2 million users to fluid simulation, finite-element analysis, thermal modelling, and numerical verification while completing a French engineering degree.',
   downloadLabel: 'Download PDF',
@@ -273,6 +275,7 @@ const french: CvContent = {
   description: 'Bing Gao — élève-ingénieur en mécanique numérique, spécialisé en mécanique des fluides numérique, systèmes thermiques, vérification numérique et logiciels d’ingénierie.',
   eyebrow: 'Curriculum vitæ · 2026',
   name: 'Bing Gao',
+  portraitAlt: 'Bing Gao aux Îles Féroé',
   role: 'Élève-ingénieur en mécanique numérique / Mécanique des fluides numérique, systèmes thermiques et logiciels d’ingénierie',
   summary: 'Ingénieur avec près de 7 ans en développement logiciel mobile et encadrement technique, appliquant l’expérience d’un produit de plus de 2 millions d’utilisateurs à la mécanique des fluides numérique, aux éléments finis, à la modélisation thermique et à la vérification numérique pendant son Diplôme d’Ingénieur.',
   downloadLabel: 'Télécharger le PDF',
@@ -472,6 +475,7 @@ const chinese: CvContent = {
   description: 'Bing Gao——计算力学工程专业学生，研究方向涵盖流体数值模拟、热系统、数值验证与工程软件。',
   eyebrow: '个人简历 · 2026',
   name: 'Bing Gao',
+  portraitAlt: 'Bing Gao 在法罗群岛',
   role: '计算力学工程专业学生 / 流体数值模拟、热系统与工程软件',
   summary: '拥有近 7 年移动软件开发与技术管理经验；目前在攻读法国工程师学位，并将服务超过 200 万用户的产品交付经验应用于流体数值模拟、有限元分析、热建模和数值验证。',
   downloadLabel: '下载简历',

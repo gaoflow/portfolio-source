@@ -4,6 +4,8 @@ dist/
 *.log
 .env*
 .firecrawl/
+/avatar_faroe2.jpg
+/avatar_memoji_03.png
 
 __pycache__/
 *.pyc

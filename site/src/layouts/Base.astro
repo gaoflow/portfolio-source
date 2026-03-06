@@ -31,7 +31,7 @@ const copyByLocale = {
     role: profile.role,
     websiteName: `${profile.name} — Engineering Portfolio`,
     rssTitle: `${profile.name} — Engineering Notes`,
-    nav: ['Home', 'Projects', 'Notes', 'About'],
+    nav: ['Home', 'Projects', 'Notes'],
     cv: 'CV',
     alternate: 'Chinese',
     avatarAlt: 'Portrait of Bing Gao',
@@ -42,7 +42,7 @@ const copyByLocale = {
     role: 'Ingénieur en mécanique des fluides numérique et développeur',
     websiteName: `${profile.name} — Portfolio d’ingénierie`,
     rssTitle: `${profile.name} — Notes d’ingénierie`,
-    nav: ['Accueil', 'Projets', 'Notes', 'À propos'],
+    nav: ['Accueil', 'Projets', 'Notes'],
     cv: 'CV',
     alternate: 'Anglais',
     avatarAlt: 'Portrait de Bing Gao',
@@ -53,7 +53,7 @@ const copyByLocale = {
     role: '计算流体力学工程师与开发者',
     websiteName: `${profile.name}——工程作品集`,
     rssTitle: `${profile.name}——工程笔记`,
-    nav: ['首页', '项目', '笔记', '关于'],
+    nav: ['首页', '项目', '笔记'],
     cv: '简历',
     alternate: '英文',
     avatarAlt: 'Bing Gao 的头像',
@@ -100,7 +100,6 @@ const nav = [
   { href: '/', label: copy.nav[0] },
   { href: projectsHref, label: copy.nav[1] },
   { href: notesHref, label: copy.nav[2] },
-  { href: '/about', label: copy.nav[3] },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
@@ -113,10 +112,10 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta name="description" content={description} />
     <link rel="canonical" href={Astro.url} />
     {alternateLinks.map((alternate) => <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />)}
-    <link rel="icon" type="image/png" href="/avatar_cats1.png" />
+    <link rel="icon" type="image/png" href="/avatar_memoji_03.png" />
     <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="apple-touch-icon" href="/avatar_cats1.png" />
+    <link rel="apple-touch-icon" href="/avatar_memoji_03.png" />
     <link rel="alternate" type="application/rss+xml" title={copy.rssTitle} href="/rss.xml" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />

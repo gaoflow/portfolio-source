@@ -32,16 +32,23 @@ const alternates = [
         </div>
       </div>
 
-      <h1>{content.name}</h1>
-      <p class="cv-role">{content.role}</p>
+      <div class="cv-identity">
+        <div class="cv-identity-copy">
+          <h1>{content.name}</h1>
+          <p class="cv-role">{content.role}</p>
 
-      <nav class="cv-contact" aria-label={content.contactNavigationLabel}>
-        <a href={`mailto:${content.contact.email}`}>{content.contact.email}</a>
-        <a href={`tel:${content.contact.phoneHref}`}>{content.contact.phoneDisplay}</a>
-        <span>{content.contact.location}</span>
-        <a href="https://www.linkedin.com/in/bing-gao/" target="_blank" rel="noopener noreferrer">{content.contact.linkedinLabel}</a>
-        <a href="https://github.com/gaoflow" target="_blank" rel="noopener noreferrer">{content.contact.githubLabel}</a>
-      </nav>
+          <nav class="cv-contact" aria-label={content.contactNavigationLabel}>
+            <a href={`mailto:${content.contact.email}`}>{content.contact.email}</a>
+            <a href={`tel:${content.contact.phoneHref}`}>{content.contact.phoneDisplay}</a>
+            <span>{content.contact.location}</span>
+            <a href="https://www.linkedin.com/in/bing-gao/" target="_blank" rel="noopener noreferrer">{content.contact.linkedinLabel}</a>
+            <a href="https://github.com/gaoflow" target="_blank" rel="noopener noreferrer">{content.contact.githubLabel}</a>
+          </nav>
+        </div>
+        <figure class="cv-portrait">
+          <img src="/avatar_faroe2.jpg" alt={content.portraitAlt} width="800" height="800" loading="eager" decoding="async" />
+        </figure>
+      </div>
 
       <p class="cv-summary">{content.summary}</p>
 
@@ -284,6 +291,33 @@ const alternates = [
     .cv-action-ghost:hover {
       background: var(--color-tint);
     }
+  }
+
+  .cv-identity {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(9.5rem, 16vw, 12rem);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: end;
+  }
+
+  .cv-identity-copy {
+    min-width: 0;
+  }
+
+  .cv-portrait {
+    width: 100%;
+    margin: 0;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border: 1px solid var(--color-edge);
+    background: var(--color-surface);
+  }
+
+  .cv-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
   }
 
   .cv-hero h1 {
@@ -586,6 +620,17 @@ const alternates = [
       min-width: 0;
     }
 
+    .cv-identity {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+
+    .cv-portrait {
+      grid-row: 1;
+      width: 8rem;
+      aspect-ratio: 1;
+    }
+
     .cv-hero h1 {
       font-size: clamp(3.35rem, 20vw, 4.6rem);
     }
@@ -695,6 +740,15 @@ const alternates = [
 
     .cv-eyebrow {
       margin-bottom: 8mm;
+    }
+
+    .cv-identity {
+      grid-template-columns: minmax(0, 1fr) 31mm;
+      gap: 8mm;
+    }
+
+    .cv-portrait {
+      width: 31mm;
     }
 
     .cv-hero h1 {
