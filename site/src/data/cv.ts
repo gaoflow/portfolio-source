@@ -18,8 +18,6 @@ export interface CvContent {
   languageLinks: { label: string; href: string }[];
   contact: {
     email: string;
-    phoneDisplay: string;
-    phoneHref: string;
     location: string;
     linkedinLabel: string;
     githubLabel: string;
@@ -90,9 +88,7 @@ const english: CvContent = {
   ],
   contact: {
     email: 'gaobing1230@gmail.com',
-    phoneDisplay: '+33 6 30 65 97 65',
-    phoneHref: '+33630659765',
-    location: 'Paris La Defense, France',
+    location: 'Paris, France',
     linkedinLabel: 'LinkedIn',
     githubLabel: 'Code portfolio',
   },
@@ -114,7 +110,7 @@ const english: CvContent = {
       role: 'Aerodynamics Engineer',
       organization: 'Vinci Eco Drive, ESILV Formula Student',
       href: 'https://vinciecodrive.fr/',
-      place: 'Paris La Defense, France',
+      place: 'Paris, France',
       period: 'Sep 2025 — Present',
       bullets: [
         'Led thermal-system modelling for the battery, inverter, and motor, coupling hydraulic, radiator, and transient coolant models to screen the E3 cooling architecture before procurement.',
@@ -213,7 +209,7 @@ const english: CvContent = {
     {
       degree: 'Engineering Degree, Modelling & Computational Mechanics',
       institution: 'ESILV',
-      place: 'Paris La Defense, France',
+      place: 'Paris, France',
       period: 'Sep 2025 — 2027 expected',
       details: [
         'Computational fluid dynamics and finite-volume methods, finite-element methods, vehicle dynamics and powertrains, sustainable automotive engineering, structural optimization, machine learning, and digital twins.',
@@ -265,7 +261,7 @@ const english: CvContent = {
   },
   closing: 'Detailed methods, figures, and evidence records are available in the',
   portfolioLabel: 'engineering portfolio',
-  closingMark: 'Bing Gao · Paris La Defense',
+  closingMark: 'Bing Gao · Paris',
 };
 
 const french: CvContent = {
@@ -290,9 +286,7 @@ const french: CvContent = {
   ],
   contact: {
     email: 'gaobing1230@gmail.com',
-    phoneDisplay: '+33 6 30 65 97 65',
-    phoneHref: '+33630659765',
-    location: 'Paris La Défense, France',
+    location: 'Paris, France',
     linkedinLabel: 'LinkedIn',
     githubLabel: 'Dépôts de code',
   },
@@ -314,7 +308,7 @@ const french: CvContent = {
       role: 'Ingénieur aérodynamique',
       organization: 'Vinci Eco Drive, Formula Student ESILV',
       href: 'https://vinciecodrive.fr/',
-      place: 'Paris La Défense, France',
+      place: 'Paris, France',
       period: 'Sept. 2025 — Aujourd’hui',
       bullets: [
         'Piloté la modélisation thermique de la batterie, de l’onduleur et du moteur en couplant modèles hydrauliques, radiateur et transitoires afin d’évaluer l’architecture de refroidissement E3 avant achat.',
@@ -413,7 +407,7 @@ const french: CvContent = {
     {
       degree: 'Diplôme d’Ingénieur, modélisation et mécanique numérique',
       institution: 'ESILV',
-      place: 'Paris La Défense, France',
+      place: 'Paris, France',
       period: 'Sept. 2025 — 2027 prévu',
       details: [
         'Mécanique des fluides numérique et volumes finis, éléments finis, dynamique du véhicule et groupes motopropulseurs, ingénierie automobile durable, optimisation structurelle, apprentissage automatique et jumeaux numériques.',
@@ -465,7 +459,7 @@ const french: CvContent = {
   },
   closing: 'Les méthodes détaillées, les figures et les dossiers de preuves sont disponibles dans le',
   portfolioLabel: 'portfolio d’ingénierie',
-  closingMark: 'Bing Gao · Paris La Défense',
+  closingMark: 'Bing Gao · Paris',
 };
 
 const chinese: CvContent = {
@@ -490,9 +484,7 @@ const chinese: CvContent = {
   ],
   contact: {
     email: 'gaobing1230@gmail.com',
-    phoneDisplay: '+33 6 30 65 97 65',
-    phoneHref: '+33630659765',
-    location: '法国巴黎拉德芳斯',
+    location: '法国巴黎',
     linkedinLabel: '职业主页',
     githubLabel: '代码主页',
   },
@@ -514,7 +506,7 @@ const chinese: CvContent = {
       role: '空气动力学工程师',
       organization: 'Vinci Eco Drive，ESILV 方程式学生车队',
       href: 'https://vinciecodrive.fr/',
-      place: '法国巴黎拉德芳斯',
+      place: '法国巴黎',
       period: '2025 年 9 月至今',
       bullets: [
         '负责电池、逆变器和电机的热系统建模，耦合液压、散热器与瞬态冷却液模型，在采购前筛查 E3 冷却架构。',
@@ -613,7 +605,7 @@ const chinese: CvContent = {
     {
       degree: '工程师学位，建模与计算力学方向',
       institution: 'ESILV',
-      place: '法国巴黎拉德芳斯',
+      place: '法国巴黎',
       period: '2025 年 9 月至 2027 年，预计',
       details: [
         '计算流体力学与有限体积法、有限元法、车辆动力学与动力总成、可持续汽车工程、结构优化、机器学习和数字孪生。',
@@ -665,7 +657,7 @@ const chinese: CvContent = {
   },
   closing: '详细方法、图表和证据记录请参阅',
   portfolioLabel: '工程作品集',
-  closingMark: 'Bing Gao · 法国巴黎拉德芳斯',
+  closingMark: 'Bing Gao · 法国巴黎',
 };
 
 export const cvLocales: Record<CvLocale, CvContent> = {
