@@ -28,7 +28,7 @@ const alternates = [
         </div>
         <div class="cv-actions print-hidden">
           <a class="cv-action cv-action-primary" href={content.downloadUrl}>{content.downloadLabel}</a>
-          <button class="cv-action cv-action-ghost" type="button" data-print-cv>{content.printLabel}</button>
+          <a class="cv-action cv-action-ghost" href={`mailto:${content.contact.email}`}>{content.contactLabel}</a>
         </div>
       </div>
 
@@ -192,9 +192,6 @@ const alternates = [
     </div>
   </article>
 
-  <script>
-    document.querySelector('[data-print-cv]')?.addEventListener('click', () => window.print());
-  </script>
 </Base>
 
 <style>

@@ -112,10 +112,10 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <meta name="description" content={description} />
     <link rel="canonical" href={Astro.url} />
     {alternateLinks.map((alternate) => <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />)}
-    <link rel="icon" type="image/png" href="/avatar_memoji_03.png" />
+    <link rel="icon" type="image/png" href="/avatar.png" />
     <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="apple-touch-icon" href="/avatar_memoji_03.png" />
+    <link rel="apple-touch-icon" href="/avatar.png" />
     <link rel="alternate" type="application/rss+xml" title={copy.rssTitle} href="/rss.xml" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />

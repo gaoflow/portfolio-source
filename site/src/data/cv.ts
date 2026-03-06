@@ -12,7 +12,7 @@ export interface CvContent {
   summary: string;
   downloadLabel: string;
   downloadUrl: string;
-  printLabel: string;
+  contactLabel: string;
   languageNavigationLabel: string;
   contactNavigationLabel: string;
   languageLinks: { label: string; href: string }[];
@@ -76,9 +76,9 @@ const english: CvContent = {
   portraitAlt: 'Bing Gao in the Faroe Islands',
   role: 'Computational Mechanics Engineering Student / Fluid Simulation, Thermal Systems & Engineering Software',
   summary: 'Engineer with nearly 7 years in mobile software development and technical leadership, now applying experience from a product serving more than 2 million users to fluid simulation, finite-element analysis, thermal modelling, and numerical verification while completing a French engineering degree.',
-  downloadLabel: 'Download PDF',
+  downloadLabel: 'Generate PDF',
   downloadUrl: '/cv-en.pdf',
-  printLabel: 'Print',
+  contactLabel: 'Contact me',
   languageNavigationLabel: 'CV language',
   contactNavigationLabel: 'Contact information',
   languageLinks: [
@@ -216,13 +216,6 @@ const english: CvContent = {
       ],
     },
     {
-      degree: 'Full-time French Language Studies',
-      institution: 'French Alliance Beijing',
-      place: 'Beijing, China',
-      period: 'Apr 2023 — May 2024',
-      details: [],
-    },
-    {
       degree: 'Bachelor of Computer Science',
       institution: 'Changchun University of Science and Technology',
       place: 'Changchun, China',
@@ -274,9 +267,9 @@ const french: CvContent = {
   portraitAlt: 'Bing Gao aux Îles Féroé',
   role: 'Élève-ingénieur en mécanique numérique / Mécanique des fluides numérique, systèmes thermiques et logiciels d’ingénierie',
   summary: 'Ingénieur avec près de 7 ans en développement logiciel mobile et encadrement technique, appliquant l’expérience d’un produit de plus de 2 millions d’utilisateurs à la mécanique des fluides numérique, aux éléments finis, à la modélisation thermique et à la vérification numérique pendant son Diplôme d’Ingénieur.',
-  downloadLabel: 'Télécharger le PDF',
+  downloadLabel: 'Générer le PDF',
   downloadUrl: '/cv-fr.pdf',
-  printLabel: 'Imprimer',
+  contactLabel: 'Me contacter',
   languageNavigationLabel: 'Langue du curriculum vitæ',
   contactNavigationLabel: 'Coordonnées',
   languageLinks: [
@@ -414,13 +407,6 @@ const french: CvContent = {
       ],
     },
     {
-      degree: 'Études de français à temps plein',
-      institution: 'Alliance Française de Beijing',
-      place: 'Pékin, Chine',
-      period: 'Avr. 2023 — mai 2024',
-      details: [],
-    },
-    {
       degree: 'Licence en informatique',
       institution: 'Université des sciences et technologies de Changchun',
       place: 'Changchun, Chine',
@@ -472,9 +458,9 @@ const chinese: CvContent = {
   portraitAlt: 'Bing Gao 在法罗群岛',
   role: '计算力学工程专业学生 / 流体数值模拟、热系统与工程软件',
   summary: '拥有近 7 年移动软件开发与技术管理经验；目前在攻读法国工程师学位，并将服务超过 200 万用户的产品交付经验应用于流体数值模拟、有限元分析、热建模和数值验证。',
-  downloadLabel: '下载简历',
+  downloadLabel: '生成 PDF',
   downloadUrl: '/cv-cn.pdf',
-  printLabel: '打印',
+  contactLabel: '联系我',
   languageNavigationLabel: '简历语言',
   contactNavigationLabel: '联系方式',
   languageLinks: [
@@ -610,13 +596,6 @@ const chinese: CvContent = {
       details: [
         '计算流体力学与有限体积法、有限元法、车辆动力学与动力总成、可持续汽车工程、结构优化、机器学习和数字孪生。',
       ],
-    },
-    {
-      degree: '全日制法语学习',
-      institution: '北京法语联盟',
-      place: '中国北京',
-      period: '2023 年 4 月至 2024 年 5 月',
-      details: [],
     },
     {
       degree: '计算机科学学士',

@@ -6,6 +6,7 @@ dist/
 .firecrawl/
 /avatar_faroe2.jpg
 /avatar_memoji_03.png
+/avatar.png
 
 __pycache__/
 *.pyc
