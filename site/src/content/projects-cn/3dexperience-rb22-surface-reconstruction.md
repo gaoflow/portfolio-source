@@ -14,7 +14,7 @@ studySequence: 19
 heroImage: /images/projects/3dexperience-rb22/sidepod/sidepod_r1_iso.jpg
 ---
 
-我是看到了真车模型，然后有了在 3DEXPERIENCE 上重建 F1 的打算。
+在我亲身去参观了一场 F1 的比赛，近距离看到了 F1 2026 的 1:1 真车模型之后，随后便有了在 3DExperience 上重建 F1 2026 赛车的打算。
 
 <div class="not-prose my-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
   <img src="/images/projects/3dexperience-rb22/f1-photos/IMG_4739.jpg" alt="真车模型的前侧三分之四视图" class="aspect-[3/2] h-full w-full rounded-lg object-cover" decoding="async" />
