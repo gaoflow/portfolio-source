@@ -87,15 +87,8 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
         {notes.map((n) => (
           <a
             href={`/notes/${n.id}`}
-            class="group grid grid-cols-[1fr] items-center gap-4 border-b border-edge-soft px-4 py-4 transition-shadow last:border-b-0 hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)] sm:grid-cols-[144px_1fr_auto]"
+            class="group grid grid-cols-[1fr] items-center gap-4 border-b border-edge-soft px-4 py-4 transition-shadow last:border-b-0 hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)] sm:grid-cols-[1fr_auto]"
           >
-            <img
-              src={n.data.image ?? `/images/notes/systems/${n.id}.svg`}
-              alt={n.data.title}
-              loading="lazy"
-              decoding="async"
-              class="hidden aspect-video w-full border border-edge bg-surface object-cover sm:block"
-            />
             <span class="min-w-0">
               <span class="block font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{n.data.title}</span>
               <span class="mt-1 line-clamp-2 block text-base leading-relaxed text-muted">{n.data.summary}</span>

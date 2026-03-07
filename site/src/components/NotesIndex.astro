@@ -39,9 +39,6 @@ const alternatePath = hasAlternate ? (isChinese ? '/notes' : '/cn/notes') : unde
       <div class="grid gap-5">
         {sortedNotes.map((note, index) => (
           <a href={`${basePath}/${note.id}`} class="group border border-edge bg-surface p-6 transition-shadow hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)]">
-            {note.data.image && (
-              <img src={note.data.image} alt={note.data.title} loading="lazy" decoding="async" class="mb-5 aspect-video w-full border border-edge object-cover" />
-            )}
             <div class="flex flex-wrap items-center justify-between gap-3 font-serif text-xs text-stone">
               <span><span class="section-num">{String(index + 1).padStart(2, '0')}</span></span>
               <span>{profile.name} · <time datetime={note.data.published.toISOString()}>{note.data.published.toISOString().slice(0, 10)}</time></span>
