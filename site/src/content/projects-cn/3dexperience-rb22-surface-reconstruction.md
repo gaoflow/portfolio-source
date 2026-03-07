@@ -23,13 +23,13 @@ heroImage: /images/projects/3dexperience-rb22/sidepod/sidepod_r1_iso.jpg
   <img src="/images/projects/3dexperience-rb22/f1-photos/IMG_4765.jpg" alt="真车模型的后翼与后部车身" class="aspect-[3/2] h-full w-full rounded-lg object-cover" loading="lazy" decoding="async" />
 </div>
 
-## 项目出发点与参考
+## 参考
 
-这项工作参考了 Ted L. 的文章 [《I Built an F1 Car — The 2026 Regulations》](https://www.linkedin.com/pulse/i-built-f1-car-2026-regulations-ted-l-dqfnc/)。原文从整车角度记录 2026 规则赛车的几何创建、法规取舍和 CFD 分析，也让我决定把整车拆成明确的部件，逐个完成曲面建模，再进入空气动力学计算。
+这篇文章参考了 TEDL 的文章 [《I Built an F1 Car — The 2026 Regulations》](https://www.linkedin.com/pulse/i-built-f1-car-2026-regulations-ted-l-dqfnc/)。这是一篇非常有深度的文章，我从中学到了很多。原文从整车的角度记录了作者如何根据 2026 新规进行几何创建、法规取舍和 CFD 分析。
 
-侧箱和后翼使用既有 STEP 作为几何目标。本文所说的“从空白开始”，指我没有直接把目标曲面作为最终模型，而是在一个空白 3D Shape 中重新建立全部构造点、截面曲线、支撑面和结果曲面；它不表示这两个空气动力外形是在没有参考几何的情况下原创设计。
+我也大致按照这篇文章的思路，打算先把整车拆成明确的部件，并逐个完成每个部件的建模，最后再进入 CFD 分析，验证自己的建模与真车之间的差距。
 
-目前已经完成侧箱和后翼。文章重点放在我如何使用 3DEXPERIENCE 的 Generative Shape Design（GSD）把两个部件从空白工作区建立出来，以及整车其余部分准备怎样继续。
+首先，我研究了侧箱，并将它作为第一个目标。在一个空白项目中，我重新建立了全部的点、曲面、截面曲线、支撑面和结构曲面，随后又用同样的方法完成了后翼的绘制。
 
 ## 从空白 3D Shape 建立建模骨架
 
