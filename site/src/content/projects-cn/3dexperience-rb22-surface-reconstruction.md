@@ -54,7 +54,7 @@ heroImage: /images/projects/3dexperience-rb22/sidepod/sidepod_r1_iso.jpg
 
 ## GSD 中的基本建模顺序
 
-每个曲面区域都遵循同一条基础顺序：
+每个曲面区域都按照同一个构建顺序进行：
 
 ```text
 基准平面
@@ -67,9 +67,11 @@ heroImage: /images/projects/3dexperience-rb22/sidepod/sidepod_r1_iso.jpg
 → Symmetry
 ```
 
-自由曲面以多组截面 Spline 为主体。截面之间变化平缓时，可以用一张 Multi-Sections Surface 连接；遇到曲率突变或轮廓快速收缩时，我把区域拆成相邻的小曲面，再通过 Join 组合。平面端面和封闭轮廓使用 Fill，带孔区域先建立外部支撑面，再投影内环并 Split。
+1. 自由曲面：以多组截面 Spline 为主体。在截面之间，如果变化比较平缓，我使用 Multi-Sections Surface 连接；但当遇到曲率突变或轮廓快速收缩时，我会把区域拆成相邻的、更小的曲面，再通过 Join 组合。
+2. 平面端面和封闭轮廓：我使用 Fill 建立曲面。
+3. 带孔区域：我先建立外部支撑面，再将内环投影到支撑面上，并进行 Split。
 
-我只在完成右侧曲面及连接关系之后进行 Symmetry。这样可以避免左右两侧同时修改，也能保证对称面始终由同一个中心基准控制。
+我只完成了右半侧的曲面和 Join，之后再进行对称处理。这样不仅能够得到与右侧一致的左侧几何结构，也能避免左右两侧同时修改，同时保证对称面始终由同一个中心基准控制。
 
 ## 侧箱：用纵向截面控制体积变化
 
