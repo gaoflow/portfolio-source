@@ -14,6 +14,15 @@ studySequence: 19
 heroImage: /images/projects/3dexperience-rb22/rear-wing/iso.jpg
 ---
 
+我是看到了真车模型，然后有了在 3DEXPERIENCE 上重建 F1 的打算。
+
+<div class="not-prose my-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+  <img src="/images/projects/3dexperience-rb22/f1-photos/IMG_4739.jpg" alt="真车模型的前侧三分之四视图" class="aspect-[3/2] h-full w-full rounded-lg object-cover" decoding="async" />
+  <img src="/images/projects/3dexperience-rb22/f1-photos/IMG_4753.jpg" alt="真车模型的正面与前翼" class="aspect-[3/2] h-full w-full rounded-lg object-cover" decoding="async" />
+  <img src="/images/projects/3dexperience-rb22/f1-photos/IMG_4756.jpg" alt="真车模型的侧箱与座舱区域" class="aspect-[3/2] h-full w-full rounded-lg object-cover" loading="lazy" decoding="async" />
+  <img src="/images/projects/3dexperience-rb22/f1-photos/IMG_4765.jpg" alt="真车模型的后翼与后部车身" class="aspect-[3/2] h-full w-full rounded-lg object-cover" loading="lazy" decoding="async" />
+</div>
+
 ## 项目出发点与参考
 
 这项工作参考了 Ted L. 的文章 [《I Built an F1 Car — The 2026 Regulations》](https://www.linkedin.com/pulse/i-built-f1-car-2026-regulations-ted-l-dqfnc/)。原文从整车角度记录 2026 规则赛车的几何创建、法规取舍和 CFD 分析，也让我决定把整车拆成明确的部件，逐个完成曲面建模，再进入空气动力学计算。
