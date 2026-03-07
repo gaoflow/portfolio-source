@@ -14,7 +14,7 @@ studySequence: 19
 heroImage: /images/projects/3dexperience-rb22/sidepod/sidepod_r1_iso.jpg
 ---
 
-在我亲身去参观了一场 F1 的比赛，近距离看到了 F1 2026 的 1:1 真车模型之后，随后便有了在 3DExperience 上重建 F1 2026 赛车的打算。
+在亲身去参观了一场 F1 的比赛，并且近距离看到了 F1 2026 的 1:1 真车模型之后，我便有了在 3DExperience 上重建 F1 2026 赛车的打算。
 
 <div class="not-prose my-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
   <img src="/images/projects/3dexperience-rb22/f1-photos/IMG_4739.jpg" alt="真车模型的前侧三分之四视图" class="aspect-[3/2] h-full w-full rounded-lg object-cover" decoding="async" />
@@ -25,7 +25,7 @@ heroImage: /images/projects/3dexperience-rb22/sidepod/sidepod_r1_iso.jpg
 
 ## 参考
 
-这篇文章参考了 TEDL 的文章 [《I Built an F1 Car — The 2026 Regulations》](https://www.linkedin.com/pulse/i-built-f1-car-2026-regulations-ted-l-dqfnc/)。这是一篇非常有深度的文章，我从中学到了很多。原文从整车的角度记录了作者如何根据 2026 新规进行几何创建、法规取舍和 CFD 分析。
+我自己的项目参考了 TEDL 的文章 [《I Built an F1 Car — The 2026 Regulations》](https://www.linkedin.com/pulse/i-built-f1-car-2026-regulations-ted-l-dqfnc/)。这是一篇非常有深度的文章，我从中学到了很多。原文从整车的角度记录了作者如何根据 2026 新规进行几何创建、法规取舍和 CFD 分析。
 
 我也大致按照这篇文章的思路，打算先把整车拆成明确的部件，并逐个完成每个部件的建模，最后再进入 CFD 分析，验证自己的建模与真车之间的差距。
 
