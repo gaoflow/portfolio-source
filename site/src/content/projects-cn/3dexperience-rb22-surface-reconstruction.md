@@ -11,7 +11,7 @@ duration: '侧箱与后翼完成 · 整车曲面建模进行中'
 featured: true
 order: 0
 studySequence: 19
-heroImage: /images/projects/3dexperience-rb22/rear-wing/iso.jpg
+heroImage: /images/projects/3dexperience-rb22/sidepod/sidepod_r1_iso.jpg
 ---
 
 我是看到了真车模型，然后有了在 3DEXPERIENCE 上重建 F1 的打算。
