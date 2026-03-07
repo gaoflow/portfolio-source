@@ -1,11 +1,11 @@
 ---
-title: '3DEXPERIENCE GSD 建模——侧箱与后翼'
+title: '在 3DEXPERIENCE 上用 GSD 建模 F1 2026 真车'
 year: 2026
 date: '2026-08-24'
 status: active
 categories: [design]
 tags: [设计, CAD, GSD, 曲面建模]
-summary: '我从空白 3D Shape 开始，在 3DEXPERIENCE 的 Generative Shape Design 中建立点、截面、样条、放样与裁剪曲面，完成侧箱和后翼，并继续推进整车其余部件。'
+summary: '我在 3DEXPERIENCE 的 Generative Shape Design 中，通过建立点、截面、样条、放样以及裁剪曲面，成功完成了 F1 2026 侧箱和后翼的还原，并打算后续绘制出 F1 2026 赛车的整车。'
 role: '独立 CAD 曲面建模'
 duration: '侧箱与后翼完成 · 整车曲面建模进行中'
 featured: true
