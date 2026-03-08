@@ -38,7 +38,7 @@ It also makes a failed result easier to accept. If the gate was written first, I
 
 ## Small problems catch mistakes that a car will hide
 
-My [Airfoil Methods project](/projects/airfoil-methods) became my favourite example of this.
+My Airfoil Methods project became my favourite example of this.
 
 Thin-airfoil theory, lifting-line theory, and a panel method are all cheap. That is their advantage. I can check symmetry, signs, closure, lift slope, and pressure integration before touching a complex vehicle.
 
@@ -58,7 +58,7 @@ For the output used in the decision, I now check:
 4. time-step sensitivity when the problem is transient; and
 5. model sensitivity only after the numerical checks pass.
 
-The [FSAE Cooling study](/projects/fsae-cooling) follows that order. Its selected transient model changes by 0.029 K under spatial refinement and 0.018 K when the time step is halved. Both sit inside the 0.1 K numerical gate.
+The FSAE Cooling study follows that order. Its selected transient model changes by 0.029 K under spatial refinement and 0.018 K when the time step is halved. Both sit inside the 0.1 K numerical gate.
 
 That makes the screen numerically trustworthy at its intended scale. It does not turn incomplete manufacturer data into a physical validation dataset.
 
@@ -80,7 +80,7 @@ The Airfoil Methods page keeps the NASA NACA 0012 data beside the inviscid predi
 
 ## A failed mesh taught me where the ladder stops
 
-In the [F1 2026 full-car project](/projects/f1-2026-aero), I tried twenty bounded meshing routes. The best volume mesh still had eight failed skew faces. The mesh gate therefore said NO-GO.
+In the F1 2026 full-car project, I tried twenty bounded meshing routes. The best volume mesh still had eight failed skew faces. The mesh gate therefore said NO-GO.
 
 An earlier coarse case still helped me check force signs and output plumbing. It could not become a production aerodynamic prediction just because its force trace looked calm.
 

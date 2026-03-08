@@ -79,7 +79,7 @@ This interval describes sampling uncertainty inside the retained history. It doe
 
 ## What happened in my F1 pilot
 
-The [F1 2026 full-car project](/projects/f1-2026-aero) kept 301 corrected coefficient samples from iterations 100 to 400. I tracked seven outputs: whole car, body, floor, front and rear wings, and front and rear tyres.
+The F1 2026 full-car project kept 301 corrected coefficient samples from iterations 100 to 400. I tracked seven outputs: whole car, body, floor, front and rear wings, and front and rear tyres.
 
 The rule selected a 31-sample window beginning at iteration 370:
 

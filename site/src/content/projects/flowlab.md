@@ -68,7 +68,7 @@ This is a numerical-method study and interactive teaching artifact, not a substi
 
 ## Reproducibility
 
-The project directory contains the solver, tests, benchmark transcription, validation runner, generated JSON/CSV evidence, and figures. `npm test && npm run validate` regenerates every metric shown above. The committed [technical report](/documents/flowlab-report.html) records the method, three-grid comparison, acceptance gates, source, and limitations.
+The project directory contains the solver, tests, benchmark transcription, validation runner, generated JSON/CSV evidence, and figures. `npm test && npm run validate` regenerates every metric shown above.
 
 ## One time step, made inspectable
 

@@ -118,6 +118,6 @@ CFD should not be asked to rescue:
 
 Those are system problems first.
 
-The [FSAE Cooling project](/projects/fsae-cooling) still carries one deliberate limitation: several component curves came from secondary hosts and were biased conservatively. That is enough to reject the passive layout, but not enough to sign off a purchase.
+The FSAE Cooling project still carries one deliberate limitation: several component curves came from secondary hosts and were biased conservatively. That is enough to reject the passive layout, but not enough to sign off a purchase.
 
 The lesson I kept is straightforward: **use the cheapest honest model to kill a bad architecture early, then spend CFD time on the installation details of the designs that survive.**

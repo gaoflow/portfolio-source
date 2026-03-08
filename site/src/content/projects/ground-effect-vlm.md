@@ -64,7 +64,7 @@ That endpoint drove the publication decision. The recorded state at $h/c=0.25$ â
 
 ## Reproduce
 
-`python3 -m unittest discover -s tests -v` checks the solver contracts. `python3 scripts/analyse.py` regenerates all metrics and figures and exits nonzero if any gate fails. The committed [technical report](/documents/ground-effect-vlm-report.html) preserves the method, checks, interpretation, sources, and negative claims.
+`python3 -m unittest discover -s tests -v` checks the solver contracts. `python3 scripts/analyse.py` regenerates all metrics and figures and exits nonzero if any gate fails.
 
 ## Boundary condition and sign discipline
 

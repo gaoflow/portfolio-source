@@ -75,4 +75,3 @@ The campaign also set a clean boundary between a pilot and production work. It p
 
 This is steady half-car RANS on reconstructed public geometry. It has no wind-tunnel or track correlation, no yaw, no full-car asymmetric flow and no demonstrated production mesh convergence. The 25–35M-cell programme, wall-resolved wing surfaces, three-grid GCI and URANS/DES ride-height cliff remain separate gates.
 
-[Open the audited campaign claims](/evidence/f1-rans-campaign.html).

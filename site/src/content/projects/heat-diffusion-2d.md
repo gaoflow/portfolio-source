@@ -16,7 +16,7 @@ heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
 
 ## Context & objective
 
-This first time-dependent solver matches the analytical slab transient to $L^\infty=1.38\times10^{-5}$, and it refuses to run outside its stability bound. It directly precedes the [FlowLab lattice-Boltzmann work](/projects/flowlab): before trusting a browser LBM solver, I wanted the smallest unsteady solver where stability, temporal order, and conservation could each be checked against an independent result.
+This first time-dependent solver matches the analytical slab transient to $L^\infty=1.38\times10^{-5}$, and it refuses to run outside its stability bound. It directly precedes the FlowLab lattice-Boltzmann work: before trusting a browser LBM solver, I wanted the smallest unsteady solver where stability, temporal order, and conservation could each be checked against an independent result.
 
 The heat equation $\partial_t T=\alpha\nabla^2 T$ is the right vehicle: it has an analytical transient, a textbook stability bound, and a conservation identity. The objective was a verifiable solver, with the gates declared before the numbers were generated.
 
@@ -69,7 +69,7 @@ A second identity pins the implementation itself: a discrete cosine mode on the 
 
 ## Reproduce
 
-`python3 -m unittest discover -s tests -v` runs the thirteen solver contracts. `python3 scripts/analyse.py` regenerates `results/analysis.json` and both figures, exiting nonzero if any gate fails. The committed [technical report](/documents/heat-diffusion-2d-report.html) preserves the derivation, gates, and recorded stability refusal.
+`python3 -m unittest discover -s tests -v` runs the thirteen solver contracts. `python3 scripts/analyse.py` regenerates `results/analysis.json` and both figures, exiting nonzero if any gate fails.
 
 ## What I took away
 

@@ -122,9 +122,6 @@ Detailed sidepod or duct CFD cannot repair an architecture that fails its system
 
 ## Evidence
 
-- [Revision 2 engineering report](/documents/fsae-cooling-system-design.pdf)
-- [Machine-audited evidence report](/evidence/fsae-cooling.html)
-- [Evidence catalogue](/evidence/)
 - Primary boundaries: AMK `PDK 205481`; component curves: Boyd 6310G3 and SPAL brushless fan catalogue
 
 The result is intentionally bounded: a verified coolant-domain system screen and an auditable no-go decision, short of a finished race-car cooling installation.

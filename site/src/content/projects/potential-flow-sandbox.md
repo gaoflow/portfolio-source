@@ -16,7 +16,7 @@ heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
 
 ## Context & objective
 
-Every identity this layer of theory claims checks out at machine precision: surface $C_p$ to $2.66\times10^{-15}$, circulation recovery to $8.9\times10^{-16}$, Kutta–Joukowski lift exact in sign and magnitude. The panel method in [Airfoil Methods](/projects/airfoil-methods) and the vortex-lattice code in [Ground Effect VLM](/projects/ground-effect-vlm) both assume that sources, doublets, and vortices are exact, that superposition is legitimate, and that circulation means lift. Rather than import those assumptions, I built the layer they rest on and verified every identity it claims.
+Every identity this layer of theory claims checks out at machine precision: surface $C_p$ to $2.66\times10^{-15}$, circulation recovery to $8.9\times10^{-16}$, Kutta–Joukowski lift exact in sign and magnitude. The panel method in Airfoil Methods and the vortex-lattice code in Ground Effect VLM both assume that sources, doublets, and vortices are exact, that superposition is legitimate, and that circulation means lift. Rather than import those assumptions, I built the layer they rest on and verified every identity it claims.
 
 This study closes the analytical fluids set before the later panel and vortex-lattice work. The deliverable is a small sandbox: elementary flows written as complex potentials, superposed into flow past a circular cylinder with and without circulation, with an RK4 streamline tracer checked against the analytical streamfunction.
 
@@ -91,4 +91,4 @@ python3 scripts/analyse.py
 python3 scripts/publish_site.py
 ```
 
-Twelve unit tests pin the elementary-flow hand values, surface impermeability, far-field decay, circulation sign, and the tracer's fourth-order convergence. `analyse.py` regenerates `results/analysis.json` and both figures and exits nonzero if any gate fails. The committed [technical report](/documents/potential-flow-sandbox-report.html) records the equations, gates, and sources.
+Twelve unit tests pin the elementary-flow hand values, surface impermeability, far-field decay, circulation sign, and the tracer's fourth-order convergence. `analyse.py` regenerates `results/analysis.json` and both figures and exits nonzero if any gate fails.

@@ -72,4 +72,3 @@ python3 scripts/analyse.py
 PYTHONPATH=src python3 -m dimensionless_numbers reynolds --rho 1.225 --u 50 --l 1.0 --mu 1.81e-5 --json
 ```
 
-The committed [technical report](/documents/dimensionless-numbers-report.html) preserves the method, gates, sources, and limitations.

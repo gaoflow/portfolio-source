@@ -31,7 +31,7 @@ It cannot tell me about separation, diffuser pumping, tyre wakes, leakage, or mo
 
 ## The VLM sweep gave me numbers I could check
 
-In the [Ground Effect VLM project](/projects/ground-effect-vlm), I used an aspect-ratio-4 rectangular wing at $4°$ angle of attack, 64 spanwise panels, and an 80-chord wake. I swept 14 heights from $h/c=0.25$ to 50.
+In the Ground Effect VLM project, I used an aspect-ratio-4 rectangular wing at $4°$ angle of attack, 64 spanwise panels, and an 80-chord wake. I swept 14 heights from $h/c=0.25$ to 50.
 
 At $h/c=0.5$:
 
@@ -57,7 +57,7 @@ That gave me confidence in the code inside its own assumptions.
 
 A panel method can put the actual surface shape into the calculation and give me a pressure distribution. That is useful for checking loading and circulation.
 
-My [Airfoil Methods project](/projects/airfoil-methods) made the limit obvious. The panel model produced pressure-derived lift and moment, but pressure drag stayed below 0.0008 while the wind tunnel measured 0.0065 to 0.0275. It also kept increasing lift after the real airfoil stalled.
+My Airfoil Methods project made the limit obvious. The panel model produced pressure-derived lift and moment, but pressure drag stayed below 0.0008 while the wind tunnel measured 0.0065 to 0.0275. It also kept increasing lift after the real airfoil stalled.
 
 Adding a ground image does not fix that. An inviscid model remains inviscid.
 
@@ -69,7 +69,7 @@ A two-dimensional diffuser slice can help me understand pressure recovery. It ca
 
 For a front wing or floor, the useful model may need the ground, rotating tyres, suspension, realistic ride and yaw, and the actual leakage paths. For full-car balance, I need the whole car and a qualified mesh.
 
-The [F1 2026 project](/projects/f1-2026-aero) is where this ladder stopped me. I had the intended 50 m/s inlet, moving ground, rotating wheels, seven force groups, and $k$–$\omega$ SST setup. The production mesh still failed its gate. Writing the boundary conditions did not make the full-car answer real.
+The F1 2026 project is where this ladder stopped me. I had the intended 50 m/s inlet, moving ground, rotating wheels, seven force groups, and $k$–$\omega$ SST setup. The production mesh still failed its gate. Writing the boundary conditions did not make the full-car answer real.
 
 ## The last rung is physical correlation
 

@@ -18,7 +18,7 @@ heroImage: /images/projects/flowrom/pod-modes.svg
 
 Rank-8 POD compresses 480 velocity fields 48.8× while holding reconstruction error on four unseen forcing cycles to 0.123%; exact DMD forecasts those cycles at 0.100% full-state error. A reduced-order model earns trust only when its compression claims survive data it did not fit, so this study holds out four full forcing cycles before fitting either model.
 
-The parent data source is the [FlowLab lattice-Boltzmann solver](/projects/flowlab/). FlowROM does not copy or relabel another portfolio project: every snapshot, decomposition, figure, metric, and test is generated in this repository.
+The parent data source is the FlowLab lattice-Boltzmann solver. FlowROM does not copy or relabel another portfolio project: every snapshot, decomposition, figure, metric, and test is generated in this repository.
 
 ## Live mode explorer
 
@@ -77,7 +77,7 @@ The result is deliberately bounded. A coarse D2Q9 BGK cavity with one determinis
 
 ## Reproduce
 
-`node scripts/generate-snapshots.mjs` creates the fields. `python3 scripts/analyse.py` fits both models, evaluates the holdout, regenerates every figure and JSON metric, and enforces the acceptance gates. The committed [technical report](/documents/flowrom-report.html) records equations, interpretation, limitations, and canonical POD/DMD references.
+`node scripts/generate-snapshots.mjs` creates the fields. `python3 scripts/analyse.py` fits both models, evaluates the holdout, regenerates every figure and JSON metric, and enforces the acceptance gates.
 
 ## Why the holdout is chronological
 

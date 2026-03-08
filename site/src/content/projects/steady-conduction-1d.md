@@ -32,7 +32,7 @@ $$
 \begin{aligned} T(x)&=T_{\text{left}}+C_1x-\frac{q'''x^2}{2k},\\[0.5em] C_1&=\frac{q'''L+\dfrac{h_c\,q'''L^2}{2k}-h_c\,(T_{\text{left}}-T_\infty)}{k+h_cL},\end{aligned}
 $$
 
-derived in the [technical report](/documents/steady-conduction-1d-report.html). That exact solution is the primary validation reference.
+That exact solution is the primary validation reference.
 
 ![Numerical and exact temperature profiles with the convective tip](/images/projects/steady-conduction-1d/temperature-profile.svg)
 
@@ -76,4 +76,4 @@ python3 scripts/analyse.py
 python3 scripts/publish_site.py
 ```
 
-`analyse.py` regenerates `results/analysis.json` and both figures and exits nonzero if any gate fails. The committed [technical report](/documents/steady-conduction-1d-report.html) carries the derivation, the verification argument, and the sources.
+`analyse.py` regenerates `results/analysis.json` and both figures and exits nonzero if any gate fails.

@@ -49,15 +49,5 @@ const alternatePath = hasAlternate
       <Content />
     </div>
 
-    {d.sourceProjects.length > 0 && (
-      <aside class="mt-16 border border-accent/30 bg-accent/5 p-6">
-        <h2 class="section-label mb-4">{isChinese ? '相关项目证据' : 'Project evidence used'}</h2>
-        <ul class="space-y-2 text-sm">
-          {d.sourceProjects.map((slug) => (
-            <li><a class="text-accent hover:underline" href={`/projects/${slug}`}>{slug}</a></li>
-          ))}
-        </ul>
-      </aside>
-    )}
   </article>
 </Base>

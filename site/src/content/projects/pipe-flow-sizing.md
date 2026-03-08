@@ -85,8 +85,7 @@ python3 scripts/analyse.py                 # regenerates metrics + figures, gate
 python3 scripts/publish_site.py            # publishes figures and the HTML report
 ```
 
-The committed [technical report](/documents/pipe-flow-sizing-report.html) preserves the equations, verification grids, element breakdown, and sources.
 
 ## What this fed into
 
-This was the first encounter with hydraulic networks, and it set the pattern for the later [FSAE cooling-system study](/projects/fsae-cooling): fan and pump operating points as curve intersections, system resistance built element by element, and a decision gate that trusts the model only as far as its verified envelope. The cooling study adds what this one deliberately omits — parallel branches, a real pump curve, thermal coupling, and transients — but its hydraulic core is this one, with the verification discipline intact.
+This was the first encounter with hydraulic networks, and it set the pattern for the later FSAE cooling-system study: fan and pump operating points as curve intersections, system resistance built element by element, and a decision gate that trusts the model only as far as its verified envelope. The cooling study adds what this one deliberately omits — parallel branches, a real pump curve, thermal coupling, and transients — but its hydraulic core is this one, with the verification discipline intact.

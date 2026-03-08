@@ -67,7 +67,7 @@ Cropping either failure would have been easy: truncate the comparison at the dec
 ![Measured drag beside the inviscid blind spot](/images/projects/airfoil-methods/drag-blind-spot.svg)
 ## Reproduce
 
-`python3 -m unittest discover -s tests -v` exercises the geometry and solver contracts. `python3 scripts/analyse.py` regenerates every metric and figure and exits nonzero if any acceptance gate fails. The [technical report](/documents/airfoil-methods-report.html) records equations, provenance, interpretation, and limitations.
+`python3 -m unittest discover -s tests -v` exercises the geometry and solver contracts. `python3 scripts/analyse.py` regenerates every metric and figure and exits nonzero if any acceptance gate fails.
 
 ## Experimental provenance
 
