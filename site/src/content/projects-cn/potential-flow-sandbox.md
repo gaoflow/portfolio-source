@@ -27,24 +27,24 @@ heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
 我把每一种基本流动表示为复势 $W(z)$，其中 $z=x+iy$，速度由
 
 $$
-\\frac{dW}{dz}=u-iv
+\frac{dW}{dz}=u-iv
 $$
 
 给出。四种基本流动分别是：
 
 $$
-\\begin{aligned}
-W_{\\text{uniform}} &= Uz, &
-W_{\\text{source}} &= \\frac{m}{2\\pi}\\ln z,\\\\
-W_{\\text{doublet}} &= \\frac{\\mu}{2\\pi z}, &
-W_{\\text{vortex}} &= \\frac{i\\Gamma}{2\\pi}\\ln z.
-\\end{aligned}
+\begin{aligned}
+W_{\text{uniform}} &= Uz, &
+W_{\text{source}} &= \frac{m}{2\pi}\ln z,\\
+W_{\text{doublet}} &= \frac{\mu}{2\pi z}, &
+W_{\text{vortex}} &= \frac{i\Gamma}{2\pi}\ln z.
+\end{aligned}
 $$
 
 复势的好处是可以直接叠加。均匀来流与偶极子组合后会形成圆柱绕流，再加入点涡就能得到带环量的圆柱：
 
 $$
-W(z)=U\\left(z+\\frac{R^2}{z}\\right)+\\frac{i\\Gamma}{2\\pi}\\ln z.
+W(z)=U\left(z+\frac{R^2}{z}\right)+\frac{i\Gamma}{2\pi}\ln z.
 $$
 
 这里的几何和流场都有解析解，所以我不需要拿另一种数值方法作为参考，可以直接检查实现是否满足理论关系。
@@ -56,7 +56,7 @@ $$
 我采用的约定是：正 $\Gamma$ 表示顺时针环量，此时
 
 $$
-L'=\\rho U\\Gamma
+L'=\rho U\Gamma
 $$
 
 对应向上的升力。轮廓积分沿逆时针方向进行，因此恢复环量时需要再处理一次符号。
@@ -75,15 +75,15 @@ $$
 
 | 检查内容 | 结果 | 要求 |
 |---|---:|---:|
-| 表面 $C_p$ 与 $1-4\\sin^2\\theta$ | $2.66\\times10^{-15}$ | $<10^{-12}$ |
-| 停滞点与解析角度 | $8.9\\times10^{-16}$ rad | $<10^{-9}$ rad |
-| 闭合积分恢复环量 | $8.9\\times10^{-16}$ | $<10^{-9}$ |
-| RK4 流函数漂移，步长 0.01 | $2.56\\times10^{-12}$ | $<10^{-6}$ |
-| 压力积分升力与 $\\rho U\\Gamma$ | 相对误差 0.0 | $<10^{-9}$ |
+| 表面 $C_p$ 与 $1-4\sin^2\theta$ | $2.66\times10^{-15}$ | $<10^{-12}$ |
+| 停滞点与解析角度 | $8.9\times10^{-16}$ rad | $<10^{-9}$ rad |
+| 闭合积分恢复环量 | $8.9\times10^{-16}$ | $<10^{-9}$ |
+| RK4 流函数漂移，步长 0.01 | $2.56\times10^{-12}$ | $<10^{-6}$ |
+| 压力积分升力与 $\rho U\Gamma$ | 相对误差 0.0 | $<10^{-9}$ |
 
-升力算例使用 $U=1$、$R=1$、$\\rho=1.225$ 和 $\\Gamma=2\\pi$。环量把停滞点从 $0^\\circ$、$180^\\circ$ 移动到 $-30^\\circ$、$-150^\\circ$。
+升力算例使用 $U=1$、$R=1$、$\rho=1.225$ 和 $\Gamma=2\pi$。环量把停滞点从 $0^\circ$、$180^\circ$ 移动到 $-30^\circ$、$-150^\circ$。
 
-在 4097 个圆柱表面测点上，$C_p$ 的最大差异为 $2.66\\times10^{-15}$；在 $r=2.5R$ 处进行 4096 点轮廓积分，得到 6.283185307179585，而输入环量是 6.283185307179586。
+在 4097 个圆柱表面测点上，$C_p$ 的最大差异为 $2.66\times10^{-15}$；在 $r=2.5R$ 处进行 4096 点轮廓积分，得到 6.283185307179585，而输入环量是 6.283185307179586。
 
 ![表面压力系数与解析分布的比较](/images/projects/potential-flow-sandbox/cp-comparison.svg)
 

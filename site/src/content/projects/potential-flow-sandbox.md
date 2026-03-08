@@ -35,7 +35,7 @@ The four elementary flows are
 $$
 \begin{aligned}
 W_{\text{uniform}} &= Uz, &
-W_{\text{source}} &= \frac{m}{2\pi}\ln z,\\
+W_{\text{source}} &= \frac{m}{2\pi}\ln z,\
 W_{\text{doublet}} &= \frac{\mu}{2\pi z}, &
 W_{\text{vortex}} &= \frac{i\Gamma}{2\pi}\ln z.
 \end{aligned}

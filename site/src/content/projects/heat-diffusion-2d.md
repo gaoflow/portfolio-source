@@ -36,7 +36,7 @@ T_{j,i}^{n+1}
 &=T_{j,i}^{n}
 +r\big[
 \Delta T_{x,\,i+1/2}
--\Delta T_{x,\,i-1/2}\\
+-\Delta T_{x,\,i-1/2}\
 &\qquad+
 \Delta T_{y,\,j+1/2}
 -\Delta T_{y,\,j-1/2}
@@ -85,7 +85,7 @@ $$
 &=\sum_{n=0}^{\infty}
 \frac{4}{(2n+1)\pi}
 \sin(\lambda_n x)
-e^{-\alpha\lambda_n^2t},\\
+e^{-\alpha\lambda_n^2t},\
 \lambda_n
 &=\frac{(2n+1)\pi}{2L}.
 \end{aligned}

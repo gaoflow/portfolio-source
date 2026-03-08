@@ -40,7 +40,7 @@ The closed-form solution is
 
 $$
 \begin{aligned}
-T(x)&=T_{\text{left}}+C_1x-\frac{q'''x^2}{2k},\\[0.5em]
+T(x)&=T_{\text{left}}+C_1x-\frac{q'''x^2}{2k},\[0.5em]
 C_1&=\frac{q'''L+\dfrac{h_cq'''L^2}{2k}-h_c(T_{\text{left}}-T_\infty)}
 {k+h_cL}.
 \end{aligned}

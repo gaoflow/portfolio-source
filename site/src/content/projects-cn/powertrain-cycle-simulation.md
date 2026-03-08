@@ -49,7 +49,7 @@ heroImage: /images/projects/powertrain-cycle-simulation/cycle-comparison.svg
 Spa ECO 的弯道速度由轮胎摩擦极限
 
 $$
-v=\\sqrt{\\mu gR}
+v=\sqrt{\mu gR}
 $$
 
 估算。ECO 模式限制 0–100 km/h 加速时间为 20 s，制动减速度为 0.4 g，最高速度为 90 km/h。SPORT 模式允许更快加速，制动提高到约 0.6 g，最高速度取决于发动机能力，制动点通过迭代确定。
@@ -57,7 +57,7 @@ $$
 在每个轨迹点，模型计算四类阻力：
 
 $$
-F=ma+fmg+\\frac{1}{2}\\rho C_xSv^2+mg\\sin\\theta.
+F=ma+fmg+\frac{1}{2}\rho C_xSv^2+mg\sin\theta.
 $$
 
 它们分别代表惯性、滚动阻力、空气阻力和坡度阻力。车轮功率为 $Fv$，再结合传动效率、发动机效率和燃料低位热值计算燃油消耗。CO₂ 使用每升汽油 2392 g 的排放因子。
