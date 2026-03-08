@@ -1,11 +1,11 @@
 ---
-title: 'Pipe Flow Sizing — Verified Hydraulics Primitives'
+title: 'How I Calculated the Actual Cooling-Loop Flow'
 year: 2025
 date: '2025-11-29'
 status: complete
 categories: [tooling]
 tags: [CFD]
-summary: 'I implemented Colebrook friction, series losses and a pump operating point, verified by exact identities, residual gates and the Swamee–Jain accuracy band.'
+summary: 'I combined pipe friction, minor losses, a series network, and a pump curve in one hydraulic model, giving a representative operating point of 26.22 L/min at 51.34 kPa, then checked the friction equations, curve intersection, and pressure closure.'
 role: 'Hydraulics & numerical methods'
 duration: 'Independent study'
 featured: false
@@ -14,78 +14,114 @@ studySequence: 3
 heroImage: /images/projects/pipe-flow-sizing/moody.svg
 ---
 
-## Context & objective
+## Why I needed to solve the loop flow first
 
-The representative cooling loop operates at 26.22 L/min against 51.34 kPa, and about 78% of that pressure drop is minor losses — the K coefficients of the radiator core and engine gallery, with straight-pipe friction a minor share at this scale. That conclusion only matters because every primitive behind it was verified before it was allowed to feed anything downstream.
+For my later FSAE cooling-system work, the radiator, pump, and engine water passages can only be assessed after I know how much coolant will actually flow through them. A pump's stated free-delivery flow is not the installed loop flow because the hoses, radiator, engine passages, and bends all create pressure losses.
 
-I needed hydraulics I could trust for the later FSAE cooling-loop study. Pipe sizing is easy to *almost* get right: a friction factor a few percent off, a minor-loss coefficient silently dropped, an operating point found by eyeballing two curves. This study covers steady, incompressible, single-phase pipe flow: Darcy–Weisbach friction, K-coefficient minor losses, a series network, and a quadratic pump/system intersection.
+I needed more than a system curve based on intuition. I wanted a hydraulic model whose individual parts I could check: straight-pipe friction, minor losses, a series network, and the intersection between the pump curve and the system resistance curve.
 
-## Friction factor, verified two ways
+## How I calculated pipe friction
 
-Below $Re=2300$ the friction factor is the analytical identity $f=64/Re$; the implementation reproduces it with zero floating-point error across a 200-point grid. Above it, the implicit Colebrook equation is solved by Newton iteration on $x=1/\sqrt{f}$ from a [Haaland](https://doi.org/10.1115/1.3240948) initial guess, with a 50-iteration guard that turns non-convergence into a loud failure instead of a silent bad factor. Substituting the solved factor back into the defining equation across 150 $(Re, \varepsilon/D)$ grid points up to $Re=10^8$ gives a maximum residual of $3.55\times10^{-15}$.
+For laminar flow, I used the analytical relation
 
-![Computed Moody-style chart: laminar line and Colebrook curves](/images/projects/pipe-flow-sizing/moody.svg)
+$$
+f=\frac{64}{Re}.
+$$
 
-The Moody-style chart is drawn from computed curves only — the laminar line and six Colebrook sweeps at declared relative roughnesses. No external chart was digitised.
+I checked this identity at 200 Reynolds numbers and found zero floating-point error.
 
-## Iteration: the cross-check that needed a fence
+For turbulent flow, I solved the implicit Colebrook equation. I used the [Haaland](https://doi.org/10.1115/1.3240948) formula to provide an initial guess, then applied Newton iteration to $x=1/\sqrt f$. The solver allows at most 50 iterations. If it still has not converged, it raises an error instead of returning an unsupported friction factor.
 
-The independent cross-check is the explicit [Swamee–Jain](https://doi.org/10.1061/JYCEAJ.0004542) formula, published with a $\pm3\%$ accuracy band over $5\times10^3\le Re\le10^8$ and $10^{-6}\le\varepsilon/D\le10^{-2}$. That band has edges, and the comparison finds them: outside the declared range — near $Re=4\times10^3$ at very low roughness — the deviation exceeds 3%.
+I also substituted each solved value of $f$ back into the Colebrook equation. Across 150 $(Re,\varepsilon/D)$ combinations reaching $Re=10^8$, the maximum residual was $3.55\times10^{-15}$.
 
-That left two bad options and one honest one. Widening the comparison grid would have produced a failing number and a false sense that the solver was wrong; quietly narrowing it would have hidden where the approximation breaks. The runner does neither. It evaluates the declared validity range, reports the in-range maximum deviation of 2.83% (inside the band), and leaves the out-of-range behaviour documented as a property of the formula. The lesson carried forward: a cross-check against an approximation is only meaningful inside that approximation's own fence.
+## The cross-check had its own limits
 
-## Series network and pump operating point
+I used the explicit [Swamee–Jain](https://doi.org/10.1061/JYCEAJ.0004542) formula as a second calculation route. Its published validity range is
 
-A representative FSAE-scale cooling loop — suction hose, radiator core, engine gallery, return hose, declared water properties, declared K coefficients — is solved in series by bisection on the monotone system curve. The pump is a declared quadratic model $\Delta p = 90\ \text{kPa} - c\,Q^2$ (40 L/min free delivery), explicitly a stand-in rather than vendor data. The operating point is where pump curve meets system resistance curve:
+$$
+5\times10^3\le Re\le10^8,\qquad
+10^{-6}\le\varepsilon/D\le10^{-2},
+$$
 
-- **Operating flow:** 26.22 L/min at 51.34 kPa, intersection residual $2.18\times10^{-11}$ Pa.
-- **Independent check:** a 4096-sample brute-force scan brackets the intersection at $[26.2173, 26.2271]$ L/min; the Newton solution sits inside.
-- **Closure:** the total drop equals the sum of the per-element drops exactly (0.0 Pa closure error, at the operating point and across a 24-flow sweep).
+with a stated accuracy of $\pm3\%$.
 
-The element breakdown shows where the pressure goes:
+Within that range, the maximum difference between my Colebrook results and Swamee–Jain was 2.83%, which is inside the stated accuracy band. Outside the range, especially near $Re=4\times10^3$ at low relative roughness, the difference exceeded 3%.
+
+That did not mean the Colebrook solver was wrong. It meant the cross-check itself had been used outside its stated range. This changed how I interpret failed checks: before blaming the result under test, I first ask whether the reference method is still valid.
+
+## The operating point was not the pump's free-delivery flow
+
+I built a representative series loop containing a suction hose, radiator core, engine gallery, and return hose. I represented its total pressure loss as
+
+$$
+\Delta p_{sys}(Q).
+$$
+
+For the pump, I used the explicitly defined quadratic stand-in
+
+$$
+\Delta p_{pump}=90\ \text{kPa}-cQ^2,
+$$
+
+with a free-delivery flow of 40 L/min. This was a substitute curve for validating the method, not measured vendor data.
+
+The actual operating point satisfies
+
+$$
+\Delta p_{pump}(Q)-\Delta p_{sys}(Q)=0.
+$$
+
+I found the intersection by bisection. The resulting operating point was **26.22 L/min at 51.34 kPa**, with an intersection residual of $2.18\times10^{-11}$ Pa.
+
+As an independent check, a brute-force scan with 4096 samples bracketed the intersection within $[26.2173,26.2271]$ L/min. The bisection result fell inside that interval.
+
+![Pump curve, system resistance curve, and final operating point](/images/projects/pipe-flow-sizing/pump-operating-point.svg)
+
+## Where the pressure loss occurred
 
 | Element | $Re$ | $f$ | $\Delta p$ |
 |---|---:|---:|---:|
-| Suction hose (0.40 m, 16 mm, $K=1.5$) | 34 654 | 0.0230 | 4.89 kPa |
-| Radiator core (0.15 m, 16 mm, $K=8.0$) | 34 654 | 0.0230 | 19.37 kPa |
-| Engine gallery (0.50 m, 14 mm, $K=4.0$) | 39 605 | 0.0296 | 20.33 kPa |
-| Return hose (0.60 m, 16 mm, $K=2.0$) | 34 654 | 0.0230 | 6.75 kPa |
+| Suction hose, 0.40 m, 16 mm, $K=1.5$ | 34 654 | 0.0230 | 4.89 kPa |
+| Radiator core, 0.15 m, 16 mm, $K=8.0$ | 34 654 | 0.0230 | 19.37 kPa |
+| Engine gallery, 0.50 m, 14 mm, $K=4.0$ | 39 605 | 0.0296 | 20.33 kPa |
+| Return hose, 0.60 m, 16 mm, $K=2.0$ | 34 654 | 0.0230 | 6.75 kPa |
 | **Total** | | | **51.34 kPa** |
 
-![Pump curve vs system resistance curve with the operating point](/images/projects/pipe-flow-sizing/pump-operating-point.svg)
+About 78% of the pressure loss came from the minor losses in the radiator core and engine gallery. In this representative loop, further reducing straight-pipe friction was not the main opportunity. Reducing the resistance of the core and engine passages would matter more.
 
-A sanity check with physics teeth: adding a 10 kPa static lift reduces the operating flow, as the model must.
+The total pressure loss matched the sum of the four element losses exactly. The closure error was 0.0 Pa at the operating point and at 24 additional flow values.
 
-## Validation summary
+## How I checked that the result was not accidentally correct
 
-| Check | Observed | Threshold |
+| Check | Result | Requirement |
 |---|---:|---:|
-| Laminar max $\lvert f-64/Re\rvert$ | 0.0 | $\le10^{-12}$ |
-| Colebrook max residual (150-point grid) | $3.55\times10^{-15}$ | $<10^{-12}$ |
-| Swamee–Jain max deviation (in validity range) | 2.83% | $\le3\%$ |
+| Laminar $f=64/Re$ | Maximum difference 0.0 | $\le10^{-12}$ |
+| Colebrook implicit residual | $3.55\times10^{-15}$ | $<10^{-12}$ |
+| Swamee–Jain difference within its validity range | 2.83% | $\le3\%$ |
 | Operating-point residual | $2.18\times10^{-11}$ Pa | $<10^{-10}$ Pa |
-| Network closure (total − element sum) | 0.0 Pa | relative $<10^{-12}$ |
+| Network pressure closure | 0.0 Pa | Relative value $<10^{-12}$ |
 
-All gates are enforced by the analysis runner, which exits nonzero if any fail.
+I also checked several physical trends that the model should preserve. Increasing the static pressure rise had to reduce the operating flow. Increasing a minor-loss coefficient had to move the system curve upward, and increasing roughness had to increase turbulent friction.
 
-## Limitations
+## What the model still lacks
 
-The model is steady, incompressible, and single-phase; there is no cavitation or NPSH check, so the pump curve is followed wherever the mathematics goes. Minor-loss K coefficients are declared handbook order-of-magnitude values, and published K tables carry wide uncertainty. The pump curve is a declared quadratic; real curves bend near shutoff and free delivery. The laminar/turbulent transition is a hard switch at $Re=2300$ with no transition band, and the network solver handles series topology only; parallel branches were deliberately left for the later cooling study.
+The model is steady, incompressible, and single-phase. It has no cavitation or NPSH check, and it does not use a real pump curve, so it is not suitable for final pump selection.
 
-## What I took away
+The minor-loss coefficients are handbook order-of-magnitude values and therefore carry substantial uncertainty. The model switches directly between laminar and turbulent flow at $Re=2300$, with no transition region. The network solver also supports only series topologies and cannot yet handle parallel branches.
 
-A cross-check against an approximation means something only inside that approximation's own fence. Swamee–Jain exceeds its ±3% band near $Re=4\times10^3$ at low roughness; a deviation measured there would have said nothing about my solver. When a check fails, the first question is now whether the code or the check is out of scope. The second habit this study set: verified primitives before capability. Every number the later cooling study consumed traces to an identity, an implicit-equation residual, or a published band.
+These limitations identified the work still needed in the later cooling-system project: real pump and radiator data, parallel flow paths, thermal coupling, and transient temperature rise.
 
-## Reproduce
+## What I learned
+
+This was the first time I treated the pump and cooling loop as two separate curves instead of assuming that the pump's nominal flow was the system flow.
+
+It also established an order of work that I continued to use: verify the friction factor, implicit-equation residual, and network pressure closure before allowing those results into a more complex thermal-fluid model. If a foundational calculation is only almost correct, the final system-level conclusion can still be completely wrong.
+
+## How to run it
 
 ```bash
 cd projects/pipe-flow-sizing
-python3 -m unittest discover -s tests -v   # 15 solver-contract tests
-python3 scripts/analyse.py                 # regenerates metrics + figures, gates
-python3 scripts/publish_site.py            # publishes figures and the HTML report
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+python3 scripts/publish_site.py
 ```
-
-
-## What this fed into
-
-This was the first encounter with hydraulic networks, and it set the pattern for the later FSAE cooling-system study: fan and pump operating points as curve intersections, system resistance built element by element, and a decision gate that trusts the model only as far as its verified envelope. The cooling study adds what this one deliberately omits — parallel branches, a real pump curve, thermal coupling, and transients — but its hydraulic core is this one, with the verification discipline intact.

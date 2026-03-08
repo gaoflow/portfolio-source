@@ -8,64 +8,103 @@ featured: false
 order: 117
 ---
 
-My work included real-time gift-rendering effects for live streaming. That gives me a client-side view of real-time systems, not evidence for a particular message broker, cache, queue, or protocol. I will keep the backend implementation unnamed.
+While implementing real-time gift-rendering effects for live streaming, I faced a concrete problem: an open connection does not mean the client still has correct state. Disconnections, out-of-order events, duplicate delivery, slow consumption, and reconnection can leave the interface running with stale or wrong content.
 
-From Android, the useful backend contract is visible in the states the client must reconcile: connected or stale, ordered or ambiguous, accepted or duplicated, current or catching up.
+My experience covers real-time features involving live streaming, voiceprints, and gifts. It lets me reason about the state created on the client, but it does not reveal which message broker, cache, queue, or protocol a backend uses. I also do not have enough information to describe a specific backend implementation or production incident, so I will not name backend components.
 
-## A connection is not a truth value
+From Android, I focus on the state the client must coordinate: whether the connection is genuinely healthy, whether event order is clear, whether an event has already been applied, whether current data is trustworthy, and whether the client can return to authoritative state.
 
-A socket can be open while the application has stopped receiving useful events. The network can disappear without an immediate close. The process can sleep and resume with a connection object that no longer represents server state.
+## I first check whether the client is really synchronized
 
-The client therefore needs more than a Boolean. It needs states such as connecting, synchronized, stale, reconnecting, and failed. Heartbeats or application-level acknowledgements can establish freshness, while deadlines decide when silence becomes stale.
+![Real-time client synchronization state machine](/images/notes/systems/realtime-backend-from-the-android-side.svg)
 
-The UI should depend on that state rather than the raw transport. A live indicator, send action, or retry prompt needs a meaningful application decision. Transport callbacks belong inside a connection adapter.
+I think of client recovery as these state changes:
 
-The backend participates by defining session identity, heartbeat behavior, idle limits, and what information survives a reconnect.
+```text
+CONNECTED → SUSPECT → DISCONNECTED
+     ↑           ↓
+ snapshot ← CATCHING_UP ← reconnect(cursor)
+```
 
-## Ordering needs a scope
+Reopening a connection is not the same as completing recovery. The client also needs connection health signals, comparable event cursors, authoritative snapshots, and rules for duplicate delivery and consumer backpressure.
 
-“Events are ordered” is incomplete. Ordered per connection, room, sender, object, or global stream are different contracts with different costs.
+## An open connection can already be useless
 
-The Android application needs the smallest scope that preserves correct behavior. Chat messages may require order within a room. Gift counts may combine by sender and gift. Presence updates may accept the latest version and discard earlier ones.
+A socket can remain open while the application receives no useful events. A network interruption may not trigger an immediate close. After a process sleeps and resumes, its old connection object may no longer represent server state.
 
-Sequence numbers can reveal gaps and duplicates inside that scope. Timestamps alone are weak because devices and servers do not share a perfect clock, and arrival time changes during reconnect.
+I therefore cannot model connection state as one Boolean. The client needs states such as connecting, synchronized, stale, reconnecting, and failed. Heartbeats or application-level acknowledgements help establish freshness, while deadlines decide how long silence is acceptable.
 
-When the client detects a gap, it needs a recovery action. It can request missing events, fetch a current snapshot, or mark the view stale. Continuing as if nothing happened turns transport loss into silent product state.
+The UI should depend on these application states, not directly on the transport. Live indicators, send actions, and retry prompts all depend on whether the data is still trustworthy. I keep transport callbacks inside a connection adapter so individual screens do not interpret connection health independently.
 
-## Reconnection is synchronization
+The backend contract must also define session identity, heartbeat behavior, idle limits, and what information remains available after reconnection. Without that, a reconnected client cannot know what it missed.
 
-Reopening a transport does not restore the state missed while disconnected.
+## I ask where ordering is guaranteed
 
-A reconnect request can carry the last accepted sequence or version. The backend may replay a bounded history or direct the client to fetch a fresh snapshot. The response needs one unambiguous point from which live events resume.
+“Events are ordered” is not a complete contract. Ordering per connection, room, sender, object, or global stream provides different guarantees at different costs.
 
-The client must prevent old connection callbacks from updating the new session. A connection generation or session token can mark ownership. Events from a previous generation are ignored even if they arrive after the new connection becomes active.
+The Android application needs the smallest scope that preserves correct behavior. For example:
 
-Backoff and jitter reduce synchronized reconnect load, but the user-facing state still needs a deadline. Endless automatic retries can leave the interface looking active while no current data exists.
+- Chat messages may need ordering within one room.
+- Gift counts may be combined by sender and gift.
+- Presence updates may accept only the latest version and discard earlier versions.
 
-## Duplicate delivery needs idempotent effects
+Sequence numbers can reveal gaps and duplicates within that scope. Timestamps alone are unreliable because devices and servers do not share a perfect clock, and reconnection changes arrival times.
 
-Real-time delivery often prefers retry over silent loss. That can produce duplicates after acknowledgements or connections fail.
+If the client finds a sequence gap, it cannot continue pretending that its state is complete. It must request missing events, fetch a current snapshot, or mark the view as stale. Otherwise, one transport loss silently becomes incorrect product state.
 
-Each event needs an identity stable across delivery attempts. The client can remember a bounded set of accepted identities or use sequence state. Durable operations need server-side idempotency because a modified or restarted client cannot enforce the final result.
+## Reconnection must restore synchronization
 
-Presentation effects require their own policy. Replaying a missed durable message may be correct; replaying an old full-screen gift animation after reconnect may be distracting. Event meaning and visual presentation should be separated so recovery can restore state without reproducing every transient effect.
+Reopening the transport does not recover state missed during disconnection.
 
-The same distinction helps caching. The cache stores current domain state, while the renderer owns short-lived animation.
+A reconnect request can carry the last sequence number or version accepted by the client as a cursor. The backend may replay a bounded history or require the client to fetch a fresh snapshot. Its response must establish one unambiguous point from which live delivery resumes.
 
-## Backpressure belongs in the contract
+If the retention window no longer covers the client’s cursor, incremental catch-up is impossible. The client must fetch authoritative state instead.
 
-A server can send events faster than a device can parse, store, and display them. An unbounded client queue converts a traffic spike into memory pressure and delayed state.
+The client must also stop callbacks from an old connection from updating a new session. I can tag events with a connection generation or session token and ignore events from earlier generations, even if they arrive after the new connection becomes active.
 
-The client needs bounded buffers and event-specific policies. Some updates can collapse to the latest value. Some can be batched. Some must be preserved or trigger a snapshot refresh when the queue overflows.
+Backoff and jitter reduce the load caused by many clients reconnecting together, but the user-facing state still needs a deadline. Endless automatic retries can make an interface look active while its data has long been stale.
 
-The backend can support this with aggregation, pagination, replay limits, and explicit snapshot endpoints. The contract should state what the client loses when it drops an event and how it recovers.
+## Duplicate delivery must not duplicate the result
 
-Observability needs queue age and synchronization state alongside message count. A small queue of old events can be more wrong than a larger queue that is current.
+Real-time delivery often prefers retries over silent loss. If an acknowledgement fails or a connection drops, the same event may arrive again.
 
-## Real time means bounded staleness
+Each event therefore needs an identity that remains stable across delivery attempts. The client can keep a bounded set of accepted event IDs, use sequence state for deduplication, and apply events through idempotent reducers.
 
-A real-time product cannot promise zero delay across mobile networks and background processes. It can define how staleness is detected, shown, and repaired.
+Operations that change durable state still need server-side idempotency. A modified or restarted client cannot guarantee the final result by itself.
 
-The Android side taught me to ask for that complete contract: freshness state, ordering scope, event identity, reconnect cursor, bounded buffering, and authoritative recovery. Once those decisions are explicit, the backend can choose its internal queue, cache, and transport without leaking them into every screen.
+Presentation needs a separate policy. Replaying a missed durable message may be correct, while replaying an old full-screen gift animation after reconnection may only distract the user. I separate event meaning from visual presentation so recovery can restore state without reproducing every transient effect.
 
-The goal is not a permanently open connection. It is a client that knows when its view is current and what to do when it is not.
+The same distinction applies to caching: the cache holds current domain state, while the renderer owns short-lived animation.
+
+## Slow consumption requires deliberate degradation
+
+A server can send events faster than a device can parse, store, and display them. An unbounded client queue turns a traffic spike into sustained memory pressure and steadily increasing delay.
+
+The client needs bounded buffers and policies for each event type:
+
+- Some updates can collapse to the latest value.
+- Some events can be processed in batches.
+- Some events must be preserved.
+- If the queue overflows, the client may need to abandon incremental catch-up and refresh from a snapshot.
+
+The backend can support these choices with aggregation, pagination, replay limits, and explicit snapshot endpoints. The contract should explain what is lost when the client drops each event type and how the client recovers afterward.
+
+Message count alone is not enough to judge the stream. I also need queue age and the client’s synchronization state: synchronized, catching up, or stale. A small queue full of old events can be more misleading than a larger queue whose contents are still current.
+
+## The retained standard is bounded staleness
+
+A real-time product cannot promise zero delay across mobile networks and background processes. It can define how stale state is detected, shown, and repaired.
+
+My Android experience taught me to ask for a complete real-time contract covering:
+
+- how freshness is determined and synchronization state is represented;
+- the scope within which ordering is guaranteed;
+- the stable identity assigned to each event;
+- the cursor sent during reconnection;
+- the authoritative snapshot path when replay is no longer possible;
+- buffer limits and the rules for merging, dropping, or degrading events;
+- how the client returns from untrusted state to authoritative state.
+
+Once these decisions are explicit, the backend can choose its internal queues, caches, and transports without leaking those implementation details into every screen.
+
+My goal is not to preserve a permanently open connection. It is to ensure that the client knows when its view is trustworthy and how to recover when it is stale.

@@ -1,67 +1,76 @@
 ---
 title: 'When the Android Client Meets the Backend'
 published: 2026-08-25
-summary: 'A mobile API contract includes failure, delay, authentication state, and old application versions. I learned to judge the backend from the client seam: what can the application know, and what must it do next?'
+summary: 'A mobile API must tell the application whether identity is valid, a write completed, a retry is safe, and what an older client should do next.'
 tags: [Android, Backend, Software Journey]
 sourceProjects: []
 featured: false
 order: 102
 ---
 
-A mobile API succeeds only when the client can make a correct decision from its response. Valid JSON is insufficient. The Android application also needs to know whether to retry, ask the user to sign in, keep cached data, show a partial result, or stop.
+An API is useful only when the client can make the correct decision from its response. Valid JSON is not enough. An Android application also needs to know whether to retry, ask the user to sign in, keep cached data, show a partial result, or stop.
 
-I worked from the mobile side, so this interface shaped how I learned backend development. The useful question was rarely “did the request return?” It was “what does this response allow the application to do next?”
+I came to backend development from the mobile side, so I judge an interface by one question: what can the application do next with this response?
 
-## The contract includes failure
+![Mobile API decision interface](/images/notes/systems/android-client-meets-backend.svg)
 
-An endpoint description often begins with the successful response. Production behavior depends just as much on the other outcomes.
+## Failure is part of the contract
 
-A timeout says that the client does not know whether the server completed the operation. A validation error says that retrying the same input is pointless. An authentication error may require a token refresh, a new login, or a full stop. A server error may be temporary, but repeated automatic retries can increase the load that caused it.
+A timeout, invalid input, expired authentication, and a server error cannot all mean “network failure.”
 
-These cases need different client states. Reducing them all to a generic failure forces the user interface to guess. It also hides useful information from logs because the application records only that “the network failed.”
+A timeout means the client does not know whether the server completed the operation. Invalid input means retrying the same values is pointless. Expired authentication may require a refresh or a new login. A server error should not trigger unlimited automatic retries.
 
-A better contract gives the client a stable error category, a human-safe message when appropriate, and enough context to choose the next action. Internal exceptions and database details stay on the server. Decisions needed by the client cross the seam.
+When the backend returns one generic failure, the interface has to guess. I instead expect stable result categories with only the information needed for the next client decision. Internal exceptions and database details stay on the server.
 
-## Authentication is a state machine
+## Login is not a Boolean
 
-Login is easy to model as a Boolean until several requests run at the same time. Then one request discovers an expired credential while another is in flight, a refresh starts, and a third request arrives before the refresh finishes.
+With concurrent requests, one request may discover an expired token while another is still in flight. A third may arrive before a refresh finishes.
 
-The client needs one owner for that transition. If every request starts its own refresh, they race. If a failed refresh leaves old credentials in storage, the application loops. If the login screen appears while a background request can still restore the previous state, the user sees contradictory behavior.
+If every request starts its own refresh, they race. If a failed refresh leaves old credentials in place, the application can enter a loop.
 
-I learned to think of authentication as a state machine: authenticated, refreshing, unauthenticated, and failed. The exact names matter less than one invariant—only one part of the application decides which state is current. Requests wait for that decision or fail explicitly.
+I treat authentication as a state machine: authenticated, refreshing, unauthenticated, and failed. The names are less important than the boundary: one component owns the transitions. Other requests wait for its decision or fail explicitly.
 
-The backend participates in the same model. It needs consistent status semantics and a refresh contract that lets the client distinguish an expired session from an account or permission problem.
+## JSON has versions
 
-## JSON is a versioned interface
+Mobile clients do not all update at once. After one server change, old application versions may remain active for months or longer.
 
-Mobile clients cannot all update with the server. An API change therefore lives longer than the deployment that introduced it.
+Adding an optional field is usually safer than changing the meaning of an existing one. Removing an enum value, changing null semantics, or reusing a field can preserve valid JSON while breaking an older client’s behavior.
 
-Adding an optional field is usually easier to absorb than changing the meaning of an existing field. Removing a value from an enum can break a client that still expects it. Replacing a nullable field with an empty string may preserve the JSON type while changing the application behavior. Compatibility depends on semantics, not syntax alone.
+At the network boundary, I convert transport objects into application values. The parser handles missing fields and unknown enum values. Screens and storage use the stable internal model instead of passing raw JSON through the application.
 
-On Android, I prefer to convert transport data into application values at one boundary. The parser handles absent fields and unknown enum values. The rest of the feature receives a smaller model with explicit defaults or an explicit failure. Raw response shapes do not spread through screens and storage.
+This conversion layer also gives me a direct test seam for old, current, and partially missing payloads.
 
-That adapter also creates a useful test seam. A test can feed old, current, and partially missing payloads into the conversion logic without starting the full application.
+## Write retries need a stable identity
 
-## Retries need an operation identity
+Reads are often safe to retry. Writes can create duplicate payments, messages, orders, or gifts.
 
-Retrying a read is often safe. Retrying a write can duplicate the action.
+After a timeout, the client does not know whether the server committed the operation. An operation ID or idempotency key must remain unchanged across retries, and the server must recognize it.
 
-A client that times out after sending a request does not know whether the server committed it. If the same request creates a payment, message, order, or gift twice, a network retry has changed the business result. The operation needs an identity that remains stable across retries, and the backend needs to recognize that identity.
+The interface can prevent rapid repeated taps, but only the server can provide the final guarantee because it sees all accepted operations.
 
-The same principle applies when a user taps twice or a process restarts. The user interface can reduce duplicate actions, but it cannot provide the final guarantee. The server owns the durable decision because it sees every accepted operation.
+## Logs must cross the client-server boundary
 
-Retries also need a budget. Delay, exponential backoff, and jitter are engineering tools, not automatic virtues. The right behavior depends on whether the operation is safe, whether the user is waiting, and whether another layer already retries.
+The client knows the device, application version, connection changes, and final interface state. The server knows request processing, dependencies, persistence, and the final decision.
 
-## Debugging crosses the seam
+A shared request ID or operation ID connects both sides of one action without recording credentials or personal data. Without that identifier, debugging becomes a comparison of timestamps and guesses.
 
-Client and backend logs answer different halves of the same question. The client sees device state, application version, connection transitions, and the decision shown to the user. The backend sees request processing, dependencies, persistence, and server-side errors.
+## Convert responses into finite results first
 
-A request or operation identifier connects those records. Without it, two teams compare timestamps and guess. With it, they can follow one action without logging private payloads.
+The interface should not build behavior directly from HTTP status codes. I first convert each response into a small set of domain results, then let a state machine decide what happens next:
 
-Useful client records include the application version, endpoint category, result category, elapsed time, and operation identifier. Useful server records preserve the same identifier and the final decision. Neither side needs to dump credentials or personal data to make the trace useful.
+```kotlin
+sealed interface SubmitResult {
+  data class Accepted(val operationId: String) : SubmitResult
+  data object Rejected : SubmitResult
+  data object Reauthenticate : SubmitResult
+  data class Unknown(val retryToken: String?) : SubmitResult
+}
+```
 
-## A backend contract is a decision interface
+This type only illustrates the interface design. It does not claim that Lao You used these specific class names.
 
-Learning backend concepts from Android gave me a narrow standard. The backend should expose the smallest stable interface that lets the client make the next correct decision. The client should convert that interface once, own its state transitions, and handle uncertainty explicitly.
+## The standard I kept
 
-That standard leaves room for different server frameworks and storage systems. Those are implementation choices. The mobile application depends on something smaller: stable meaning across success, failure, delay, and version change.
+A backend should expose the smallest stable decision interface. The client should convert it once and explicitly handle success, rejection, authentication changes, and unknown outcomes.
+
+Server frameworks and databases can change. What the mobile application depends on is stable meaning across failure, delay, and version changes.

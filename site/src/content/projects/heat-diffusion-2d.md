@@ -14,63 +14,165 @@ studySequence: 7
 heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
 ---
 
-## Context & objective
+## Why I started with heat diffusion
 
-This first time-dependent solver matches the analytical slab transient to $L^\infty=1.38\times10^{-5}$, and it refuses to run outside its stability bound. It directly precedes the FlowLab lattice-Boltzmann work: before trusting a browser LBM solver, I wanted the smallest unsteady solver where stability, temporal order, and conservation could each be checked against an independent result.
+Before working on more complex unsteady flows, I wanted to build a time-dependent solver simple enough that I could test stability, temporal accuracy, and conservation separately.
 
-The heat equation $\partial_t T=\alpha\nabla^2 T$ is the right vehicle: it has an analytical transient, a textbook stability bound, and a conservation identity. The objective was a verifiable solver, with the gates declared before the numbers were generated.
-
-## Method
-
-The domain is a uniform grid of square cells with temperatures at cell centres. The update is explicit FTCS written in face-flux form,
+The two-dimensional heat equation was a good fit:
 
 $$
-\begin{aligned} T_{j,i}^{n+1} &= T_{j,i}^{n}+r\,\big[\Delta T_{x,\,i+1/2}-\Delta T_{x,\,i-1/2}\\[0.5em] &\quad+\Delta T_{y,\,j+1/2}-\Delta T_{y,\,j-1/2}\big], \qquad r=\frac{\alpha\,\Delta t}{\Delta x^2},\end{aligned}
+\frac{\partial T}{\partial t}=\alpha\nabla^2T.
 $$
 
-which makes the conservation property structural: with all boundaries zero-flux, every interior face difference is added to one cell and subtracted from its neighbour as the same floating-point value, so cell-integrated energy is conserved to round-off. Dirichlet boundaries use a linear ghost cell; Neumann boundaries have exactly zero face difference.
+It has an analytical transient solution, a clear stability limit for an explicit scheme, and a conservation relationship that I could check by summing over the grid.
 
-Von Neumann analysis gives the amplification factor $g=1-4r\big[\sin^2(k_x\Delta x/2)+\sin^2(k_y\Delta y/2)\big]$, hence the stability bound $r\leq\tfrac14$ on a square grid. The solver enforces this as a contract, not a warning: `check_stability` raises `StabilityError` and logs the refusal before any integration. A solver that diverges silently is worse than one that refuses to run.
+## How I updated the temperature
 
-## Validation
-
-The analytical reference is the transient in a slab with one fixed-temperature face and one insulated face, initialised uniform:
+I used a uniform Cartesian grid of square, cell-centred control volumes. I wrote the explicit FTCS update as differences between the four face fluxes:
 
 $$
-\begin{aligned} \theta(x,t)&=\sum_{n=0}^{\infty}\frac{4}{(2n+1)\pi}\sin(\lambda_n x)\,e^{-\alpha\lambda_n^2 t},\\[0.5em] \lambda_n&=\frac{(2n+1)\pi}{2L},\end{aligned}
+\begin{aligned}
+T_{j,i}^{n+1}
+&=T_{j,i}^{n}
++r\big[
+\Delta T_{x,\,i+1/2}
+-\Delta T_{x,\,i-1/2}\\
+&\qquad+
+\Delta T_{y,\,j+1/2}
+-\Delta T_{y,\,j-1/2}
+\big],
+\qquad
+r=\frac{\alpha\Delta t}{\Delta x^2}.
+\end{aligned}
 $$
 
-truncated when the term envelope falls below $10^{-14}$, which bounds the neglected tail since $|\sin|\leq1$. The 2-D solve is run quasi-1-D: west face Dirichlet, the other three insulated, on a $100\times20$ grid at $r=0.2$.
+Writing the update this way makes conservation structural. The same interior-face contribution leaves one cell and enters its neighbour, so the contributions cancel in pairs when I sum over the whole grid.
 
-![Temperature field at t = 0.05 s: the insulated faces keep the field uniform across y](/images/projects/heat-diffusion-2d/temperature-field.svg)
+For fixed-temperature boundaries, I used a linear ghost cell. For insulated boundaries, I set the normal face flux to exactly zero instead of copying a boundary temperature.
 
-Five predeclared gates, all passing:
+Von Neumann analysis gives the amplification factor
 
-| Gate | Observed | Threshold |
+$$
+g=1-4r\left[
+\sin^2\left(\frac{k_x\Delta x}{2}\right)
++\sin^2\left(\frac{k_y\Delta y}{2}\right)
+\right].
+$$
+
+On a square two-dimensional grid, the explicit stability limit is therefore
+
+$$
+r\leq0.25.
+$$
+
+## Why the solver rejects unstable input
+
+The most dangerous behaviour for an explicit solver is not an immediate error. It is a run that appears reasonable for hundreds of steps before the temperature begins to diverge.
+
+I therefore check $r$ before allocating the time arrays or starting the integration. If a user requests $r=0.26$, `check_stability` raises `StabilityError` and records the reason for the refusal. The solver does not generate a result that initially looks plausible and then blows up.
+
+I treat this as part of the solver’s input contract, not as an optional warning.
+
+## Comparing the solver with an analytical transient
+
+My reference case was a slab with a uniform initial temperature. The west face was held at a fixed temperature, while the other three faces were insulated. I used a $100\times20$ grid, $r=0.2$, and a final time of 0.05 s.
+
+The one-dimensional analytical transient is represented by the Fourier series
+
+$$
+\begin{aligned}
+\theta(x,t)
+&=\sum_{n=0}^{\infty}
+\frac{4}{(2n+1)\pi}
+\sin(\lambda_n x)
+e^{-\alpha\lambda_n^2t},\\
+\lambda_n
+&=\frac{(2n+1)\pi}{2L}.
+\end{aligned}
+$$
+
+I truncated the series when the remaining term envelope fell below $10^{-14}$. Since $|\sin|\leq1$, this also bounds the neglected tail.
+
+At $t=0.05$ s, the maximum difference between the numerical and analytical temperatures was
+
+$$
+L^\infty=1.384\times10^{-5},
+$$
+
+which was below my predefined requirement of $5\times10^{-5}$. Because the upper and lower boundaries were insulated, the two-dimensional solution remained exactly uniform in the transverse direction.
+
+## Why my first temporal-refinement plan was wrong
+
+FTCS is first-order accurate in time and second-order accurate in space. My initial plan was to keep the grid fixed, reduce the time step, and compare every result directly with the analytical solution.
+
+That comparison would not isolate temporal accuracy. The leading error contains the coupled term
+
+$$
+\frac{\alpha\Delta x^2}{12}(6r-1)\,\frac{\partial^4T}{\partial x^4}.
+$$
+
+Because its coefficient depends on $r$, changing the time step also changes how the spatial truncation error appears in the total error. A direct comparison with the analytical solution would therefore mix spatial and temporal effects and could assign spatial error to the time integrator.
+
+I corrected the study by using a fine-time numerical solution on the same grid as the reference. I set the reference to $r=10^{-3}$ and compared it with runs at
+
+$$
+r\in\{0.20,\ 0.10,\ 0.05,\ 0.025\}.
+$$
+
+The shared spatial error largely cancels when solutions on the same grid are differenced. The observed temporal order was 1.017, consistent with first-order time integration.
+
+![Error versus time step with a first-order reference line](/images/projects/heat-diffusion-2d/temporal-refinement.svg)
+
+## Separate checks for conservation and indexing errors
+
+The analytical transient does not test every part of the implementation independently, so I added two more targeted checks.
+
+First, I ran a grid with insulated boundaries on every side. After 576 steps, the drift in discrete total energy was 0.0. This directly checks that interior fluxes cancel in pairs and that no energy enters or leaves through the boundaries.
+
+Second, I used a discrete cosine mode on the insulated grid. This mode is an exact eigenvector of the discrete FTCS operator, with theoretical per-step amplification
+
+$$
+g=1-4r\sin^2\left(\frac{\pi}{2n_x}\right).
+$$
+
+The solver reproduced this amplification factor to $10^{-14}$. This test can expose sign or indexing mistakes that might appear only as an unclear change in the error constant during a comparison with the analytical solution.
+
+## Results I retained
+
+| Check | Observed result | Requirement |
 |---|---:|---:|
-| $L^\infty$ error vs series at $t=0.05$ s | $1.384\times10^{-5}$ | $\leq5\times10^{-5}$ |
-| Temporal order, fixed grid | 1.017 | within $[0.9,\,1.1]$ |
-| Insulated energy drift, 576 steps | $0.0$ | $\leq10^{-12}$ |
-| Attempted $r=0.26$ run | refused and logged | refused |
-| Cross-direction variation, series-initialised 2-D field | $0.0$ | $<10^{-14}$ |
+| Maximum error against the analytical series at $t=0.05$ s | $1.384\times10^{-5}$ | $\leq5\times10^{-5}$ |
+| Temporal order on a fixed grid | 1.017 | 0.9–1.1 |
+| Energy drift after 576 steps on an insulated grid | 0.0 | $\leq10^{-12}$ |
+| Attempted run at $r=0.26$ | Refused and logged | Must refuse |
+| Transverse variation in the two-dimensional field | 0.0 | $<10^{-14}$ |
 
-The obvious temporal-refinement plan fails on paper. FTCS applied to the heat equation carries the combined leading truncation term $\tfrac{\alpha\Delta x^2}{12}(6r-1)\,\partial_x^4T$: temporal and spatial errors couple, so refining $\Delta t$ against the analytical solution at fixed grid cannot show order one. The temporal order is therefore isolated by comparing four runs at $r\in\{0.20,0.10,0.05,0.025\}$ against a fine-time reference ($r=10^{-3}$) on the *same* grid, where the shared spatial error cancels in the difference. The observed slope is 1.017.
+Each check answers a different question. The analytical solution checks the overall temperature field and boundary treatment. The fine-time reference isolates temporal order. The insulated case checks conservation. The discrete mode checks signs and indexing. The stability gate verifies that invalid input is rejected before integration begins.
 
-![Error versus time step with slope-1 reference](/images/projects/heat-diffusion-2d/temporal-refinement.svg)
+## Limits and further work
 
-A second identity pins the implementation itself: a discrete cosine mode on the insulated grid is an exact eigenvector of the FTCS operator, and the solver reproduces its per-step amplification $g=1-4r\sin^2(\pi/2n_x)$ to $10^{-14}$. That test catches sign and indexing errors that an error-vs-analytical check alone would only blur into the truncation constant.
+The explicit scheme requires
 
-## Limitations
+$$
+\Delta t\propto\Delta x^2
+$$
 
-- Explicit scheme: the $r\leq0.25$ bound forces $\Delta t\propto\Delta x^2$, so resolved runs cost thousands of steps — the production validation is 2500 steps for 0.05 s of physical time.
-- Constant isotropic diffusivity; no advection, no source terms, no phase change.
-- Cartesian uniform grids with square cells only; only fixed-temperature and zero-flux boundaries are implemented.
-- First order in time, second order in space; the temporal-order gate relies on a fine-time reference rather than the analytical solution because of the $(6r-1)$ coupling above.
+to remain within $r\leq0.25$. As the grid is refined, the number of required time steps therefore grows quickly. The 0.05 s production validation required 2500 steps.
 
-## Reproduce
+The current model supports only constant isotropic diffusivity, uniform Cartesian grids with square cells, fixed-temperature boundaries, and zero-flux boundaries. It does not include advection, heat sources, phase change, non-uniform materials, or non-uniform grids.
 
-`python3 -m unittest discover -s tests -v` runs the thirteen solver contracts. `python3 scripts/analyse.py` regenerates `results/analysis.json` and both figures, exiting nonzero if any gate fails.
+Extending the solver beyond these limits would require new numerical treatment and new validation cases rather than assuming that the present checks still apply unchanged.
 
-## What I took away
+## What I learned
 
-The temporal-order study was redesigned before it ran. Deriving the leading truncation term first exposed the $(6r-1)$ coupling, so the planned refinement against the analytical solution would have attributed spatial error to the time integrator; the fix was a fine-time reference ($r=10^{-3}$) on the same grid, where the shared spatial error cancels, and the observed order came out 1.017. The stability gate taught a second lesson: refusing the $r=0.26$ attempt, and logging the refusal, made the solver's failure behaviour part of the deliverable instead of an accident left to the user.
+I originally expected temporal refinement to be a straightforward comparison with the analytical solution. Deriving the truncation term first showed that the comparison would not isolate the error I wanted to measure. Replacing the analytical reference with a fine-time result on the same grid allowed me to measure temporal order without folding the shared spatial error into it.
+
+I also learned to treat refusal as a valid numerical result. Rejecting the $r=0.26$ case is part of correct solver behaviour; the user should not have to discover an invalid time step only after the solution diverges.
+
+## How to run it
+
+```bash
+cd projects/heat-diffusion-2d
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+```

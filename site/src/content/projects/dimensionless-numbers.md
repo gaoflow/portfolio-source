@@ -1,11 +1,11 @@
 ---
-title: 'Dimensionless Numbers — a Guarded First Toolkit'
+title: 'Why I Built a Dimensionless-Number Toolkit First'
 year: 2025
 date: '2025-10-18'
 status: complete
 categories: [tooling]
 tags: [CFD]
-summary: 'I built Reynolds, Mach, Prandtl, Nusselt, Grashof and Rayleigh calculators with SI dimension guards and a property table anchored to cited textbook data.'
+summary: 'I built Reynolds, Mach, Prandtl, Nusselt, Grashof, and Rayleigh calculators with unit checks so that viscosity, temperature, and property-input errors cannot quietly propagate into later CFD work.'
 role: 'Solo study project'
 duration: 'Independent build'
 featured: false
@@ -14,56 +14,103 @@ studySequence: 1
 heroImage: /images/projects/dimensionless-numbers/reynolds-sweep.svg
 ---
 
-## Context & objective
+## Why I started with dimensionless numbers
 
-Six dimensionless groups — Reynolds, Mach, Prandtl, Nusselt, Grashof, Rayleigh — now sit one command away, machine-exact against a hand calculation, with guards that reject a dimensionally wrong input loudly instead of returning a plausible-looking number. That is the whole deliverable, and it was deliberately small.
+When I began studying fluid mechanics and CFD systematically, I found that many initial estimates start with dimensionless numbers. Reynolds number identifies the relevant flow scale, Mach number helps assess compressibility, and Prandtl, Nusselt, Grashof, and Rayleigh numbers appear in heat-transfer and natural-convection problems.
 
-I built the smallest useful mechanics tool first: a guarded dimensionless-number calculator. Nearly every aerodynamics estimate starts with a Reynolds number, and the wrong viscosity quietly poisons everything downstream. The objective was a strict toolkit that computes the standard groups, refuses inconsistent input, and carries a property table whose numbers cite a traceable source.
+The formulas are short. The harder problem is supplying the right inputs. Dynamic viscosity and kinematic viscosity differ by a density relationship and have different dimensions. If I confuse them, a basic calculator can still return a plausible-looking Reynolds number while quietly leading later mesh choices, similarity arguments, and solver settings in the wrong direction.
 
-## Method
+I therefore built a toolkit that checks units, numerical ranges, and property-data sources rather than a collection of formulas that accepts unlabelled numbers without question.
 
-Each group is implemented from its defining equation: $Re=\rho u L/\mu$, $Ma=u/a$, $Pr=\mu c_p/k$, $Nu=hL/k$, $Gr=g\beta\lvert\Delta T\rvert L^3\rho^2/\mu^2$, and $Ra$ in expanded form.
+## What the toolkit calculates
 
-Guarding uses a minimal SI dimension system: every parameter declares its dimension vector over $(M, L, T, \Theta)$, and `Quantity(value, unit)` inputs are checked against it. Passing kinematic viscosity ($L^2T^{-1}$) where dynamic viscosity ($ML^{-1}T^{-1}$) is required produces an error naming the parameter, the expected dimension, and the received unit — exactly the mix-up a hand calculation invites. Plain floats are trusted as SI values; domain guards then enforce positivity and finiteness.
+The toolkit currently implements six common dimensionless numbers:
 
-The property table transcribes five anchors from Incropera 7th ed. Tables A.4 (air, 300–400 K) and A.6 (water, 300–320 K), cross-checkable against the NIST Chemistry WebBook. Lookup is exact at anchors, piecewise-linear between them, and refuses to extrapolate.
+| Dimensionless number | Definition |
+|---|---|
+| Reynolds number | $Re=\rho uL/\mu$ |
+| Mach number | $Ma=u/a$ |
+| Prandtl number | $Pr=\mu c_p/k$ |
+| Nusselt number | $Nu=hL/k$ |
+| Grashof number | $Gr=g\beta\lvert\Delta T\rvert L^3\rho^2/\mu^2$ |
+| Rayleigh number | Calculated independently from its expanded definition |
 
-## Iteration: making the identity test able to fail
+Plain floating-point inputs are treated as SI values. For stricter checking, I can pass `Quantity(value, unit)`. The toolkit verifies the required mass, length, time, and temperature dimensions and rejects zero, negative, non-finite, or out-of-range property inputs.
 
-The headline check is the identity $Ra = Gr\cdot Pr$ over 500 seeded random draws. That check is vacuous if both sides share the computation: implement $Ra$ as $Gr\cdot Pr$ and the test compares a number with itself, passing at 0.0 error while proving nothing. $Ra$ is therefore implemented from its expanded defining equation, so the identity test is a genuine algebraic check that can fail. It passes at a worst relative error of $4.4\times10^{-16}$.
+## The main problem I wanted to prevent
 
-The same suspicion applies to the property table. Transcription errors are the realistic failure mode for a hand-copied table, so the runner checks more than the anchors: tabulated Prandtl numbers must agree with $\mu c_p/k$ computed from the transcribed $\mu$, $c_p$, $k$. They agree to within 0.19%, which bounds transcription coherence rather than trusting it.
+A parameter that requires dynamic viscosity $\mu$ expects dimensions of $ML^{-1}T^{-1}$. Kinematic viscosity $\nu$ has dimensions of $L^2T^{-1}$. They are not interchangeable physical quantities.
 
-## Validation
+If I pass kinematic viscosity into the dynamic-viscosity parameter, the toolkit stops instead of continuing the calculation. Its error identifies the incorrect parameter, the expected dimensions, and the unit it received.
 
-Four predeclared gates, all passing:
+The same checks cover several other common input problems:
 
-| Gate | Observed | Threshold |
+| Input problem | Why the toolkit rejects it |
+|---|---|
+| Using kinematic viscosity $\nu$ as dynamic viscosity $\mu$ | The quantities differ and require a density relationship |
+| Absolute temperature at or below zero | The ideal-gas relation $\beta=1/T$ is undefined |
+| Zero characteristic length | $Re$, $Nu$, and $Gr$ lose their physical scale |
+| A property lookup outside the tabulated range | Extrapolation would no longer be supported by the source data |
+
+## Property data and interpolation
+
+I transcribed five property anchors for air from 300–400 K and water from 300–320 K from Incropera, 7th edition, Tables A.4 and A.6. I cross-checked the values against the [NIST Chemistry WebBook](https://webbook.nist.gov/chemistry/).
+
+For temperatures between anchors, the toolkit uses piecewise-linear interpolation. It refuses values outside the available range rather than extrapolating them.
+
+I also recalculated Prandtl number from the transcribed values of $\mu$, $c_p$, and $k$ and compared the result with the tabulated Prandtl number. The two agree within 0.19%.
+
+The table is not intended to cover every fluid. Its purpose is to provide a small set of clearly sourced, explicitly bounded inputs for common air and water problems.
+
+## Making sure a test could actually fail
+
+Rayleigh number satisfies
+
+$$
+Ra=Gr\cdot Pr.
+$$
+
+My first option was to implement `rayleigh()` by returning `grashof()*prandtl()`. That would make both sides identical by construction, so every test would report zero error even if the Grashof and Prandtl implementations shared the same mistake.
+
+That test would only compare an expression with itself.
+
+I corrected this by implementing Rayleigh number independently from its expanded definition, then calculating Grashof and Prandtl numbers through their separate paths. I compared the two routes over 500 samples generated with a fixed random seed. The worst relative error was $4.4\times10^{-16}$.
+
+This turned the identity check into a test that could reveal an implementation error rather than one that was guaranteed to pass.
+
+## Retained validation results
+
+| Check | Result | Requirement |
 |---|---:|---:|
-| Reference Re vs hand calculation | 0.0 relative error | $\leq 10^{-12}$ |
-| $Ra = Gr\cdot Pr$, 500 seeded draws | $4.4\times10^{-16}$ | $\leq 10^{-12}$ |
-| Invalid calls rejected | 10 of 10 | 10 of 10 |
-| Property anchors exact | 20 of 20 values | 20 of 20 |
+| Reference $Re$ compared with a hand calculation | 0.0 relative error | $\leq 10^{-12}$ |
+| $Ra=Gr\cdot Pr$ over 500 seeded samples | $4.4\times10^{-16}$ | $\leq 10^{-12}$ |
+| Invalid inputs rejected | 10/10 | 10/10 |
+| Property anchors matched exactly | 20/20 | 20/20 |
 
-The reference case is hand-checkable: $Re = 1.225 \times 15 \times 0.3 / 1.81\times10^{-5} \approx 3.05\times10^{5}$. A valid control call passes the same guards untouched, so rejection is not over-firing.
+One reference case can be checked by hand:
 
-## Quantitative results
+$$
+Re=\frac{1.225\times15\times0.3}{1.81\times10^{-5}}
+\approx3.05\times10^5.
+$$
 
-At sea level ($\rho=1.225$ kg/m³, $\mu=1.81\times10^{-5}$ Pa·s), the front-wing chord ($L=0.3$ m) reaches $Re = 3.05\times10^{5}$ at 15 m/s, and the full car ($L=5$ m) reaches $Re = 2.03\times10^{7}$ at 60 m/s. The sweep figure plots $Re(u)$ for three FSAE characteristic lengths on a log axis.
+Using the same sea-level properties, a 5 m full-car characteristic length reaches $Re=2.03\times10^7$ at 60 m/s. The hero figure plots $Re(u)$ for three FSAE characteristic lengths on the same logarithmic axis, showing how velocity and characteristic length change the flow scale together.
 
-![Reynolds number vs velocity for three characteristic lengths](/images/projects/dimensionless-numbers/reynolds-sweep.svg)
-
-The horizontal annotations — flat-plate transition near $5\times10^{5}$ and a fully-turbulent order of magnitude near $10^{7}$ — are regime intuition: real transition depends on roughness, pressure gradient, and free-stream turbulence, none of which a dimensionless group models.
+The annotations at $5\times10^5$ and $10^7$ are only textbook-level regime references. Real transition also depends on surface roughness, pressure gradients, and free-stream turbulence, so Reynolds number alone cannot determine it.
 
 ## Limitations
 
-The property table is a constant-property approximation: five anchors, linear interpolation, narrow temperature ranges, ideal-gas $\beta = 1/T$ for air, and coverage of air and water only. The toolkit's scope is the incompressible regime; compressibility appears as the Mach definition and the perfect-gas speed of sound, with no real-gas effects. The figure's regime limits are textbook intuition, and a specific surface needs a specific transition model.
+The property table contains only five anchors, covers only air and water, and uses linear interpolation. For air, the volumetric expansion coefficient follows the ideal-gas relation $\beta=1/T$.
 
-## What I took away
+The toolkit is mainly intended for incompressible-flow work. It can calculate Mach number and the speed of sound for a perfect gas, but it does not include real-gas effects. It also cannot replace transition, roughness, turbulence, or heat-transfer models.
 
-A check that cannot fail proves nothing. The $Ra = Gr\cdot Pr$ identity became a real test only once Rayleigh was written from its expanded definition; before that decision the 500-draw sweep would have compared a number with itself at 0.0 error. The viscosity guard — kinematic rejected where dynamic is required, with the error naming parameter, expected dimension, and received unit — is the check my own hand calculations kept inviting. Building the rejection path first (10 invalid calls, all refused, control call untouched) set the pattern for every later study: design the failure modes before the happy path.
+## What I learned
 
-## Reproduce
+The most important part of this project was not implementing six formulas. It was making the toolkit refuse incorrect inputs before those errors could propagate.
+
+My own hand calculations repeatedly exposed opportunities to confuse viscosity definitions and units, so I designed the failure paths before the normal calculation paths. I also learned that validation should not merely show that a program runs. It should deliberately supply incorrect inputs and confirm that the program stops at the right place.
+
+## How to run it
 
 ```bash
 cd projects/dimensionless-numbers
@@ -71,4 +118,3 @@ python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 PYTHONPATH=src python3 -m dimensionless_numbers reynolds --rho 1.225 --u 50 --l 1.0 --mu 1.81e-5 --json
 ```
-

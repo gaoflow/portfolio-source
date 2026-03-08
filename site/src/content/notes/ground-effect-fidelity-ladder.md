@@ -9,86 +9,129 @@ featured: false
 order: 4
 ---
 
-Ground effect is easy to make look impressive. Put a wing near a floor, colour the pressure field, and almost any image starts to feel like an explanation.
+Ground effect is easy to make look convincing. Put a wing near the ground, colour the pressure field, and the image can look authoritative even when the model lacks the physics that decide the answer.
 
-I wanted a way to stop myself from trusting the prettiest picture. So I wrote a ladder: start with the cheapest model that contains the mechanism I care about, and climb only when the next question requires more physics.
+I built a ground-effect fidelity ladder to avoid trusting the prettiest result. I start with the simplest model that can answer the current question and move up only when it is missing a necessary mechanism.
 
-## I begin with signs and definitions
+![Ground-effect fidelity ladder](/images/notes/systems/ground-effect-fidelity-ladder.svg)
 
-Before solving anything, I write down the span, chord, reference area, ride-height definition, angle-of-attack sign, downforce sign, ground reference frame, and coefficient normalisation.
+Each step can represent more physics, but it also adds mesh, modelling, boundary-condition, and physical-correlation problems. More complexity does not automatically mean more credibility.
 
-This sounds boring, but ground-effect comparisons often disagree because one person measured minimum floor clearance and another used quarter-chord height, or because one coefficient used planform area and another used frontal area.
+## I define the signs and measurements first
 
-If those definitions are wrong, a more expensive solver only gives me a more expensive disagreement.
+Before solving anything, I write down:
 
-## My first useful model was just a mirrored vortex
+- span, chord, and reference area;
+- where and how ride height is measured;
+- angle-of-attack and downforce signs;
+- the ground reference frame;
+- coefficient normalisation.
 
-For inviscid flow above a solid plane, a mirrored vortex below the plane can enforce zero normal velocity at the ground. It is a small model with one clear job: show how the floor changes induced velocity and circulation for a finite wing.
+This prevents disagreements with no physical meaning. One person might use minimum floor clearance while another uses quarter-chord height. One coefficient might use planform area while another uses frontal area.
 
-This model can tell me whether the sign is plausible, whether the solution returns to free-air behaviour as height increases, and whether symmetry and ground tangency are implemented correctly.
+If those definitions do not match, a more expensive solver only gives me a more expensive disagreement.
 
-It cannot tell me about separation, diffuser pumping, tyre wakes, leakage, or moving-ground boundary layers. I keep that list beside the result so I do not accidentally turn a wing model into a floor claim.
+## I use an image vortex to check the basic ground mechanism
+
+For inviscid flow above a solid plane, I can place an image vortex below the plane to enforce zero normal velocity at the ground. This model has a narrow but clear purpose: it shows how the ground changes induced velocity and circulation for a finite wing.
+
+I use it to check:
+
+- whether the result has a plausible sign;
+- whether it returns to free-air behaviour as height increases;
+- whether symmetry and ground tangency are implemented correctly.
+
+An image-vortex model cannot represent separation, diffuser suction, tyre wakes, leakage, or a moving-ground boundary layer. I keep those limits beside the result so I do not turn a wing-model conclusion into a floor or full-car claim.
 
 ## The VLM sweep gave me numbers I could check
 
-In the Ground Effect VLM project, I used an aspect-ratio-4 rectangular wing at $4°$ angle of attack, 64 spanwise panels, and an 80-chord wake. I swept 14 heights from $h/c=0.25$ to 50.
+In `ground-effect-vlm`, I used a Vortex Lattice Method model of an aspect-ratio-4 rectangular wing at $4°$ angle of attack, with 64 spanwise panels and an 80-chord wake. I swept 14 heights from $h/c=0.25$ to 50.
 
-At $h/c=0.5$:
+At $h/c=0.5$ and fixed angle of attack, the results were:
 
 | Quantity | Change from free air |
 |---|---:|
 | Lift coefficient, 0.2615 → 0.3461 | +32.4% |
 | $C_{D_i}/C_L^2$ | −41.9% |
 
-Those numbers tell me what the image-vortex model predicts. They do not tell me what a race-car underfloor will do.
+Under ideal inviscid boundary conditions, the image-vortex model predicts more lift and a lower induced cost per lift squared. That supports this specific mechanism. It does not predict diffuser separation, a ride-height cliff, or the real performance of a race-car floor.
 
-The model also warns me when it is being pushed too far. At $h/c=0.25$, it predicts $C_L=0.5419$, roughly twice the free-air value. Thickness, separation, and leakage are missing, so the runaway trend is a reason to climb the ladder—not a dramatic design result.
-
-I kept several checks around the sweep:
+I kept several checks to confirm that the code worked within its assumptions:
 
 - ground-normal velocity was 0.0 at 257 sample points;
 - the $h/c=50$ result returned within 0.00335% of free air;
 - spanwise symmetry error was $1.9\times10^{-16}$;
-- 64 to 96 panels changed lift by 0.258%.
+- increasing the panel count from 64 to 96 changed lift by 0.258%.
 
-That gave me confidence in the code inside its own assumptions.
+These checks increased my confidence in the implementation. They did not expand the model’s valid scope.
 
-## Surface geometry adds detail, not viscosity
+## Very low height exposed the model’s limit
 
-A panel method can put the actual surface shape into the calculation and give me a pressure distribution. That is useful for checking loading and circulation.
+At $h/c=0.25$, the model predicted $C_L=0.5419$, roughly twice the free-air value.
 
-My Airfoil Methods project made the limit obvious. The panel model produced pressure-derived lift and moment, but pressure drag stayed below 0.0008 while the wind tunnel measured 0.0065 to 0.0275. It also kept increasing lift after the real airfoil stalled.
+I could not treat that as a design result. The model has no thickness, separation, or leakage, so it continues to predict a rapidly rising trend. My correction was not to present the curve as stronger ground effect. It was to recognise that the model was now missing the physics that decide the question and move to a higher rung.
 
-Adding a ground image does not fix that. An inviscid model remains inviscid.
+## Surface geometry does not add viscosity
 
-## I climb to RANS only when the question needs it
+A panel method can include the real surface shape and calculate pressure distribution. That makes it useful for checking loading, circulation, pressure-derived lift, and moment.
 
-A simplified RANS case adds viscosity, wall shear, turbulence closure, moving-ground treatment, pressure recovery, and separation. It also creates new work: wall resolution, domain size, turbulence inputs, grid sensitivity, model sensitivity, and validation.
+`airfoil-methods` made the limit clear. Its panel model kept pressure drag below 0.0008, while the wind tunnel measured 0.0065 to 0.0275. The calculated lift also continued to rise after the real airfoil had stalled.
 
-A two-dimensional diffuser slice can help me understand pressure recovery. It cannot tell me how tyre wakes or side-edge leakage rank two full floors.
+Adding a ground image would not fix this. An inviscid model remains inviscid; more geometric detail does not create wall shear, separation, or realistic drag.
 
-For a front wing or floor, the useful model may need the ground, rotating tyres, suspension, realistic ride and yaw, and the actual leakage paths. For full-car balance, I need the whole car and a qualified mesh.
+## I use RANS only when near-wall flow and separation decide the answer
 
-The F1 2026 project is where this ladder stopped me. I had the intended 50 m/s inlet, moving ground, rotating wheels, seven force groups, and $k$–$\omega$ SST setup. The production mesh still failed its gate. Writing the boundary conditions did not make the full-car answer real.
+When the question depends on viscosity, wall shear, pressure recovery, or separation, I need Reynolds-Averaged Navier–Stokes methods.
 
-## The last rung is physical correlation
+RANS can include those mechanisms, but it also adds work:
 
-A tunnel or track result is not a decorative line on the final plot. I still need matched geometry, Reynolds and Mach numbers, ground and wheel treatment, ride, yaw, tyre state, sensor uncertainty, and a declared comparison metric.
+- near-wall resolution;
+- domain size;
+- turbulence inputs;
+- moving-ground treatment;
+- mesh sensitivity;
+- turbulence-model sensitivity;
+- comparison with physical results.
 
-Track data add even more context: driver controls, transient vehicle state, weather, and alignment. A force delta without a matched state is not a clean validation point.
+The model scope must also match the question. A two-dimensional diffuser slice can help me understand pressure recovery, but it cannot show how tyre wakes or side-edge leakage change the ranking of two complete floors.
 
-## The ladder I use now
+A useful front-wing or floor model may need the ground, rotating tyres, suspension, realistic ride height and yaw, and the actual leakage paths. If the question is full-car balance, I need the complete vehicle, and the mesh must first meet its planned checks.
 
-| Question | Lowest model I would try first |
-|---|---|
-| Is the ground-image sign correct? | image-vortex check |
-| Does a finite wing recover toward free air? | verified VLM sweep |
-| How does inviscid surface loading move? | panel method |
-| Does a diffuser separate? | viscous CFD with mesh checks |
-| How does tyre wake change front-wing loading? | component CFD with rotating tyre |
-| How does a package change full-car balance? | qualified full-car RANS |
-| Does the model represent the car? | matched experiment |
+## `f1-2026-aero` does not yet have a credible full-car result
 
-I do not climb the ladder because a higher rung looks more professional. I climb when the lower model is missing the mechanism that decides the question.
+In `f1-2026-aero`, the ladder stopped me at the setup stage. I had configured the intended 50 m/s inlet speed, moving ground, rotating wheels, seven force groups, and the $k$–$\omega$ SST turbulence model.
 
-A verified low-order model can be more trustworthy than an unqualified RANS case. The authority comes from asking a question the model can actually answer.
+The production mesh still failed its gate checks. I therefore cannot present that full-car case as a credible result. Completing the boundary conditions did not make the simulation physically reliable.
+
+This is one reason I use the ladder: a checked low-order model can be more trustworthy than a RANS case whose mesh has not met its requirements.
+
+## Tunnel and track comparisons must match the conditions
+
+A wind-tunnel or track result is not a decorative line on the final plot. A meaningful comparison still requires matched:
+
+- geometry;
+- Reynolds and Mach numbers;
+- ground and wheel treatment;
+- ride height and yaw;
+- tyre state;
+- sensor uncertainty;
+- comparison metric.
+
+Track data also depend on driver inputs, transient vehicle state, weather, and position alignment. A force change without matched conditions is not a clean comparison point.
+
+## I choose the lowest useful model for the question
+
+| Current question | Lowest model I would try first | When I move up |
+|---|---|---|
+| Is the ground-image sign correct, and does the ground strengthen circulation? | Image-vortex check | I need the spanwise distribution of a finite wing |
+| Does a finite wing recover toward free-air behaviour as height increases? | Checked VLM sweep | I need thickness or real surface pressure |
+| How does loading vary along the span? | VLM | I need surface geometry and pressure distribution |
+| How does inviscid surface loading change? | Panel method | Viscosity, drag, or stall decides the answer |
+| Does a diffuser or floor separate? | Viscous CFD with mesh checks | I need unsteady behaviour or physical correlation |
+| How does tyre wake change front-wing loading? | Component CFD with a rotating tyre | Component interactions require the full vehicle |
+| How does a package change full-car balance? | Full-car RANS with a qualified mesh | I need to confirm that the numerical trend represents the real car |
+| Does the model represent the real car? | Matched wind-tunnel or track test | Geometry and operating conditions must match |
+
+I do not move up because a higher rung looks more professional. I move up only when the lower-order model lacks the mechanism that decides the current question.
+
+The standard I keep is simple: credibility does not come from the model’s name. It comes from asking a question the model can answer and stating clearly what it cannot.

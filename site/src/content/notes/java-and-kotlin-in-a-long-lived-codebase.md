@@ -8,64 +8,99 @@ featured: false
 order: 115
 ---
 
-My Android stack includes Java and Kotlin. The evidence does not establish a formal Java-to-Kotlin migration, its date, or its scope. I can still describe the engineering problem that matters in a long-lived application: both languages must share one set of runtime, ownership, and review rules.
+My Android stack includes Java and Kotlin. The concrete problem is not how to replace one language with the other, but how to prevent them from making different assumptions about nullability, threading, errors, and ownership.
 
-Kotlin changes how code expresses those rules. It does not automatically repair unclear state, unsafe threading, or a broad module interface.
+I can confirm that both languages are part of my stack. I cannot confirm a formal Java-to-Kotlin migration, its date, or its scope, so I do not claim a migration timeline. The useful question is how the two languages can coexist in a long-lived Android codebase.
 
-## Interoperability is the starting condition
+Kotlin can change how code expresses rules, but it cannot repair unclear state, unsafe threading, or broad module interfaces by itself. Both languages need to share the same runtime, ownership, review, and release rules.
 
-Java and Kotlin compile into the same Android application, but source-level assumptions cross the language seam.
+## Define the Java–Kotlin contract first
 
-A Java method may return `null` without an annotation. Kotlin then sees a platform type and cannot prove its safety. Treating that value as non-null merely moves the failure. The adapter at the seam should validate it and return an explicit nullable value, result, or domain invariant.
+![Java / Kotlin coexistence contract](/images/notes/systems/java-and-kotlin-in-a-long-lived-codebase.svg)
 
-Kotlin default parameters, properties, companion objects, checked-exception behavior, and function types also have Java-facing consequences. A module used from both languages needs an interface designed for both callers rather than a Kotlin surface patched with annotations afterward.
+I keep language boundaries narrow and define nullability, threading, errors, and cancellation at each boundary. For performance, I consider the allocations and calls that code generates rather than assuming shorter source is cheaper.
 
-The narrowest seam wins. If only one adapter crosses languages, the rest of each module can use its native conventions.
+Java and Kotlin compile into the same Android application, but source-level assumptions cross the language boundary. Each boundary should state:
 
-## Null safety needs data meaning
+| Boundary | What to define |
+|---|---|
+| Nullable values | Why a value may be absent and what the default behavior is |
+| Asynchronous calls | Dispatcher, cancellation, and owner |
+| Collections | Mutability and whether elements may be null |
+| Exceptions | Whether to throw, wrap, or return a result type |
+| Hot paths | Lambda, boxing, and temporary collection allocations |
 
-Kotlin distinguishes nullable and non-null types, but the type alone does not explain why a value may be absent.
+A Java method without nullability annotations may return `null`. Kotlin sees its return value as a platform type and cannot prove whether it is safe. Treating it as non-null only delays the failure.
 
-Missing because data has not loaded, missing because the server omitted a field, missing because the user cleared it, and missing because access is forbidden are different states. Collapsing them into `null` leaves callers to guess.
+I correct this at the language boundary. An adapter validates the input and returns an explicit nullable value, result type, or established domain invariant. Annotations, result types, and threading documentation can make a public interface precise, but they cannot hide an interface that was never designed for both languages.
 
-A sealed result or explicit state can preserve the distinction where behavior depends on it. For simple optional data, a nullable type remains appropriate. The goal is to make the next decision visible, not to replace every `null` with a hierarchy.
+The reverse boundary also needs care. Kotlin default parameters, properties, extension functions, companion objects, checked-exception behavior, function types, and coroutines can introduce conventions that are not obvious to Java callers. I design shared module interfaces for both callers from the start.
 
-Unsafe assertions deserve a local proof. `!!` says the programmer knows something the compiler cannot know. That claim should sit next to the validation that establishes it or disappear behind an interface that guarantees the invariant.
+The narrower the boundary, the smaller the failure surface. When one adapter owns cross-language interaction, each module can use its language idiomatically without repeatedly converting Java and Kotlin models across several layers.
 
-## Coroutines do not choose ownership
+## Do not reduce every missing state to `null`
 
-Kotlin coroutines make asynchronous code easier to read. They also make it easy to launch work without deciding who owns it.
+Kotlin distinguishes nullable and non-null types, but a type alone cannot explain why a value is absent.
 
-A coroutine scope defines lifetime. Screen work belongs to the screen or its state holder. Application work belongs to an application-level owner. Durable background work may need a platform scheduler and persisted input rather than an in-memory scope.
+Data that has not loaded, a field omitted by the server, a value cleared by the user, and access that has been denied are four different states. If they all become `null`, callers must guess whether to wait, display an empty value, request permission, or report an error.
 
-Cancellation needs to reach blocking or suspended operations. Catching a broad exception and continuing can swallow cancellation, leaving work alive after its owner ended.
+When behavior depends on those differences, I use a sealed result or explicit state to preserve the meaning. A nullable type remains appropriate for simple optional data. The goal is not to replace every `null` with a complex hierarchy, but to make the caller’s next decision clear.
 
-Java callbacks can be adapted into suspending functions at one seam. The adapter handles completion, error, cancellation, and duplicate callback protection. Callers then use structured concurrency without spreading callback mechanics through Kotlin code.
+`!!` is not a substitute for meaning. It says that the programmer knows something the compiler cannot prove, so it needs a local justification. Validation should sit next to the assertion or be hidden behind an interface that guarantees the invariant. Otherwise, null safety has only moved the failure to runtime.
 
-## Language features need team limits
+## Give every coroutine a clear owner
 
-Kotlin offers extension functions, operator overloads, delegated properties, inline functions, and compact expression syntax. Each can clarify a local idea. Combined without restraint, they can hide control flow and allocation.
+Coroutines make asynchronous code easier to read, but they also make it easy to start work before deciding who owns it.
 
-A long-lived codebase benefits from conventions that serve review. Extension functions stay close to the type and domain they clarify. Operators keep their conventional meaning. Scope functions are chosen for readability rather than line count. Public module interfaces avoid clever generic constructions that every caller must decode.
+I treat a coroutine scope as a declaration of lifetime and ownership:
 
-Java code needs the same standard. Builders, listeners, mutable models, and static helpers should expose ownership and failure rather than rely on familiarity.
+- Screen-related work belongs to the screen or its state holder.
+- Application-level work belongs to an application-level owner.
+- Durable background work may require a platform scheduler and persisted input rather than an in-memory scope.
 
-The convention is successful when an engineer can review behavior without mentally compiling language tricks.
+A common failure is cancellation that does not reach a blocking or suspending operation. Another is catching a broad exception and continuing, which may swallow the cancellation signal. The task can then outlive its owner.
 
-## Performance follows the generated work
+I correct this by propagating cancellation through the call chain and documenting the dispatcher, owner, and failure behavior of asynchronous interfaces.
 
-Source brevity does not guarantee runtime economy. Lambdas, collections, boxing, reflection, delegated properties, and conversions can allocate or repeat work in a hot path.
+For Java callbacks, I keep the adaptation at one boundary and convert callbacks into suspending functions there. The adapter handles completion, errors, cancellation, and duplicate callback protection. Kotlin callers can then use structured concurrency without spreading Java callback mechanics throughout Kotlin code.
 
-The response is measurement and locality. Keep performance-sensitive loops simple, inspect generated behavior when a language feature is uncertain, and avoid converting between Java and Kotlin models at several layers.
+## Set team limits on language features
 
-One adapter can normalize data once. Repeated copying at every seam wastes memory and blurs ownership.
+Kotlin provides extension functions, operator overloads, delegated properties, inline functions, and compact expression syntax. Each feature can clarify a local concept, but too many together can hide control flow and allocation.
 
-Performance review should start from an observable budget—startup, frame work, memory, or operation latency—rather than banning a language feature globally.
+For long-term maintenance and direct review, I use these standards:
 
-## One codebase needs one model
+- Extension functions stay close to the type and domain they clarify.
+- Operators retain their conventional meaning.
+- Scope functions are chosen for readability, not line-count reduction.
+- Public module interfaces avoid clever generic structures that every caller must reinterpret.
+- State ownership, error meaning, threading, and release behavior remain consistent across Java and Kotlin modules.
 
-Java and Kotlin can coexist for years when modules agree on state ownership, error meaning, threading, and release behavior.
+Java code follows the same standard. Builders, listeners, mutable models, and static helpers should expose ownership and failure behavior instead of relying on callers to know an unstated convention.
 
-Kotlin can make valid states easier to express and asynchronous paths easier to follow. Java remains predictable and fully capable inside stable modules. Rewriting working code earns its cost only when it removes a specific risk or unlocks a needed change.
+The result is not code that merely looks more modern. It is code whose behavior can be reviewed without mentally compiling language tricks first.
 
-The durable decision is architectural rather than linguistic: keep the cross-language interface small, convert uncertainty once, and let each module state its contract clearly.
+## Judge performance by actual allocations and calls
+
+Short source code does not guarantee low runtime cost. Lambdas, collection operations, boxing, reflection, delegated properties, and type conversions can create extra allocations or repeated work in hot paths.
+
+I measure first and keep any optimization local:
+
+- Keep performance-sensitive loops simple.
+- Inspect generated behavior when the cost of a language feature is uncertain.
+- Avoid repeatedly converting Java and Kotlin models across layers.
+- Normalize data once in one adapter instead of copying it at every boundary.
+
+Repeated copying wastes memory and also obscures data ownership.
+
+Performance review should start with an observable budget such as startup time, per-frame work, memory, or operation latency. It should not begin by banning a language feature across the codebase. I do not have measurement data that supports specific performance figures here, so I do not claim that either language or any particular style is inherently faster.
+
+## Result, limits, and retained standard
+
+Java and Kotlin can coexist for years when modules use one model for state ownership, error meaning, threading, and release behavior.
+
+Kotlin can make valid states easier to express and asynchronous paths easier to follow. Java remains predictable and fully capable in stable modules. Rewriting is worth its cost only when it removes a specific risk or enables a necessary change; adopting a newer language is not enough by itself.
+
+The direct result of this approach is that cross-language uncertainty is converted once, callers receive clearer contracts, and module internals can retain the conventions of their language. Its limits are equally clear: these rules cannot repair incorrect business-state definitions, replace performance measurement, choose lifecycle ownership, or eliminate the need for code review.
+
+The standard I retain is architectural rather than linguistic: keep cross-language interfaces small, convert uncertainty once, and require every module to state its contract clearly.

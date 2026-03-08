@@ -8,64 +8,116 @@ featured: false
 order: 114
 ---
 
-Lao You reached more than two million users. The source record does not say when it crossed that threshold or which observability products we used, so I will not invent either. The scale still changes the engineering question: how can a team diagnose a condition it cannot reproduce on its own devices?
+Lao You has more than two million users. At that scale, a condition affecting only a small percentage of users can become a real support problem. My challenge is to identify the version, state transition, and operation involved when I cannot reproduce the condition on my own device.
 
-The answer is not “log everything.” Mobile observability needs enough structure to connect a user-visible failure to a version, state transition, and operation while keeping personal data out of general telemetry.
+I can confirm the user count, but not when Lao You crossed that threshold. I also have no documented incident, crash rate, or observability product to cite. I will not invent those details or claim unproven improvements from operating at this scale.
 
-## Start with an observable outcome
+My lesson is not to record everything. I need the shortest useful chain from a user-visible outcome to the context that explains the code path, then to an exact build. Usernames, message bodies, and voice content do not belong in that chain.
 
-A crash is observable because the process ends unexpectedly. Many costly failures do not crash. A button remains disabled, a request loops, a gift never renders, a login state disagrees with the server, or a migration silently drops a setting.
+## Start with what the user actually saw
 
-Each important flow needs a defined outcome. Started, completed, cancelled, rejected, timed out, and superseded are examples. The exact set belongs to the operation. Recording only “clicked” and “error” leaves the middle invisible.
+![Mobile observability correlation chain](/images/notes/systems/observability-at-two-million-users.svg)
 
-The application should emit those transitions at the module seam where the decision is known. Scattered screen logs often duplicate events or miss background paths. One operation owner can record one terminal result.
+Crashes are easy to notice because the process ends unexpectedly. Many costly failures do not crash:
 
-A stable operation identifier ties client transitions to backend processing without requiring payload contents in the log.
+- a button stays disabled;
+- a request enters a loop;
+- a gift never renders;
+- the login state disagrees with the server;
+- a migration silently drops a setting.
 
-## Context should explain the code path
+I define explicit outcomes for important flows. Depending on the operation, these can include started, completed, cancelled, rejected, timed out, and superseded.
 
-An error report needs the application version, build identifier, operating-system version, device class, feature configuration, and relevant module state. It rarely needs a username, message body, voice sample, token, or full server response.
+Recording only “clicked” and “error” is not enough. It hides the intermediate steps, so I cannot tell where the operation stopped. Scattering logs across screens also creates duplicate events while missing background paths.
 
-Context should use bounded categories where possible. A connection result can be offline, timeout, authentication, rejected, server, parsing, or cancelled. Free-form exception text remains useful for diagnosis, but categories make rates comparable across versions.
+I instead record state transitions at module boundaries, where the decision is clearest. One clear operation owner records one terminal result rather than letting several screens describe the same action.
 
-Release and hotfix identifiers matter because two devices with the same store version may run different dynamic behavior. The active artifact identity belongs in every report produced after activation.
+A stable operation ID connects client transitions with backend processing without storing request payloads or user content.
 
-Logs also need size and retention limits. A mobile application can operate offline for long periods; an unbounded queue turns observability into a storage and performance defect.
+## Keep only the context that explains the code path
 
-## Aggregation changes priority
+A diagnostic event can include:
 
-One stack trace describes one failure. Aggregation shows whether many failures share a fingerprint, version, device family, or rollout state.
+- application version;
+- build ID;
+- operating-system version;
+- device class;
+- feature configuration;
+- relevant module state;
+- operation ID;
+- terminal state.
 
-Crash grouping is imperfect. Obfuscation changes names unless symbol mappings are preserved. Different root causes can meet at one framework frame. One root cause can produce several stacks. A group remains a starting hypothesis, not a diagnosis.
+It usually does not need:
 
-Non-crash outcomes need aggregation too. Completion rate, timeout rate, repeated retry, and state-transition violations can reveal a broken feature that never throws.
+- usernames;
+- message bodies;
+- voice samples or voice content;
+- tokens;
+- complete server responses.
 
-At more than two million users, raw counts can mislead. A common harmless warning may outnumber a severe failure in a small new rollout. Rates need denominators such as active sessions, attempted operations, eligible devices, or exposed users.
+Each correlation key answers a different question:
 
-## Release comparison needs a baseline
+| Correlation key | Question it answers |
+|---|---|
+| build ID | Which code produced this event? |
+| operation ID | Which steps belonged to the same user action? |
+| release cohort | Does the new release differ from the stable baseline? |
+| state transition | Where did the operation stop? |
+| artifact hash | Do the symbols and source match? |
 
-A metric becomes actionable when the team can compare it with a prior stable period or an unexposed audience.
+I use bounded categories where possible. A connection result might be offline, timeout, authentication, rejected, server, parsing, or cancelled. Free-form exception text can still help diagnosis, but stable categories make rates comparable across versions.
 
-The release record should identify when an artifact entered each rollout stage. Observability can then compare crash and operation outcomes by artifact rather than by calendar day alone. Stop conditions defined before rollout prevent the team from rationalizing a bad change after seeing the data.
+Release and hotfix IDs matter too. Two devices with the same store version can behave differently because of a dynamic release or hotfix. Every event produced after activation should include the active artifact ID.
 
-Sampling must preserve the failures that govern the decision. Routine success events can be sampled. Rare terminal errors, integrity failures, or security-relevant transitions may need complete capture within privacy and cost limits.
+Mobile applications can remain offline for long periods. If a log queue has no capacity or retention limit, observability becomes its own storage and performance defect. I therefore limit both queue size and event age.
 
-A dashboard is useful only when an owner knows what action follows a threshold. Otherwise it becomes a visual archive.
+## Use aggregation to judge impact
 
-## Diagnosis needs a path back to code
+One stack trace describes one failure. Aggregation can show whether failures concentrate around the same fingerprint, application version, device family, or rollout state.
 
-A useful report identifies the module and transition that failed. Source maps, symbol files, build manifests, and artifact hashes connect runtime output to the exact code.
+Crash grouping is only an initial hypothesis:
 
-The engineer can then reconstruct the sequence with controlled test input. The goal is a minimal reproducer or a bounded explanation, not a guess based on one device model.
+- obfuscation changes names unless symbol mappings are preserved;
+- different root causes can converge on the same framework frame;
+- one root cause can produce several stacks.
 
-When the condition depends on stale data or an old version, the fix may live in compatibility parsing or server behavior rather than the latest screen code. Operation identity and version context keep that possibility visible.
+I also aggregate non-crash outcomes. Completion rates, timeout rates, repeated retries, and invalid state transitions can reveal a broken feature that never throws an exception.
 
-The diagnosis should improve the observable contract. Add the missing category, invariant, or transition record that would have shortened the investigation. Avoid adding a dump of every local object.
+With more than two million users, raw counts are easy to misread. A frequent but harmless warning may outnumber a severe failure in a small new rollout. A rate needs an appropriate denominator, such as:
 
-## Observe the system, not the person
+- active sessions;
+- attempted operations;
+- eligible devices;
+- users exposed to the feature.
 
-Scale increases the temptation to collect more data. It also increases the privacy cost of a bad choice.
+Two million users make low-probability failures relevant to many real people. However, without a documented incident or monitoring data, I can describe this method but cannot give actual improvement figures.
 
-I prefer telemetry that describes software state: artifact, capability, transition, duration, result category, and bounded device context. Sensitive content stays out unless a separate, explicit support flow requires it with consent and retention controls.
+## Compare releases against a baseline
 
-Two million users made rare software states important. It did not make each user's data an acceptable debugging resource. Good observability narrows the failure while collecting less.
+A metric becomes actionable only when I can compare it with a previous stable period or an audience that was not exposed to the release.
+
+The release history should record when an artifact entered each rollout stage. I can then compare crashes and operation outcomes by artifact instead of relying only on calendar dates.
+
+I define stop conditions before rollout. Otherwise, unfavorable data can invite explanations for continuing rather than applying the original standard.
+
+Sampling should not treat every event equally. Routine success events can be sampled to control cost. Rare terminal errors, integrity failures, and security-relevant transitions may need complete capture where privacy and cost limits allow it.
+
+A dashboard is useful only when someone knows what action follows a threshold. Without a defined action, it is only a visual archive.
+
+## Keep a path back to the exact code
+
+A useful event identifies the module and state transition that failed. Source maps, symbol files, build manifests, and artifact hashes connect runtime output to the exact code.
+
+From there, I can reconstruct the sequence with controlled test input. The goal is a minimal reproducer or a bounded explanation, not a guess based on one device model.
+
+If a condition depends on stale data or an older version, the fix may belong in compatibility parsing or server behavior rather than the latest screen code. Operation IDs and version context keep that possibility visible.
+
+Each diagnosis should improve the event design. If an investigation lacks a category, invariant, or state transition, I add that missing signal so the next investigation can be shorter. I do not correct the gap by dumping every local object, which would increase noise, cost, and privacy risk.
+
+## Observe the software, not the person
+
+Scale increases the temptation to collect more data, and it also increases the privacy cost of a poor decision.
+
+I prefer telemetry that describes software state: artifact, capability, transition, duration, result category, and bounded device context. Sensitive content stays out of routine telemetry. It should be handled only through a separate, explicit support flow with user consent and retention controls.
+
+Two million users make rare software states important. They do not make each user’s data an acceptable debugging resource. My retained standard is to narrow the failure while collecting less.

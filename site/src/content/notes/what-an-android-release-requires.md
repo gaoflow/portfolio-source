@@ -1,69 +1,77 @@
 ---
 title: 'What an Android Release Requires'
 published: 2026-08-25
-summary: 'An Android release is a chain from source revision to signed artifact, rollout decision, and recovery path. My later work automating Android and iOS delivery with Ruby started from one rule: every artifact must be identifiable and reproducible.'
+summary: 'I later used Ruby to automate Android and iOS testing, packaging, and distribution. The real problem was not generating an installable file, but tying source, build inputs, signing, tests, release scope, and recovery to the same artifact.'
 tags: [Android, CI/CD, Software Journey]
 sourceProjects: []
 featured: false
 order: 104
 ---
 
-An Android release is complete when the team can identify what it shipped, reproduce the artifact, control who receives it, and recover from a bad decision. Producing an installable file covers only one link in that chain.
+Generating an APK or Android App Bundle is only part of a release. A complete release must also show which code produced it, which configuration it used, which checks it passed, who can receive it, and how to limit the damage if something goes wrong.
 
-I later designed a Ruby-based CI/CD pipeline for testing, packaging, and distributing Android and iOS applications. I do not have a source-backed story about one first release or rollback, so this note stays with the release contract that the automation had to enforce.
+I later used Ruby to automate testing, packaging, and distribution for Android and iOS. The available records do not identify a specific first release, store incident, or speed improvement, so I will only describe the release method I can confirm.
 
-## Start with artifact identity
+![Android release chain](/images/notes/systems/what-an-android-release-requires.svg)
 
-A release artifact needs a traceable identity. Given an APK or Android App Bundle, an engineer should be able to find the source revision, build configuration, version, dependencies, and signing context that produced it.
+## Every artifact needs an identity
 
-A filename alone cannot carry that contract. Names are copied and changed. The identity belongs in build metadata and in the release record. The pipeline should produce the artifact and its record together so they cannot drift through a manual handoff.
+Given an installable file, an engineer should be able to find its source revision, version, build configuration, locked dependencies, and signing category.
 
-Reproducibility also requires controlled inputs. If a build downloads an unpinned dependency, reads an undocumented local file, or depends on a developer's machine state, the same revision can produce a different result. A passing build then proves little about the artifact users received.
+A filename is not reliable because it can be copied or changed. The pipeline should create the artifact and its metadata together so the binary and its record do not become separated during a manual handoff.
 
-The practical target is bounded reproducibility: a clean environment, declared tool versions, locked dependencies, explicit configuration, and a recorded source revision. Signing secrets stay outside source control, but the method used to select them must remain deterministic.
+Reproducibility does not necessarily mean producing a byte-for-byte identical result on every machine. A more practical goal is to control the build environment, tool versions, dependencies, configuration, and source revision.
 
-## Signing is an operational dependency
+## Signing is not just a packaging option
 
-Android signing connects every update to a long-lived identity. Losing control of that identity can block future releases. Using it carelessly can expose the application to unauthorized updates.
+Android signing determines whether an application can continue to receive updates. Losing control of a key can block future releases or allow unauthorized updates.
 
-The pipeline therefore needs a narrow signing seam. Build jobs request a signing operation; they do not print, copy, or expose secret material. Access is limited to the release path. Logs identify which credential class was used without revealing the credential.
+The pipeline should request signing through a narrow interface without printing or copying keys. Development, test, and production artifacts must also be separated by package identifiers, signing identities, endpoints, and version rules. Renaming a file must not change its environment.
 
-Development, test, and production artifacts also need visible separation. An artifact should not become “production” because someone renamed it. Package identifiers, signing identities, endpoints, and version rules should agree with the intended environment.
+Checking these properties before distribution is cheaper than discovering a configuration error after users install the application.
 
-A release check can verify those properties before distribution. It is cheaper to reject an artifact at the pipeline than to discover its configuration after installation.
+## Tests must protect the release decision
 
-## Tests must defend the release decision
+Compilation and static checks are only a baseline. Before release, tests should also cover authentication state, data migrations, parsing of older data, critical navigation, and the behavior changed in that release.
 
-A release pipeline can run hundreds of checks and still miss the behavior that matters. The useful gate covers contracts that would make the artifact unsafe to distribute.
+A smoke test should install and launch the actual signed artifact. Code working in a development environment does not prove that the final package has the right combination of resources, configuration, and signing.
 
-Compilation and static checks establish a baseline. Focused tests should then cover authentication transitions, data migrations, compatibility parsing, critical navigation, and any feature changed in the release. A packaging smoke test installs the actual signed artifact and exercises the start path. This catches failures hidden by a development environment.
+Automatically rerunning an unstable test until it passes turns that test into a random approval mechanism. It should be fixed, isolated under an explicit risk decision, or removed if it protects no user behavior.
 
-The gate also needs a clear treatment of flaky checks. Automatically rerunning until green turns an unreliable test into a random approval mechanism. A flaky gate should be fixed, isolated with an explicit risk decision, or removed if it protects no observable contract.
-
-The pipeline should report why it stopped. “Build failed” sends an engineer searching through logs. “Production signing configuration missing” names the decision that could not be made.
+Failures should also name the blocked decision. “Production signing configuration missing” is more useful than “Build failed.”
 
 ## Distribution is a controlled state change
 
-Uploading an artifact changes who can run the code. That makes distribution a state transition rather than a file-copy task.
+Uploading an artifact changes which users can run new code. It is not an ordinary file-copy operation.
 
-A sound workflow separates artifact creation from release approval. The same verified artifact moves through internal testing, limited distribution, and wider rollout. Rebuilding between stages breaks the evidence because the final audience receives a different binary.
+I prefer to move the same verified binary through internal testing, limited rollout, and wider release. Rebuilding between stages breaks the basis of the earlier tests because users receive a different file.
 
-Staged rollout reduces exposure, but it needs observable stop conditions. Crash changes, failed starts, authentication errors, and backend incompatibility can justify a pause. The exact thresholds belong to the product and its telemetry; the workflow needs a place to evaluate them.
+A staged rollout needs conditions that can pause it, such as increased crashes, startup failures, authentication errors, or backend incompatibility.
 
-Mobile rollback is constrained because installed clients do not disappear. Recovery may mean stopping a rollout, disabling a compatible feature on the server, restoring an old response behavior, or publishing a corrected version. Every new release should enter production with at least one viable recovery path.
+Mobile rollback is also limited because installed clients do not disappear. Recovery may require stopping the rollout, disabling a feature on the server, restoring a compatible response, or publishing a corrected version.
 
-## Automation should remove interpretation
+## Automation handles repeated decisions; people decide whether to release
 
-I used Ruby to automate testing, packaging, and distribution across Android and iOS. The value of that pipeline was repeatability across two platforms, not the language itself.
+My Ruby pipeline unified the steps shared by Android and iOS: selecting a version, running checks, producing an artifact, requesting signing, recording approval, and tracking distribution state.
 
-Automation earns trust when it turns policy into executable checks. It should select declared inputs, produce one identifiable artifact, run the release gates, sign through controlled credentials, and record each transition. Humans still decide whether to release. They should not have to remember which manual step makes the release valid.
+The platforms still have different signing systems, package formats, and store rules, so platform-specific adapters handle those differences. A shared workflow should not pretend they do not exist.
 
-Cross-platform automation also needs restraint. Android and iOS have different signing, packaging, and store semantics. A shared pipeline should unify the common decisions—revision, version, test evidence, approval, and audit record—while leaving platform adapters to handle their own rules.
+People still decide whether to release. They should not have to rely on memory to confirm the version, check signing, or record the current state.
 
-## The release is evidence
+## The release checklist stays with the artifact
 
-A release record should answer four questions: what code was shipped, what checks passed, who approved the transition, and what recovery path remained available.
+| State | Allowed action | Required information |
+|---|---|---|
+| built | Internal installation | Build inputs and artifact identity |
+| verified | Enter release candidacy | Critical behavior and startup checks |
+| approved | Begin distribution | Approver and release scope |
+| staged | Expand the rollout | Comparison with the stable version |
+| halted | Stop expansion | Trigger and current impact |
 
-That record turns delivery into engineering evidence. It lets the team diagnose a user report against the exact artifact, compare releases without guesswork, and improve the gate after a missed failure.
+The release record must answer four questions: what was released, which checks it passed, who approved it, and which recovery paths remain available.
 
-The build file is the output users install. The release process is the argument that the team was justified in distributing it.
+## The standard I kept
+
+The build file is what users install. The release process explains why the team has reason to give that file to them.
+
+When every artifact can be traced to its code, inputs, signing, tests, and distribution state, the team can diagnose the exact version instead of guessing among similarly named installable files.

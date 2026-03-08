@@ -5,7 +5,7 @@ date: '2025-11-08'
 status: complete
 categories: [component-cfd]
 tags: [CFD]
-summary: 'I implemented the classical elementary flows as complex potentials, superposed them into cylinder flow with circulation, and verified every available analytical identity.'
+summary: 'I wrote uniform flow, a source, a doublet, and a point vortex as complex potentials, then combined them into cylinder flow with circulation and checked each step against analytical pressure, stagnation points, circulation, lift, and RK4 convergence order.'
 role: 'Aerodynamics fundamentals'
 duration: 'Independent build'
 featured: false
@@ -14,75 +14,98 @@ studySequence: 2
 heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
 ---
 
-## Context & objective
+## Why I started with a potential-flow sandbox
 
-Every identity this layer of theory claims checks out at machine precision: surface $C_p$ to $2.66\times10^{-15}$, circulation recovery to $8.9\times10^{-16}$, Kutta–Joukowski lift exact in sign and magnitude. The panel method in Airfoil Methods and the vortex-lattice code in Ground Effect VLM both assume that sources, doublets, and vortices are exact, that superposition is legitimate, and that circulation means lift. Rather than import those assumptions, I built the layer they rest on and verified every identity it claims.
+Before moving on to panel methods and vortex-lattice methods, I wanted to make sure I had implemented the underlying sources, doublets, point vortices, and linear superposition correctly.
 
-This study closes the analytical fluids set before the later panel and vortex-lattice work. The deliverable is a small sandbox: elementary flows written as complex potentials, superposed into flow past a circular cylinder with and without circulation, with an RK4 streamline tracer checked against the analytical streamfunction.
+These elements later support more complicated airfoil and finite-wing calculations. If the velocity direction, circulation sign, or integration convention is wrong at this level, the code can still produce convincing streamlines while giving the wrong lift direction and physical interpretation.
 
-## Method
+I therefore built a small potential-flow sandbox. It only models two-dimensional, inviscid, incompressible flow, but every result can be compared directly with a closed-form analytical solution.
 
-Each elementary flow is a complex potential $W(z)$, $z = x + iy$, with the physical velocity from $dW/dz = u - iv$:
+## Building the elementary flows
 
-$$
-\begin{aligned} W_{\text{uniform}} &= Uz, & W_{\text{source}} &= \frac{m}{2\pi}\ln z,\\[0.5em] W_{\text{doublet}} &= \frac{\mu}{2\pi z}, & W_{\text{vortex}} &= \frac{i\Gamma}{2\pi}\ln z.\end{aligned}
-$$
-
-Superposing the stream, a doublet of moment $\mu = 2\pi U R^2$, and the vortex gives cylinder flow with circulation:
+I represented each elementary flow with a complex potential $W(z)$, where $z=x+iy$ and the velocity follows from
 
 $$
-W(z) = U\!\left(z + \frac{R^2}{z}\right) + \frac{i\Gamma}{2\pi}\ln z .
+\frac{dW}{dz}=u-iv.
 $$
 
-The linearity that permits this superposition is the same linearity the panel and vortex-lattice methods exploit; the difference is that here the superposed field has a closed form, so the implementation can be tested to machine precision rather than to experimental scatter.
+The four elementary flows are
 
-![Streamlines around the cylinder at both circulations](/images/projects/potential-flow-sandbox/streamlines-cylinder.svg)
+$$
+\begin{aligned}
+W_{\text{uniform}} &= Uz, &
+W_{\text{source}} &= \frac{m}{2\pi}\ln z,\\
+W_{\text{doublet}} &= \frac{\mu}{2\pi z}, &
+W_{\text{vortex}} &= \frac{i\Gamma}{2\pi}\ln z.
+\end{aligned}
+$$
 
-## Iteration: designing tests for failures that stay silent
+Complex potentials can be added directly. Combining uniform flow with a doublet produces flow around a circular cylinder; adding a point vortex gives cylinder flow with circulation:
 
-Two failure modes in this code produce plausible output, so the test suite is built around them explicitly.
+$$
+W(z)=U\left(z+\frac{R^2}{z}\right)+\frac{i\Gamma}{2\pi}\ln z.
+$$
 
-**The sign of circulation.** A sign error in the vortex term crashes nothing and fails no residual; it returns a lift vector of the right magnitude pointing down. The sandbox adopts the aerodynamics convention — positive $\Gamma$ clockwise, the convention under which $L' = \rho U \Gamma$ points upward — and a unit test pins the sign so a later refactor cannot flip it quietly. The convention also follows the code into the integration: the trapezoid sum evaluates the contour counter-clockwise, so recovering $\Gamma$ takes a sign flip. One line, easy to get wrong, and invisible to every residual-based check. The contour-integral check isolates the same term from the other direction: the uniform and doublet parts contribute zero circulation, so whatever the integral returns at $r = 2.5R$ belongs to the vortex alone.
+The required doublet moment is $\mu=2\pi U R^2$. Because both the geometry and flow field have analytical solutions, I could test the implementation against theory rather than against another numerical method.
 
-**The order of the tracer.** A small streamline drift at one step size would prove little, because a broken integrator can still hug the analytical line at $h = 0.01$. The real check is the halving experiment: drift falls by a factor of 16.0 when the step halves, an observed convergence order of 4.003. That pins the RK4 truncation behaviour, where a single small number would have been luck.
+## The first silent failure: circulation sign
 
-The third deliberate choice is interpretive. Integrated surface pressure gives zero drag to machine precision — d'Alembert's paradox. I recorded it as a limitation of the model class, not as a successful drag prediction.
+Reversing the sign of the vortex term does not make the program fail. The velocity magnitude, pressure distribution, and streamlines can still look reasonable, but the lift points in the opposite direction.
 
-## Validation
+I use the convention that positive $\Gamma$ means clockwise circulation. Under this convention,
 
-Five checks, each against theory rather than another numerical method:
+$$
+L'=\rho U\Gamma
+$$
 
-| Check | Observed | Gate |
+gives upward lift. My contour integration runs counter-clockwise, so recovering $\Gamma$ requires an additional sign change.
+
+I added a dedicated test for this convention. Uniform flow and the doublet should each contribute zero circulation, so a closed contour integral at $r=2.5R$ must recover only the point-vortex contribution. This checks the same sign convention through an independent calculation.
+
+## The second silent failure: plausible streamlines
+
+I used RK4 to trace streamlines. A smooth trajectory at a step size of 0.01 is not enough to show that the integrator retains fourth-order accuracy. An incorrect implementation could still remain close to the analytical streamline at one chosen step size.
+
+The meaningful check was to halve the step size repeatedly. A correct RK4 implementation should reduce the error by approximately a factor of 16 each time. In my test, halving the step reduced the streamfunction drift to $1/16.0$ of its previous value, giving an observed convergence order of 4.003.
+
+This tests how the algorithm behaves as the step size changes rather than relying on a streamline that merely looks smooth.
+
+## Analytical checks and retained results
+
+I checked the implementation against five analytical relationships:
+
+| Check | Result | Requirement |
 |---|---:|---:|
-| Surface $C_p$ vs $1 - 4\sin^2\theta$ | $2.66\times10^{-15}$ | $<10^{-12}$ |
-| Stagnation angles vs $\sin\theta = -\Gamma/(4\pi U R)$ | $8.9\times10^{-16}$ rad | $<10^{-9}$ rad |
-| Contour-integral circulation vs imposed $\Gamma$ | $8.9\times10^{-16}$ | $<10^{-9}$ |
-| RK4 streamfunction drift, step 0.01 | $2.56\times10^{-12}$ | $<10^{-6}$ |
-| Integrated lift vs $\rho U \Gamma$ | 0.0 relative | $<10^{-9}$ |
+| Surface $C_p$ versus $1-4\sin^2\theta$ | $2.66\times10^{-15}$ | $<10^{-12}$ |
+| Stagnation points versus analytical angles | $8.9\times10^{-16}$ rad | $<10^{-9}$ rad |
+| Circulation recovered by closed-contour integration | $8.9\times10^{-16}$ | $<10^{-9}$ |
+| RK4 streamfunction drift at step 0.01 | $2.56\times10^{-12}$ | $<10^{-6}$ |
+| Pressure-integrated lift versus $\rho U\Gamma$ | 0.0 relative error | $<10^{-9}$ |
 
-The lift case imposes $\Gamma = 2\pi U R$, moving the stagnation points from $0^\circ, 180^\circ$ to $-30^\circ, -150^\circ$; the figure marks the located points on top of the traced field.
+The lift case used $U=1$, $R=1$, $\rho=1.225$, and $\Gamma=2\pi$. Adding circulation moved the stagnation points from $0^\circ$ and $180^\circ$ to $-30^\circ$ and $-150^\circ$.
 
-![Surface Cp: velocity-field evaluation against the analytical distribution](/images/projects/potential-flow-sandbox/cp-comparison.svg)
+Across 4097 stations on the cylinder surface, the maximum difference in $C_p$ was $2.66\times10^{-15}$. A 4096-point contour integration at $r=2.5R$ returned a circulation of 6.283185307179585, compared with the imposed value of 6.283185307179586.
 
-## Quantitative results
+![Surface pressure coefficient compared with the analytical distribution](/images/projects/potential-flow-sandbox/cp-comparison.svg)
 
-With $U = 1$, $R = 1$, $\rho = 1.225$, and $\Gamma = 2\pi$:
+## Why zero drag is not a successful prediction
 
-- surface $C_p$ from $|dW/dz|$ matches $1 - 4\sin^2\theta$ to $2.66\times10^{-15}$ over 4097 stations;
-- stagnation points are recovered at $-30.00000000000005^\circ$ and $-149.99999999999997^\circ$ by bisecting the signed tangential surface speed;
-- a 4096-point contour integral at $r = 2.5R$ returns $6.283185307179585$ against the imposed $6.283185307179586$;
-- the RK4 tracer's maximum streamfunction drift is $2.56\times10^{-12}$ at step 0.01 over 720 samples around the body;
-- integrated surface pressure gives $L' = 7.6969$ per unit span, equal to $\rho U \Gamma$ at integration precision, upward for positive $\Gamma$, with zero drag to machine precision.
+The pressure-integrated lift agrees with the Kutta–Joukowski relation, while the drag is zero to machine precision. This is not a successful prediction of real cylinder drag; it is d'Alembert's paradox.
 
-## Limitations
+Potential flow contains no viscosity or boundary layer, so it cannot reproduce the separation and wake that dominate the drag of a real cylinder.
 
-The model is inviscid, irrotational, incompressible, and strictly two-dimensional. There is no boundary layer, so the real flow's separation and wake — which dominate an actual cylinder's drag — are absent by construction. Circulation is imposed, not predicted: nothing here explains why a lifting body carries a particular $\Gamma$; that requires the Kutta condition introduced with the airfoil work.
+The circulation is also imposed rather than predicted. This model shows how a specified circulation changes the pressure field and lift, but it does not explain why a real airfoil acquires a particular value of $\Gamma$. A later airfoil model will need a Kutta condition to determine that circulation.
 
-## What I took away
+## What I learned
 
-The failures this code invited were all silent: a flipped circulation sign returns a lift of the right magnitude pointing down, and a broken integrator can still hug one streamline at one step size. The two tests that matter — the pinned sign convention and the halving experiment with its factor-16 drift drop — exist because a single plausible-looking number would have proved nothing. Machine-precision agreement was achievable here only because the theory is linear with closed forms; the panel method has no such luxury, which is why I verified this layer before building on it.
+The most important errors in this project would not have caused a crash. A reversed circulation sign gives lift with the correct magnitude but the wrong direction, while an integrator with degraded order can still produce a plausible streamline at one step size.
 
-## Reproduce
+I no longer treat a reasonable-looking streamline plot as validation. I check sign conventions through both contour integration and lift direction, and I check the integrator through a step-halving convergence experiment.
+
+This model reaches machine-precision agreement because it is linear and has closed-form solutions. Panel methods, vortex-lattice methods, and practical CFD do not offer the same convenience, so I chose to verify this foundation before adding more complicated geometry and physics.
+
+## How to run it
 
 ```bash
 cd projects/potential-flow-sandbox
@@ -91,4 +114,4 @@ python3 scripts/analyse.py
 python3 scripts/publish_site.py
 ```
 
-Twelve unit tests pin the elementary-flow hand values, surface impermeability, far-field decay, circulation sign, and the tracer's fourth-order convergence. `analyse.py` regenerates `results/analysis.json` and both figures and exits nonzero if any gate fails.
+The tests cover hand-calculated elementary-flow values, surface impermeability, far-field decay, circulation sign, and fourth-order RK4 convergence. `analyse.py` regenerates the numerical results and figures, and exits with a nonzero status if any check fails.

@@ -1,11 +1,11 @@
 ---
-title: 'Coursework: Fluent Vortex Shedding — Triggering the Kármán Street'
+title: 'How I Triggered and Measured a Kármán Vortex Street in Fluent'
 year: 2026
 date: '2026-03-12'
 status: complete
 categories: [component-cfd, validation]
 tags: [CFD]
-summary: 'I triggered the Re=150 Kármán street with a velocity perturbation; the measured St=0.155 passes its gate while coarse-mesh dissipation leaves 29% drag error.'
+summary: 'I added a controlled transverse-velocity perturbation to a Re=150 cylinder wake, triggered stable vortex shedding, and measured St=0.155. I also retained the 29.3% drag underprediction, showing that the tutorial mesh could capture the frequency but not predict pressure drag accurately.'
 role: 'Simulation & report lead'
 team: 'ESILV MMN1 group — Bing Gao, Nicolas Chang, Daphné Baray'
 duration: '4 weeks'
@@ -13,7 +13,7 @@ academic:
   institution: 'ESILV'
   course: 'Computational Fluid Dynamics'
   assignment: 'TD2 steady and transient flow past a cylinder'
-  note: 'The second tutorial of the same ESILV CFD module, again as a group of three. I set up the steady and transient cylinder cases, triggered the vortex street with a deliberate velocity patch, and wrote the report. Later I rebuilt the force histories by digitising the archived Fluent monitors, verified the endpoints against the exported force reports, and packaged the result as a self-contained reproduction bundle.'
+  note: 'The second tutorial of the same ESILV CFD module, again completed by a group of three. I set up the steady and transient cylinder cases, triggered the vortex street with a deliberate velocity patch, and wrote the report. Later, I digitised the archived Fluent monitor images, reconstructed the force histories, checked their endpoints against the exported force reports, and organised the results as a self-contained reproduction package.'
   requirements:
     - 'Solve steady laminar cylinder flow at Re=40 and check convergence, mass balance and drag.'
     - 'Run a transient Re=150 case and trigger symmetry breaking with a controlled velocity perturbation.'
@@ -22,114 +22,127 @@ academic:
   media:
     - src: '/images/projects/fluent-cylinder-vortex/assignment-workflow.svg'
       alt: 'Workflow from steady cylinder flow to a perturbed transient case and Strouhal extraction'
-      caption: 'The brief becomes a controlled experiment: establish the steady case, perturb symmetry, monitor forces, then extract St and error.'
+      caption: 'I turned the assignment into a controlled experiment: establish the steady case, perturb symmetry, monitor the forces, then extract St and the drag error.'
     - src: '/images/projects/fluent-cylinder-vortex/vortex-evolution.gif'
       alt: 'Animated sequence of the cylinder wake developing into a staggered vortex street'
-      caption: 'Four retained Fluent frames show the imposed asymmetry growing into the developed Kármán street.'
+      caption: 'Four retained Fluent frames show the imposed asymmetry growing into a developed Kármán vortex street.'
 featured: true
 order: 17
 studySequence: 9
 heroImage: /images/projects/fluent-cylinder-vortex/force-history.svg
 ---
 
-## Context & objective
+## What I needed to observe
 
-A cylinder at Re=150 sheds vortices; the simulation only shows it if you break the symmetry that keeps the wake attached. This project ran flow past a unit-diameter cylinder in ANSYS Fluent at two Reynolds numbers — steady at Re=40, transient at Re=150 — and the transient case produced a clean Kármán street with a measured Strouhal number of 0.155. The drag came out 29.3% below the experimental chart value, and the deficit traces to numerical dissipation on a deliberately coarse tutorial mesh.
+The assignment covered two cylinder-flow regimes: a steady, symmetric wake at $Re=40$ and an unsteady Kármán vortex street at $Re=150$.
 
-This was the second CFD tutorial of the ESILV MMN1 module, done as a group of three. I set up the simulations, ran the monitors, and wrote the report; the numbers below come from that report and from the Fluent force exports, which I re-parsed for this article.
+This was a three-person group assignment. I set up the steady and transient Fluent cases, ran the monitors, introduced the controlled perturbation that triggered vortex shedding, and wrote the report. Later, I digitised the surviving monitor screenshots and checked the reconstructed endpoints against the final-step force reports.
 
-## Setup: two Reynolds numbers, one mesh
+The Re=150 case produced a Strouhal number of $St=0.155$, but its drag was 29.3% below the experimental chart value. Both results matter. The frequency shows that the tutorial mesh was sufficient to reveal the shedding cycle, while the drag error shows that it was not sufficient for an accurate pressure-drag prediction.
 
-Both cases share one fluid domain and one quad mesh: 20,200 nodes, about 100 elements on the cylinder edge, within the tutorial requirement of 20,000 ±10%. The inlet is a uniform x-velocity (2 m/s for Re=40, 1 m/s for Re=150), the cylinder is a no-slip wall, and the domain is wide enough that the outer streamlines stay straight — the boundaries do not touch the wake. The physics change through velocity and viscosity only, with $\rho = 1$ kg/m³ and $D = 1$ m throughout.
+## Method and simulation settings
 
-| Case | $V$ [m/s] | $\mu$ [Pa·s] | Regime | Run |
-|---|---:|---:|---|---|
-| Re = 40 | 2 | 0.05 | steady, symmetric | 53 iterations to residuals $< 10^{-6}$ |
-| Re = 150 | 1 | 0.00667 | transient, shedding | 400 steps × 0.2 s = 80 s |
+Both cases used the same quadrilateral mesh, with 20,200 nodes and about 100 elements around the cylinder edge. The fluid density was 1 kg/m³, and the cylinder diameter was 1 m.
 
-For the transient run I refined the downstream region with Fluent's Adapt tool so the wake keeps some resolution as vortices convect out, and set the transient residual target to $10^{-3}$.
+| Case | Inlet velocity | Dynamic viscosity | Run |
+|---|---:|---:|---|
+| $Re=40$ | 2 m/s | 0.05 Pa·s | Steady; residuals below $10^{-6}$ after 53 iterations |
+| $Re=150$ | 1 m/s | 0.00667 Pa·s | Transient; 400 steps × 0.2 s |
 
-## The kick: breaking symmetry on purpose
+For the transient case, I also used Fluent Adapt to refine the downstream region. I set the transient residual target to $10^{-3}$.
 
-A numerically perfect setup is symmetric: same mesh top and bottom, uniform inlet, no round-off asymmetry worth the name. Left alone, the Re=150 wake still destabilizes eventually, but "eventually" can eat most of an 80 s run. So I forced the issue.
+## Why I broke the symmetry deliberately
 
-After initialization, I patched a uniform $+0.2$ m/s y-velocity into the downstream quadrant $X > 0.5$ m, $Y > 0$ using Fluent's patch tool. The check is arithmetic: the patched region's peak velocity magnitude reads $\sqrt{1^2 + 0.2^2} \approx 1.02$ m/s, exactly what the initial contour showed. The patch seeds a cross-stream imbalance the flow already wants to amplify at this Reynolds number; it sets the phase of the first shedding cycle, not the frequency. The street that develops is the flow's own.
+The mesh, inlet, and cylinder were all symmetric about the centreline. Although the physical flow at $Re=150$ is unstable, a numerical model with this symmetry can remain nearly symmetric for a long time.
 
-This is the piece of the setup I would defend in a review. The perturbation is large enough to act within a few convective times and small enough — 0.2 m/s against a 1 m/s free stream, 4% of the dynamic pressure — to leave no trace in the developed regime: once shedding locks in, the lift oscillation is centered on zero with symmetric amplitude, which a persistent artificial bias would distort.
+To make the vortex street appear within the available simulation time, I used Fluent's patch tool after initialization. In the downstream quadrant defined by $X>0.5$ m and $Y>0$, I imposed a transverse velocity of $+0.2$ m/s.
 
-## Steady Re=40: the symmetric baseline
+The resulting peak velocity magnitude was
 
-The steady case is the control experiment. At Re=40 the flow is steady and perfectly symmetric about the centerline: the streamlines close into two stationary recirculation loops behind the cylinder, the vorticity field is antisymmetric (positive on top, negative on the bottom), and the lift is zero by symmetry — the pressure on the upper half cancels the lower half exactly.
+$$
+\sqrt{1^2+0.2^2}\approx1.02\ \text{m/s},
+$$
 
-The centerline velocity profile confirms the setup mechanically: velocity falls to zero at the front stagnation point, goes negative through the recirculation zone, and recovers to the 2 m/s free stream downstream.
+which matched the initial contour.
 
-The drag split at this Reynolds number:
+The patch set the phase of the first vortices, but it did not determine the final shedding frequency. After the wake reached a developed state, lift continued to oscillate symmetrically around zero. This indicated that the imposed bias had not remained in the developed result.
 
-| Component | Force [N] | Coefficient |
+## The Re=40 control case
+
+At $Re=40$, the wake remained steady and symmetric about the centreline. Two stationary recirculation regions formed behind the cylinder. The pressure contributions from the upper and lower surfaces cancelled in the transverse direction, so the lift was zero.
+
+The drag components were:
+
+| Component | Force | Coefficient |
 |---|---:|---:|
-| Pressure | 2.0100 | 3.2816 |
-| Viscous | 1.0615 | 1.7330 |
-| **Total** | **3.0714** | **5.0146** |
+| Pressure | 2.0100 N | 3.2816 |
+| Viscous | 1.0615 N | 1.7330 |
+| **Total** | **3.0714 N** | **5.0146** |
 
-Pressure already dominates, and that dominance is exactly where the error will live at Re=150.
+This steady case later became an important check on whether the Re=150 drag error was incidental or systematic.
 
-## What the force history shows
+## How I measured the Strouhal number
 
-![Lift and drag coefficient histories at Re=150, digitized from the archived Fluent monitors and verified against the exported force reports](/images/projects/fluent-cylinder-vortex/force-history.svg)
+Vortices shed alternately from the upper and lower sides of the cylinder, causing the lift coefficient to oscillate around zero. Once the wake was developed, the lift amplitude was about $\pm0.117$.
 
-The lift history is the street's fingerprint. For an unsteady wake the number that matters is the Strouhal number, $St = fD/U$ — shedding frequency made non-dimensional — so the point of the history is to extract a period from it. After the impulsive start, $C_L$ grows through a short transient and locks into a regular oscillation about zero with amplitude $\pm 0.117$ — vortices shedding alternately from the top and bottom surfaces.
+I used upward zero-crossings after $t>40$ s to measure six complete periods. Their mean period was 6.44 s, giving
 
-Counting upward zero-crossings in the developed regime ($t > 40$ s) gives a mean period of 6.44 s over six cycles, so $f = 0.155$ Hz and $St = 0.155$.
+$$
+f=0.155\ \text{Hz},\qquad St=\frac{fD}{U}=0.155.
+$$
 
-The drag history shows the start-up spike (an artifact of the impulsive start), then settles to a mean near 0.9. In the full-resolution Fluent monitor the drag oscillates at twice the lift frequency — each lift cycle passes two vortices — but the archived drag screenshot spans 0–7 N and the ripple is roughly 0.01 N, below the pixel scale of the image. The regenerated figure therefore shows the settled mean rather than the 2× ripple; I flag that rather than redraw what the pixels cannot support.
+I also applied a Hann-windowed FFT to the same digitised lift history. With 670 samples, the frequency resolution was 0.0252 Hz. The largest non-zero frequency bin was at 0.151 Hz, within the same frequency interval as the zero-crossing result.
 
-The mechanism is visible in the pressure field: each shed vortex is a travelling low-pressure core, and because the cores alternate between the upper and lower wake, they pull the cylinder up and down in turn. That is the oscillating lift, read straight off the contours.
+These are not independent experimental validations because both methods use the same screenshot-derived signal. They only show that the identified frequency does not depend on manually selecting one particular pair of peaks.
 
-One provenance note. The raw Fluent monitor text exports were not retained from the tutorial; what survives is two force reports (final time step) and screenshots of the monitors. The figure above is digitized from those screenshots, with the endpoints verified against the force reports: digitized final $C_L$ of 0.075 against the report's 0.069, digitized final drag of 0.555 N against the report's 0.565 N. The regeneration script treats these checks as hard gates.
+![Spectrum of the developed lift history](/images/projects/fluent-cylinder-vortex/lift-spectrum.svg)
 
-## The 29% drag error
+## The concrete failure: drag was 29.3% too low
 
-The featured result is a failure, quantified. At the final time step Fluent reports:
+At the final time step of the Re=150 run, Fluent reported:
 
-| Component | Force [N] | Coefficient |
+| Component | Force | Coefficient |
 |---|---:|---:|
-| Pressure | 0.4385 | 0.7159 |
-| Viscous | 0.1269 | 0.2072 |
-| **Total** | **0.5654** | **0.9231** |
+| Pressure | 0.4385 N | 0.7159 |
+| Viscous | 0.1269 N | 0.2072 |
+| **Total** | **0.5654 N** | **0.9231** |
 
-The experimental chart value at Re=150 is $C_D \approx 1.6$, a drag force of 0.8 N under the run conditions. The simulation lands 29.3% low. Pressure drag is 78% of the total, so the shortfall lives in the pressure field: base suction behind the cylinder is too shallow.
+The supplied experimental chart corresponds to about 0.8 N under these conditions. The simulated force was therefore 29.3% too low.
 
-The steady case fails the same way. At Re=40 the computed drag is 3.07 N against 4.2 N from the chart ($C_D \approx 2.1$), an error of 26.9%. Two Reynolds numbers, same direction, same magnitude of error — that is a systematic bias, so the explanation has to live in the discretization. It does: a coarse mesh with a loose transient tolerance ($10^{-3}$, and the continuity residual plateaued just above it) dissipates.
+Pressure drag accounted for 78% of the computed total. This located the main shortfall in the pressure recovery behind the cylinder rather than in the wall-viscous contribution.
 
-The shedding vortices lose strength as they form, the low-pressure cores in the wake fill in, and the pressure difference across the cylinder shrinks. A converged residual history is evidence the solver finished; the 29% gap is evidence the mesh and tolerances were not good enough.
+The Re=40 result showed the same pattern. Its computed drag was 3.07 N, compared with about 4.2 N from the chart, an underprediction of 26.9%. The error had the same direction and a similar magnitude at both Reynolds numbers. That made numerical dissipation a more useful explanation than a difference between an instantaneous and mean value.
 
-Parsing the exports turned up a second, quieter trap. Both force reports imply the same coefficient conversion: $C_D = F_D / 0.6125$, while $\frac{1}{2}\rho U^2 D$ evaluates to 2.0 for the Re=40 run and 0.5 for the Re=150 run. Fluent's reference values were set once and did not follow the run conditions, so comparing the reported *coefficients* against a textbook chart mixes reference definitions. The comparisons above are done on forces, where the reference area cancels — the only defensible level for this data.
+A coarse mesh and the looser transient convergence tolerance can weaken the shedding vortices and fill in the low-pressure wake. This reduces the pressure difference between the front and rear of the cylinder and therefore lowers the pressure drag. Residual convergence only shows that Fluent has solved the current discretised equations; it does not establish that the resulting drag is accurate.
 
-## Iteration: how the error estimate converged
+## Correcting the reference-coefficient problem
 
-The 29.3% figure was not the first answer. The group's Word draft read the experimental chart at $Re=150$ as $C_D \approx 1.2$, put the gap at 23.8%, and explained it with the standard pair: an instantaneous value against a time-averaged chart, and a 2-D simulation against a 3-D experiment. Both explanations are true in general and predicted nothing here. The submitted report re-read the chart at $\approx 1.6$, recomputed the gap from the final-step force (0.5654 N against 0.8 N), and landed on 29.3% with a diagnosis that does make predictions: the deficit lives in pressure drag (78% of the total), and it should repeat at $Re=40$.
+The two Fluent force reports both satisfy
 
-It does, at 26.9% — which is what promoted dissipation from excuse to explanation.
+$$
+C_D=\frac{F_D}{0.6125}.
+$$
 
-The steady case failed the same way in miniature. The draft matched the *pressure* coefficient 3.2816 to a chart reading of 3.28, declared agreement, and dismissed the total 5.0146 as a reference-values default. The chart plots total drag, so the agreement was a coincidence of definitions. The fix was structural: compare forces, where the reference values cancel — the rule the rest of this article follows.
+However, the theoretical dynamic-pressure reference quantities for the Re=40 and Re=150 runs are 2.0 and 0.5 respectively. Fluent's reference values had therefore not been updated between operating conditions.
 
-The draft also settled the provenance question by accident. Two of its sections quote two different "final" drags for the same run — 0.5654 N in one, 0.5601 N ($C_D = 0.9145$) in the other — because two people read the monitor at different instants of a shedding cycle. The submitted report standardized on the exported final-step force reports, and the digitization gates above exist to hold the figures to that standard.
+Directly comparing the reported coefficients with the textbook chart would mix different reference definitions. I corrected the comparison by using forces instead, because the reference area cancels when the geometry is unchanged.
 
-## Verification
+This also explained a misleading result in the draft. The Re=40 pressure coefficient of 3.2816 was almost identical to the chart's total drag coefficient of 3.28. It initially looked like excellent validation, but the two numbers represented different physical quantities. The suspiciously close match was what led me to check the definitions.
 
-| Check | Result |
-|---|---|
-| Steady convergence | 53 iterations, all residuals $< 10^{-6}$ |
-| Transient residuals (Re=150) | x/y-velocity $< 10^{-3}$ each step; continuity plateaus just above $10^{-3}$, bounded and periodic |
-| Mass conservation (Re=40) | inlet–outlet imbalance $5.84 \times 10^{-9}$ kg/s |
-| Digitized vs reported final $C_L$ | 0.075 vs 0.069 (gate: $< 0.02$) |
-| Digitized vs reported final drag | 0.555 N vs 0.565 N (gate: $< 0.03$ N) |
-| Coefficient conversion consistency | $F/C_D = 0.6125$ in both reports (gate: $< 0.1\%$) |
-| Shedding period regularity | six cycles, std 0.03 s |
+## What could be recovered from the archived data
 
-## Street development
+The original Fluent monitor text was not retained after the course. Only screenshots of the monitors and the final-time-step force reports survived.
 
-Four frames from the report's y-velocity animation show the sequence the force history compresses into curves. Report figures, copied as archived. One caveat carried over from the report: the vorticity contours in the original document plot magnitude, so clockwise and counter-clockwise cores render in the same colors — the alternating arrangement is visible, the opposite rotation directions are masked.
+I digitised the force histories from those screenshots and used the reports to check their endpoints:
+
+| Quantity | Digitised endpoint | Force-report endpoint |
+|---|---:|---:|
+| Final $C_L$ | 0.075 | 0.069 |
+| Final drag | 0.555 N | 0.565 N |
+
+The drag screenshot used a vertical scale from 0 to 7 N, while the developed drag fluctuation was only about 0.01 N. That fluctuation was below the image's pixel resolution. I therefore retained only the supported mean drag instead of recreating a small twice-frequency oscillation that the archived image could not resolve.
+
+## How the vortex street developed
 
 <div class="grid gap-3 sm:grid-cols-2">
   <figure>
@@ -138,31 +151,43 @@ Four frames from the report's y-velocity animation show the sequence the force h
   </figure>
   <figure>
     <img src="/images/projects/fluent-cylinder-vortex/animation-0002.png" alt="Cylinder wake beginning to roll up after the imposed asymmetry" loading="lazy">
-    <figcaption>2. The velocity kick seeds the first uneven roll-up.</figcaption>
+    <figcaption>2. The transverse-velocity perturbation triggers the first uneven roll-up.</figcaption>
   </figure>
   <figure>
     <img src="/images/projects/fluent-cylinder-vortex/animation-0003.png" alt="Alternating cylinder-wake structures detaching downstream" loading="lazy">
-    <figcaption>3. Alternating structures detach from each side.</figcaption>
+    <figcaption>3. Alternating structures detach from the two sides of the cylinder.</figcaption>
   </figure>
   <figure>
     <img src="/images/projects/fluent-cylinder-vortex/animation-0004.png" alt="Developed staggered Karman vortex street" loading="lazy">
-    <figcaption>4. The wake reaches a developed staggered street.</figcaption>
+    <figcaption>4. The wake develops into a mature staggered Kármán vortex street.</figcaption>
   </figure>
 </div>
 
-## Limitations
+## Retained checks and results
 
-One mesh, no refinement study, so the 29% bias is diagnosed but not bounded. One time step (0.2 s, about 32 steps per shedding period), no temporal refinement check. The continuity residual plateaued above the $10^{-3}$ target; I accepted it because the maxima stayed bounded and periodic, but a tighter run would cost little and answer more. The force history is digitized from screenshots because the raw monitor exports were not kept — endpoints match the force reports, but sub-pixel features like the 2× drag ripple are lost.
+| Check | Result |
+|---|---|
+| Re=40 steady convergence | 53 iterations; residuals below $10^{-6}$ |
+| Re=40 mass imbalance | $5.84\times10^{-9}$ kg/s |
+| Digitised vs reported final $C_L$ | 0.075 vs 0.069 |
+| Digitised vs reported final drag | 0.555 N vs 0.565 N |
+| Shedding-period sample | Six periods; standard deviation 0.03 s |
+| Strouhal number | 0.155 |
 
-The Strouhal estimate rests on six cycles. The laminar solver is the right model at Re=150 — the wake is laminar — but the mesh does not resolve the boundary layer that sets the separation points.
+## Limits and next work
 
-## Reproduce
+I used only one mesh and one time step, so this work does not include a spatial or temporal refinement study. The 0.2 s time step gives about 32 steps per shedding period.
 
+The continuity residual settled on a plateau slightly above $10^{-3}$. The raw monitor text was also not retained, and the surviving screenshots cannot support sub-pixel drag fluctuations.
 
-The earlier acquisition script (`research/esilv-cfd/plot_vortex_forces.py`) digitised the archived Fluent monitors and cross-checked their endpoints against the private final force reports. Those originals are hashed in the private ESILV archive; they are not required for the public rebuild.
+The Strouhal estimate is based on only six periods. A laminar model is appropriate for the Re=150 case, but this mesh still does not resolve the boundary layer that determines the separation points. The drag should therefore not be treated as a high-accuracy result.
 
-## What I took away
+The next useful step would be to repeat the calculation with mesh and time-step refinement, especially near the cylinder boundary layer and in the near wake, while retaining the raw force-monitor data. That work was not completed here.
 
-The first explanation of a discrepancy is usually a list of generic CFD excuses; ours were "instantaneous vs averaged" and "2D vs 3D", and neither survived contact with the force split. The dissipation story did, because it says where the error lives (pressure, 78% of the total) and where else it should appear ($Re=40$, 26.9%).
+## What I learned
 
-I also learned to treat a matching number as a suspect: pressure $C_D$ of 3.2816 against a chart's 3.28 felt like validation and was a definition error, so comparing forces first — where reference values cancel — is now my default.
+My first explanations for the drag discrepancy were the usual ones: comparing an instantaneous result with an average, and comparing a two-dimensional simulation with a three-dimensional experiment. Those statements can be relevant, but they did not predict which force component or which case should contain the error.
+
+The numerical-dissipation explanation was more useful because it located the shortfall in pressure drag and predicted that the Re=40 case should show a similar bias. The later comparison did show a 26.9% underprediction in the same direction.
+
+I took two practical habits from this assignment: decompose the forces before explaining a total error, and when two numbers appear to match perfectly, first check that they use the same definition.

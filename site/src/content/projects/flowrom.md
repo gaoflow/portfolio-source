@@ -14,29 +14,31 @@ studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg
 ---
 
-## Context & objective
+## Why I reduced the flow fields
 
-Rank-8 POD compresses 480 velocity fields 48.8× while holding reconstruction error on four unseen forcing cycles to 0.123%; exact DMD forecasts those cycles at 0.100% full-state error. A reduced-order model earns trust only when its compression claims survive data it did not fit, so this study holds out four full forcing cycles before fitting either model.
+An unsteady CFD simulation can produce large collections of velocity, pressure, and vorticity fields. Storing and comparing every grid value is expensive, so I wanted to test whether a small set of spatial modes could represent the flow while still reconstructing and predicting a time interval the model had not seen.
 
-The parent data source is the FlowLab lattice-Boltzmann solver. FlowROM does not copy or relabel another portfolio project: every snapshot, decomposition, figure, metric, and test is generated in this repository.
+I used data generated with the FlowLab D2Q9 BGK lattice-Boltzmann solver to study two reduced-order methods. Proper orthogonal decomposition (POD) handled compression and reconstruction, while exact dynamic mode decomposition (DMD) identified temporal frequencies and advanced the flow beyond the training interval.
 
-## Live mode explorer
+The snapshots, decompositions, figures, metrics, and tests were generated in the FlowROM repository rather than copied or relabelled from another portfolio project.
 
-Choose a retained POD rank and scrub from the training interval into the held-out cycles. Both canvases share one fixed speed scale; the frame error is computed on the full two-component velocity field, not on the displayed downsampled magnitude.
+## How I generated and divided the 480 snapshots
 
-<iframe src="/labs/flowrom/?v=1" title="Interactive FlowROM POD rank explorer" style="width:100%;height:620px;border:1px solid #d9d2c4;background:#f5efe2" loading="lazy"></iframe>
+FlowLab first converged a $48\times48$ lid-driven cavity at $Re=100$. I then applied a sinusoidal perturbation to the lid speed with a period of 400 solver iterations.
 
-## Data and split
+After four settling cycles, I recorded $u$ and $v$ at all 2,304 fluid cells every 10 iterations. This produced 480 snapshots and a $4{,}608\times480$ data matrix.
 
-The FlowLab D2Q9 BGK solver first converges a $48\times48$ lid-driven cavity at $Re=100$. Its lid speed is then perturbed sinusoidally with a 400-iteration period. After four settling cycles, the study records $u$ and $v$ at 2,304 fluid cells every 10 iterations, yielding a $4,608\times480$ matrix.
+I used the first 320 snapshots—eight complete forcing cycles—to train both models. I reserved the final 160 snapshots, or four complete cycles, and did not use them during fitting.
 
-The first 320 snapshots, eight complete cycles, train both models. The remaining 160, four cycles, stay untouched until evaluation. That split prevents a random holdout from leaking adjacent phases of the same periodic response across train and test sets.
+A random frame-level split would have placed nearly identical phases of the same periodic response in both sets. That would mainly test interpolation between neighbouring states. The chronological split instead required DMD to advance autonomously beyond the training endpoint and required POD to reconstruct later flow fields.
+
+This is still not a distribution-shift test. Training and holdout data share the same geometry, Reynolds number, mean lid speed, forcing amplitude, and forcing frequency. The split measures temporal continuation under one operating condition.
 
 ![POD modal energy and held-out reconstruction error](/images/projects/flowrom/pod-spectrum.svg)
 
-## POD: compression with an external error check
+## POD compression and reconstruction
 
-After subtracting the training mean, singular-value decomposition gives the orthonormal POD basis. Two modes retain 99.973% of training fluctuation energy. The held-out error still matters: energy retention alone does not establish reconstruction quality on later fields.
+I subtracted the training mean and applied singular-value decomposition to obtain orthonormal spatial modes ordered by captured fluctuation energy.
 
 | Rank | Training fluctuation error | Held-out fluctuation error |
 |---:|---:|---:|
@@ -46,71 +48,87 @@ After subtracting the training mean, singular-value decomposition gives the orth
 | 8 | 0.0885% | 0.123% |
 | 16 | 0.00439% | 0.00949% |
 
-At rank 8, one mean field, eight spatial modes, and eight coefficients per snapshot require 48.8× fewer scalar values than the original matrix.
+At rank 8, storing one mean field, eight spatial modes, and eight coefficients per snapshot requires 48.8 times fewer scalar values than storing the original matrix. The held-out fluctuation error is 0.123%.
 
-Rank 1 is the instructive failure. The first mode alone carries 87.05% of training fluctuation energy, yet rank-1 reconstruction misses 35.97% of the held-out fluctuation. The periodic response is a quadrature pair: the dominant mode without its partner reproduces a spatial shape but cannot follow the phase. Adding the second mode drops held-out error to 1.301%.
+Two modes retain 99.973% of the training fluctuation energy, but retained energy alone does not establish reconstruction quality on later fields. I therefore selected and evaluated ranks using the chronological holdout as well as the training spectrum.
 
-![First four POD mode magnitudes](/images/projects/flowrom/pod-modes.svg)
+## The useful failure at rank 1
 
-## DMD: recover the temporal mechanism
+The first POD mode contains 87.05% of the training fluctuation energy. Judged only by that percentage, a rank-1 model might appear sufficient.
 
-Exact DMD fits a rank-12 linear evolution operator to consecutive training snapshots. The strongest oscillatory mode is 0.02500023 cycles per snapshot; the imposed frequency is 0.025. Relative frequency error is 0.00093%.
+It is not. Rank 1 misses 35.97% of the fluctuation in the held-out cycles. The periodic response needs a quadrature pair: the first mode represents the main spatial shape, while the second provides the other phase needed to follow the oscillation.
 
-The autonomous DMD evolution then continues through the four cycles it never saw. Relative Frobenius error is 0.100% for the full velocity state and 1.41% for fluctuations about the training mean. Both are reported because the steady cavity component makes the full-state denominator much larger.
+Adding the second mode reduces held-out error directly to 1.301%. This failure showed me that the minimum useful rank cannot be chosen from training energy alone; it must also be checked against fields excluded from fitting.
+
+## DMD frequency identification and forecast
+
+I fitted a rank-12 exact DMD linear evolution operator to consecutive training snapshots.
+
+The imposed frequency was 0.025 cycles per snapshot. The strongest oscillatory DMD mode had a frequency of 0.02500023 cycles per snapshot, giving a relative frequency error of 0.00093%.
+
+I then advanced the model autonomously through the four held-out cycles. The relative Frobenius error was 0.100% when measured against the complete velocity state and 1.41% when measured against fluctuations about the training mean.
 
 ![DMD probe forecast and modal spectrum](/images/projects/flowrom/dmd-forecast.svg)
 
-## Validation & acceptance
+## Why I retained both DMD errors
 
-The analysis exits nonzero unless all four predeclared gates pass:
+The complete velocity field contains a dominant steady mean component. Normalising by the full state makes the denominator much larger, so the 0.100% error answers: “How much of the total flow-field norm is wrong?”
+
+After removing the training mean, the 1.41% error answers a different question: “How much of the unsteady fluctuation is wrong?”
+
+Both values are correct. Reporting only the smaller full-state error would allow the stable mean flow to hide part of the temporal prediction error, so I retained both denominators.
+
+## What POD and DMD established
+
+| Metric | Question it answers |
+|---|---|
+| POD energy fraction | How many spatial directions represent the training fluctuation? |
+| POD held-out error | Can those directions reconstruct later, unseen cycles? |
+| DMD frequency | Did the evolution operator identify the correct time scale? |
+| DMD forecast error | Can the model advance beyond its fitting interval? |
+
+POD was the more useful method here for storage and reconstruction. Rank 8 reduced the scalar count by 48.8 times while keeping held-out fluctuation error at 0.123%.
+
+DMD was evaluated on temporal behaviour rather than maximum captured energy. The rank-12 model identified 0.02500023 cycles per snapshot and maintained the phase through the reserved four-cycle interval.
+
+Neither result makes ranks 8 and 12 universal choices. Rank is part of the model definition and must be selected again when the operating condition, geometry, or observed quantity changes.
+
+## How I checked the implementation
+
+I did not use the FlowLab production case as the implementation’s only oracle. I also used two synthetic tests:
+
+- POD had to recover a known rank-2 field exactly.
+- DMD had to identify and forecast a known sinusoidal signal to numerical precision.
+
+The analysis exits with a nonzero status unless all four predeclared acceptance gates pass:
 
 1. held-out POD error decreases as rank increases;
-2. rank-8 held-out fluctuation error is below 2%;
-3. dominant DMD frequency is within 5% of the known forcing frequency;
-4. DMD full-state holdout error is below 2%.
+2. rank-8 held-out fluctuation error remains below 2%;
+3. the dominant DMD frequency remains within 5% of the known forcing frequency;
+4. DMD full-state holdout error remains below 2%.
 
-Separate synthetic tests require POD to recover a known rank-two field and DMD to identify and forecast a known sinusoid to numerical precision. This keeps the FlowLab generator from being the implementation's only oracle.
+These checks help distinguish a decomposition or forecasting defect from a problem in FlowLab’s generated data. A visually plausible mode plot is not enough to pass the analysis.
 
-## Limitations
+## Limits and next work
 
-The result is deliberately bounded. A coarse D2Q9 BGK cavity with one deterministic excitation is not turbulent external aerodynamics. Training and holdout share one Reynolds number, geometry, and forcing amplitude. This study demonstrates the mechanics, error accounting, and reproducible software workflow; it does not claim production CFD fidelity.
+This study uses one coarse-grid cavity, one geometry, one Reynolds number, and one deterministic sinusoidal perturbation. A D2Q9 BGK lid-driven cavity is not turbulent external aerodynamics, and these results do not constitute a surrogate model for a racing-car wake.
 
-## Reproduce
+Applying the same process to vehicle CFD would require data spanning multiple ride heights, yaw angles, speeds, and geometry states. It would also require holdout sets defined by operating condition rather than only by time.
 
-`node scripts/generate-snapshots.mjs` creates the fields. `python3 scripts/analyse.py` fits both models, evaluates the holdout, regenerates every figure and JSON metric, and enforces the acceptance gates.
+The current result demonstrates snapshot selection, leakage prevention, compression, reconstruction, frequency identification, autonomous continuation, and explicit error accounting under one operating condition. It does not claim production CFD fidelity.
 
-## Why the holdout is chronological
+## What I learned
 
-Randomly withholding individual snapshots would place nearly identical phases of the same periodic response on both sides of the split. That tests interpolation between neighbouring states, not autonomous prediction. Reserving the final four complete cycles forces DMD to advance beyond its fitting interval and makes every POD error an evaluation on later fields.
+The rank-1 result changed how I assess reduced-order models. Capturing 87.05% of the training fluctuation energy sounds strong, but the resulting model still missed 35.97% of the held-out fluctuation. The chronological holdout and the drop to 1.301% at rank 2 exposed a failure that the energy percentage alone would have approved.
 
-The split is still not a distribution shift. Training and holdout share geometry, Reynolds number, mean lid speed, amplitude, and forcing frequency. The result measures temporal continuation under one operating condition.
+I also learned to inspect both the numerator and denominator of every reported error. The same DMD forecast scores 0.100% against the full velocity state and 1.41% against the fluctuations. Neither number replaces the other because they describe different aspects of the prediction.
 
-## POD and DMD answer different questions
+## How to run the study
 
-POD orders orthogonal modes by captured fluctuation energy. It is the better tool here for storage and reconstruction: rank 8 reduces the scalar count by 48.8× while keeping held-out fluctuation error at 0.123%.
+```bash
+cd projects/flowrom
+node scripts/generate-snapshots.mjs
+python3 scripts/analyse.py
+```
 
-DMD attaches a single complex evolution factor to each mode. It is therefore judged on frequency and autonomous forecast rather than maximum captured energy. The rank-12 model identifies 0.02500023 cycles per snapshot and continues phase through the reserved interval.
-
-Neither result implies that eight or twelve modes are universal. Rank is part of the model contract and must be selected again when the operating envelope or observable changes.
-
-## Error denominators matter
-
-The DMD holdout error is 0.100% when normalised by the complete velocity state and 1.41% when normalised by fluctuations about the training mean. The first number answers “how much of the total field norm is wrong?” The second answers “how much of the unsteady content is wrong?”
-
-Reporting only the full-state number would let a dominant steady mean hide temporal error. Reporting both prevents a numerically correct denominator from becoming a misleading communication choice.
-
-## Numerical safeguards
-
-The production case is not the only oracle. Synthetic tests require exact recovery of a known rank-two field and correct identification of a known sinusoid. The analysis also rejects non-monotonic POD holdout error, excessive rank-8 error, a misplaced DMD frequency, or excessive full-state forecast error.
-
-These tests separate decomposition defects from FlowLab data-generation defects. A plausible mode plot cannot pass the project if the known-rank or known-frequency contracts fail.
-
-## Motorsport relevance and boundary
-
-The transferable skill is field-data reduction: choosing snapshots, preventing leakage, defining a metric, and preserving the distinction between reconstruction and prediction. Applied to vehicle CFD, the same discipline could compress pressure or wake databases and identify coherent operating modes.
-
-That application would require multiple ride heights, yaw angles, speeds, and geometry states with operating-point holdouts. Until then, this article demonstrates ROM methodology—not a surrogate for turbulent vehicle aerodynamics.
-
-## What I took away
-
-Rank 1 was the failure that organised the study. One mode held 87.05% of training fluctuation energy yet missed 35.97% of the held-out fluctuation, because the response is a quadrature pair: the dominant mode carries the spatial shape, and without its partner it cannot follow the phase. Energy retention alone would have approved that model; the chronological holdout and the rank table — 1.301% at rank 2 — are what rejected it. The denominator lesson followed directly: the same DMD forecast scores 0.100% against the full state and 1.41% against fluctuations, so both numbers ship.
+The snapshot script generates the velocity fields. The analysis script fits both reduced-order models, evaluates the chronological holdout, regenerates the figures and JSON metrics, and enforces the acceptance gates.

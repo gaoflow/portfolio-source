@@ -8,62 +8,112 @@ featured: false
 order: 106
 ---
 
-The way I understand Ruby on Rails starts from the mobile side of the interface. Android had already made me care about response shapes, authentication failures, retries, and old clients. Rails forced me to follow those outcomes back through a route, a controller, domain rules, and persistent state.
+On Android, I could see response shapes, authentication failures, retries, and compatibility problems with old clients. I could not see how the server produced those outcomes. Rails helped me trace a request backward through routing, authentication, authorization, application rules, transactions, and persistent state.
 
-My resume lists Ruby and Ruby on Rails, but it does not preserve when I learned each concept or which production system used it. This note therefore describes the model I took from the framework rather than an invented project history.
+## I traced one request across its boundaries
 
-## A route names an operation
+![Rails request lifecycle](/images/notes/systems/learning-rails-from-the-mobile-side.svg)
 
-A Rails route connects an HTTP method and path to application behavior. That sounds mechanical until the same resource supports several meanings.
+A response seen by a mobile client may pass through routing, identity checks, application rules, transactions, and serialization. If the operation moves to background work, the server must also expose its later state.
 
-`GET` should read without changing durable state. `POST` usually creates or starts an operation. `PATCH` changes part of an existing resource. `DELETE` removes or deactivates it. Those conventions give the client useful expectations about retries, caching, and failure.
+I summarize a create operation like this:
 
-The controller should keep that promise narrow. It accepts transport input, invokes the application rule, and converts the result into an HTTP response. When business decisions accumulate in the controller, the route becomes difficult to test without the entire web stack. It also becomes easy for a second route to implement the same rule differently.
+```text
+POST /operations
+  → parameter parsing and identity
+  → application rules
+  → database transaction
+  → versioned response
+  → optional background-job state
+```
 
-I prefer to think of the controller as an adapter. HTTP enters on one side. A small application result leaves on the other.
+This separation clarified the role of each layer. A route maps an HTTP method and path to an entry point. Input adaptation, authorization, transactions, and response serialization need their own boundaries. Otherwise database fields, business rules, and the mobile contract all become tied to one controller.
 
-## Persistence changes the meaning of success
+## I keep controllers at the transport boundary
 
-On Android, a successful response often looks like the end of an operation. On the server, success depends on whether the durable state changed as one coherent decision.
+Rails routes name operations and connect HTTP methods and paths to application behavior. Their conventions affect how clients interpret retries, caching, and failures:
 
-Suppose an operation updates two records and creates an audit entry. If the second update fails after the first commits, returning an error does not restore the previous state. A transaction defines the set of writes that succeed or fail together.
+- `GET` should read without changing durable state.
+- `POST` usually creates something or starts an operation.
+- `PATCH` changes part of an existing resource.
+- `DELETE` removes or deactivates a resource.
 
-Transactions also force a question about invariants. Which facts must always agree? Which can become eventually consistent? A database constraint can protect uniqueness or references even when two requests race. An application validation improves the error message, but it cannot replace the final durable guard.
+The design starts to fail when business decisions accumulate in controllers. Rules then depend on the whole web stack, become harder to test alone, and may be implemented differently when a second route needs the same behavior.
 
-Rails makes common persistence work concise. That convenience increases the need to see the SQL-shaped consequences: query count, lock duration, transaction scope, and the difference between loading one record and loading a collection one row at a time.
+I treat a controller as an adapter instead. HTTP input enters on one side, the controller invokes an application rule, and a clear application result becomes an HTTP response. The controller should not make the business decision itself.
 
-## Authentication is separate from authorization
+## Transactions changed what success means to me
 
-A backend first determines who sent the request. It then decides whether that identity may perform the operation.
+On Android, a successful response can look like the end of an operation. Rails showed me that server-side success also depends on whether durable state changed as one complete decision.
 
-Combining those questions creates vague errors and broad permissions. Authentication can establish a user or session. Authorization evaluates the requested action against ownership, role, state, and policy. A logged-in user can still be forbidden from changing a particular resource.
+Suppose an operation updates two records and creates an operation record. If the first update commits and the second fails, returning an error does not restore the earlier state. A transaction defines the writes that must succeed or fail together.
 
-The mobile client needs stable outcomes from both cases. An expired session may lead to a refresh or login flow. A forbidden action should remain forbidden after retry. Returning the same generic error for both makes the Android application guess and can trap it in an authentication loop.
+That distinction made me ask:
 
-Rails filters can enforce common authentication, but the resource-specific decision belongs close to the operation. The rule should be testable without constructing a browser request.
+- Which facts must always remain consistent?
+- Which states may become eventually consistent?
+- When two requests race, which rules must the database protect?
 
-## Serialization is a compatibility decision
+Application validation can provide a clearer error, but it cannot replace database constraints that protect uniqueness and references.
 
-A Rails model contains more information than a mobile response should expose. Returning model objects directly leaks database names, nullable details, internal states, and fields that become difficult to remove.
+Rails makes common persistence code concise, but that convenience can hide costs. I still need to examine the SQL-level result: query count, lock duration, transaction scope, and the difference between loading one record and loading a collection one row at a time.
 
-A response serializer gives the public contract its own shape. It can preserve a stable field while the storage model changes. It can omit sensitive values and make optionality explicit. It also becomes the place to review whether an old Android client can still understand the response.
+A successful transaction only means that persistent state changed atomically. The mobile client may still need a stable operation ID, explicit failure types, and queryable background status.
 
-The inverse path deserves the same care. Request parameters are untrusted input. The server should select accepted fields, validate meaning, and reject ambiguous operations before they reach persistence.
+## I separate authentication from authorization
 
-This seam lets both sides evolve. The database serves the current backend. The API serves several client generations.
+The server must first determine who sent a request and then decide whether that identity may perform the operation. These are separate questions.
 
-## Background work needs a visible state
+Authentication establishes a user or session. Authorization evaluates ownership, role, resource state, and policy. A logged-in user may still be forbidden from changing a particular resource.
 
-Some operations take longer than one request should remain open. The server may accept work, return an operation identifier, and process it later.
+Combining the two can produce vague errors or permissions that are too broad. Android needs stable, distinct outcomes:
 
-That changes the contract. The Android client needs to know whether the operation is queued, running, complete, failed, or safe to retry. A job system hidden behind a perpetual “processing” response gives the user no reliable next action.
+- An expired session may require credential refresh or another login.
+- A forbidden operation should remain forbidden after a retry.
 
-The durable record should outlive the worker process. Retried jobs need idempotent behavior or a guard against duplicate effects. Failure needs a state that support and clients can inspect.
+If both return the same generic error, the client has to guess and may repeatedly enter the authentication flow.
 
-I learned to view background work as another state machine, not as a thread detached from the request.
+Rails filters are useful for applying common authentication checks. Resource-specific authorization belongs close to the operation rule and should be testable without constructing a browser request.
 
-## Rails completed the interface
+## I treat serialization as a compatibility boundary
 
-Android showed me the consequences of backend decisions. Rails made the server path concrete: route, input adapter, application rule, transaction, and response adapter.
+A Rails model usually contains more information than a mobile response should expose. Returning model objects directly can leak database field names, nullability details, internal states, and fields that later become difficult to remove.
 
-The framework can generate much of that structure quickly. The engineering work is deciding what each layer promises. A clear server interface lets the mobile client act without guessing, while a clear client makes backend failures visible before they become user confusion.
+A response serializer gives the public API its own shape. It can:
+
+- keep fields stable while storage changes;
+- omit sensitive values;
+- make optional values explicit;
+- verify that older Android clients can still understand the response.
+
+The request path needs the same care. Parameters are untrusted input. The server should select accepted fields, validate their meaning, and reject ambiguous or invalid operations before they reach persistence.
+
+This boundary lets both sides evolve at different speeds. The database serves the current backend, while the API must serve several generations of clients.
+
+## I treat background work as a queryable state machine
+
+Some operations take too long to keep a request open. The server can accept the work, return an operation identifier, and finish processing it in the background.
+
+Moving work to a job does not solve the whole problem because it changes the client contract. Android needs to know whether the operation is:
+
+- queued;
+- running;
+- complete;
+- failed;
+- safe to retry.
+
+A job system that exposes only a permanent “processing” state gives neither the client nor the user a reliable next action.
+
+The operation state should be durable and outlive the worker process. Retried jobs need idempotent behavior or another guard against duplicate effects. Failure must become an explicit, queryable state that clients and support staff can inspect.
+
+I therefore see background work as another state machine with public transitions, not as a thread detached from the request.
+
+## The standard I retained
+
+Android showed me the consequences of backend decisions. Rails helped me divide the server path into clear boundaries: routing, input adaptation, authentication, authorization, application rules, transactions, response serialization, and background-job state.
+
+The approaches that fail are equally clear: putting business rules in controllers, relying on application validation instead of database constraints, mixing authentication with authorization, exposing models directly, and starting background work without queryable state. The correction is to give each layer a limited and explicit promise.
+
+Rails can generate much of this structure quickly, but engineering judgment still determines what each layer guarantees. A clear server contract lets a mobile client act without guessing, while clear client-side state handling exposes backend failures before they become user confusion.
+
+My resume lists Ruby and Ruby on Rails, but the available information does not establish when I learned each concept, which production systems used them, or which databases were involved. This is the technical model I formed from Rails, not a reconstruction of undocumented project experience.

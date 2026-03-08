@@ -9,115 +9,156 @@ featured: false
 order: 5
 ---
 
-I started this project expecting to size a radiator. I ended up rejecting the whole cooling layout.
+I only meant to size a radiator and decide whether to buy an existing radiator, fan, and pump combination. Instead, I rejected the entire passive E3 cooling layout.
 
-The important result did not come from CFD. It came from putting the requirements, pump curve, branch losses, radiator behaviour, and transient heat load in the same small model.
+The design case used 40 °C air, while the AMK KW26 inverter required coolant supply at or below 25 °C. No passive radiator could resolve that temperature contradiction.
 
-That model told me something a detailed duct simulation could never fix: our passive E3 architecture could not supply the inverter with coolant below its required temperature when the radiator inlet air was already 40 °C.
+The decisive result did not come from CFD. It came from a small system model that combined component requirements, the pump curve, parallel-branch losses, radiator behaviour, and transient heat load. I used it to check whether the temperature boundaries and operating points could all hold at once.
 
-## I did not begin with clean data
+![Cooling-system screening before CFD](/images/notes/systems/cooling-system-screen-before-cfd.svg)
 
-I inherited a legacy team report, a hardware shortlist, and numbers that looked precise: 520 W inverter heat, 2.736 kW for two motors, a generic radiator coefficient, and 40 °C ambient.
+The model exposed something a more detailed duct simulation could not fix: with 40 °C air entering the radiator, a passive system could not supply the inverter with coolant below 25 °C.
 
-My first job was to stop confusing precision with proof.
+## I first checked where the numbers came from
 
-I made a small claim register. Every input became one of four things:
+I inherited a legacy team report, a hardware shortlist, and several precise-looking numbers:
 
-- verified from a primary source;
-- produced by my own calculation;
-- an assumption kept for sensitivity; or
-- unknown and able to block a decision.
+- 520 W of inverter heat;
+- 2.736 kW from two motors;
+- a generic radiator coefficient;
+- 40 °C ambient air.
 
-That table changed the project before I wrote any model.
+Before modelling, I stopped treating precision as proof. I classified every input as:
 
-The 520 W inverter value, for example, came from $26\,\mathrm{kVA}\times2\%$. Apparent power is not the real operating point, and AMK does not publish a KW26 loss map for our exact torque, speed, and switching state. I kept 520 W as a scenario, not as a measured truth.
+- supported by a primary source;
+- calculated by me;
+- assumed only for sensitivity analysis; or
+- unknown and potentially able to block a decision.
 
-The motor data had a similar problem. AMK publishes total motor-loss maps, but total loss is not automatically the heat entering a custom water jacket. The coolant fraction remained unknown.
+That changed the direction of the work before the model was complete.
 
-## One requirement made the passive layout impossible
+The 520 W inverter value came from:
 
-The AMK documentation gave me usable boundaries:
+\[
+26\,\mathrm{kVA}\times2\%
+\]
+
+Apparent power is not the vehicle’s real operating point. AMK also does not publish a KW26 loss map for our specific torque, speed, and switching state. I therefore kept 520 W as one scenario, not as measured heat generation.
+
+The motor data had the same problem. AMK publishes total motor-loss maps, but total loss does not necessarily enter the custom water jackets. The fraction transferred to the coolant remained unknown.
+
+## The temperature boundary rejected the passive layout
+
+The AMK documentation provided several usable limits:
 
 - KW26 coolant supply at or below 25 °C;
-- at least 10 L/min total flow;
-- less than 5 K coolant rise;
+- at least 10 L/min total system flow;
+- less than 5 K coolant temperature rise;
 - each DD5 branch at or below 40 °C;
-- at least 4 L/min in each motor branch.
+- at least 4 L/min through each motor branch.
 
 Our design case used 40 °C air entering the radiator.
 
-A passive radiator cannot deliver coolant below the temperature of the air cooling it in steady state. That was the basic contradiction. The inverter wanted at most 25 °C; the available air was already 40 °C.
+In steady state, a passive radiator cannot cool its coolant below the temperature of the cooling air. Increasing radiator size, refining the duct, or running higher-fidelity CFD could not make 40 °C air deliver 25 °C coolant.
 
-I still completed the component model because I wanted to know whether hydraulics created another blocker.
+That contradiction was enough to reject the architecture. I still completed the component model to see whether the hydraulic system had other problems.
 
-## The pump and branch model passed—barely
+## I solved the installed pump operating point
 
-I digitised the available Boyd radiator, SPAL fan, and Pierburg CWA150 pump curves. I then solved the pump/system intersection instead of using the pump's free-flow number.
+I digitised the available curves for the Boyd radiator, SPAL fan, and Pierburg CWA150 pump. I then solved the intersection of the pump curve and system resistance curve instead of using the pump’s unrestricted free-flow value.
 
-The installed operating point was:
+The calculated operating point was:
 
 | Quantity | Result |
 |---|---:|
 | Total loop flow | 10.03 L/min |
-| Limiting motor branch | 4.16 L/min |
+| Limiting motor-branch flow | 4.16 L/min |
 | Pump delivery pressure | 1.61 bar |
-| Air point per radiator | 6.56 m³/min at 45.6 Pa |
-| Radiator outlet / KW26 inlet | 59.45 °C |
+| Air operating point per radiator | 6.56 m³/min at 45.6 Pa |
+| Radiator outlet / KW26 inlet temperature | 59.45 °C |
 
-The two flow requirements passed by very little. The temperature requirement failed by a huge margin.
+The total flow exceeded the 10 L/min requirement by only 0.03 L/min. The limiting motor branch exceeded its 4 L/min requirement by only 0.16 L/min. Both hydraulic limits passed narrowly, while the 59.45 °C KW26 inlet temperature was far above the 25 °C maximum.
 
-That made the decision simple: **do not buy this combination as the final passive E3 cooling system**.
+My procurement conclusion was direct: **do not buy this combination as the final passive E3 cooling system**.
 
-## I used a transient model to check the short-load story
+That did not prove that every candidate component was unusable. It only showed that this combination could not meet the system requirements in the current passive architecture.
 
-The team could still argue that thermal mass might carry a short peak. I added an 80-cell coolant model with 2.0 L of coolant and checked the energy balance, mesh size, and time step.
+## I checked whether thermal mass could absorb a short peak
 
-The numerical checks were comfortably smaller than the 0.1 K gate:
+The team could still argue that the coolant’s thermal capacity might carry a short peak even if the steady-state temperature failed. I built a transient model with 80 cells and 2.0 L of coolant, then checked its energy balance, spatial resolution, and time step.
 
-- 0.029 K change under spatial refinement;
-- 0.018 K change when the time step was halved;
-- $5\times10^{-14}$ W energy residual in the steady balance.
+I used 0.1 K as the threshold for meaningful numerical change. Every check was well below it:
 
-A legacy 10-second, 6 kW peak reached 68.18 °C maximum coolant. I kept that result as a sensitivity, not as validation of the real vehicle duty cycle.
+- spatial refinement changed the result by 0.029 K;
+- halving the time step changed it by 0.018 K;
+- the steady-state energy-balance residual was \(5\times10^{-14}\) W.
 
-The transient model made the NO-GO harder to dismiss. It also showed that the numerical method was not the reason for the thermal failure.
+Under a legacy 10-second, 6 kW peak case, the maximum coolant temperature reached 68.18 °C.
 
-## The next idea was not “buy a bigger radiator”
+I kept that result as a sensitivity study because the 10-second, 6 kW load had not been validated against a real vehicle duty cycle. It did not prove that the car would reach 68.18 °C in operation. It did show that short-term heat storage did not automatically rescue the layout, and that mesh or time-step error was not causing the thermal failure.
 
-Once the contradiction was clear, I separated the temperature levels.
+## I separated the inverter and motors into two temperature levels
 
-The inverter needs a cold loop that may sit below ambient, so it needs active conditioning. The motors can tolerate a warmer passive loop. A two-temperature architecture therefore makes more sense than forcing every component through one loop.
+After confirming the contradiction, I did not move straight to a larger radiator.
 
-I explored active branches with broad compressor, heat-exchanger, humidity, heat-leak, and coolant-partition assumptions. One screen passed numerically, but 36 application inputs were still missing. I treated it as a research direction, not a bill of materials.
+The inverter may require coolant below ambient temperature, so its low-temperature loop needs active conditioning. The motors can accept warmer coolant and can remain on a passive heat-rejection loop. A two-temperature architecture made more sense than forcing every component to share one temperature level.
 
-That distinction matters. A model can tell me which architecture deserves more work without approving hardware for purchase.
+I examined that direction in three stages:
 
-## What the references taught me
+- **E3** tested the existing passive architecture. The conflict between 40 °C ambient air and the 25 °C KW26 inlet limit rejected that architecture, but did not reject every candidate component.
+- **E7** split the system into an active low-temperature loop and a passive high-temperature loop. I swept 0.5–2.3 kW of evaporator capacity with different COP assumptions. Some cases closed the energy balance, but that was not enough to select a chiller.
+- **E8** used public catalogue data to build a steady-state reference and calculate the boundaries between feasible and infeasible fan performance, heat-exchanger UA, loop pressure loss, and DD5 heat load. It tested whether the equations closed with public data; it did not approve procurement or vehicle use.
 
-Several rules from this project now follow me into every system model:
+I also varied compressor performance, heat exchangers, humidity, heat leak, and the fraction of component heat entering the coolant over broad ranges. One active-cooling case passed the numerical screen, but 36 application-specific inputs were still missing. I treated it as a direction worth studying, not as a bill of materials.
 
-- A component rating belongs to its test condition. The KW26 “2 kW” cold-plate rating is not an inverter loss map.
-- Total motor loss is not the same as coolant heat.
-- A fan's free-air flow is not the installed airflow through a core and duct.
-- A product-page maximum is not a system operating point.
-- Missing measurements stay visible instead of being replaced with a confident guess.
+Five interacting variable groups in E8 also showed why separate one-variable limits could not be combined into a feasible system. A “last feasible point” found while changing one variable might be incompatible with the corresponding point from another sweep. The system model exposed those couplings instead of combining unrelated best cases.
 
-The missing-data list became part of the result: calorimetry, branch flow, absolute pressure, duty telemetry, and synchronised temperatures.
+## CFD should answer installation questions
 
-## Why I now screen before CFD
+Installation-level CFD becomes useful only after the system-level temperature, flow, and energy conditions can all hold together. It can then answer:
 
-CFD is useful after the system closes. It can answer where the air enters, how evenly it crosses the core, whether hot air recirculates, where a duct separates, and how cooling exits affect aerodynamics.
+- where the cooling air enters;
+- whether flow is uniform across the radiator core;
+- whether hot air recirculates;
+- where the duct separates;
+- how cooling exits affect aerodynamics;
+- how flow divides through frozen geometry.
 
-CFD should not be asked to rescue:
+CFD cannot create a missing heat load or rescue:
 
 - insufficient pump head;
 - a starved parallel branch;
 - an impossible coolant-temperature boundary;
-- a fan/core operating point that misses the requirement; or
-- a transient heat load that exceeds the system's stored energy and rejection capacity.
+- a fan/core operating point that misses the requirement;
+- a transient load beyond the system’s heat-storage and rejection capacity.
 
-Those are system problems first.
+Those conditions belong in the system model first. Otherwise, CFD only describes an impossible design in greater detail.
 
-The FSAE Cooling project still carries one deliberate limitation: several component curves came from secondary hosts and were biased conservatively. That is enough to reject the passive layout, but not enough to sign off a purchase.
+## The result could stop a purchase, but not approve one
 
-The lesson I kept is straightforward: **use the cheapest honest model to kill a bad architecture early, then spend CFD time on the installation details of the designs that survive.**
+Several component curves came from secondary sources, and I applied conservative biases to them.
+
+The available evidence was enough to reject the passive layout because the conflict between 40 °C air and 25 °C coolant did not depend on detailed component curves. It was not enough to approve new hardware or release a vehicle cooling system.
+
+Further design work still needed:
+
+- calorimetry;
+- branch-flow measurements;
+- absolute-pressure measurements;
+- real duty-cycle telemetry;
+- time-synchronised temperature data.
+
+The missing-data list was itself a model result. I preferred to state what remained unknown rather than replace it with a plausible-looking guess.
+
+## The rules I kept
+
+This work left me with several rules that I now carry into other system models:
+
+- A component rating only applies under its stated test conditions. The KW26 cold plate’s “2 kW” rating is not an inverter loss map.
+- Total motor loss is not the same as heat transferred to the coolant.
+- A fan’s free-air flow is not its installed flow through a core and duct.
+- A product-page maximum is not a system operating point.
+- Missing measurements must stay visible instead of being replaced by a confident guess.
+- Showing that an architecture deserves more study is not the same as approving hardware for purchase.
+
+The lesson was simple: **use the cheapest honest model to eliminate an impossible architecture early, then spend CFD time on the installation details of designs that remain feasible.**

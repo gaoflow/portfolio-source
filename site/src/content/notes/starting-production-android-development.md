@@ -1,59 +1,77 @@
 ---
-title: 'Starting Production Android Development'
+title: 'My Code Standard Changed When I Started Building Production Android Apps'
 published: 2026-08-25
-summary: 'I began working on production Android software in Beijing in August 2016. The lasting lesson was that application code has to survive change: devices, releases, network failures, and engineers who were not present when it was written.'
+summary: 'After I began building Android products in August 2016, compiling and running were no longer enough. Code also had to handle lifecycle interruptions, old data, network failures, multiple client versions, and maintainers unfamiliar with the original implementation.'
 tags: [Android, Software Journey]
 sourceProjects: []
 featured: false
 order: 101
 ---
 
-I began the software-career period documented in this series in Beijing in August 2016. Production Android work changed the standard I used to judge code: compiling was only the entry condition. The application also had to remain understandable after requirements, devices, dependencies, and people changed.
+In August 2016, I began working on production Android development in Beijing. I quickly learned that personal programs and real products have different standards for completion.
 
-I do not have a preserved account of one dramatic first release, so I will not manufacture one. What I can describe is the engineering shift. A private program can assume a clean start and a patient author. A mobile product runs on hardware I do not control, receives data I did not create, and keeps state longer than the code that produced it.
+A personal program can be good enough once it runs on my device. A production app runs across devices, system versions, and unreliable networks. It also has to handle old data and multiple client versions.
 
-## The device owns part of the program
+I do not have a preserved account of a dramatic first release, so I will not invent a specific incident. What I can document is how I changed my definition of finished code.
 
-An Android application shares control with the operating system. The system can pause an activity, recreate a screen, restrict background work, revoke a permission, or remove a process. The user still expects the same task to continue.
+## Android does not give the app full control
 
-That changes how I think about ownership. A screen cannot be the only owner of information that must survive the screen. A callback cannot assume that its original view still exists. A background operation cannot depend on a component whose lifetime is shorter than the operation.
+The system can pause an activity, recreate a screen, restrict background work, revoke permissions, or terminate the process. The user still expects to continue the same task.
 
-These rules sound obvious when written down. They become useful only when they shape the code. State needs an explicit owner. Work needs a lifetime. Every transition needs a defined result when the destination has disappeared.
+A screen therefore cannot be the only owner of important state. A network callback cannot assume its original view still exists. Background work cannot depend on a component with a shorter lifetime.
 
-## Inputs are part of the design
+I began requiring explicit ownership for every piece of state and work: who keeps it, how long it can live, where its result goes if the destination disappears, and what minimum input is needed for recovery.
 
-Production code accepts input from more places than a method signature suggests. It receives server responses, stored values from older versions, deep links, user text, device settings, locale choices, permissions, and timing.
+![Production Android delivery boundaries](/images/notes/systems/starting-production-android-development.svg)
 
-I learned to treat those inputs as part of the module interface. A field can be absent. A request can finish after the user leaves. A stored enum can contain a value introduced by a later version. The safe question is not “does this work with my sample?” It is “what happens when one assumption is false?”
+## External input is also an interface
 
-This does not mean wrapping every line in defensive code. It means putting validation at the seam where uncertain data becomes application state. Past that seam, the rest of the module should be allowed to rely on a smaller set of invariants.
+Android code receives more than method parameters. It also receives server responses, stored data from older versions, deep links, user text, permissions, locale settings, and results that may arrive at unexpected times.
 
-## Small boundaries make change cheaper
+Fields can be missing. Requests can finish after the user leaves. Old storage can contain values the new version no longer recognizes.
 
-A mobile application built over years cannot keep every early decision. Libraries change. Platform rules change. Product language changes. Backend responses evolve. The code remains workable when those changes stop at a narrow boundary.
+I moved validation to the boundary where uncertain input becomes application state. Beyond that boundary, feature code should rely on simpler, more stable internal values instead of repeatedly interpreting raw data in every screen.
 
-I came to value modules that hide their storage, transport, or platform details. A screen should ask for a result instead of assembling a network request. A feature should depend on a stable domain value instead of the raw JSON shape. A caller should not need to know whether data came from memory, disk, or a server.
+## Small boundaries make long-term change easier
 
-This is less about architecture diagrams than about reducing the number of places that must change together. If a backend field rename requires edits across several screens, the transport shape has leaked. If a dependency upgrade touches every feature, the dependency has no adapter. Production pressure exposes these leaks because each scattered edit creates another opportunity for disagreement.
+Backend fields, libraries, platform rules, and product language all change. If raw JSON flows directly into several screens, one renamed field can require changes across the app.
 
-## Releaseability belongs inside the code
+I came to value small adapter boundaries. A screen asks for a result instead of assembling a network request. A feature uses domain values instead of transport structures. A caller does not need to know whether data came from memory, disk, or a server.
 
-A feature is incomplete when the only safe deployment plan is “hope the new version works.” Mobile releases have long feedback loops. Users update at different times, and some keep old versions for months. A server may have to support several client generations at once.
+The goal is not a more elaborate architecture diagram. It is to reduce the number of places that must change together.
 
-That reality affects implementation. New behavior needs a safe default. Stored data needs a migration path. A partial rollout needs a way to disable a feature without waiting for another store review. Logs and error reports need enough context to distinguish a code defect from a device, version, or data problem.
+## Releases and rollback belong in the design
 
-I later worked on release automation across Android and iOS, but the principle starts earlier: code should be designed to enter and leave production safely. Packaging automation cannot rescue a feature that has no fallback or compatible data path.
+Mobile users do not all upgrade on the same day. Some remain on old versions for a long time, so a server may need to support several client generations at once.
 
-## Readability is operational work
+New behavior needs safe defaults. Stored formats need migration paths. A staged rollout needs a way to disable a feature. Error logs need device, version, and input context.
 
-Readable code is sometimes described as a courtesy to future maintainers. In a production application it also reduces recovery time. When an error reaches users, the engineer reading the module needs to locate the failed assumption before making the next release worse.
+I later worked on release automation for Android and iOS, but the same limit remained: automated packaging cannot make a feature safe when it has no compatible path or rollback plan.
 
-Names should expose state and intent. Side effects should be visible. Error handling should end in a defined state rather than a swallowed exception. Comments should explain a constraint that the code cannot express, not repeat the code in another language.
+## Readability affects recovery
 
-The same standard applies to code I wrote myself. Memory is not documentation. A module that only makes sense while its author remembers the surrounding conversation is already carrying debt.
+When a production problem appears, the next engineer needs to find the failed assumption quickly. Names should expose state and intent. Side effects should be clear. Errors should lead to defined states instead of being swallowed.
+
+This applies to my own code too. Memory is not documentation. If a module only makes sense while its author remembers the original discussion, it already carries maintenance debt.
+
+## Four questions I keep for production features
+
+Every feature should answer at least these questions:
+
+1. Where does the input come from?
+2. Who owns the state?
+3. How does it recover after a system interruption?
+4. How does failure become a result the user can understand and continue from?
+
+| Scenario | Unsafe approach | Clearer approach |
+|---|---|---|
+| Screen rotation | Restart the request with the activity | Give the work to a stable state owner |
+| Process death | Keep the only copy of state in memory | Persist the minimum input needed for recovery |
+| Network change | Treat a timeout as a business failure | Distinguish an unknown result from an explicit rejection |
+| Old client version | Assume the API and app ship together | Use compatible defaults and capability checks |
+
+These are engineering rules I developed later, not evidence of one specific incident.
 
 ## The standard I kept
 
-Production Android development taught me to evaluate code over time. The useful unit is not one successful execution. It is the path from uncertain input, through state changes and platform interruptions, to a release that another engineer can inspect and change.
-
-That standard followed me into larger features, backend work, delivery automation, and team leadership. The technologies changed. The question remained stable: when the environment stops matching the happy path, does the code still make its decision clearly?
+Production Android taught me to evaluate code over time. One successful call is not enough. A user path should remain understandable, recoverable, and changeable through input changes, lifecycle interruptions, release upgrades, and handoffs between engineers.

@@ -8,64 +8,97 @@ featured: false
 order: 110
 ---
 
-A backend can replace its code in one deployment. A mobile application cannot replace every installed client at once. API design for Android therefore includes a period when old and new clients use the server together.
+A backend can replace its code in one deployment, but a mobile application cannot replace every installed client at once. An Android API change can create a compatibility window lasting months. During that time, old and new clients share the server, which may itself be rolling out multiple versions.
 
-My mobile work gives me the client side of this problem, while my listed backend skills give me the server vocabulary. I do not have a preserved account of one migration, so this article states the compatibility rules rather than inventing an outage.
+My long Android experience gives me the client view of this problem, while my listed backend skills give me the server terminology. I do not have a preserved record of one complete API migration, so I will not present a specific failure, fix, or result as my own experience. These are the compatibility rules I retain.
 
-## Add meaning before removing it
+## Define the compatibility window first
 
-The safest API changes expand what a client may understand without changing the meaning of what it already receives.
+![Compatibility window for old clients](/images/notes/systems/api-compatibility-for-old-clients.svg)
 
-An optional response field can be ignored by an old client. A new enum value is more dangerous because an old parser may reject it or fall into the wrong default. Changing a field from absent to `null`, or from `null` to an empty value, can alter UI behavior even when the JSON remains valid.
+The window is defined by both deployed servers and old clients that remain active. Before retiring a field or endpoint, I need to define its new meaning, compatible defaults, capability checks, and the data that will prove old callers are gone.
 
-Compatibility needs semantic review. For each field, ask what an old client does when the value is missing, unknown, empty, duplicated, or larger than expected. The transport type is only the first constraint.
+I do not ask only whether the new client works with the new server. I check every supported combination:
 
-On Android, a transport adapter should contain those decisions. Unknown values become an explicit `Unknown` state or a bounded fallback. Raw server enums should not spread into screens where each feature invents its own behavior.
+- old client with old server;
+- old client with new server;
+- new client with old server;
+- new client with new server;
+- different server versions running behind the same endpoint.
 
-## Requests need tolerant evolution too
+Compatibility works in both directions. The server must handle old clients that omit new fields and decide what to do with unknown fields from new clients. The client must handle missing response fields, expanded enums, and disabled capabilities.
 
-A new client may send fields that an old backend does not know. A rolling backend deployment can also place different server versions behind one endpoint.
+## Additive changes can still break clients
 
-The request parser should select accepted input and reject ambiguity. Silently accepting a field that the current server ignores can mislead the client into believing the operation used it. A response should make unsupported capability visible when it changes the result.
+A relatively safe change adds information without changing the meaning of existing information. An old client can often ignore an optional response field, but not every additive change is safe.
 
-Default values deserve care. A server-side default can preserve old clients, but only if it matches their previous behavior. Reusing a default to introduce a new policy silently changes existing applications.
+Old clients may fail when:
 
-Write operations also need idempotency where a retry can duplicate effects. Compatibility across versions is useless when a timeout causes the same action twice.
+- a new enum value is rejected or reaches the wrong default branch;
+- an absent field becomes `null`;
+- a `null` field becomes an empty value;
+- an existing field keeps its format but changes meaning;
+- a value is duplicated, unknown, or outside the expected range.
 
-## Version numbers are one tool
+For each field, I consider what happens when it is missing, unknown, empty, duplicated, or larger than expected. Valid JSON proves only that the transport format is valid, not that application behavior remains correct.
 
-A versioned path can separate incompatible contracts. It also creates parallel interfaces that need maintenance, monitoring, and a retirement plan.
+On Android, I keep these decisions in the transport adapter. Unknown values become an explicit `Unknown` state or a clearly bounded fallback. I do not let raw server enums spread through screens, where each feature could invent a different default.
 
-Small additive changes often fit one version when optionality and unknown values are designed well. A new version earns its cost when the resource meaning, authorization model, or operation semantics change enough that coexistence inside one contract becomes harder to explain.
+## Evolve requests gradually
 
-Client version is a weak capability signal. Two builds can share a version family while differing by platform, rollout, or configuration. When a feature depends on a specific behavior, an explicit capability handshake can be clearer than a large table of version comparisons.
+Responses are only half of the contract. A new client may send fields that an old backend does not recognize, and a rolling deployment may place different server versions behind one endpoint.
 
-The server should still record application version for diagnosis and retirement analysis. It should not trust that value for security decisions.
+A request parser should select accepted input and reject ambiguity. If a server silently accepts a field that it ignores, the client may believe that field affected the operation. When an unsupported capability would change the result, the response should state that it was not applied.
 
-## Feature flags need compatible off states
+A new request field can use a server-side default for old clients, but that default must match their previous behavior. Using the default to introduce a new policy silently changes existing applications. A new field should not become required immediately.
 
-A feature flag can stop new behavior without waiting for an application update. That works only when both states are valid for every active client.
+Writes also need safe retries. If retrying after a timeout can perform the same operation twice, field and version compatibility are not enough. Writes with duplicate effects need idempotency and an identifier that recognizes the same operation.
 
-The off state needs a defined UI result and data behavior. Turning off a write path while leaving cached controls visible creates repeated failures. Removing a response object may crash a client that assumed it always existed.
+## Add a version only for a truly incompatible contract
 
-Flags also need ownership and expiry. A permanent pile of overlapping flags creates contracts that nobody can enumerate. Each flag should name its audience, default, rollback behavior, and removal condition.
+A versioned path can isolate an incompatible contract, but it also creates parallel interfaces that must be maintained, monitored, and retired.
 
-A server-controlled flag does not replace client safeguards. The application should still handle missing capability, rejected action, and stale cached state.
+Small additive changes can usually remain in one version when optional fields, defaults, and unknown values are designed clearly. A new version is worth the cost when resource meaning, authorization, or operation semantics change so much that old and new behavior can no longer coexist clearly.
 
-## Retirement requires evidence
+A client version number is only a weak capability signal. Two builds in the same version family may differ by platform, rollout group, or configuration. When a feature depends on specific behavior, I prefer an explicit capability handshake to a large table of version comparisons.
 
-An old contract can be removed only when its callers are gone or an explicit business decision accepts the remaining impact.
+The server should still record application versions for diagnosis and retirement decisions. It must not trust a client-supplied version for security decisions.
 
-Download counts do not prove active use. Server records can show requests by application version and endpoint. The measurement window must be long enough to include infrequent users, and the identifier must remain privacy-conscious.
+## Give every feature flag a safe off state
 
-Retirement then follows a sequence: stop creating new dependencies, announce the boundary where relevant, measure remaining traffic, reject or redirect in a controlled way, and remove the compatibility code after the old path is quiet.
+A feature flag can stop new behavior without waiting for an application update, but only if every active client works correctly with the flag both on and off.
 
-The client needs its own cleanup. Parsers, flags, and fallback branches that no longer serve an active version should disappear. Compatibility code without a retirement rule becomes permanent ambiguity.
+The off state needs defined UI and data behavior:
 
-## Compatibility is shared state
+- If the write path is disabled while cached controls remain visible, users will repeatedly encounter failures.
+- If a response object disappears while an old client assumes it exists, the application may crash.
+- If a capability is unavailable, the client needs a clear alternative state instead of repeatedly attempting an impossible action.
+
+Each flag should define its audience, default, rollback behavior, owner, expiry, and removal condition. Permanent, overlapping flags eventually create contracts that nobody can fully explain.
+
+A server-controlled flag does not replace client safeguards. The application must still handle missing capabilities, rejected operations, and stale cached state.
+
+## Prove old callers are gone before removal
+
+I cannot infer retirement from release dates or download counts. Downloads do not prove active use, and a release date does not mean every user has updated.
+
+Server records can show endpoint requests by application version. The measurement window must be long enough to include infrequent users, and any identifier used for measurement must respect privacy.
+
+I remove an old contract only when its callers are gone or the business explicitly accepts the remaining impact. The sequence is:
+
+1. Stop creating new dependencies on the old contract.
+2. Announce the support boundary where appropriate.
+3. Measure the remaining traffic to the old path.
+4. Reject or redirect requests in a controlled way.
+5. Confirm that the old path receives no more traffic.
+6. Remove the server-side compatibility code.
+
+The client also needs cleanup. Parsers, feature flags, and fallback branches should be removed once they no longer serve any active version. Compatibility code without a retirement rule becomes permanent ambiguity.
+
+## Treat compatibility as shared state
 
 An API is shared state between server deployments and installed applications. Neither side can change its interpretation alone.
 
-The backend owns stable semantics and observable retirement. The Android client owns tolerant parsing, explicit unknown states, and safe fallbacks. Both sides need operation identity and diagnosable versions.
+The backend must provide stable semantics, compatible defaults, and a measurable retirement process. The Android client must parse responses tolerantly, represent unknown states explicitly, and provide safe fallbacks. Both sides need operation identifiers and version information that supports diagnosis.
 
-This view changed how I evaluate an API change. The question is not whether the new client and new server agree. It is whether every supported pairing can still make a correct decision during the transition.
+The standard I retain is not merely that the new client and new server agree. Every supported combination must continue making correct decisions throughout the transition. Versions and feature flags are tools; compatibility depends on field meaning, default behavior, capability checks, idempotency, and evidence-backed retirement rules.

@@ -1,71 +1,80 @@
 ---
-title: 'Android Lifecycle Rules in Production Code'
+title: 'I Treat Android Lifecycle Problems as Ownership Problems'
 published: 2026-08-25
-summary: 'Android can replace a screen or process while the user still thinks the same task is open. The engineering response is explicit ownership: state, asynchronous work, and resources must each have a lifetime that the code can explain.'
+summary: 'Activities, Fragments, and processes can disappear before a task finishes. I handle lifecycle problems by giving the UI, state, asynchronous work, and persistent data owners whose lifetimes match their responsibilities.'
 tags: [Android, Kotlin, Software Journey]
 sourceProjects: []
 featured: false
 order: 105
 ---
 
-Android can destroy and recreate a screen while the user still believes the same task is open. Code that treats an Activity or Fragment as the task itself will eventually lose state, update a dead view, or retain resources beyond their useful life.
+A user may think they are still completing the same task even though Android has destroyed and recreated the screen—or terminated the entire process.
 
-My listed mobile stack includes Java and Kotlin, and the software period in this series began in 2016. I do not have a source-backed incident report for a particular lifecycle failure. The useful account is the model I use to reason about production Android code: every state value, operation, and resource needs an owner whose lifetime matches the work.
+When code treats an Activity or Fragment as the task itself, it can lose state, update a dead view, or retain resources longer than the screen.
 
-## A screen is a temporary projection
+I do not have a specific production lifecycle incident that I can cite, so I will not invent one. This is the ownership model I later adopted when reviewing Android code.
 
-A screen displays application state. It should not be the only place where durable task state exists.
+![Android ownership hierarchy](/images/notes/systems/android-lifecycle-in-production.svg)
 
-Configuration changes can recreate the UI. Navigation can remove it. The process can disappear while the application is in the background. If a user has selected values, loaded a result, or started a multi-step task, the code needs to decide which part survives each event.
+## The UI is a temporary projection of state
 
-Short-lived display details can stay with the view. State needed across recreation belongs in a longer-lived state holder. State needed after process death requires a serializable representation or persistent storage. State owned by the server should be fetched again or reconciled through a defined cache policy.
+The UI displays state. It should not be the only place where important state exists.
 
-The mistake is to make everything durable. Persisting transient state creates stale behavior and migration work. The design should classify state by the failure it must survive, then choose the narrowest owner that survives it.
+Short-lived visual details can stay in the view. Task state that must survive rotation or recreation belongs in a more stable state holder. Information that must survive process death needs a serializable representation or persistent storage.
 
-## Asynchronous work needs a lifetime
+That does not mean persisting everything. Persisting temporary state can create stale behavior and migration work. I first ask which interruption the state must survive, then choose the narrowest suitable owner.
 
-A request often outlives the gesture that started it. The user can navigate away, rotate the device, sign out, or start a newer request before the first one completes.
+## Asynchronous work does not automatically belong to the screen that started it
 
-The completion handler needs a rule for each case. If the work serves only the current screen, cancel it when that screen ends. If it serves a longer task, move ownership to a module with that lifetime. If a newer request supersedes it, discard the older result even if it returns last.
+A network request often outlives the gesture that started it. The user may leave the screen, rotate the device, sign out, or start a newer request.
 
-This is why a reference to a view inside a long-running callback is risky. The callback remembers an object whose lifecycle it does not control. A safer path publishes a result to a state owner; the current UI observes that state only while active.
+If work serves only the current screen, I cancel it when that screen ends. If it serves a longer task, I give the result to a longer-lived state module. If a newer request replaces an older one, I discard the older result even if it returns last.
 
-Coroutines make cancellation and structured ownership easier to express, but syntax does not choose the correct owner. Launching work in a convenient scope can still give it the wrong lifetime. The scope should follow the operation, not the nearest line of code.
+A long-running callback that directly holds a view is risky. A safer design writes the result to a state holder, while the active UI only observes that state.
 
-## Memory leaks are ownership errors
+Coroutines help express cancellation and structured scopes, but they do not choose the correct owner for me. The scope should follow responsibility for the task, not the nearest convenient line of code.
 
-A memory leak often means that a long-lived object holds a reference to something shorter-lived. A singleton stores an Activity. A listener remains registered after the screen ends. A delayed task captures a view. A cache retains an object whose contents should have been converted into a smaller value.
+## Memory leaks usually reveal mismatched lifetimes
 
-The garbage collector cannot repair an ownership rule that the object graph contradicts. The code must release the reference or move the required data into an object with the correct lifetime.
+A singleton holding an Activity, a listener left registered, or a delayed task capturing a view all have the same problem: a long-lived object references a shorter-lived one.
 
-This framing makes leak prevention more concrete. For every registration there is an unregister condition. For every callback there is a cancellation or staleness rule. For every cache there is a size and eviction policy. For every context reference there is a reason that its lifetime is safe.
+The garbage collector cannot fix an incorrect reference that is still reachable. The code must release it or copy only the required data into an object with the longer lifetime.
 
-Tools can reveal retained objects, but the fix comes from understanding why the reference remained reachable.
+I define an unregister condition for every registration, a cancellation or expiry rule for every callback, and a capacity and eviction policy for every cache. I also require every `Context` reference to explain why its lifetime is safe.
 
-## Process death is part of the contract
+## Process death needs a recovery policy
 
-Applications often test recreation but assume the process will remain alive. Android makes no such promise.
+After process death, singletons, caches, and other in-memory objects are gone. A restored screen may still receive navigation arguments or saved state while missing the dependencies of the original task.
 
-After process death, in-memory singletons and caches are empty. The restored screen may receive navigation arguments or saved state, but any object that existed only in memory is gone. Code that restores half of a task can be more dangerous than code that restarts it, because the interface looks valid while its dependencies are missing.
+A task can reload authoritative data from a small identifier, continue from persisted progress, or return the user to a safe starting point. The correct choice depends on the cost and meaning of repeating the operation.
 
-A production task needs an explicit restoration policy. It may reconstruct itself from small identifiers, reload authoritative data, resume from persisted progress, or return the user to a safe start. The right answer depends on the cost and semantics of repeating the operation.
+Sensitive information must not be placed in a general state bundle merely to restore the screen. Restoring the user journey and protecting credentials are separate boundaries that must both hold.
 
-Secrets and credentials need separate treatment. Saving UI state provides no reason to serialize sensitive values into a general state bundle. Restoration must preserve the security boundary as well as the user journey.
+## Tests must trigger lifecycle changes
 
-## Lifecycle tests should force transitions
+Lifecycle tests should not cover only launch-to-success paths. I deliberately test these transitions:
 
-A happy-path UI test rarely proves lifecycle behavior. The test has to trigger the transition the code claims to handle.
+- Recreate the screen after entering state.
+- Leave while a task is running.
+- Start two requests and deliver the older result last.
+- Restore using only persisted identifiers.
+- Sign out while a protected operation is waiting.
 
-Recreate the screen after entering state. Navigate away while work is active. Return after the result completes. Start two requests and deliver the older one last. Restore with only persisted identifiers. Sign out while a protected operation is waiting.
+I check user-visible outcomes: the latest result wins, an invalid screen is not updated, sensitive state disappears after sign-out, and a restored task either continues or restarts safely.
 
-These tests defend observable outcomes: the latest result wins, a removed screen is not updated, sensitive state disappears after logout, and a restored task either resumes correctly or restarts safely. They do not need to assert internal callback counts or framework details.
+## The ownership table I use
 
-The same scenarios improve code review. Instead of asking whether a scope or state holder is fashionable, ask which transition it survives and which result the user sees.
+| Object | Suitable owner | Common mistake |
+|---|---|---|
+| View / Activity | Current screen | Retained by a singleton or delayed task |
+| Screen task state | ViewModel or state container | Stored only in widget fields |
+| Login session | Application identity layer | Refreshed independently by every screen |
+| Long-running task | Persistent task scheduler | Depends on the initiating screen remaining alive |
 
-## Ownership is the lifecycle model
+## The standard I keep
 
-Android lifecycle callbacks describe platform events. They do not decide where application state belongs.
+Lifecycle callbacks describe platform events. They do not decide where state belongs.
 
-The design work is to align lifetimes. Screens own presentation. State holders own task state. repositories or stores own data access. Persistent storage owns only data that must survive the process. Long-running work lives with the task it serves.
+I align each object’s lifetime with its responsibility: the UI owns presentation, the state layer owns the task, a repository or store owns data access, and persistence holds only the minimum information that must survive process death.
 
-When those ownership rules are explicit, lifecycle events become ordinary transitions. When they are implicit, every callback becomes a chance for the application to contradict itself.
+When ownership is clear, rotation, background process death, and navigation become ordinary state transitions. When ownership is unclear, every callback can leave the application in a contradictory state.

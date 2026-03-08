@@ -8,60 +8,94 @@ featured: false
 order: 112
 ---
 
-I developed a mobile hotfix mechanism that enabled dynamic updates without waiting for the normal application-store cycle. The feature created a faster path into production, which also created a faster path to a large mistake.
+The normal application-store cycle can delay urgent fixes. I developed a mobile hotfix mechanism so the application could receive dynamic updates without waiting for every store release.
 
-The source record does not preserve the patch format, rollout service, supported code surface, or a failure incident. I will keep those details open. The design lesson is still clear: a hotfix system is a risk-control system before it is a delivery shortcut.
+This created a faster path into production—and a faster path to a serious mistake. The product could respond to problems sooner than the normal store cycle allowed, but the more important lesson was that a hotfix system is a risk-control system before it is a delivery shortcut.
 
-## Define the patchable surface
+The surviving material confirms only that I developed this dynamic update mechanism. It does not preserve the patch format, release service, supported code surface, coverage, or any failure incident. I therefore cannot claim that a specific incident occurred, describe corrective action taken at the time, or present the following principles as completed implementation details.
 
-A hotfix cannot safely replace arbitrary application behavior unless the runtime, state, and compatibility rules are equally arbitrary. A bounded patch surface is easier to validate and recover.
+## I treat hotfixing as a set of controlled states
 
-The system should state which modules, resources, or functions may change; which platform versions support the mechanism; and which changes always require a store release. Database schema, native interfaces, security policy, and startup code often carry wider consequences than an isolated business rule.
+![Controlled hotfix state machine](/images/notes/systems/hotfix-risk-control.svg)
 
-Each patch declares its target application versions and prerequisites. A client outside that range rejects it. Compatibility must be checked before loading code, not after a missing method or data shape reaches the user.
+Between download and activation, a patch should pass through immutable identification, integrity verification, and staging. Staged rollout stop conditions and an independent rollback path determine whether the faster route remains controlled.
 
-A smaller patch surface also improves review. Engineers can reason about the allowed dependencies and build focused verification around them.
+## I would limit what a patch can change
 
-## Patch identity must be immutable
+A hotfix cannot safely replace arbitrary application behavior unless its runtime, state, and compatibility rules are also unrestricted. A clearly bounded patch surface is easier to verify and recover.
 
-A patch needs a unique identity tied to its bytes, target, metadata, and approval. Reusing a version label for changed content destroys the audit trail and can make caches serve different code under one name.
+The system should define:
 
-The client verifies integrity before activation. A cryptographic signature can establish that an authorized release process produced the patch. A content hash detects corruption and gives logs a stable identifier. Transport security supports delivery but does not replace artifact verification.
+- which modules, resources, or functions may change;
+- which platform versions support hotfixes;
+- which changes must always use a store release.
 
-The release record should connect the patch to source, build inputs, tests, reviewer, target versions, and rollback plan. Secrets used to sign the patch remain outside the application package.
+Database schemas, native interfaces, security policy, and startup code usually have wider effects than an isolated business rule. A change should not enter the hotfix path merely because that path is faster.
 
-The loader should fail closed when identity or compatibility checks fail. Running the old code is safer than partially loading an untrusted update.
+Each patch should declare its target application versions and prerequisites. Clients outside that range must reject it. Compatibility checks should happen before code loads, not after a missing method or incompatible data shape has affected users.
 
-## Activation is a state transition
+A smaller surface also makes review more specific. Engineers can inspect the dependencies a patch may use and focus verification on them.
 
-Downloading a patch and activating it are separate operations. The application may fetch data in the background, validate it, stage it, and activate only at a safe boundary such as the next process start.
+## I would never reuse a patch identity for different content
 
-Atomic activation prevents half-old, half-new behavior. The system records the active patch and can tell whether startup completed. If the patch causes an early crash loop, the recovery path must run before the patched code repeats the failure.
+A patch needs an immutable, unique identity tied to its bytes, target versions, capability scope, metadata, and approvals. The same version label must not refer to different content. Otherwise, tracing becomes unreliable and caches may serve different code under one name.
 
-A last-known-good state gives the loader somewhere to return. Recovery data must be simpler than the patched runtime and stored where the failed patch cannot corrupt it.
+Before activation, the client should verify the patch:
 
-Cancellation also matters. A patch withdrawn before activation should never become active from a stale download or queued task.
+- A cryptographic signature confirms that it came from an authorized release process.
+- A content hash detects corruption and gives logs a stable identifier.
+- Transport security protects delivery but does not replace verification of the patch itself.
 
-## Rollout needs stop conditions
+The release record should connect the patch to its source, build inputs, tests, reviewers, target versions, and rollback plan. Signing keys must remain outside the application package.
 
-Sending a patch to every eligible device at once defeats the purpose of a controlled path. A staged audience limits exposure while the team compares observable behavior.
+If identity, compatibility, hash, or signature checks fail, the loader should reject the patch by default. Continuing with the old code is usually safer than partially loading an untrusted update. A hash or signature failure should also delete the staged content.
 
-The useful signals depend on the patch, but startup completion, crash categories, affected operation failures, and patch-loader errors are common. The rollout plan defines stop conditions before release. Watching a dashboard without a decision threshold is observation, not control.
+## I would separate download from activation
 
-The server should be able to stop distribution and mark a patch inactive. Clients need a refresh rule so they receive that decision promptly without turning every startup into a hard network dependency.
+Downloading a patch is not the same as activating it. The application can fetch data in the background, verify and stage it, then switch at a safe boundary such as the next process start.
 
-Rollback semantics need precision. Deactivating code does not automatically reverse data written by that code. A patch that changes durable state needs a compatible forward and backward path or must stay outside the hotfix surface.
+Activation should be atomic so old and new behavior do not run together. The system should record the active patch and detect whether the application completed startup successfully.
 
-## Hotfix does not replace release engineering
+If a patch causes repeated crashes early in startup, recovery must run before the patched code can trigger the failure again. The loader needs a last-known-good state and a way to return to it. Recovery logic should be simpler than the patched runtime, and its data should be stored where a failed patch cannot corrupt it.
 
-A hotfix still needs source control, review, deterministic build inputs, tests, signing, an artifact record, approval, and monitoring. Compressing the timeline cannot remove the evidence.
+Cancellation matters too. A patch withdrawn before activation must not later become active because a device retained a stale download or queued task.
 
-The normal store release remains the durable path for changes that alter platform contracts, native dependencies, permissions, schemas, or broad architecture. A successful hotfix should usually flow into the next regular version so future installations do not depend on an accumulated patch chain.
+Each critical check needs an explicit failure action:
 
-Patch chains multiply combinations. If patch C assumes patch B, while some clients skipped B or rolled back to A, the loader has become a package manager. Keeping the chain short reduces that state space.
+| Checkpoint | Failure action |
+|---|---|
+| Target version does not match | Reject the download |
+| Hash or signature fails | Delete staged content |
+| Staged-rollout metrics cross a limit | Stop expansion and roll back |
+| The patch prevents startup | Use the last-known-good version |
 
-## Speed is useful only when bounded
+## I would define stop conditions before expanding rollout
 
-The hotfix mechanism gave the product a way to respond faster than the store cycle. Its value came from the controls around that speed: narrow scope, immutable identity, verified activation, staged rollout, and an independent recovery path.
+Sending a patch to every eligible device at once defeats the purpose of controlled rollout. Expanding the audience in stages limits exposure and lets the team compare behavior before and after activation.
 
-A release pipeline asks whether an artifact deserves distribution. A hotfix pipeline asks the same question under greater time pressure. The answer still needs evidence.
+Useful signals depend on the patch, but common ones include:
+
+- whether startup completes;
+- whether crash categories change;
+- failures in the affected operation;
+- patch-loader errors.
+
+The rollout plan must define stop conditions before release. Watching a dashboard without decision thresholds is observation, not risk control.
+
+The server should be able to stop distribution and mark a patch inactive. Clients need a reasonable refresh policy so they receive that decision promptly without making every startup depend on the network.
+
+Rollback also needs a precise meaning. Deactivating patch code does not automatically undo data it has already written. A patch that changes durable state needs compatible forward and backward paths. If that is not possible, the change should remain outside the hotfix surface.
+
+## I would not use hotfixes to replace normal releases
+
+A hotfix still needs source control, review, deterministic build inputs, tests, signing, artifact records, approval, and monitoring. A shorter release timeline does not justify removing those steps.
+
+A normal store release remains the more reliable long-term path for changes involving platform contracts, native dependencies, permissions, frameworks, or broad architecture.
+
+A successful hotfix should usually be included in the next regular release so future installations do not depend on a growing patch chain. Patch chains quickly multiply possible states. If patch C depends on patch B while some clients skipped B or rolled back to A, the loader has effectively become a package manager. Keeping the chain short reduces that state space.
+
+## The standard I retained
+
+The hotfix mechanism gave the product a way to respond faster than the application-store cycle. That speed is useful only when bounded by a narrow patch surface, immutable identity, verified activation, staged rollout, explicit stop conditions, and a recovery path independent of the failed patch.
+
+A normal release process asks whether an artifact deserves distribution. A hotfix asks the same question under greater time pressure. The answer still has to come from verifiable information.

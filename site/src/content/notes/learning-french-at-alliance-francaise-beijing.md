@@ -8,64 +8,86 @@ featured: false
 order: 121
 ---
 
-From April 2023 through May 2024, I studied French full time at Alliance Française de Beijing. After nearly seven years of mobile development in the period documented here, I entered a field where I could not rely on production experience, a familiar toolchain, or the authority of being the person who knew the system.
+After nearly seven years of mobile development, I faced a problem that familiar tools and production experience could not solve. From April 2023 through May 2024, I studied French full time at Alliance Française de Beijing and had to become a beginner again.
 
-The available record does not preserve my course levels, teachers, classmates, examination dates, or individual classroom scenes. I will not invent them. What I can describe is the change in learning model: natural language gives feedback differently from code.
+In software work, I could rely on a familiar toolchain, background knowledge, and the authority of knowing the system. None of that could make me understand another person or express myself in French. I often had to say a sentence I was unsure about and let someone show me what it actually communicated.
 
-## Rules were necessary and insufficient
+The available record does not preserve my course levels, teachers, classmates, examination dates, or specific classroom events, so I will not add them. What I can describe is how my approach to learning changed and why natural language gives feedback differently from code.
 
-Software rewards explicit rules. A type system rejects some invalid states. A test can compare output with an expected result. A protocol can define which message is legal at each transition.
+## I relied too heavily on rules at first
 
-French also has rules, but correct grammar does not guarantee useful communication. A sentence can be structurally valid and still sound unnatural, carry the wrong emphasis, or arrive too slowly for conversation. A phrase learned as one mapping can change meaning with register, context, and tone.
+Software rewards explicit rules. A type system rejects some invalid states. Tests compare actual output with expected results. A protocol can define which messages are valid at each transition.
 
-I could study conjugation, agreement, word order, and vocabulary as systems. That helped me find patterns. It became limiting when I expected every expression to have one reversible rule.
+French also has rules. Studying conjugation, agreement, word order, and vocabulary as systems helped me recognize patterns. The limit was my early expectation that I could derive every expression from a rule.
 
-The adjustment was to treat examples as evidence, not noise around the rule. Repeated usage showed which structure belonged in which situation. The rule remained valuable, while listening and reading supplied its operating range.
+Correct grammar does not guarantee effective communication. A sentence can be structurally correct but still sound unnatural, carry the wrong emphasis, or arrive too slowly to keep a conversation moving. A phrase learned as a single mapping can also change meaning with register, context, and tone.
 
-## Feedback was less binary
+I corrected this by treating examples as evidence rather than noise around a rule. Repeated usage showed me which structures belonged in which situations. Rules remained useful, while listening and reading showed me their range.
 
-A compiler reports an error at a location. Human communication can succeed with several errors and fail with every word pronounced carefully.
+## I had to speak before I could get useful feedback
 
-This made feedback harder to classify. A correction might address grammar, pronunciation, rhythm, vocabulary, or the social meaning of the phrase. Fixing the visible error did not always fix the reason the listener hesitated.
+A compiler usually reports an error at a location. Human communication can succeed despite several errors, or fail even when every word is pronounced carefully.
 
-I learned to separate two questions. Did the other person understand the intended meaning? Which part of the expression should change before I use it again? Communication could continue after the first answer was yes, while study continued because the second answer still mattered.
+A correction might concern grammar, pronunciation, rhythm, vocabulary, or the social meaning of a phrase. Fixing the most visible error did not always resolve the listener’s hesitation.
 
-That distinction reduced the need to produce a perfect sentence before speaking. Silence protects correctness by avoiding evidence. Speaking creates the feedback needed for the next attempt.
+I began separating two questions:
 
-## Recall had to become immediate
+1. Did the other person understand what I meant?
+2. What should I change before using the expression again?
 
-Recognizing a word on a page is different from retrieving it during speech. Knowing a grammar explanation is different from applying it while listening to the next sentence.
+If the answer to the first question was yes, the conversation could continue. The second question kept the learning process moving.
 
-The gap is latency. Conversation does not wait while every rule is searched consciously. Frequent structures need to become available as chunks, and pronunciation needs enough repetition that the mouth does not reconstruct each sound from spelling.
+This distinction reduced the pressure to construct a perfect sentence before speaking. Silence can preserve the appearance of correctness by producing no evidence. Speaking creates the feedback needed for the next attempt.
 
-My engineering habits helped with this part. I could break a broad goal into a small operation, record recurring errors, revisit them after delay, and compare what I understood with what I could produce.
+![Language learning feedback loop](/images/notes/systems/learning-french-at-alliance-francaise-beijing.svg)
 
-Yet measurement needed restraint. A count of reviewed words says little about whether I can recognize them in connected speech or use them under pressure. The observable result is comprehension or expression in context.
+Language ability develops through exposure, immediate recall, real expression, and external correction. Rules can explain an error, but they cannot replace repeated use.
 
-## Listening removed my control of the input
+## I practised four skills separately
 
-When I read code, I can stop, inspect a definition, and return. Listening arrives once, at someone else's speed, with reductions and connections that do not match isolated dictionary forms.
+Reading, listening, speaking, and writing share vocabulary, but they have different bottlenecks.
 
-The first task is often to keep the structure of the message even when one word is missing. Chasing the missed word can erase the rest of the sentence. Prediction from context, verb tense, connectors, and topic becomes part of comprehension.
+| Skill | Main feedback |
+|---|---|
+| Reading | Recognition and inference in context |
+| Listening | Processing connected speech, reductions, and one-time input |
+| Speaking | Immediate recall under time pressure |
+| Writing | Producing accurate language that can be reviewed and rewritten |
 
-This was another departure from debugging. An unknown token in a program may block the exact interpretation. Human language carries redundancy. Partial evidence can still support the intended meaning, and conversation can repair uncertainty with a question.
+Writing gave me time to inspect agreement and sentence structure. Speaking exposed problems with retrieval and pronunciation. Listening tested whether I could segment speech and keep up with its speed. Reading expanded the examples available for later expression.
 
-Accepting partial comprehension was practical. It also required humility: understanding the subject was not the same as understanding every claim.
+Some engineering habits still helped. I broke broad goals into smaller actions, recorded recurring errors, reviewed them after a delay, and compared what I could understand with what I could express. These methods were useful, but knowing more rules did not guarantee that I could apply them during a live conversation.
 
-## Progress came from exposure and correction
+## I had to turn knowledge into immediate recall
 
-I could organize study, but I could not design away the need for repeated contact with the language. Reading, listening, speaking, and writing exposed different weaknesses.
+Recognizing a word on a page is different from retrieving it while speaking. Understanding a grammar explanation is different from applying it while listening to the next sentence.
 
-A written exercise gives time to inspect agreement and sentence structure. Speech reveals retrieval and pronunciation. Listening tests segmentation and speed. Reading expands the examples available for later production.
+The difference is latency. Conversation does not wait while I consciously search every rule. Common structures need to become available as chunks. Pronunciation needs enough repetition that I do not reconstruct every sound from spelling.
 
-The useful loop was simple: attempt, receive evidence, isolate one recurring problem, practise it in context, and attempt again. The loop resembles engineering in structure, while the evidence remains human and variable.
+This also taught me to measure progress carefully. A count of reviewed words does not show whether I can recognize them in connected speech or use them under pressure. The observable result is whether I can understand or express something in context.
 
-My current resume lists French at B2/DELF B2, but the record does not date that qualification. I therefore do not use it as an outcome of this specific period. The defensible fact is the full-time study itself from April 2023 through May 2024.
+## Listening forced me to accept partial understanding
 
-## Becoming a beginner again
+When I read code, I can stop, inspect a definition, and return. Spoken language usually arrives once, at someone else’s speed, with reductions and connections that do not always match isolated dictionary forms.
 
-The most valuable change was accepting low authority. In mobile development I could draw on years of accumulated context. In French, I often had to form an uncertain sentence and let another person show me what it actually communicated.
+At first, I tended to chase a word I had missed and then lose the rest of the sentence. I corrected this by preserving the overall structure of the message and using context, verb tense, connectors, and topic to predict what I had not heard.
 
-That experience changed how I approach later technical learning. Familiar problem-solving habits remain useful, but a new field decides what counts as evidence. I can bring discipline to the work. I cannot bring the conclusion with me.
+This differs from debugging. An unknown token in a program may block an exact interpretation, but human language contains redundancy. Partial evidence can still support a reasonable understanding, and I can ask a question to resolve uncertainty.
 
-The French-study period ended in May 2024. The available sources do not document the interval from June 2024 to the start of my later studies, so this series stops here rather than filling the gap with a polished story.
+Accepting partial comprehension was practical, but it also required humility. Understanding the subject did not mean that I had understood every claim.
+
+## Progress required repeated attempts and external correction
+
+I could organize my study, but I could not design away the need for repeated contact with French. The useful cycle was simple: attempt something, receive evidence, isolate one recurring problem, practise it in context, and try again.
+
+The cycle resembled engineering practice, but the feedback came from people and changed with context. Test scores for individual exercises could not replace real output and external correction.
+
+My current résumé lists my French as B2/DELF B2, but the available record does not give the date of that qualification. I therefore do not present it as an outcome of this full-time study period. What I can confirm is that I studied French full time at Alliance Française de Beijing from April 2023 through May 2024.
+
+## I learned to be a beginner again
+
+The most valuable change was accepting that I lacked authority. Familiar problem-solving habits still helped, but a new field defined its own evidence. I could bring discipline to the work, but not my existing conclusions.
+
+I retained that standard in later technical learning: first observe how the new field provides feedback, then decide which old methods still apply. I no longer assume that every problem can be approached like a software system.
+
+This period of French study ended in May 2024. The available material does not document the interval from June 2024 to the start of my later studies, so my account stops here rather than filling the gap with a polished story.

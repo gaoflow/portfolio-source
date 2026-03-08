@@ -8,60 +8,95 @@ featured: false
 order: 113
 ---
 
-I integrated React Native into a mature Android application. The decision did not turn the product into a new application; it added a second runtime, packaging path, and UI model inside a system that already had users and native behavior.
+I needed to add React Native to an Android product that already had users and stable native behavior, not build a new application from scratch. The main risk was introducing a second runtime, packaging path, and UI model without a clear boundary. If that boundary stayed vague, JavaScript would depend on Android lifecycle, threading, permissions, and build details, while the existing application would be pulled into a second architecture.
 
-The available record does not identify which screens moved, how large the bundle became, or how performance changed. The useful account is the integration seam: what stays native, what crosses the bridge, and how either side fails without taking the whole product with it.
+I kept the seam narrow: native code retained platform capabilities and recovery, the bridge exposed a small versioned interface, and React Native owned its UI and screen state. Both toolchains still had to meet the same product standard.
 
-## Start with a bounded surface
+![React Native integration boundary](/images/notes/systems/react-native-in-a-mature-android-app.svg)
 
-A hybrid integration is easier to control when it begins with a feature whose inputs, outputs, and navigation are clear. A screen deeply coupled to camera state, audio processing, background work, or custom rendering creates a broad bridge and many lifecycle assumptions.
+## I limited the initial React Native surface
 
-The candidate surface should have a stable data contract and a native fallback or exit. React Native can own its view state and presentation while asking native modules for platform capabilities through narrow operations.
+I started with UI whose inputs, outputs, and navigation could be defined clearly. I avoided areas deeply coupled to camera state, audio processing, background work, or custom rendering because they would widen the bridge and force JavaScript to understand too many Android lifecycle assumptions.
 
-This is a product boundary as well as a code boundary. Navigation into the surface, return values, analytics meaning, accessibility, and error handling need the same definition on both sides.
+A suitable hybrid surface needed:
 
-Starting narrow also makes the comparison honest. The team can observe startup, interaction, memory, package cost, and release behavior before expanding the integration.
+- a stable data contract;
+- clear entry and exit paths;
+- a native fallback;
+- a limited set of platform operations;
+- shared definitions for navigation, return values, and errors.
 
-## The bridge is a versioned interface
+React Native could manage its own view state and presentation. When it needed a platform capability, it had to request a specific operation from a native module. Navigation into the surface, return values, analytics meaning, accessibility, and error handling also needed the same definition on both sides.
 
-JavaScript should not reach arbitrary native classes. Native modules should expose a small set of operations with serializable inputs, explicit results, and documented thread behavior.
+Keeping the first surface small made startup time, interaction behavior, memory use, package cost, and release behavior easier to compare. I do not have validated results for those measures, so I treated them as gates to check before expanding the integration, not as completed improvements.
 
-Every bridge call needs a version assumption. The JavaScript bundle and native application may update through different paths, especially when dynamic delivery is available. A new bundle cannot assume a native method exists on every installed version.
+## I made the bridge a versioned capability interface
 
-Capabilities can be negotiated at startup. The native host reports supported operations or an interface version. JavaScript chooses a compatible path and rejects unsupported behavior before the user reaches it.
+I did not allow JavaScript to reach arbitrary native classes. The bridge exposed a small set of operations with serializable inputs, explicit results, and documented threading behavior.
 
-Errors also cross the bridge as stable categories. Passing a native stack trace to JavaScript leaks implementation and leaves the UI guessing. The native adapter can preserve the detailed log locally while returning a bounded error and recovery action.
+```text
+JS feature → Capability v2 → Android adapter → platform API
+           ← typed result / failure ←
+```
 
-## Lifecycle ownership must be singular
+Thread switching, permission handling, Activity callbacks, and resource cleanup stayed inside the Android adapter. React Native remained responsible for its rendering tree and screen state. If every JavaScript screen had to understand Activity lifecycle, thread changes, or Gradle variants, the bridge was not providing a real boundary.
 
-Android owns the process, Activity, permissions, and many external callbacks. React Native owns its rendering tree and JavaScript state. A feature becomes unreliable when both sides believe they own the same transition.
+Every bridge call also carried a version assumption. The JavaScript bundle and native application could update through different paths, especially with dynamic delivery. A new bundle could not assume that every installed application version already contained a native method.
 
-Permission requests are one example. JavaScript can request a capability, but the native host should coordinate the platform dialog and deliver one result to the active caller. Navigation away or host recreation must cancel or reconnect that request through a defined rule.
+The native host could report its supported operations or interface version at startup. JavaScript then selected a compatible path and rejected unsupported actions before the user invoked them. I also treated the bridge version as part of both the release manifest and the runtime capability check.
 
-The same applies to authentication, deep links, push notifications, and background events. Native code can convert the platform event into an application event. React Native consumes it only when its surface is ready, with buffering or expiry controlled at one seam.
+Errors crossed the bridge as stable categories. Passing a native stack trace directly to JavaScript would expose implementation details without telling the UI whether to retry, exit, or inform the user. The Android adapter kept detailed logs and returned only a bounded error type with a recovery action.
 
-Listeners need symmetric registration and cleanup. A bridge that keeps an abandoned JavaScript callback can retain state and deliver events to a screen that no longer exists.
+## Each lifecycle state had one owner
 
-## Packaging creates another compatibility matrix
+Android owned the process, Activity, permissions, and external platform callbacks. React Native owned its rendering tree and JavaScript state. The design became unreliable if both sides believed they controlled the same transition.
 
-A React Native feature adds JavaScript, assets, native dependencies, and build configuration. The Android artifact now has to prove that those parts agree.
+Permission handling was a clear example. JavaScript could request a capability, but the native host coordinated the platform dialog and returned one explicit result to the caller that was still active. If the user left the screen or the host was recreated, the request had to be cancelled or reconnected according to a predefined rule.
 
-A bundled JavaScript version should be recorded with the native build. If the product supports dynamic bundle updates, the loader must verify signature, target native versions, integrity, and rollback state. The hotfix controls apply because a JavaScript update can change production behavior.
+I applied the same ownership rule to authentication, deep links, push notifications, and background events. Native code first converted a platform event into an application event, then delivered it when the React Native surface was ready. One seam decided whether an event was buffered or expired; the two runtimes did not make separate decisions.
 
-Native dependency upgrades remain store releases. JavaScript cannot import a native capability that is absent from the installed binary. This is why the bridge version belongs in both the release manifest and runtime capability check.
+Listener registration and cleanup also had to be symmetric. An abandoned JavaScript callback could retain state and send events to a screen that no longer existed. More callbacks would not correct that failure. Explicit ownership, invalidation rules, and cleanup timing would.
 
-Package size and startup cost need measurement on the actual artifact. The source record does not contain those results, so I treat them as required gates rather than completed claims.
+## Packaging added another compatibility problem
 
-## Two toolchains need one product standard
+A React Native feature added JavaScript, assets, native dependencies, and build configuration. The Android artifact now had to prove that all of those parts matched.
 
-React Native can shorten some UI development paths, but it also introduces JavaScript tests, native integration tests, dependency review, and debugging across two runtimes.
+The JavaScript version shipped with a native build needed to be recorded. If the product supported dynamic bundle updates, the loader had to verify:
 
-The team needs one definition of done. A feature must pass its JavaScript behavior checks, native bridge tests, packaged-artifact smoke test, accessibility review, and failure-path verification. A green JavaScript test does not prove that the Android host can load the bundle or survive process recreation.
+- the signature;
+- the target native version;
+- file integrity;
+- rollback state.
 
-Ownership should follow the module rather than the language. The engineer changing a hybrid feature is responsible for its full interface, including native behavior and release compatibility.
+A JavaScript update could change production behavior, so dynamic bundles needed the same controls as native hotfixes.
 
-## Hybrid works when the seam stays small
+Native dependency upgrades still required an application-store release. JavaScript could not call a native capability that did not exist in the installed binary. Packaging checks therefore needed to cover the bundle, native dependencies, resources, and the mapping between JavaScript and native interface versions.
 
-Integrating React Native taught me to judge cross-platform code by the native knowledge it forces callers to carry. A useful module hides most platform machinery behind a small capability interface. A weak integration exposes lifecycle, threading, build, and version details everywhere.
+Package size and startup cost had to be measured from real build artifacts. I can confirm that I completed the React Native integration, but the available information does not identify the migrated screens, bundle growth, startup change, memory change, overall performance effect, or migration percentage. Those remain validation gates rather than results I can claim.
 
-The goal was never to erase Android. It was to let a bounded surface evolve through React Native while the host preserved platform authority, compatibility, and recovery. That arrangement can remain maintainable. A bridge without those limits becomes a second application architecture leaking through the first.
+## Both toolchains followed one completion standard
+
+React Native could shorten some UI development paths, but it also added JavaScript tests, native integration tests, dependency review, and debugging across two runtimes.
+
+I used one completion standard for the whole feature:
+
+- JavaScript behavior checks;
+- native bridge tests;
+- smoke tests against the packaged artifact;
+- accessibility review;
+- failure-path verification;
+- recovery checks after process or host recreation.
+
+Passing JavaScript tests did not prove that the Android host could load the bundle or recover after process recreation. A successful native build did not prove that JavaScript was using a compatible capability version.
+
+Ownership followed the module rather than the language. An engineer changing a hybrid feature needed to own its full interface, including JavaScript behavior, native behavior, and release compatibility.
+
+## The result was a narrow, maintainable seam
+
+I completed the React Native integration inside the mature Android application. It did not replace the product or turn it into a new application. It added a second runtime, packaging path, and UI model while the Android host retained platform control, compatibility, and recovery. React Native surfaces could evolve through versioned capabilities.
+
+I do not have source-backed data for specific screens, bundle size, startup speed, memory use, overall performance, or migration percentage. I also have no record of a specific production incident and correction, so I cannot present one as part of the outcome.
+
+The retained lesson is simple: judge a cross-platform boundary by how much native knowledge it forces callers to carry. A useful module hides most platform machinery behind a small capability interface. A weak integration exposes lifecycle, threading, build, and version details throughout the JavaScript code.
+
+The goal was not to erase Android. It was to let bounded UI evolve through React Native while keeping the seam small, assigning each state transition to one owner, versioning the interface, and defining recoverable failures. Without those limits, the bridge would become a second application architecture leaking into the first.

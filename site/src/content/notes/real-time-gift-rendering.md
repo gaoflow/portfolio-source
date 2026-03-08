@@ -8,58 +8,90 @@ featured: false
 order: 107
 ---
 
-I independently developed real-time gift-rendering effects for live streaming. The visible output was animation, but the engineering problem was scheduling: new effects arrived while video, chat, input, and previous gifts were already using the device.
+When I independently developed real-time gift effects for live streaming, the first problem was not how to draw the animation. New effects arrived while video, chat, input, and earlier gifts were already competing for the same device resources. Users saw animation, but the engineering problem was scheduling: acknowledge the gift without damaging the main live-room experience.
 
-The surviving record does not contain a rendering engine, frame rate, device matrix, or incident log. I will keep those details unstated. The useful lesson is the set of contracts a live effect system needs before any animation technique matters.
+The surviving record does not include the rendering engine, frame rate, device matrix, device list, incident log, or failure metrics. I will not fill in those details or claim unsupported performance results. What I can confirm is that I completed the real-time gift effects and learned which contracts must be defined before animation techniques matter.
 
-## The live room remains the primary task
+## Protect video, chat, and input first
 
-A gift effect is important because it acknowledges an event in the room. It still shares the screen with the stream itself. If the effect delays video, blocks input, or makes chat unreadable, the acknowledgement has damaged the product it was meant to support.
+A gift effect matters because it acknowledges an event in the room. It still shares the screen with the stream. If it delays video, blocks input, or makes chat hard to read, the acknowledgement harms the product it is meant to support.
 
-That gives the renderer a strict priority rule. It must fit inside the resources left by the primary experience. CPU time, GPU work, memory, network activity, and view hierarchy cost all count against the same device.
+I therefore treated the live-room path as the priority. Gift rendering could use only the resources left by the core experience, including CPU time, GPU work, memory, network activity, and view-hierarchy cost.
 
-The code needs a way to decline work. A lower-cost effect, fewer simultaneous layers, a shorter queue, or a static fallback can preserve the event without preserving every visual detail. Graceful degradation is part of the feature contract, not a last-minute optimization.
+![Gift effect scheduler](/images/notes/systems/real-time-gift-rendering.svg)
 
-## Arrival order is not display order
+The renderer also needed to decline work instead of accumulating tasks to play every effect in full. Possible fallbacks included:
 
-Live events can arrive faster than they can be shown. Displaying every effect immediately creates overlap. Queueing everything creates delay and unbounded memory. Dropping everything after a limit can hide the most important events.
+- using a lower-cost effect;
+- showing fewer layers at once;
+- shortening the queue;
+- falling back to a static acknowledgement;
+- reducing particles or audio when the frame budget was tight;
+- skipping decorative layers.
 
-The scheduler therefore needs policy. It can classify effects by priority, combine repeated events, cap queue age, reserve space for high-value events, and discard items whose moment has passed. The exact policy belongs to the product; the renderer should expose enough state for that policy to remain explicit.
+These options sacrifice visual detail while still acknowledging the event. I came to treat graceful degradation as part of the feature contract, not a last-minute optimization.
 
-Time matters more than item count. A queue of three long effects can be worse than ten short ones. Each entry needs an expected display cost or a deadline so the scheduler can reason about latency.
+## Define merge, preemption, and drop rules before overload
 
-Cancellation is also a normal transition. Leaving the room, hiding effects, changing account state, or replacing the live surface should cancel queued and active work without leaving callbacks attached to the old screen.
+Live events can arrive faster than they can be shown. Playing every effect immediately creates overlap. Queueing everything increases delay and allows unbounded memory use. Dropping everything after a limit can hide the most important events.
 
-## Assets need a lifecycle
+These are predictable design failures, but the surviving record contains no incident log, so I will not describe them as production incidents. My conclusion was that scheduling policy must be defined before overload, not added after a queue has already grown.
 
-An effect may depend on images, vector data, fonts, audio, or a compiled animation description. Fetching and decoding those assets at display time turns network and storage delay into visible lag.
+The scheduler should state which effects can be merged, preempted, queued, degraded, or dropped. For example:
 
-Preloading can reduce that delay, but an unlimited cache moves the failure into memory pressure. The asset layer needs a budget, an eviction rule, and a defined response when an item is absent or corrupt.
+- repeated instances of the same gift can increase a count and extend the current effect;
+- a high-priority event can preempt a lower-priority slot;
+- if an asset is not ready, the interface can show a lightweight acknowledgement while prefetching it;
+- effects can be grouped by priority;
+- queue entries can have a maximum age;
+- capacity can be reserved for high-value events;
+- an item can be discarded after its useful display moment has passed.
 
-The renderer should request an effect asset through a stable interface. It should not care whether the asset came from packaged resources, disk, or a download. The asset adapter can validate format, version, and integrity before returning something renderable.
+The exact rules are product decisions. The renderer should expose enough state to keep them explicit. It should consume ordered local state rather than modifying the live room’s primary model.
 
-This seam also supports safe updates. A new asset format can coexist with an old client only when the server knows what the client accepts or provides a compatible fallback.
+Time usually matters more than item count under load. Three long effects can create a worse queue than ten short ones. Each entry therefore needs an expected display cost or a deadline so the scheduler can decide when the wait has become too long. An unbounded queue only turns a traffic spike into memory pressure and stale animations that appear many seconds later.
 
-## Rendering state should stay local
+Cancellation is a normal state transition, not an exception. Leaving the room, hiding effects, changing account state, or replacing the live surface should cancel queued and active work. Callbacks must not remain attached to a screen that is no longer valid.
 
-The live-room model needs to know that a gift event occurred. It should not own every animation frame.
+## Give images, audio, and animation assets a lifecycle
 
-I separate durable event meaning from transient presentation state. The event can carry sender, gift identity, count, and timing. The renderer converts that into layers, progress, and cleanup. When the screen disappears, the transient state can end without corrupting the underlying room state.
+An effect may depend on images, vector data, fonts, audio, or a compiled animation description. Fetching and decoding these assets only when they must be displayed turns network and storage delay into visible lag.
 
-This separation prevents visual implementation from leaking into networking and business logic. It also makes the scheduler testable. Tests can feed event sequences and assert which effects start, combine, expire, or fall back without drawing pixels.
+Preloading can reduce that delay, but an unlimited cache moves the problem into memory pressure. The asset layer needs a budget, an eviction policy, and a defined response to missing or corrupt content.
 
-The rendering implementation still needs instrumentation around long frames, queue delay, asset misses, and cancellation. Those measurements describe the health of the presentation layer without forcing callers to know its internals.
+The renderer should request assets through a stable interface without knowing whether they come from packaged resources, disk, or a download. An asset adapter can validate format, version, and integrity before returning renderable content.
 
-## Device variation needs policy before tuning
+This boundary also supports safe updates. A new asset format can coexist with an older client only if the server knows which formats the client accepts or provides a compatible fallback.
 
-Android devices differ in graphics capability, memory, screen size, operating-system behavior, and background load. One successful device proves only that one path can work.
+## Keep live events separate from animation frames
 
-A renderer can choose a capability tier from measured or declared conditions, but the decision should remain stable during one effect. Switching quality halfway through an animation can cost more than using the lower tier from the start.
+The live-room model needs to know that a gift event occurred. It should not manage every animation frame.
 
-Tuning comes after the fallback is defined. Reduce overdraw, reuse decoded assets, avoid allocations in the frame path, and release resources promptly. Yet the strongest protection remains a bounded workload. No micro-optimization can make an unlimited queue safe.
+I separated durable event meaning from transient presentation state. An event can carry the sender, gift identity, count, and timing. The renderer turns it into layers, playback progress, and cleanup. When the screen disappears, the transient state can end without corrupting the underlying room state.
 
-## The effect succeeds when the room stays responsive
+This boundary keeps visual implementation details out of networking and business logic. It also makes the scheduler testable without drawing pixels. A test can provide an event sequence and assert which effects should start, merge, expire, or fall back.
 
-Real-time gift rendering taught me to define a visual feature by its behavior under contention. The best case shows the full effect. The normal contract controls ordering and resource use. The failure contract still acknowledges the event while protecting the live room.
+The presentation layer still needs measurements for long frames, queue delay, asset misses, and cancellation. These describe rendering health without requiring callers to understand the implementation. The surviving record does not preserve numerical values for those measurements, so I cannot provide them.
 
-That model applies beyond gifts. Any transient animation attached to a real-time product needs an owner, a scheduler, an asset lifecycle, a budget, and a fallback. The pixels are the output. Time is the interface.
+## Define device fallbacks before local tuning
+
+Android devices differ in graphics capability, memory, screen size, operating-system behavior, and background load. Success on one device proves only that one path can run, not that every device can support the same effect.
+
+The renderer can choose a capability tier from measured or declared conditions, but that choice should remain stable during a single effect. Changing quality halfway through an animation can cost more than using a lower tier from the start.
+
+Only after defining the fallback does local tuning become useful. I can then:
+
+- reduce overdraw;
+- reuse decoded assets;
+- avoid allocations in the per-frame path;
+- release resources promptly.
+
+The strongest protection is still a bounded workload. No amount of micro-optimization can make an unbounded queue safe.
+
+## The retained standard is a time contract
+
+The direct result was that I completed the real-time gift effects for live streaming. Without the engine, frame-rate, device-matrix, or failure data, I can honestly retain the design boundaries, not claim quantified performance.
+
+In the best case, the system shows the full effect. Under normal load, its contract controls ordering and resource use. During failure or degradation, it should still acknowledge the event while protecting video, chat, and input so the live room remains responsive.
+
+The same standard applies beyond gifts. Any transient animation attached to a real-time product needs a clear owner, scheduler, asset lifecycle, budget, and fallback. Pixels are the output; time is the interface.

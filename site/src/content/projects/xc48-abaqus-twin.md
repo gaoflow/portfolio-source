@@ -1,11 +1,11 @@
 ---
-title: 'Coursework: XC48 Tensile Twin — Experiment to Abaqus Explicit'
+title: 'How I Rebuilt a Tensile Test as an Abaqus Digital Twin'
 year: 2026
 date: '2026-04-04'
 status: complete
 categories: [validation, design]
 tags: [FEA]
-summary: 'We rebuilt an XC48 tensile test in Abaqus Explicit to R²=0.9663; the low measured modulus and the failed Static General path remain visible.'
+summary: 'In this four-person course project, I handled the test data, material card, ODB post-processing, and report toolchain. After correcting the specimen dimensions, the final M2 + Dynamic Explicit + Smooth Step model reproduced the measured curve with R²=0.9663, although the low measured modulus and single-specimen calibration limit the conclusions.'
 role: 'Data post-processing & report toolchain'
 team: 'ESILV MMN1 group — Nicolas Chang, Bing Gao, Sabin Karn, Nithor Bhowmik'
 duration: '8 weeks'
@@ -13,132 +13,155 @@ academic:
   institution: 'ESILV'
   course: 'Materials and Behavior'
   assignment: 'XC48 tensile experiment and Abaqus numerical reconstruction'
-  note: 'An eight-week Materials and Behavior project at ESILV, in a group of four with Nicolas Chang, Sabin Karn and Nithor Bhowmik. The group ran the physical tensile test and built the Abaqus models; I owned the data side — the Python pipeline from raw machine output to the material card, the ODB post-processing, and the report toolchain.'
+  note: 'An eight-week Materials and Behavior project at ESILV, completed with Nicolas Chang, Sabin Karn, and Nithor Bhowmik. The group ran the physical tensile test and built the Abaqus models; I handled the data side — the Python pipeline from raw machine output to the material card, the ODB post-processing, and the report toolchain.'
   requirements:
     - 'Run and post-process an XC48 uniaxial tensile test through fracture.'
-    - 'Derive engineering, true and plastic stress–strain data and identify material properties.'
-    - 'Build an Abaqus model of the specimen and compare simulation with the measured curve.'
-    - 'Study mesh, solver and loading-amplitude sensitivity and explain the selected setup.'
+    - 'Derive engineering, true, and plastic stress–strain data and identify material properties.'
+    - 'Build an Abaqus model of the specimen and compare the simulation with the measured curve.'
+    - 'Study mesh, solver, and loading-amplitude sensitivity and explain the selected setup.'
   media:
+    - src: '/images/projects/xc48-abaqus-twin/source/laboratory-handout-summary.webp'
+      alt: 'Page from the submitted XC48 report summarising the laboratory worksheet, raw data, and specimen sketch'
+      caption: 'The original assignment sheet is not preserved separately in the current archive; the submitted report reproduces its main laboratory panels. This page also retains the overall-length, diameter, and yield-strength transcription errors later corrected by the data pipeline, so it documents both the coursework and the source of the mistakes.'
     - src: '/images/projects/xc48-abaqus-twin/geometry-correction.svg'
       alt: 'Placeholder and validated specimen dimensions with the resulting UTS values'
-      caption: 'The first data pass was internally consistent but used placeholder geometry. Correcting diameter and gauge length moved UTS from 489 to 766 MPa.'
+      caption: 'The first data pass was internally consistent but used placeholder geometry. Correcting the diameter and gauge length moved UTS from 489 to 766 MPa.'
     - src: '/images/projects/xc48-abaqus-twin/assignment-workflow.svg'
       alt: 'Workflow from the tensile experiment through material data reduction to Abaqus comparison'
-      caption: 'The work is a chain, not a single solve: test, correct geometry, derive true/plastic data, build the material card, then audit mesh and solver choices.'
+      caption: 'The work was a complete chain rather than a single solve: run the test, correct the geometry, derive true and plastic data, build the material card, and then review the mesh and solver choices.'
     - src: '/images/projects/xc48-abaqus-twin/solver-comparison.svg'
-      alt: 'R squared comparison across four meshes and the Static General solver'
-      caption: 'The middle-density M2 mesh gives the best retained fit. More mesh or a nominally simpler static solve does not improve agreement.'
+      alt: 'R-squared comparison across four meshes and the Static General solver'
+      caption: 'The medium-density M2 mesh produced the best retained fit. Increasing the mesh density or using a nominally simpler static solve did not improve agreement.'
 featured: false
 order: 19
 studySequence: 11
 heroImage: /images/projects/xc48-abaqus-twin/stress-strain.svg
 ---
 
-## Context & objective
+## The project began with a physical test
 
-A tensile test on XC48 medium-carbon steel became a validated digital twin: the final Abaqus configuration — M2 mesh, Dynamic Explicit, Smooth Step loading — reproduces the measured stress–strain curve at $R^2 = 0.9663$ and follows the specimen through necking to rupture. The sensitivity study behind that number also produced a result worth keeping: the mid-density mesh beat the finest one, and the implicit solver never finished the job.
+We first pulled an XC48 medium-carbon steel specimen in uniaxial tension through necking and fracture. We then converted the measured curve into Abaqus material data and tried to reproduce the experiment numerically.
 
-The group ran the physical test and built the Abaqus models. My part was the data side: the Python pipeline from raw machine output to the material card, the post-processing of the simulation ODB, and the report toolchain. The physical test was run once, on one specimen, in the ESILV mechanics lab (MMN1, March 2026).
+This was an eight-week course project completed by a four-person group. We ran the test and built the Abaqus models together. I handled the data work: the raw machine output, stress–strain conversion, material card, ODB post-processing, and report toolchain.
 
-## From machine output to a material card
+The retained configuration was an M2 mesh with Dynamic Explicit and Smooth Step loading. It matched the experimental curve with $R^2=0.9663$.
 
-The machine logged 1,129 points over 112.7 s: time, crosshead displacement, force (peak 38.41 kN). The pipeline converts that record in three steps:
+## My first wrong curve looked perfectly clean
 
-1. **Engineering:** $\varepsilon = \Delta L / L_0$, $\sigma = F / A_0$.
-2. **True:** $\varepsilon_t = \ln(1+\varepsilon)$, $\sigma_t = \sigma(1+\varepsilon)$, valid until necking localises.
-3. **Plastic table:** subtract the elastic strain and hand Abaqus the $(\sigma_t, \varepsilon_{pl})$ pairs.
+The testing machine recorded 1,129 data points containing time, crosshead displacement, and force. The peak load was 38.41 kN.
 
-The geometry that matters is the reduced section: gauge length $l_0 = 70$ mm and $S_0 = 50.14$ mm² (Ø7.99 mm), from the test spreadsheet. The report's geometry section prints $L_0 = 114.23$ mm; that is the specimen's overall length, and using it for strain contradicts the spreadsheet and the plotted curves, so the pipeline uses 70 mm.
+I calculated engineering strain and stress as
 
-An earlier pass of my own script ran with placeholder geometry (Ø10 mm, 50 mm) and reported a 489 MPa UTS — wrong by the area ratio, and a good lesson in where stress–strain numbers actually come from.
+$$
+\varepsilon=\frac{\Delta L}{L_0},\qquad
+\sigma=\frac{F}{A_0}
+$$
 
-![Engineering vs true stress–strain, regenerated from the test data](/images/projects/xc48-abaqus-twin/stress-strain.svg)
+and then converted them into true stress, true strain, and plastic strain data for Abaqus.
 
-## Measured behaviour
+My first script used placeholder dimensions: a 10 mm diameter and a 50 mm gauge length. The entire pipeline ran successfully and produced a plausible-looking curve with a UTS of 489.09 MPa.
+
+The error was hidden in the denominator. The test spreadsheet gave the actual reduced-section dimensions as $L_0=70$ mm and $S_0=50.14$ mm², corresponding to a diameter of 7.99 mm. After I corrected those values, the UTS became 766.12 MPa.
+
+That failure showed me that a smooth curve does not prove that its inputs are correct. I now print the gauge length and cross-sectional area beside the results so they can be checked before interpreting the curve.
+
+## What the experiment measured
 
 | Quantity | Value | Note |
 |---|---:|---|
-| Young's modulus $E$ | 12.28 GPa | as measured; see the anomaly below |
-| Yield $\sigma_y$ (0.2% offset) | 758.33 MPa | printed as "7583" in the report — a typo |
-| Engineering UTS | 766.12 MPa | at $\varepsilon = 7.6\%$ |
-| True peak stress | 828.4 MPa | at $\varepsilon_t = 8.2\%$ |
-| Breaking strength | 557.80 MPa | just before the final load drop |
-| Fracture strain | 13.4% | engineering |
-| Necking | Ø7.99 → 5.77 mm | 47.8% area reduction, ductile range |
+| Young's modulus | 12.28 GPa | Affected by machine and grip compliance |
+| 0.2% offset yield strength | 758.33 MPa | Previously printed as “7583” in the report |
+| Engineering UTS | 766.12 MPa | At 7.6% engineering strain |
+| True peak stress | 828.4 MPa | At 8.2% true strain |
+| Breaking strength | 557.80 MPa | Immediately before the final load drop |
+| Fracture strain | 13.4% | Engineering strain |
+| Necking | Ø7.99 → 5.77 mm | 47.8% reduction in area |
 
-UTS sits 9.5% above the 700 MPa handbook value and the area reduction lands in the 40–50% ductile band, so the strength numbers are believable. The curve reads as a normal ductile steel: proportional limit near 730 MPa, plastic flow from $\varepsilon \approx 0.06$, uniform hardening up to the peak at 7.6%, then the load drops as the neck localises and the specimen separates at 13.4%.
+The UTS and reduction in area are reasonable for a ductile steel, but the measured modulus of 12.28 GPa is far below the typical value of about 210 GPa for steel.
 
-The modulus is not believable: 12.28 GPa against a textbook 210 GPa for steel. The strain came from crosshead displacement, so machine and grip compliance swamp the specimen's elastic strain, and the reported $E$ is mostly a property of the test rig. We kept it as measured — the twin below inherits it, and the limitations section prices that in.
+The strain was calculated from crosshead displacement, which includes deformation from the testing machine and grips. The low modulus therefore reflects the test setup more than the XC48 material itself. To match the measured curve, the digital twin inherited this slope, so part of the final $R^2$ represents a fit to a measurement artifact.
 
-## Iteration: the numbers that had to be recomputed
+## How I built the Abaqus model
 
-The pipeline failed once at full length before it produced a number worth keeping. My first pass ran the whole chain on the placeholder geometry named above and returned a self-consistent, plausible, wrong mini-report: UTS 489.09 MPa, $E = 5.45$ GPa, figures included. Nothing in the curve looked broken; the error lived entirely in the denominator. The fix was one source of truth — $l_0 = 70$ mm and $S_0 = 50.14$ mm² from the test spreadsheet — which moved the UTS to 766.12 MPa.
+The model used the complete dog-bone specimen with C3D4 tetrahedral elements. One end was fixed, and the other was displaced by 15 mm over 1 s.
 
-The group's report drafts carried their own copy of the same bug: gauge length 114.23 mm (the specimen's overall length, not the reduced section), diameter 13.95 mm, area 152 mm². The drafts also lost a decimal point on the 0.2% offset yield — printed as 7583304756 MPa in one version and "7583" in the submitted report — where the value is 758.33 MPa. Both errors survived because the numbers were pasted, not recomputed from the spreadsheet.
+The material card came from the measured curve rather than an idealised handbook law. It used $E=12{,}283.5$ MPa, $\nu=0.3$, true plastic data, and ductile damage initiation at an equivalent plastic strain of 0.0821.
 
-The solver switch is visible in the archived input decks. Every explicit iteration in the archive — Job-6 through Job-27, then the final copy27 — carries the identical material card ($E = 12{,}283.5$ MPa, damage initiation at the measured peak, displacement-based evolution), with mesh and damage details changing between them.
+Damage evolution was displacement-based over 0.5 mm, with element deletion enabled. This allowed the model to pass through necking, post-peak softening, and final separation.
 
-The Static General deck carries the same elastic–plastic card and no damage keywords at all, so its curve plateaus near 795 MPa true where the explicit runs delete elements and follow the drop. The switch to Explicit changed the solver, never the material.
+My ODB script read 200 field-output frames, selected the 70 mm gauge section, integrated the reaction force at the loaded end, and generated engineering and true stress–strain curves.
 
-## The digital twin
+The script also revealed a geometric mismatch. The numerical specimen had a radius of 3.838 mm, while the physical specimen radius was 3.995 mm, making the modelled cross-sectional area about 8% smaller. The simulated peak was still within 1% of the experiment, but the difference remains part of the model record.
 
-The Abaqus model is the specimen itself: C3D4 tetrahedra over the full dog-bone, one end encastred, the other pulled 15 mm over a 1 s step. The material card is the measured curve, not a handbook law: $E = 12{,}283.5$ MPa, $\nu = 0.3$, plasticity starting at 826.9 MPa true, ductile damage initiation at $\bar\varepsilon_{pl} = 0.0821$ and triaxiality 0.333 — exactly the true strain at the measured peak — with displacement-based damage evolution over 0.5 mm and element deletion to separate the specimen.
+## The finest mesh did not produce the best result
 
-Three design choices decided whether this twin matched the test, so we swept each one. Post-processing was the other half of the toolchain: the job wrote 200 field-output frames, and an `odbAccess` script walks them, selects the gauge-section elements (z from 22.54 to 92.54 mm in the model), integrates reaction force over the end set, and writes engineering and true stress–strain CSVs for the validation plots.
-
-One geometry note from that script: the modelled gauge radius is 3.838 mm (from node coordinates) against 3.995 mm on the physical specimen — about 8% less cross-section in the twin. The peak still lands within 1%, so the mismatch is real but not dominant.
-
-## Sensitivity: the middle mesh won
-
-| Mesh | Elements | $R^2$ vs experiment | Behaviour |
+| Mesh | Elements | $R^2$ | Main behaviour |
 |---|---:|---:|---|
-| Baseline ("Optimal") | max nodes, Learning Edition | 0.9308 | no softening; keeps hardening past the peak |
-| M1 | < 1,000 | 0.9653 | pointy fracture tips, strain trapped in few elements |
-| M2 | ≈ 2,000 | **0.9663** | captures necking onset and the post-peak drop |
-| M3 | ≈ 3,000 | 0.9497 | over-localisation, slowest stable increment |
+| Baseline mesh | Learning Edition limit | 0.9308 | No damage softening; continued hardening after the peak |
+| M1 | Fewer than 1,000 | 0.9653 | Strain concentrated in a small number of elements |
+| M2 | About 2,000 | **0.9663** | Captured necking and the post-peak drop |
+| M3 | About 3,000 | 0.9497 | Excessive localisation and the smallest stable time increment |
 
-M2 wins because it resolves the neck without forcing deformation into distorted elements. M3's regression is small but real, and it cost the lowest stable time increment of the three. The baseline's last place is the instructive part: a mesh with no damage-driven softening cannot fit a curve whose second half is defined by it.
+M2 gave the best balance between resolving the neck and avoiding excessive localisation in distorted elements. M3 was finer and more expensive, but it moved farther away from the experimental curve.
 
-![R² comparison of the four mesh configurations (group-report figure)](/images/projects/xc48-abaqus-twin/mesh-r2-comparison.png)
+![Fit results for the four mesh configurations against the experimental curve](/images/projects/xc48-abaqus-twin/mesh-r2-comparison.png)
 
-## Sensitivity: why Explicit beat Static
+This result showed that “keep refining until the result improves” does not necessarily work for damage and element-deletion problems. Mesh density, damage regularisation, and localisation behaviour have to be considered together.
 
-Static General solves $\mathbf{K}\mathbf{u} = \mathbf{F}$ iteratively; once necking and damage make the stiffness matrix negative, Newton–Raphson has nothing to converge to. That is what the run did: the static curve plateaus near 795 MPa true and ends around $\varepsilon_t \approx 0.13$, never following the experimental softening branch ($R^2 = 0.9595$).
+## Why Static General did not complete the softening branch
 
-Dynamic Explicit marches $\mathbf{M}\ddot{\mathbf{u}} = \mathbf{F} - \mathbf{F}^{int}$ forward with no matrix inversion, so it stays stable through element deletion and reaches full separation ($R^2 = 0.9653$ in the solver-only comparison). The physical test is quasi-static, but the instability at rupture is exactly the regime where the implicit assumption breaks.
+Static General lost a stable Newton–Raphson path after necking and damage introduced negative stiffness. Its true-stress curve reached a plateau near 795 MPa and ended at a true strain of about 0.13, producing $R^2=0.9595$.
 
-## Sensitivity: loading amplitude and the energy gate
+Dynamic Explicit does not invert a stiffness matrix at every increment. It could continue through damage and element deletion, allowing the model to follow the post-peak drop and reach final fracture.
 
-An Explicit quasi-static run is only honest if inertia stays negligible, so the gate was ALLKE under 5% of ALLIE during loading. Smooth Step (fifth-order, zero velocity and acceleration at both ends) passes: kinetic energy stays at zero until fracture at $t \approx 0.45$, where a sharp ALLKE spike and ALLIE drop mark the elastic energy release — physical, not noise.
+The physical experiment was quasi-static, but the fracture process itself was unstable. That made the explicit solver better suited to this particular assignment.
 
-| Amplitude | Rupture time | Energy behaviour | Verdict |
-|---|---:|---|---|
-| Smooth Step | $t \approx 0.45$ | ALLKE ≈ 0 while loading, spike at fracture | quasi-static, passes the gate |
-| Ramp (tabular) | $t \approx 0.41$ | $t=0$ impulse, inertial oscillations | premature failure |
-| Step (brutal, 10% of step) | immediate | ALLKE dominates from increment one | impact test, invalid |
+The retained records also show that the Static and Explicit runs used the same elastic–plastic material data. The Static model did not include damage or element deletion, so its plateau came from the different solution path rather than a changed base material curve.
 
-A brutal step that applies the full 15 mm in the first 10% of the step no longer measures the material: internal energy peaks almost instantly and both energies ring at high frequency. The gate exists because "the solver finished" says nothing about whether the run was quasi-static.
+## The Explicit run still had to remain quasi-static
 
-## Final validation
+I checked inertia using an energy criterion: during loading, kinetic energy ALLKE had to remain below 5% of internal energy ALLIE.
 
-M2 + Dynamic Explicit + Smooth Step: $R^2 = 0.9663$ against the experiment, peak stress ≈ 820 MPa true against 828 measured (about 1% low), correct post-peak softening and rupture. The .sta file records 71,965 increments at a 13.8 µs stable increment (semi-automatic mass scaling at 10 µs) in 77 s of wall time — cheap enough to iterate, which is the point of a twin. The simulation runs slightly stiffer than the test in the final fracture phase, the one visible deviation.
+| Loading amplitude | Result |
+|---|---|
+| Smooth Step | ALLKE remained close to zero during loading and showed a physical spike only at fracture |
+| Linear Ramp | Produced an initial shock, inertial oscillations, and premature failure |
+| Sudden Step | Became dominated by kinetic energy from the first increment and no longer represented quasi-static tension |
 
-![M2 deformed shape at fracture, showing the necked section (group-report figure)](/images/projects/xc48-abaqus-twin/m2-necking-deformed.png)
+Smooth Step has zero velocity and acceleration at both ends, so I retained it. The kinetic-energy spike at fracture came from the release of stored elastic energy rather than an impact introduced by the loading function.
 
-## Limitations
+## What the final model reproduced
 
-- **The modulus is a rig property.** Feeding $E = 12.28$ GPa makes the twin match the measured elastic slope, but that slope is machine compliance, so part of the 0.9663 fit is agreement on an artifact. The plastic regime is where the validation means something.
-- **One specimen, one test.** No repeats, no scatter band; the damage parameters were calibrated to this same curve, so "validated" covers one geometry at one loading rate.
-- **Learning Edition ceiling.** The node cap put M3 (~3,000 elements, linear C3D4 tets) at the top of the mesh range; convergence past that is untested.
-- **Missing fractography.** The report's fracture-photo slots ended up holding spreadsheet screenshots, so the cup-and-cone claim rests on the measured 47.8% area reduction and the simulated neck, not on surface images.
+The final M2 + Dynamic Explicit + Smooth Step model reached $R^2=0.9663$ against the experiment. Its peak true stress was about 820 MPa, compared with 828 MPa experimentally, a difference of about 1%.
 
-## Reproduce
+The model reproduced the start of necking, post-peak softening, and final fracture. The `.sta` file recorded 71,965 increments, a stable increment of about 13.8 µs, and a wall-clock time of 77 s.
 
-The experiment side lives in `research/esilv-materials/plot_stress_strain.py`: it reads the pipeline CSV, applies the spreadsheet geometry ($l_0 = 70$ mm, $S_0 = 50.14$ mm²), and regenerates the hero figure — printing UTS 766.12 MPa, true peak 828.4 MPa, and fracture strain 13.4% as a check. The simulation side is the group Abaqus job (`copy27`): the input deck carries the full material card and Smooth Step setup, and a small `odbAccess` script pulls frame-by-frame stress–strain from the ODB for the validation plot.
+![Necked shape of the M2 model at fracture](/images/projects/xc48-abaqus-twin/m2-necking-deformed.png)
 
-## What I took away
+The clearest remaining difference is that the simulation stays slightly stiffer than the experiment during the final fracture stage.
 
-Stress is a force divided by an area someone typed: the placeholder run returned a clean curve at 489 MPa, wrong by exactly the area ratio, and no plot would have caught it. I now print the geometry next to the first figure, before any analysis. The yield-strength typo — 7583304756 MPa in one draft, "7583" in the submitted report — survived because the number was pasted rather than recomputed against the spreadsheet.
+## The failures and data problems I kept visible
 
-M3 losing to M2 (0.9497 against 0.9663) is the table entry I re-checked first, because "refine until converged" would have stopped at the most expensive mesh and the sweep is the only evidence that the middle one wins.
+The 489 MPa result from the placeholder geometry was not the only data problem. A report draft used the specimen's 114.23 mm overall length as its gauge length and printed the yield strength as 7583304756 MPa. The submitted version still showed “7583.” The correct yield strength is 758.33 MPa.
+
+These errors came from copying values manually instead of recalculating them. My correction was to make the geometry and key material values enter the scripts from the same spreadsheet source.
+
+The clean but incorrect first curve was especially useful. It demonstrated that a calculation can remain internally consistent while answering the wrong physical problem.
+
+## What this digital twin cannot establish
+
+Only one specimen was tested once, so there is no repeatability range or scatter band. The damage parameters were calibrated against that same curve, which means the validation applies only to this geometry and loading rate.
+
+The Abaqus Learning Edition limited the available mesh size, so convergence beyond M3 remains unknown.
+
+The report did not preserve photographs of the fracture surface. The ductile-fracture interpretation therefore rests on the measured 47.8% reduction in area, the experimental curve, and the simulated necking rather than direct fractography.
+
+The most important limitation is the low measured modulus. The model reproduces the recorded curve well, but some of that agreement comes from testing-machine compliance. The plastic and post-peak regions provide more meaningful validation than the elastic slope.
+
+## What I learned
+
+Stress is force divided by an area that someone entered. The wrong area can still produce a neat, convincing curve, so I now display and verify the key geometry before beginning the analysis.
+
+M3 losing to M2 also stopped me from treating a finer mesh as an automatic improvement. For damage, localisation, and element deletion, I need to consider physical behaviour, regularisation, and computational cost together.
+
+Finally, I learned to check the `.sta` file and ODB before trusting the CAE model tree. A model can look complete in the interface without having run a single increment.

@@ -9,38 +9,56 @@ featured: true
 order: 3
 ---
 
-For a while, my F1 full-car project looked like a folder full of missing results. I had no clean production mesh, no final aerodynamic comparison, and no impressive contour to put at the top of the page.
+My F1 full-car project stalled at the meshing stage. I had no clean production mesh, no final aerodynamic comparison, and no contour plot worth showing. The most complete results in the folder were a series of failed meshes.
 
-What I did have was a series of failed meshes.
+At first, I kept adjusting `snappyHexMesh` in search of one bad parameter. After twenty bounded routes, the evidence pointed elsewhere: the real blocker was overlapping, ambiguous topology in the full-car source geometry.
 
-Once I stopped treating those failures as wasted runs, they became the most useful part of the campaign.
+## I made one rule: no solver launch after a failed mesh check
 
-## I first made one rule: no solver launch after a failed mesh gate
+![Mesh-failure response chain](/images/notes/systems/mesh-failure-is-engineering-data.svg)
 
-`snappyHexMesh` finishing is not the same as the mesh being usable. It can write millions of cells and still leave skew faces, broken layers, leaks, or a boundary that no longer means what the CAD meant.
+`snappyHexMesh` finishing successfully does not mean the mesh is usable. It can write millions of cells while leaving highly skewed faces, broken layers, leaks, or boundaries that no longer express the intended CAD meaning.
 
-I wrote down the checks that had to pass before the solver was allowed to start: geometry hashes, closed surfaces, complete `checkMesh` output, cell and memory limits, non-orthogonality, skewness, patch names, patch areas, and layer coverage.
+Before launching the solver, I required the mesh to pass checks for:
 
-This rule felt strict when I was impatient to run the car. It saved me from turning a known geometry problem into a confusing solver problem.
+- geometry hashes;
+- closed surfaces;
+- complete `checkMesh` output;
+- cell-count and memory limits;
+- non-orthogonality;
+- skewness;
+- patch names;
+- patch areas;
+- layer coverage.
 
-## “Bad CAD” was too vague to help
+Each mesh variant changed one named assumption. When a check failed, I carried the defect location and parameter change into the next run instead of using the solver to hide a known mesh problem.
 
-I learned to separate four failure types.
+This felt strict when I wanted to run the full car, but it stopped a geometry problem from becoming a harder-to-explain solver problem.
+
+## I split “bad CAD” into four different problems
+
+“Bad CAD” was too vague to guide the next step. I separated failures into four types:
 
 - A **surface defect** is a hole, duplicate triangle, zero-area facet, bad normal, or self-intersection.
-- A **topology problem** happens when individually closed solids overlap but do not describe one unambiguous fluid boundary.
-- A **volume-mesh problem** is created by refinement, transitions, snapping, or cell quality after the boundary is understood.
-- A **layer problem** concerns collapsed or missing wall cells and the turbulence treatment they were meant to support.
+- A **topology problem** occurs when individually closed solids overlap without defining one clear, unambiguous fluid boundary.
+- A **volume-mesh problem** concerns refinement, transitions, snapping, or cell quality after the boundary meaning is clear.
+- A **layer problem** concerns collapsed or missing wall cells that cannot support the intended turbulence treatment.
 
-The distinction matters because the fixes are different. More snap iterations may help a volume-mesh problem. They cannot decide the Boolean meaning of two overlapping solids.
+These problems need different fixes. More snap iterations may improve a volume mesh, but they cannot decide the Boolean meaning of two overlapping solids.
 
-## I changed one idea at a time
+## I used the same checks across twenty routes
 
-The campaign eventually covered twenty bounded routes: nineteen OpenFOAM outcomes and one external topology attempt.
+The campaign covered twenty bounded routes: nineteen OpenFOAM outcomes and one external topology attempt.
 
-I treated each run as one question. Was the base mesh too coarse? Did one surface need more refinement? Were extracted features helping or hurting? Was the refinement transition too abrupt? Could a small surface repair remove the blocker without changing the shape?
+I treated each run as a specific question:
 
-The best uniform-envelope mesh reached 5,207,960 cells and improved the worst numbers to:
+- Was the base mesh too coarse?
+- Did one surface need more refinement?
+- Were extracted features helping or hurting?
+- Was the refinement transition too abrupt?
+- Could a small surface repair remove the blocker without changing the shape?
+
+The best uniform-envelope mesh reached 5,207,960 cells and improved the worst quality measures to:
 
 | Check | Best result |
 |---|---:|
@@ -49,47 +67,64 @@ The best uniform-envelope mesh reached 5,207,960 cells and improved the worst nu
 | Maximum skewness | 8.785 |
 | Face-interior skew failures left | 8 |
 
-That was progress, but it was not a pass. Eight failed faces still meant **NO-GO**.
+That was progress, but not a pass. Eight failed faces still meant **NO-GO**.
 
-## The surface repairs gave me a useful surprise
+Improving one measure was not enough. One candidate reduced the highly skewed faces from 97 to 7 but increased the number of failed checks from one to two, so I still rejected it. Other variants only moved defect clusters from the front wing to other parts. A changed location did not mean the problem was solved; I still had to record the defects and inspect the topological coupling between parts.
 
-I then tried six bounded repair candidates with a 0.1 mm deviation limit.
+## Six surface repairs did not change the underlying problem
 
-One candidate barely moved the surface at all: 0.0000017 mm maximum deviation. Another sat close to the budget edge at 0.08368 mm. They produced the same downstream verdict: 5,322,222 cells, fifteen highly skew faces, and one failed check.
+I then tried six bounded surface-repair candidates with a 0.1 mm deviation limit.
 
-That killed two assumptions I had been carrying:
+One candidate barely moved the surface, with a maximum deviation of 0.0000017 mm. Another came close to the deviation budget at 0.08368 mm.
 
-1. a smoother surface must create a better volume mesh;
+Both produced exactly the same downstream result:
+
+- 5,322,222 cells;
+- 15 highly skewed faces;
+- one failed check.
+
+This comparison overturned two assumptions:
+
+1. a smoother surface must produce a better volume mesh;
 2. using more of the allowed geometry-change budget must move me closer to success.
 
-Neither was true here. The repair changed triangle positions, but the blocking topology stayed.
+Neither assumption held for this car and this campaign. The repairs moved triangles but did not change the blocking topology. Both the near-zero-deviation candidate and the candidate near the 0.1 mm limit left 15 highly skewed faces, so further smoothing within the same deviation budget was no longer an evidence-backed route.
 
-## I tried another mesher to challenge my own diagnosis
+## Gmsh reproduced the same class of failure
 
-I did not want to blame `snappyHexMesh` without a control. I tried Gmsh 4.12.1 on the same multi-solid assembly.
+I did not want to blame `snappyHexMesh` without a comparison, so I tried Gmsh 4.12.1 on the same multi-solid assembly.
 
 Gmsh imported 14 surfaces, generated 3,689,664 nodes, wrote 7,379,556 elements in 309 seconds, and used about 10 GiB of memory. It still produced zero volume elements because overlapping facets left the discrete boundary ambiguous.
 
-That result narrowed the problem. It was not one OpenFOAM parameter family. Two different meshing routes could not find a valid fluid volume from the source assembly.
+This was not a successful alternative, but it narrowed the diagnosis. The problem was not limited to one OpenFOAM parameter family. Two different meshing routes could not find a valid fluid volume from the source assembly.
 
-## The project ended with a requirement, not a number
+## I stopped the calculations the evidence could not support
 
-I blocked the production solve, the 25–35 million-cell baseline, and every sensitivity study that depended on that baseline. I also refused to publish aerodynamic rankings from the rejected meshes.
+I did not launch the production solve, the 25–35 million-cell baseline, or any sensitivity study that depended on that baseline. I also refused to publish aerodynamic performance rankings from rejected meshes.
 
-The campaign still established useful things:
+The campaign produced no final aerodynamic numbers, but it established that:
 
 - the STEP-to-OpenFOAM pipeline runs;
-- the force-output plumbing works;
+- the force-output path works;
 - bounded variants can be compared consistently;
-- the blocker is repeatable; and
-- the next input requirement is clear.
+- the blocker is repeatable;
+- the requirements for the next input are clear.
 
-The next campaign needs replacement geometry or engineer-directed simplification of the overlapping source topology. Repeating the same control sweep would add compute, not information.
+The next attempt needs replacement geometry or engineer-directed simplification of the overlapping source topology. Changing the meshing backend is another possibility. Repeating the same control sweep would add compute, not information.
 
-## What I now save from every failed mesh
+## What I now keep from every failed mesh
 
-I keep the source hash, geometry inventory, exact parameter change, full mesh-quality output, failed-face locations, surface-deviation measurements, and solver-launch decision. I also keep unsuccessful alternative routes.
+I retain:
 
-That record means I do not have to rediscover the same dead ends six months later. More importantly, another engineer can see why the run stopped instead of finding only an empty results folder.
+- the source-file hash;
+- the geometry inventory;
+- the exact parameter change;
+- the complete mesh-quality output;
+- failed-face locations;
+- surface-deviation measurements;
+- the solver-launch decision;
+- unsuccessful alternative routes.
 
-The numbers in this note belong to one car and one bounded campaign. They are not universal OpenFOAM limits. The lesson I am keeping is simpler: **a failed mesh can still finish the engineering decision if I record why it failed and what has to change next.**
+These records stop me from rediscovering the same dead ends six months later. They also let another engineer see why the work stopped instead of finding only a folder with no final result.
+
+The numbers here belong to one car and one bounded campaign. They are not universal OpenFOAM limits. The standard I am keeping is simple: a failed mesh can still support an engineering decision if I record why it failed and what must change next.

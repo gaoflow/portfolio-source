@@ -1,11 +1,11 @@
 ---
-title: 'Steady 1-D Conduction — First Discretised PDE'
+title: 'How I Verified My First Finite-Difference Heat-Conduction Model'
 year: 2026
 date: '2026-01-17'
 status: complete
 categories: [validation]
 tags: [CFD]
-summary: 'I solved a generating rod by finite differences and a Thomas algorithm, then checked it with an exact solution, second-order MMS convergence and energy closure.'
+summary: 'I used central differences and a Thomas algorithm to solve an internally heated rod, discovered that my original grid study measured only roundoff, then used a manufactured solution to verify second-order convergence and checked conservation and implementation independently.'
 role: 'Heat transfer & numerical methods'
 duration: 'Independent study'
 featured: false
@@ -14,60 +14,95 @@ studySequence: 6
 heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg
 ---
 
-## Context & objective
+## Why I started with a one-dimensional rod
 
-The scheme is verified, and the interesting part is how close it came to being "verified" vacuously: it reproduces the closed-form solution to $1.34\times10^{-11}$ K, converges at observed order 2.0002 on a manufactured case, and closes the global energy balance to $1.59\times10^{-12}$. Each check exists because one of the others cannot see a particular failure mode.
+This was the first time I moved beyond evaluating a correlation and instead discretised a differential equation, assembled a linear system, and solved for a temperature field.
 
-This study discretises a differential equation instead of evaluating a closed-form correlation. It establishes the workflow every later numerical project depends on: discretise, impose boundary conditions honestly, solve, then verify before interpreting. The physics stays deliberately simple — a generating rod.
+I deliberately chose a simple problem: a rod of length $L=0.5$ m with constant thermal conductivity $k=167$ W/(m·K) and uniform volumetric heat generation $q'''=2\times10^4$ W/m³. The left boundary is fixed at 350 K. At the right boundary, convection with $h_c=25$ W/(m²·K) transfers heat to an environment at 300 K.
 
-The problem: steady conduction in a rod of length $L=0.5$ m with uniform conductivity $k=167$ W/(m·K), uniform volumetric generation $q'''=2\times10^{4}$ W/m³, a fixed temperature $T(0)=350$ K, and a convective tip $-k\,T'(L)=h_c(T(L)-T_\infty)$ with $h_c=25$ W/(m²·K) and $T_\infty=300$ K.
+Because the physics is simple, I could derive a closed-form solution and focus on the numerical details: discretisation, boundary-condition assembly, the linear solver, and energy conservation.
 
-## Method
+## How I discretised the equation
 
-The rod is split into $N$ uniform cells. Interior nodes use central differences on $kT''+q'''=0$. The convective tip is a half-control-volume balance: the last interior face flux plus half a cell of generation equals the surface convection. The resulting tridiagonal system is solved with a Thomas algorithm implemented from scratch — forward elimination, back substitution, explicit zero-pivot guards — with no library solve in the production path.
-
-The governing equation integrates twice to a closed form,
+The governing equation is
 
 $$
-\begin{aligned} T(x)&=T_{\text{left}}+C_1x-\frac{q'''x^2}{2k},\\[0.5em] C_1&=\frac{q'''L+\dfrac{h_c\,q'''L^2}{2k}-h_c\,(T_{\text{left}}-T_\infty)}{k+h_cL},\end{aligned}
+kT''+q'''=0.
 $$
 
-That exact solution is the primary validation reference.
+I divided the rod into a uniform grid and used central differences at the interior nodes. At the convective end, I used a half-control-volume balance that includes conduction through the final interior face, heat generation within half a cell, and convection from the surface.
 
-![Numerical and exact temperature profiles with the convective tip](/images/projects/steady-conduction-1d/temperature-profile.svg)
+That treatment matters because the physical convective boundary lies half a grid spacing beyond the final node centre. Applying the Robin condition directly at that node would shift the boundary by half a cell.
 
-## Iteration: the convergence study that measured nothing
+The discretisation produces a tridiagonal linear system. I implemented the Thomas algorithm from scratch, including forward elimination, back substitution, and explicit zero-pivot checks. The production solution path does not call a library linear solver.
 
-The verification plan failed on first contact. The plan was to run the grid-convergence study against the closed-form solution. At $N=160$ the maximum nodal error came back $1.34\times10^{-11}$ K — roundoff, not truncation error. Central differences are exact for quadratics, the exact solution is quadratic, and the half-cell Robin balance is exact for quadratics too: the face-flux truncation term $-\tfrac{h}{2}kT''$ cancels the half-cell generation term $\tfrac{h}{2}q'''$ exactly. Refining the grid further would have measured floating-point noise.
+The closed-form solution is
 
-The exactness result still earns its place, because it catches what a convergence study can mask: sign errors and boundary-row assembly mistakes. But the convergence rate needed a different vehicle. The iteration was to adopt the method of manufactured solutions — a sinusoidal source whose exact solution satisfies the same Dirichlet and Robin conditions. On that case the error falls $4.81\times10^{-2} \to 1.20\times10^{-2} \to 3.00\times10^{-3} \to 7.51\times10^{-4}$ K across $N=20/40/80/160$, a least-squares observed order of 2.0002 against a slope-2 reference.
+$$
+\begin{aligned}
+T(x)&=T_{\text{left}}+C_1x-\frac{q'''x^2}{2k},\\[0.5em]
+C_1&=\frac{q'''L+\dfrac{h_cq'''L^2}{2k}-h_c(T_{\text{left}}-T_\infty)}
+{k+h_cL}.
+\end{aligned}
+$$
 
-![Log-log error versus grid spacing with slope-2 reference](/images/projects/steady-conduction-1d/convergence.svg)
+I used this exact solution to check both the calculated temperatures and the assembly of the convective boundary equation.
 
-## Validation
+## My first convergence study measured nothing useful
 
-Four predeclared gates, all passing:
+I originally planned to compare the numerical and closed-form solutions on successively finer grids and observe the error decrease. At $N=160$, however, the maximum error was already only $1.34\times10^{-11}$ K.
 
-| Gate | Observed | Threshold |
+That result did not mean the grid was exceptionally good. The exact temperature profile is quadratic, and central differences reproduce a quadratic exactly. At the half-control-volume boundary, the face-flux error also cancels the half-cell heat-generation term. Further refinement therefore reveals floating-point roundoff rather than the truncation-error order of the method.
+
+I did not treat the very small error as proof that the convergence study was complete. Instead, I changed the test problem.
+
+## I used a manufactured solution to verify second-order convergence
+
+I constructed a sinusoidal manufactured solution that satisfies the same fixed-temperature and convective boundary conditions. Unlike the quadratic solution, it cannot be represented exactly by the central-difference scheme, so grid refinement exposes the actual truncation error.
+
+For $N=20/40/80/160$, the maximum errors were
+
+$$
+4.81\times10^{-2},
+1.20\times10^{-2},
+3.00\times10^{-3},
+7.51\times10^{-4}\ \text{K}.
+$$
+
+A least-squares fit gave an observed order of 2.0002, consistent with the expected second-order behaviour of the central-difference discretisation.
+
+![Manufactured-solution error versus grid spacing](/images/projects/steady-conduction-1d/convergence.svg)
+
+## I also checked energy conservation
+
+The exact tip temperature is 360.446 K. The temperature reaches a maximum of 360.788 K at $x=0.425$ m.
+
+The rod generates 10,000 W/m² per unit cross-sectional area. Of that total, only 1,511 W/m² leaves through the convective end. The remaining 8,489 W/m² conducts back to the fixed-temperature boundary at $x=0$.
+
+When I summed the energy balances of all discrete cells, the relative residual was $1.59\times10^{-12}$. The model therefore preserves the global energy balance as well as matching the pointwise temperature solution.
+
+## The four checks I retained
+
+| Check | Result | Requirement |
 |---|---:|---:|
-| Max nodal error vs exact, $N=160$ | $1.34\times10^{-11}$ K | $\leq 10^{-9}$ K |
-| Observed order, $N=20/40/80/160$ | 2.0002 | $\in[1.8,\,2.2]$ |
-| Energy-balance relative residual | $1.59\times10^{-12}$ | $\leq 10^{-10}$ |
-| Thomas vs NumPy dense solve | $1.1\times10^{-16}$ | $\leq 10^{-12}$ |
+| Maximum error against the closed-form solution at $N=160$ | $1.34\times10^{-11}$ K | $\leq10^{-9}$ K |
+| Observed order for the manufactured solution | 2.0002 | 1.8–2.2 |
+| Relative energy-balance residual | $1.59\times10^{-12}$ | $\leq10^{-10}$ |
+| Difference between Thomas and NumPy dense solutions | $1.1\times10^{-16}$ | $\leq10^{-12}$ |
 
-## Quantitative results
+I compared my Thomas implementation with NumPy’s dense solver on 64 random tridiagonal systems. The maximum difference was $1.1\times10^{-16}$. The implementation also rejects a zero pivot explicitly rather than allowing NaNs to propagate through the calculation.
 
-The exact tip temperature is 360.446 K and the profile peaks at 360.788 K at $x=0.425$ m. The global balance is the more instructive number: of the $10{,}000$ W/m² generated per unit area, only $1{,}511$ W/m² leaves through the convective tip — the remaining $8{,}489$ W/m² conducts backwards into the fixed-temperature wall at $x=0$. Summing the discrete cell balances reproduces that identity with a relative residual of $1.59\times10^{-12}$, so the scheme is conservative as well as pointwise accurate. The hand-written Thomas solver also matches a NumPy dense solve to $1.1\times10^{-16}$ over 64 randomized systems.
+Each check targets a different failure mode. Comparison with the closed-form solution can reveal sign errors and mistakes in the boundary row. The manufactured solution tests whether the discretisation retains its expected second-order accuracy. The energy balance can expose a non-conservative scheme even when its temperatures appear reasonable. The independent dense solve checks my implementation of the tridiagonal algorithm.
 
-## Limitations
+These checks are not interchangeable. My first convergence study failed precisely because I chose a solution that the discretisation could reproduce exactly. Only the sinusoidal manufactured solution allowed me to measure the numerical order.
 
-The model is one-dimensional and steady with constant properties; temperature-dependent conductivity would make it nonlinear. There is no contact resistance at either boundary, and tip radiation — a nonlinear $T^4$ term — is excluded. The manufactured convergence case is a verification device, not a physical scenario. Nothing here extends to multidimensional spreading, fins of varying section, or transients.
+## What the model still leaves out
 
-## What I took away
+The model is one-dimensional and steady, with constant material properties. It does not include temperature-dependent conductivity, contact resistance, or radiation from the end. It also cannot represent multidimensional heat spreading, fins with varying cross-sections, or transient heating.
 
-Central differences are exact on quadratics, and my exact solution was quadratic — the convergence study I had planned measured roundoff, $1.34\times10^{-11}$ K of it. The manufactured sinusoidal source exists because of that failure, and it is what produced a genuine observed order of 2.0002. I also stopped treating checks as interchangeable: exactness catches sign and boundary-row assembly errors, the manufactured slope catches truncation behaviour, and the energy residual catches a non-conservative scheme. Each sees a failure the other two cannot.
+The manufactured solution is a verification tool, not a physical operating condition. Extending the model to the omitted effects would require new equations, boundary treatments, and verification cases.
 
-## Reproduce
+## How to run it
 
 ```bash
 cd projects/steady-conduction-1d
@@ -75,5 +110,3 @@ python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 python3 scripts/publish_site.py
 ```
-
-`analyse.py` regenerates `results/analysis.json` and both figures and exits nonzero if any gate fails.
