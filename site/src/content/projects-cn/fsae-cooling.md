@@ -1,5 +1,5 @@
 ---
-title: '我怎样一步步筛选 FSAE 冷却系统：先否决，再拆回路，最后离采购还差一步'
+title: '从零构建 FSAE 冷却系统'
 year: 2026
 date: '2026-08-22'
 status: complete
