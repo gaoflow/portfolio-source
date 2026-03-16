@@ -23,57 +23,49 @@ Space Rider 是我接到的第一个完整的模型任务，也是最重要的�
 
 简单来说，我的实际工作要求是只用公开的资料，用 Blender 重建 Space Rider 卫星模型。任务给的几何精度要求大约是 10 cm。
 
-<figure class="not-prose my-6 overflow-hidden rounded-lg border border-border/50 bg-card/30">
-  <img src="/images/projects/space-rider/reference/esa-official-render.jpg" alt="ESA 官方 Space Rider 概念图" class="w-full object-cover" loading="lazy" />
-  <figcaption class="p-2.5 text-center text-xs text-muted">ESA 官方 Space Rider 轨道概念渲染</figcaption>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/reference/esa-official-render.jpg" alt="ESA 官方 Space Rider 概念图" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">ESA 官方 Space Rider 轨道概念渲染</figcaption>
 </figure>
 
-<video controls class="my-6 w-full rounded-lg" preload="metadata">
+<video controls class="my-8 w-full rounded-xl shadow-sm" preload="metadata">
   <source src="/videos/projects/space-rider/esa-space-rider-1.mp4" type="video/mp4">
 </video>
 ## 参考资料
 
 ESA 的三视图蓝图是外形唯一的依据。用户指南用来确定货舱门、接近舱门和推进器的位置；通过 ESA 渲染图和硬件照片可以推测涂装和材质；前代 IXV 的照片只能用来补那些实在看不清的细节，不能决定 Space Rider 的外形。
 
-<div class="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <img src="/images/projects/space-rider/report/official-blueprint.png" alt="ESA 三视图蓝图" class="w-full object-cover" loading="lazy" />
-    <figcaption class="p-2 text-center text-xs text-muted">ESA 官方三视图蓝图</figcaption>
+<div class="not-prose my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <figure>
+    <img src="/images/projects/space-rider/report/official-blueprint.png" alt="ESA 三视图蓝图" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">ESA 官方三视图蓝图</figcaption>
   </figure>
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <img src="/images/projects/space-rider/report/blueprint-calibration.png" alt="蓝图比例标定" class="w-full object-cover" loading="lazy" />
-    <figcaption class="p-2 text-center text-xs text-muted">蓝图 4.6 m 标定 (276.96 px/m)</figcaption>
-  </figure>
-</div>
-
-<div class="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[4/3] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/reference/esa-infographic.jpg" alt="ESA Space Rider 信息图" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">ESA 官方信息图</figcaption>
-  </figure>
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[4/3] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/reference/user-guide-cover.jpg" alt="Space Rider 用户指南封面" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">Space Rider 用户指南</figcaption>
-  </figure>
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[4/3] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/reference/ixv.jpg" alt="前代 IXV 飞行器" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">前代 IXV 验证机参考</figcaption>
-  </figure>
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[4/3] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/reference/esa-earth-render.jpg" alt="ESA Space Rider 轨道概念渲染" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">ESA 官方轨道概念渲染</figcaption>
+  <figure>
+    <img src="/images/projects/space-rider/report/blueprint-calibration.png" alt="蓝图比例标定" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">蓝图 4.6 m 标定 (276.96 px/m)</figcaption>
   </figure>
 </div>
 
-<video controls class="my-6 w-full rounded-lg" preload="metadata">
+<div class="not-prose my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <figure>
+    <img src="/images/projects/space-rider/reference/esa-infographic.jpg" alt="ESA Space Rider 信息图" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">ESA 官方信息图</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/reference/user-guide-cover.jpg" alt="Space Rider 用户指南封面" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">Space Rider 用户指南</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/reference/ixv.jpg" alt="前代 IXV 飞行器" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">前代 IXV 验证机参考</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/reference/esa-earth-render.jpg" alt="ESA Space Rider 轨道概念渲染" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">ESA 官方轨道概念渲染</figcaption>
+  </figure>
+</div>
+
+<video controls class="my-8 w-full rounded-xl shadow-sm" preload="metadata">
   <source src="/videos/projects/space-rider/esa-space-rider-2.mp4" type="video/mp4">
 </video>
 
@@ -99,9 +91,9 @@ v2 里我重新做了标准外形，我把再入舱从头开始重建了一遍�
 
 v2.720 完成后，大概有了该有的形态。所以它也成了受保护的基线——后面每次回滚，都是滚回这里。
 
-<figure class="not-prose my-6 overflow-hidden rounded-lg border border-border/50 bg-card/30">
-  <img src="/images/projects/space-rider/versions/v2-720-cinematic.jpg" alt="v2.720 受保护基线整机渲染" class="w-full object-cover" loading="lazy" />
-  <figcaption class="p-2.5 text-center text-xs text-muted">v2.720 受保护基线整机形态</figcaption>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/v2-720-cinematic.jpg" alt="v2.720 受保护基线整机渲染" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">v2.720 受保护基线整机形态</figcaption>
 </figure>
 
 ## v3 版本
@@ -132,30 +124,22 @@ v4 里，我依旧尝试使用 Claude Code，用径向重建的办法消掉鼻�
 
 但最后发现鼻尖还是有折痕，因为控制笼的末端是个伪极点。那就说明拓扑本身就是错的，移动顶点无法根治问题。所以我干脆删掉最后所有的面，把尖端重建成一个整洁的极点扇面，至此，模型第一次达到零凹陷。所以说拓扑问题，靠继续挪顶点是解决不了的！
 
-<div class="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[16/10] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/versions/v5.015-wide.jpg" alt="v5.015 阶段整机渲染" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">v5.015 阶段整机</figcaption>
+<div class="not-prose my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <figure>
+    <img src="/images/projects/space-rider/versions/v5.015-wide.jpg" alt="v5.015 阶段整机渲染" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">v5.015 阶段整机</figcaption>
   </figure>
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[16/10] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/versions/v5.027-wide.jpg" alt="v5.027 阶段整机渲染" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">v5.027 阶段整机</figcaption>
+  <figure>
+    <img src="/images/projects/space-rider/versions/v5.027-wide.jpg" alt="v5.027 阶段整机渲染" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">v5.027 阶段整机</figcaption>
   </figure>
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[16/10] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/versions/v5.044-wide.jpg" alt="v5.044 阶段整机渲染" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">v5.044 阶段整机</figcaption>
+  <figure>
+    <img src="/images/projects/space-rider/versions/v5.044-wide.jpg" alt="v5.044 阶段整机渲染" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">v5.044 阶段整机</figcaption>
   </figure>
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[16/10] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/versions/v5.049-wide.jpg" alt="v5.049 阶段整机渲染" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">v5.049 阶段整机</figcaption>
+  <figure>
+    <img src="/images/projects/space-rider/versions/v5.049-wide.jpg" alt="v5.049 阶段整机渲染" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">v5.049 阶段整机</figcaption>
   </figure>
 </div>
 
@@ -166,29 +150,26 @@ v4 里，我依旧尝试使用 Claude Code，用径向重建的办法消掉鼻�
 我按纵向站位，把机体重新映射到蓝图轮廓的 B-spline 拟合曲线上。改完之后，侧视图控制在 ±6 mm 以内，俯视图控制在 ±8.4 mm 以内。
 
 每个横截面还被投影到拟合椭圆上检查，最差差异 2.1 mm，rms 0.5 mm。
-<figure class="not-prose my-6 overflow-hidden rounded-lg border border-border/50 bg-card/30">
-  <img src="/images/projects/space-rider/blueprint-overlay.png" alt="最终蓝图叠加结果" class="w-full object-cover" loading="lazy" />
-  <figcaption class="p-2.5 text-center text-xs text-muted">最终蓝图叠加检验（侧视 ±6 mm / 俯视 ±8.4 mm）</figcaption>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/blueprint-overlay.png" alt="最终蓝图叠加结果" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">最终蓝图叠加检验（侧视 ±6 mm / 俯视 ±8.4 mm）</figcaption>
 </figure>
 
 表面平滑走的也是同一条路。最初用基于 4 cm 网格的限制器，数值检查全过，可外壳上留着 2.39 mm rms 的可见波纹。换成无网格的解析限制之后，粗糙度降到 0.09 mm rms。
 
-<figure class="not-prose my-6 overflow-hidden rounded-lg border border-border/50 bg-card/30">
-  <img src="/images/projects/space-rider/report/surface-rake-before-after.png" alt="解析表面约束前后的掠射光比较" class="w-full object-cover" loading="lazy" />
-  <figcaption class="p-2.5 text-center text-xs text-muted">解析表面约束前后的掠射光波纹对比</figcaption>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/report/surface-rake-before-after.png" alt="解析表面约束前后的掠射光比较" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">解析表面约束前后的掠射光波纹对比</figcaption>
 </figure>
-<div class="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[4/3] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/report/tail-junction.png" alt="最终尾端面和服务舱连接" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">最终尾端面和服务舱连接</figcaption>
+
+<div class="not-prose my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <figure>
+    <img src="/images/projects/space-rider/report/tail-junction.png" alt="最终尾端面和服务舱连接" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">最终尾端面和服务舱连接</figcaption>
   </figure>
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[4/3] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/report/animation-ready.png" alt="v5.051 动画就绪四组件版本" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">v5.051 动画就绪四组件版本</figcaption>
+  <figure>
+    <img src="/images/projects/space-rider/report/animation-ready.png" alt="v5.051 动画就绪四组件版本" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">v5.051 动画就绪四组件版本</figcaption>
   </figure>
 </div>
 
@@ -206,51 +187,37 @@ v4 里，我依旧尝试使用 Claude Code，用径向重建的办法消掉鼻�
 | 表面粗糙度 | 0.09 mm rms，从 2.39 mm 降低 |
 | 清理前后像素差 | 0.00000 |
 
-<figure class="not-prose my-6 overflow-hidden rounded-lg border border-border/50 bg-card/30">
-  <img src="/images/projects/space-rider/final-vehicle.png" alt="客户验收的 v5.050 Space Rider" class="w-full object-cover" loading="lazy" />
-  <figcaption class="p-2.5 text-center text-xs text-muted">客户最终验收的 v5.050 Space Rider</figcaption>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/final-vehicle.png" alt="客户验收的 v5.050 Space Rider" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">客户最终验收的 v5.050 Space Rider</figcaption>
 </figure>
 
-<div class="not-prose my-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[16/10] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/versions/v5-050-side.jpg" alt="v5.050 最终侧视形态" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">最终侧视轮廓</figcaption>
+<div class="not-prose my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <figure>
+    <img src="/images/projects/space-rider/versions/v5-050-side.jpg" alt="v5.050 最终侧视形态" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">最终侧视轮廓</figcaption>
   </figure>
-  <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-    <div class="aspect-[16/10] w-full overflow-hidden bg-black/10">
-      <img src="/images/projects/space-rider/versions/v5-050-persp.jpg" alt="v5.050 最终透视形态" class="h-full w-full object-cover" loading="lazy" />
-    </div>
-    <figcaption class="p-2 text-center text-xs text-muted">最终透视形态</figcaption>
+  <figure>
+    <img src="/images/projects/space-rider/versions/v5-050-persp.jpg" alt="v5.050 最终透视形态" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">最终透视形态</figcaption>
   </figure>
 </div>
 
-<div class="not-prose my-6">
-  <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-    <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-      <div class="aspect-[16/10] w-full overflow-hidden bg-black/10">
-        <img src="/images/projects/space-rider/versions/detail-flap.jpg" alt="襟翼细节" class="h-full w-full object-cover" loading="lazy" />
-      </div>
-      <figcaption class="p-1.5 text-center text-xs text-muted">襟翼细节</figcaption>
-    </figure>
-    <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-      <div class="aspect-[16/10] w-full overflow-hidden bg-black/10">
-        <img src="/images/projects/space-rider/versions/detail-nozzle.jpg" alt="喷管细节" class="h-full w-full object-cover" loading="lazy" />
-      </div>
-      <figcaption class="p-1.5 text-center text-xs text-muted">喷管细节</figcaption>
-    </figure>
-    <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-      <div class="aspect-[16/10] w-full overflow-hidden bg-black/10">
-        <img src="/images/projects/space-rider/versions/detail-wings-full.jpg" alt="翼面细节" class="h-full w-full object-cover" loading="lazy" />
-      </div>
-      <figcaption class="p-1.5 text-center text-xs text-muted">翼面细节</figcaption>
-    </figure>
-    <figure class="overflow-hidden rounded-lg border border-border/50 bg-card/30">
-      <div class="aspect-[16/10] w-full overflow-hidden bg-black/10">
-        <img src="/images/projects/space-rider/versions/detail-tail.jpg" alt="尾部细节" class="h-full w-full object-cover" loading="lazy" />
-      </div>
-      <figcaption class="p-1.5 text-center text-xs text-muted">尾部细节</figcaption>
-    </figure>
-  </div>
+<div class="not-prose my-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+  <figure>
+    <img src="/images/projects/space-rider/versions/detail-flap.jpg" alt="襟翼细节" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">襟翼细节</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/versions/detail-nozzle.jpg" alt="喷管细节" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">喷管细节</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/versions/detail-wings-full.jpg" alt="翼面细节" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">翼面细节</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/versions/detail-tail.jpg" alt="尾部细节" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+    <figcaption class="mt-2 text-center text-xs text-muted">尾部细节</figcaption>
+  </figure>
 </div>
