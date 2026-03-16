@@ -23,6 +23,12 @@ Space Rider 是我接到的第一个完整的模型任务，也是最重要的�
 
 简单来说，我的实际工作要求是只用公开的资料，用 Blender 重建 Space Rider 卫星模型。任务给的几何精度要求大约是 10 cm。
 
+![ESA 官方 Space Rider 概念图](/images/projects/space-rider/reference/esa-official-render.jpg)
+
+<video controls class="my-4 w-full rounded-lg" preload="metadata">
+  <source src="/videos/projects/space-rider/esa-space-rider-1.mp4" type="video/mp4">
+</video>
+
 ## 参考资料
 
 ESA 的三视图蓝图是外形唯一的依据。用户指南用来确定货舱门、接近舱门和推进器的位置；通过 ESA 渲染图和硬件照片可以推测涂装和材质；前代 IXV 的照片只能用来补那些实在看不清的细节，不能决定 Space Rider 的外形。
@@ -32,6 +38,17 @@ ESA 的三视图蓝图是外形唯一的依据。用户指南用来确定货舱�
 ![蓝图比例标定](/images/projects/space-rider/report/blueprint-calibration.png)
 
 回看我的工作，这件标本该在项目第一天就做，但实际上我到中期才把蓝图确认为唯一的外形标准，之前比照照片绘制的状态都不太理想，这也是我整个项目里最可惜的一笔返工。
+
+<div class="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+  <img src="/images/projects/space-rider/reference/esa-infographic.jpg" alt="ESA Space Rider 信息图" class="w-full rounded-lg object-cover" loading="lazy" />
+  <img src="/images/projects/space-rider/reference/user-guide-cover.jpg" alt="Space Rider 用户指南封面" class="w-full rounded-lg object-cover" loading="lazy" />
+  <img src="/images/projects/space-rider/reference/ixv.jpg" alt="前代 IXV 飞行器" class="w-full rounded-lg object-cover" loading="lazy" />
+  <img src="/images/projects/space-rider/reference/esa-earth-render.jpg" alt="ESA Space Rider 轨道概念渲染" class="w-full rounded-lg object-cover" loading="lazy" />
+</div>
+
+<video controls class="my-4 w-full rounded-lg" preload="metadata">
+  <source src="/videos/projects/space-rider/esa-space-rider-2.mp4" type="video/mp4">
+</video>
 
 ## v1 版本
 
@@ -54,6 +71,8 @@ v2 里我重新做了标准外形，我把再入舱从头开始重建了一遍�
 - 对比过后发现，机体高度高出 11%，整体压缩后重新对着蓝图核了尺寸。
 
 v2.720 完成后，大概有了该有的形态。所以它也成了受保护的基线——后面每次回滚，都是滚回这里。
+
+![v2.720 受保护基线整机渲染](/images/projects/space-rider/versions/v2-720-cinematic.jpg)
 
 ## v3 版本
 
@@ -82,6 +101,25 @@ v4 里，我依旧尝试使用 Claude Code，用径向重建的办法消掉鼻�
 但是后面又遇到了新问题，我反复挪动局部顶点，慢慢在表面堆出一条折痕带。后面换了个思路：一次性拟合整个鼻部，用 B-spline 截面加对称 Fourier 级数，具体是：共 91 个系数，拟合 rms 是 2.6 mm。
 
 但最后发现鼻尖还是有折痕，因为控制笼的末端是个伪极点。那就说明拓扑本身就是错的，移动顶点无法根治问题。所以我干脆删掉最后所有的面，把尖端重建成一个整洁的极点扇面，至此，模型第一次达到零凹陷。所以说拓扑问题，靠继续挪顶点是解决不了的！
+
+<div class="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+  <figure>
+    <img src="/images/projects/space-rider/versions/v5.015-wide.jpg" alt="v5.015 阶段整机渲染" class="w-full rounded-lg" loading="lazy" />
+    <figcaption class="mt-1 text-center text-xs text-muted">v5.015 阶段整机</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/versions/v5.027-wide.jpg" alt="v5.027 阶段整机渲染" class="w-full rounded-lg" loading="lazy" />
+    <figcaption class="mt-1 text-center text-xs text-muted">v5.027 阶段整机</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/versions/v5.044-wide.jpg" alt="v5.044 阶段整机渲染" class="w-full rounded-lg" loading="lazy" />
+    <figcaption class="mt-1 text-center text-xs text-muted">v5.044 阶段整机</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/space-rider/versions/v5.049-wide.jpg" alt="v5.049 阶段整机渲染" class="w-full rounded-lg" loading="lazy" />
+    <figcaption class="mt-1 text-center text-xs text-muted">v5.049 阶段整机</figcaption>
+  </figure>
+</div>
 
 ## 蓝图才是 king
 
@@ -116,3 +154,15 @@ v4 里，我依旧尝试使用 Claude Code，用径向重建的办法消掉鼻�
 | 清理前后像素差 | 0.00000 |
 
 ![客户验收的 v5.050 Space Rider](/images/projects/space-rider/final-vehicle.png)
+
+<div class="not-prose my-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+  <img src="/images/projects/space-rider/versions/v5-050-side.jpg" alt="v5.050 最终侧视形态" class="w-full rounded-lg" loading="lazy" />
+  <img src="/images/projects/space-rider/versions/v5-050-persp.jpg" alt="v5.050 最终透视形态" class="w-full rounded-lg" loading="lazy" />
+</div>
+
+<div class="not-prose my-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+  <img src="/images/projects/space-rider/versions/detail-flap.jpg" alt="襟翼细节" class="w-full rounded-lg" loading="lazy" />
+  <img src="/images/projects/space-rider/versions/detail-nozzle.jpg" alt="喷管细节" class="w-full rounded-lg" loading="lazy" />
+  <img src="/images/projects/space-rider/versions/detail-wings-full.jpg" alt="翼面细节" class="w-full rounded-lg" loading="lazy" />
+  <img src="/images/projects/space-rider/versions/detail-tail.jpg" alt="尾部细节" class="w-full rounded-lg" loading="lazy" />
+</div>
