@@ -35,35 +35,35 @@ Space Rider 是我接到的第一个完整的模型任务，也是最重要的�
 
 ESA 的三视图蓝图是外形唯一的依据。用户指南用来确定货舱门、接近舱门和推进器的位置；通过 ESA 渲染图和硬件照片可以推测涂装和材质；前代 IXV 的照片只能用来补那些实在看不清的细节，不能决定 Space Rider 的外形。
 
-<div class="not-prose my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <figure>
-    <img src="/images/projects/space-rider/report/official-blueprint.png" alt="ESA 三视图蓝图" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">ESA 官方三视图蓝图</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/report/blueprint-calibration.png" alt="蓝图比例标定" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">蓝图 4.6 m 标定 (276.96 px/m)</figcaption>
-  </figure>
-</div>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/report/official-blueprint.png" alt="ESA 三视图蓝图" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">ESA 官方三视图蓝图</figcaption>
+</figure>
 
-<div class="not-prose my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <figure>
-    <img src="/images/projects/space-rider/reference/esa-infographic.jpg" alt="ESA Space Rider 信息图" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">ESA 官方信息图</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/reference/user-guide-cover.jpg" alt="Space Rider 用户指南封面" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">Space Rider 用户指南</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/reference/ixv.jpg" alt="前代 IXV 飞行器" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">前代 IXV 验证机参考</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/reference/esa-earth-render.jpg" alt="ESA Space Rider 轨道概念渲染" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">ESA 官方轨道概念渲染</figcaption>
-  </figure>
-</div>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/report/blueprint-calibration.png" alt="蓝图比例标定" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">蓝图 4.6 m 标定 (276.96 px/m)</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/reference/esa-infographic.jpg" alt="ESA Space Rider 信息图" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">ESA 官方信息图</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/reference/user-guide-cover.jpg" alt="Space Rider 用户指南封面" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">Space Rider 用户指南封面</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/reference/ixv.jpg" alt="前代 IXV 飞行器" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">前代 IXV 验证机参考</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/reference/esa-earth-render.jpg" alt="ESA Space Rider 轨道概念渲染" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">ESA 官方轨道概念渲染</figcaption>
+</figure>
 
 <video controls class="my-8 w-full rounded-xl shadow-sm" preload="metadata">
   <source src="/videos/projects/space-rider/esa-space-rider-2.mp4" type="video/mp4">
@@ -124,24 +124,25 @@ v4 里，我依旧尝试使用 Claude Code，用径向重建的办法消掉鼻�
 
 但最后发现鼻尖还是有折痕，因为控制笼的末端是个伪极点。那就说明拓扑本身就是错的，移动顶点无法根治问题。所以我干脆删掉最后所有的面，把尖端重建成一个整洁的极点扇面，至此，模型第一次达到零凹陷。所以说拓扑问题，靠继续挪顶点是解决不了的！
 
-<div class="not-prose my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <figure>
-    <img src="/images/projects/space-rider/versions/v5.015-wide.jpg" alt="v5.015 阶段整机渲染" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">v5.015 阶段整机</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/versions/v5.027-wide.jpg" alt="v5.027 阶段整机渲染" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">v5.027 阶段整机</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/versions/v5.044-wide.jpg" alt="v5.044 阶段整机渲染" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">v5.044 阶段整机</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/versions/v5.049-wide.jpg" alt="v5.049 阶段整机渲染" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">v5.049 阶段整机</figcaption>
-  </figure>
-</div>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/v5.015-wide.jpg" alt="v5.015 阶段整机渲染" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">v5.015 阶段整机</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/v5.027-wide.jpg" alt="v5.027 阶段整机渲染" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">v5.027 阶段整机</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/v5.044-wide.jpg" alt="v5.044 阶段整机渲染" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">v5.044 阶段整机</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/v5.049-wide.jpg" alt="v5.049 阶段整机渲染" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">v5.049 阶段整机</figcaption>
+</figure>
 
 ## 蓝图才是 king
 
@@ -162,16 +163,15 @@ v4 里，我依旧尝试使用 Claude Code，用径向重建的办法消掉鼻�
   <figcaption class="mt-2 text-center text-xs text-muted">解析表面约束前后的掠射光波纹对比</figcaption>
 </figure>
 
-<div class="not-prose my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <figure>
-    <img src="/images/projects/space-rider/report/tail-junction.png" alt="最终尾端面和服务舱连接" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">最终尾端面和服务舱连接</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/report/animation-ready.png" alt="v5.051 动画就绪四组件版本" class="aspect-[4/3] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">v5.051 动画就绪四组件版本</figcaption>
-  </figure>
-</div>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/report/tail-junction.png" alt="最终尾端面和服务舱连接" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">最终尾端面和服务舱连接</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/report/animation-ready.png" alt="v5.051 动画就绪四组件版本" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">v5.051 动画就绪四组件版本</figcaption>
+</figure>
 
 ## 最终的对比
 
@@ -192,32 +192,32 @@ v4 里，我依旧尝试使用 Claude Code，用径向重建的办法消掉鼻�
   <figcaption class="mt-2 text-center text-xs text-muted">客户最终验收的 v5.050 Space Rider</figcaption>
 </figure>
 
-<div class="not-prose my-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-  <figure>
-    <img src="/images/projects/space-rider/versions/v5-050-side.jpg" alt="v5.050 最终侧视形态" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">最终侧视轮廓</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/versions/v5-050-persp.jpg" alt="v5.050 最终透视形态" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">最终透视形态</figcaption>
-  </figure>
-</div>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/v5-050-side.jpg" alt="v5.050 最终侧视形态" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">最终侧视轮廓</figcaption>
+</figure>
 
-<div class="not-prose my-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-  <figure>
-    <img src="/images/projects/space-rider/versions/detail-flap.jpg" alt="襟翼细节" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">襟翼细节</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/versions/detail-nozzle.jpg" alt="喷管细节" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">喷管细节</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/versions/detail-wings-full.jpg" alt="翼面细节" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">翼面细节</figcaption>
-  </figure>
-  <figure>
-    <img src="/images/projects/space-rider/versions/detail-tail.jpg" alt="尾部细节" class="aspect-[16/10] w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-    <figcaption class="mt-2 text-center text-xs text-muted">尾部细节</figcaption>
-  </figure>
-</div>
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/v5-050-persp.jpg" alt="v5.050 最终透视形态" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">最终透视形态</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/detail-flap.jpg" alt="襟翼细节" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">襟翼细节</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/detail-nozzle.jpg" alt="喷管细节" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">喷管细节</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/detail-wings-full.jpg" alt="翼面细节" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">翼面细节</figcaption>
+</figure>
+
+<figure class="not-prose my-8">
+  <img src="/images/projects/space-rider/versions/detail-tail.jpg" alt="尾部细节" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
+  <figcaption class="mt-2 text-center text-xs text-muted">尾部细节</figcaption>
+</figure>
