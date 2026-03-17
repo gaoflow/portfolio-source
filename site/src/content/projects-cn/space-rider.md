@@ -31,8 +31,8 @@ Space Rider 是我接到的第一个完整的模型任务，也是最重要的�
 <video controls class="my-8 w-full rounded-xl shadow-sm" preload="metadata">
   <source src="/videos/projects/space-rider/esa-space-rider-1.mp4" type="video/mp4">
 </video>
-## 参考资料
 
+## 参考资料
 ESA 的三视图蓝图是外形唯一的依据。用户指南用来确定货舱门、接近舱门和推进器的位置；通过 ESA 渲染图和硬件照片可以推测涂装和材质；前代 IXV 的照片只能用来补那些实在看不清的细节，不能决定 Space Rider 的外形。
 
 <figure class="not-prose my-8">
