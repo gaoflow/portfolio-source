@@ -97,10 +97,13 @@ $$
 
 它还让我养成了之后一直用的习惯：检查程序不能只证明它能跑，还得故意喂错误输入，确认它会在正确的位置停下来。
 
-## 怎么跑起来
+## 代码与运行
+
+代码已开源在 GitHub：[gaoflow/dimensionless-numbers](https://github.com/gaoflow/dimensionless-numbers)
 
 ```bash
-cd projects/dimensionless-numbers
+git clone https://github.com/gaoflow/dimensionless-numbers.git
+cd dimensionless-numbers
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 PYTHONPATH=src python3 -m dimensionless_numbers reynolds --rho 1.225 --u 50 --l 1.0 --mu 1.81e-5 --json

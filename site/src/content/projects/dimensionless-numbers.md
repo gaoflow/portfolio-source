@@ -110,10 +110,13 @@ The most important part of this project was not implementing six formulas. It wa
 
 My own hand calculations repeatedly exposed opportunities to confuse viscosity definitions and units, so I designed the failure paths before the normal calculation paths. I also learned that validation should not merely show that a program runs. It should deliberately supply incorrect inputs and confirm that the program stops at the right place.
 
-## How to run it
+## Code and reproduction
+
+The source code is open source on GitHub: [gaoflow/dimensionless-numbers](https://github.com/gaoflow/dimensionless-numbers)
 
 ```bash
-cd projects/dimensionless-numbers
+git clone https://github.com/gaoflow/dimensionless-numbers.git
+cd dimensionless-numbers
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 PYTHONPATH=src python3 -m dimensionless_numbers reynolds --rho 1.225 --u 50 --l 1.0 --mu 1.81e-5 --json
