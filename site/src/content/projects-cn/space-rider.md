@@ -1,5 +1,5 @@
 ---
-title: '把卫星公开蓝图用 Blender 重建成 3D 模型'
+title: '根据卫星蓝图用 Blender 重建 3D 模型'
 year: 2026
 date: '2026-06-15'
 status: complete
@@ -12,7 +12,7 @@ featured: true
 order: 8
 studySequence: 16
 model3d: /models/space-rider-v5.050.glb
-heroImage: /images/projects/space-rider-blueprint.png
+heroImage: /images/projects/space-rider/reference/esa-earth-render.jpg
 ---
 
 ## 模型介绍

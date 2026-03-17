@@ -12,7 +12,7 @@ featured: true
 order: 8
 studySequence: 16
 model3d: /models/space-rider-v5.050.glb
-heroImage: /images/projects/space-rider-blueprint.png
+heroImage: /images/projects/space-rider/reference/esa-earth-render.jpg
 ---
 
 ## Why I made this model

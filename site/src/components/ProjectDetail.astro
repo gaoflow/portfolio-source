@@ -53,10 +53,10 @@ const alternatePath = hasAlternate
         src={d.model3d}
         alt={d.title}
         poster={d.heroImage}
-        caption={isChinese ? '交互式 3D：按需加载后，可拖动旋转并滚动缩放。' : 'Interactive 3D — load on demand, then drag to rotate and scroll to zoom.'}
+        caption={isChinese ? '在线预览 3D' : 'Interactive 3D — drag to rotate and scroll to zoom.'}
       />
     )}
-    {d.heroImage && (
+    {d.heroImage && !d.model3d && (
       <img src={d.heroImage} alt={d.title} class="w-full border border-edge mb-10" loading="lazy" />
     )}
 
