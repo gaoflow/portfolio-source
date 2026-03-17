@@ -51,6 +51,14 @@ body {
   line-height: 1.55;
 }
 
+/* Article media: full natural aspect ratio, zero cropping, clean rounded corners */
+article .prose img,
+article .prose video {
+  border-radius: 0.75rem;
+  max-width: 100%;
+  height: auto;
+}
+
 ::selection {
   background: #d7e1ee; /* ink blue at ~12% over parchment, solid */
 }
