@@ -164,11 +164,6 @@ v4 里，我依旧尝试使用 Claude Code，用径向重建的办法消掉鼻�
 </figure>
 
 <figure class="not-prose my-8">
-  <img src="/images/projects/space-rider/report/tail-junction.png" alt="最终尾端面和服务舱连接" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
-  <figcaption class="mt-2 text-center text-xs text-muted">最终尾端面和服务舱连接</figcaption>
-</figure>
-
-<figure class="not-prose my-8">
   <img src="/images/projects/space-rider/report/animation-ready.png" alt="v5.051 动画就绪四组件版本" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
   <figcaption class="mt-2 text-center text-xs text-muted">v5.051 动画就绪四组件版本</figcaption>
 </figure>

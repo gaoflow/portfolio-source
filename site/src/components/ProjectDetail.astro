@@ -41,7 +41,7 @@ const alternatePath = hasAlternate
       <div class="mb-10 space-y-10">
         {d.academic.media.map((media) => (
           <figure>
-            <img src={media.src} alt={media.alt} class="w-full border border-edge bg-white" loading="lazy" />
+            <img src={media.src} alt={media.alt} class="w-full rounded-xl shadow-sm bg-white" loading="lazy" />
             <figcaption class="mt-2 font-mono text-xs leading-relaxed text-stone">{media.caption}</figcaption>
           </figure>
         ))}
@@ -57,7 +57,7 @@ const alternatePath = hasAlternate
       />
     )}
     {d.heroImage && !d.model3d && (
-      <img src={d.heroImage} alt={d.title} class="w-full border border-edge mb-10" loading="lazy" />
+      <img src={d.heroImage} alt={d.title} class="w-full rounded-xl shadow-sm mb-10" loading="lazy" />
     )}
 
     <div class="prose prose-neutral prose-lg max-w-none

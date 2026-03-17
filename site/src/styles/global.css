@@ -51,9 +51,9 @@ body {
   line-height: 1.55;
 }
 
-/* Article media: full natural aspect ratio, zero cropping, clean rounded corners */
-article .prose img,
-article .prose video {
+/* Article media (both hero and body): full natural aspect ratio, zero cropping, clean rounded corners */
+article img,
+article video {
   border-radius: 0.75rem;
   max-width: 100%;
   height: auto;
