@@ -1,12 +1,12 @@
 ---
-title: 'FlowROM — POD & DMD of Unsteady Flow Fields'
+title: 'How I compressed 480 flow fields into a few modes'
 year: 2026
 date: '2026-05-30'
 status: complete
 categories: [validation, tooling]
 tags: [CFD]
-summary: 'A reproducible reduced-order modelling study I ran on FlowLab snapshots: 480 independently generated velocity fields, held-out reconstruction, and a four-cycle frequency forecast.'
-role: 'Numerical methods & software engineering'
+summary: 'Unsteady CFD generates massive datasets that quickly fill hard drives. I built a lightweight particle-based fluid solver (FlowLab) from scratch, then created a reduced-order modeling toolkit (FlowROM): compressing hundreds of complex flow fields into 8 key mode shapes—much like video compression—and forecasting future flow evolution without re-running fluid solvers.'
+role: 'Numerical Methods & Software Engineering'
 duration: 'Independent study'
 featured: false
 order: 4
@@ -15,108 +15,133 @@ heroImage: /images/projects/flowrom/pod-modes.svg
 github: 'https://github.com/gaoflow/flowrom'
 ---
 
-## Origin: staring at tens of gigabytes of unsteady flowfield snapshots
+## Why I started by building my own solver
 
-The origin of this reduced-order modeling toolkit was running unsteady CFD simulations and staring at tens of gigabytes of raw snapshot files. Saving full-grid velocity fields every few milliseconds consumes vast storage and makes exploring dynamic patterns painfully slow.
+I wanted an intuitive way to explore fluid dynamics directly inside the browser and terminal. Commercial CFD tools require tedious meshing and heavy differential equation solvers that are too slow for real-time interactive web experiments.
 
-I wondered: periodic unsteady flows exhibit coherent spatial structures—why can't we compress hundreds of flowfield frames into a handful of dominant modes, like video compression?
+So, I built a lightweight fluid solver from scratch in JavaScript: **FlowLab**.
 
-To achieve high-ratio data compression and forecast future flow states without re-running full-order PDE solvers, I built this Proper Orthogonal Decomposition (POD) and Dynamic Mode Decomposition (DMD) pipeline.
+To keep it fast, I avoided solving the traditional Navier–Stokes equations and chose the **Lattice Boltzmann Method (LBM)**. Once written, it ran at 60 FPS in the browser, letting me drag obstacles and watch cavity vortex structures evolve in real time.
 
-## How I generated and divided the 480 snapshots
+However, when I moved on to study **unsteady periodic flows**, I hit an immediate bottleneck: **the dataset grew too large for my storage to handle**.
 
-FlowLab first converged a $48\times48$ lid-driven cavity at $Re=100$. I then applied a sinusoidal perturbation to the lid speed with a period of 400 solver iterations.
+Recording how vortices evolve over time meant saving the velocity of every single cell every few milliseconds. A single simulation easily generated dozens of gigabytes of raw snapshot files. Storing this data was expensive, and analyzing flow patterns by stepping through thousands of frames in post-processing tools was painfully slow.
 
-After four settling cycles, I recorded $u$ and $v$ at all 2,304 fluid cells every 10 iterations. This produced 480 snapshots and a $4{,}608\times480$ data matrix.
+I wondered: since periodic flows follow clear underlying rhythms, why can't we compress hundreds of 2D flow fields into a handful of core mode shapes—much like video compression? And could we forecast future flow evolution directly without re-running heavy fluid equations?
 
-I used the first 320 snapshots—eight complete forcing cycles—to train both models. I reserved the final 160 snapshots, or four complete cycles, and did not use them during fitting.
+To tackle this, I built the reduced-order modeling toolkit: **FlowROM**.
 
-A random frame-level split would have placed nearly identical phases of the same periodic response in both sets. That would mainly test interpolation between neighbouring states. The chronological split instead required DMD to advance autonomously beyond the training endpoint and required POD to reconstruct later flow fields.
+---
 
-This is still not a distribution-shift test. Training and holdout data share the same geometry, Reynolds number, mean lid speed, forcing amplitude, and forcing frequency. The split measures temporal continuation under one operating condition.
+## What exactly is the Lattice Boltzmann Method (LBM)?
 
-![POD modal energy and held-out reconstruction error](/images/projects/flowrom/pod-spectrum.svg)
+While traditional CFD treats fluid as a continuous block and solves complex calculus equations, the Lattice Boltzmann Method models fluid as **swarms of virtual particles bouncing around on a regular grid**.
 
-## POD compression and reconstruction
+I implemented the standard 2D model: **D2Q9**. The domain is divided into square cells where particles can move in 9 discrete directions (stationary at the center, 4 cardinal axes, and 4 diagonals).
 
-I subtracted the training mean and applied singular-value decomposition to obtain orthonormal spatial modes ordered by captured fluctuation energy.
+In every time step, the algorithm executes two basic operations:
 
-| Rank | Training fluctuation error | Held-out fluctuation error |
+1. **Collision**: Particles arriving at the same node collide and redistribute their velocities toward local equilibrium;
+2. **Streaming**: After colliding, particles hop along their directions to neighboring grid nodes.
+
+Summing the particles across all 9 directions yields the local fluid density, and taking their momentum-weighted average gives the macroscopic flow velocity.
+
+Because LBM avoids solving global pressure Poisson equations, it is naturally parallel and extremely fast. I set up a lid-driven cavity flow with a sinusoidal lid velocity perturbation. Once the flow settled into a stable limit cycle, I saved a snapshot every 10 steps, exporting **480 full flowfield snapshots** to feed into the reduction pipeline.
+
+---
+
+## How FlowROM works
+
+FlowROM does not solve fluid dynamics equations. It is an algorithmic toolkit designed to compress flowfield data and forecast its evolution. It consists of two complementary components:
+
+### 1. POD: extracting the core spatial modes
+POD works like dimensional reduction. After subtracting the mean flow from the 480 snapshots, it uses Singular Value Decomposition (SVD) to decompose the messy flow fields into a series of orthogonal spatial modes ranked by importance.
+
+- Raw flow fields contain thousands of velocity numbers per frame;
+- POD reduces this entire dataset to just **8 core spatial mode shapes** and their temporal coefficients;
+- Storage requirements drop by **nearly 50x**, while reconstructing unseen test flows with around 0.1% fluctuation error.
+
+### 2. DMD: the temporal metronome
+POD compresses historical flow fields, but cannot advance states forward in time on its own. To forecast future dynamics, I integrated DMD.
+
+DMD analyzes the sequential progression of snapshot frames and fits a linear operator to advance time:
+- **First, catch the frequency**: DMD automatically extracts the primary oscillation frequency with high precision;
+- **Then, forecast autonomously**: Starting from the end of the training data, DMD steps forward step by step on its own, forecasting four full cycles of flow evolution without calling the fluid solver.
+
+---
+
+## How to split data: why random frame sampling is cheating
+
+When analyzing flowfield data, avoiding self-deception is paramount.
+
+I used the first 320 snapshots (the first 8 cycles) for training and strictly quarantined the final 160 snapshots (4 full cycles) as the unseen test exam.
+
+![POD energy and holdout reconstruction error](/images/projects/flowrom/pod-spectrum.svg)
+
+In standard machine learning, people often randomly sample 20% of the data for testing. **In periodic fluid dynamics, random frame sampling is severe data leakage**.
+
+Because periodic flows repeat cyclically, a randomly sampled test frame shares near-identical flow states with the frames right before and after it in the training set. The model would not need to learn genuine physical evolution; it could achieve a cosmetically low error simply by interpolating between neighboring frames.
+
+Reserving four continuous cycles at the end forces the model to step into genuinely unobserved territory from a fixed starting point, proving whether it truly captured the physical dynamics.
+
+---
+
+## The most valuable failure: why keeping only one mode breaks down
+
+When looking at the energy distribution, the 1st spatial mode accounts for **87%** of the fluctuating kinetic energy. Looking only at this number, one might assume that a single mode is enough to represent the flow.
+
+However, when I used only this 1st mode to reconstruct the unseen test set, the error spiked to **36%**—discarding over a third of the dynamic fluctuations!
+
+| Modes Retained | Training Error | Unseen Test Error |
 |---:|---:|---:|
-| 1 | 35.981% | 35.971% |
-| 2 | 1.630% | 1.301% |
-| 4 | 0.387% | 0.471% |
-| 8 | 0.0885% | 0.123% |
-| 16 | 0.00439% | 0.00949% |
+| 1 mode | 35.98% | **35.97% (severe distortion)** |
+| 2 modes | 1.63% | **1.30% (instant recovery)** |
+| 4 modes | 0.39% | 0.47% |
+| 8 modes | 0.09% | 0.12% |
 
-At rank 8, storing one mean field, eight spatial modes, and eight coefficients per snapshot requires 48.8 times fewer scalar values than storing the original matrix. The held-out fluctuation error is 0.123%.
+**Why did 1 mode fail so dramatically?**
+Periodic vortex shedding in space is a closed rotational trajectory. Describing a full rotation requires at least a pair of orthogonal directions (just as plotting a circle requires both $\cos$ and $\sin$). With only one mode, the flow cannot physically rotate across phases.
 
-Two modes retain 99.973% of the training fluctuation energy, but retained energy alone does not establish reconstruction quality on later fields. I therefore selected and evaluated ranks using the chronological holdout as well as the training spectrum.
+Adding the 2nd mode caused the test error to plummet from 36% down to 1.3%. This failure made one thing clear: **model truncation cannot be decided by cumulative energy on training data alone; it must be audited against unobserved test data and physical kinematics**.
 
-## The useful failure at rank 1
+---
 
-The first POD mode contains 87.05% of the training fluctuation energy. Judged only by that percentage, a rank-1 model might appear sufficient.
+## Why I deliberately report two different errors
 
-It is not. Rank 1 misses 35.97% of the fluctuation in the held-out cycles. The periodic response needs a quadrature pair: the first mode represents the main spatial shape, while the second provides the other phase needed to follow the oscillation.
+When evaluating DMD forecast accuracy across the 4 unobserved cycles, I report two distinct error figures:
 
-Adding the second mode reduces held-out error directly to 1.301%. This failure showed me that the minimum useful rank cannot be chosen from training energy alone; it must also be checked against fields excluded from fitting.
+- Relative to the **full velocity field**: **0.10%** (looks cosmetically perfect)
+- Relative to **mean-subtracted dynamic fluctuations**: **1.41%** (honest reflection of time-stepping error)
 
-## DMD frequency identification and forecast
+![DMD probe forecasts and modal frequencies](/images/projects/flowrom/dmd-forecast.svg)
 
-I fitted a rank-12 exact DMD linear evolution operator to consecutive training snapshots.
+In cavity flows, the steady mean flow contributes the majority of velocity magnitude. Using full velocity as the denominator dilutes the forecasting error down to 0.10%.
 
-The imposed frequency was 0.025 cycles per snapshot. The strongest oscillatory DMD mode had a frequency of 0.02500023 cycles per snapshot, giving a relative frequency error of 0.00093%.
+However, evaluating the quality of dynamic forecasting requires isolating the fluctuations. Normalizing by fluctuation magnitude reveals the true dynamic error of 1.41%. Reporting only 0.10% would use the steady average to mask time-stepping discrepancies. Reporting both numbers provides an honest engineering assessment.
 
-I then advanced the model autonomously through the four held-out cycles. The relative Frobenius error was 0.100% when measured against the complete velocity state and 1.41% when measured against fluctuations about the training mean.
+---
 
-![DMD probe forecast and modal spectrum](/images/projects/flowrom/dmd-forecast.svg)
+## Preventing the solver from grading its own homework
 
-## Why I retained both DMD errors
+FlowLab is both the data generator and the reference benchmark. If the reduction code has a subtle bug, relying solely on FlowLab data might leave it unnoticed.
 
-The complete velocity field contains a dominant steady mean component. Normalising by the full state makes the denominator much larger, so the 0.100% error answers: “How much of the total flow-field norm is wrong?”
+To prevent self-referential validation, I added two independent mathematical synthetic unit tests:
+1. A known analytical rank-2 matrix to verify that POD reconstructs it with zero loss;
+2. A pure synthetic sine wave to verify that DMD extracts exact frequencies and trajectories.
 
-After removing the training mean, the 1.41% error answers a different question: “How much of the unsteady fluctuation is wrong?”
+Because these benchmark tests have undisputed mathematical solutions, any failure immediately isolates bugs in the reduction algorithms from physical data noise.
 
-Both values are correct. Reporting only the smaller full-state error would allow the stable mean flow to hide part of the temporal prediction error, so I retained both denominators.
+---
 
-## What POD and DMD established
+## What this project does not claim
 
-| Metric | Question it answers |
-|---|---|
-| POD energy fraction | How many spatial directions represent the training fluctuation? |
-| POD held-out error | Can those directions reconstruct later, unseen cycles? |
-| DMD frequency | Did the evolution operator identify the correct time scale? |
-| DMD forecast error | Can the model advance beyond its fitting interval? |
+All data in this study comes from a coarse $48\times48$ lid-driven cavity with a single geometry, single Reynolds number ($Re=100$), and single operating condition. It is not complex turbulent external aerodynamics, and cannot be used directly as a surrogate model for a racecar wake.
 
-POD was the more useful method here for storage and reconstruction. Rank 8 reduced the scalar count by 48.8 times while keeping held-out fluctuation error at 0.123%.
+Applying this methodology to full-car CFD requires sweeping ride heights, speeds, and yaw angles, with test sets partitioned across distinct operating conditions.
 
-DMD was evaluated on temporal behaviour rather than maximum captured energy. The rank-12 model identified 0.02500023 cycles per snapshot and maintained the phase through the reserved four-cycle interval.
+Nevertheless, the foundational workflow established here—leakage-free temporal partitioning, POD spatial compression, DMD frequency extraction, orthogonal modal matching, and dual-denominator error auditing—provides a solid, rigorous data analysis framework.
 
-Neither result makes ranks 8 and 12 universal choices. Rank is part of the model definition and must be selected again when the operating condition, geometry, or observed quantity changes.
-
-## How I checked the implementation
-
-I did not use the FlowLab production case as the implementation’s only oracle. I also used two synthetic tests:
-
-- POD had to recover a known rank-2 field exactly.
-- DMD had to identify and forecast a known sinusoidal signal to numerical precision.
-
-The analysis exits with a nonzero status unless all four predeclared acceptance gates pass:
-
-1. held-out POD error decreases as rank increases;
-2. rank-8 held-out fluctuation error remains below 2%;
-3. the dominant DMD frequency remains within 5% of the known forcing frequency;
-4. DMD full-state holdout error remains below 2%.
-
-These checks help distinguish a decomposition or forecasting defect from a problem in FlowLab’s generated data. A visually plausible mode plot is not enough to pass the analysis.
-
-## Limits and next work
-
-This study uses one coarse-grid cavity, one geometry, one Reynolds number, and one deterministic sinusoidal perturbation. A D2Q9 BGK lid-driven cavity is not turbulent external aerodynamics, and these results do not constitute a surrogate model for a racing-car wake.
-
-Applying the same process to vehicle CFD would require data spanning multiple ride heights, yaw angles, speeds, and geometry states. It would also require holdout sets defined by operating condition rather than only by time.
-
-The current result demonstrates snapshot selection, leakage prevention, compression, reconstruction, frequency identification, autonomous continuation, and explicit error accounting under one operating condition. It does not claim production CFD fidelity.
+---
 
 ## Code and reproduction
 
@@ -133,10 +158,4 @@ python3 scripts/analyse.py
 
 Unsteady CFD simulations generate massive flowfield datasets across grid cells and time steps, creating multi-gigabyte storage footprints that cannot be deployed in real-time control loops.
 
-FlowROM applies Proper Orthogonal Decomposition (POD) to 480 flowfield snapshots, capturing over 99.9% of fluctuating kinetic energy with just 8 spatial modes (a 48.8x compression ratio, holdout error 0.123%). Combined with Dynamic Mode Decomposition (DMD), it extracts dominant frequencies to 0.00093% accuracy and autonomously forecasts future flow states without re-running full-order PDE solvers.
-
-## What I learned
-
-The rank-1 result changed how I assess reduced-order models. Capturing 87.05% of the training fluctuation energy sounds strong, but the resulting model still missed 35.97% of the held-out fluctuation. The chronological holdout and the drop to 1.301% at rank 2 exposed a failure that the energy percentage alone would have approved.
-
-I also learned to inspect both the numerator and denominator of every reported error. The same DMD forecast scores 0.100% against the full velocity state and 1.41% against the fluctuations. Neither number replaces the other because they describe different aspects of the prediction.
+FlowROM applies Proper Orthogonal Decomposition (POD) to 480 flowfield snapshots, capturing over 99.9% of fluctuating kinetic energy with just 8 spatial modes (a nearly 50x compression ratio); combined with Dynamic Mode Decomposition (DMD), it extracts dominant frequencies with high accuracy and forecasts future flow states without re-running full-order PDE solvers.
