@@ -12,6 +12,7 @@ featured: false
 order: 5
 studySequence: 14
 heroImage: /images/projects/flowlab/cavity-vorticity.svg
+github: 'https://github.com/gaoflow/flowlab'
 ---
 
 ## 这件事的缘起：网页里的流体小特效，为什么大部分都是“假物理”？
@@ -106,7 +107,16 @@ $\tau$ 一靠近 0.5，BGK 就会变脆；半格反弹还会带来随网格变�
 
 它是数值方法和教学工具，替代不了工业有限体积求解器。以后如果改用 MRT 或正则化碰撞，三套网格和外部参考检查必须全部重跑。
 
+## 代码与运行
 
+本项目已开源在 GitHub: [gaoflow/flowlab](https://github.com/gaoflow/flowlab)
+
+```bash
+git clone https://github.com/gaoflow/flowlab.git
+cd flowlab
+npm test
+npm run analyse
+```
 
 ## 实际应用场景：我在什么时候用到了它
 
@@ -119,14 +129,3 @@ FlowLab 作为一个零外部依赖的轻量级格子玻尔兹曼求解器，既
 第一次 20,000 步的运行让我确认：结果接近参考数据和内部状态收敛，不是同一件事。加迭代次数可以把前者没走完的路走完，但不能靠降低标准让运行“合格”。
 
 移动顶盖那次也提醒我：显示层不能替数值核心补边界条件。一个值画对了，不代表分布函数和守恒关系被正确更新。
-
-## 代码与运行
-
-代码已开源在 GitHub：[gaoflow/flowlab](https://github.com/gaoflow/flowlab)
-
-```bash
-git clone https://github.com/gaoflow/flowlab.git
-cd flowlab
-npm test
-npm run validate
-```

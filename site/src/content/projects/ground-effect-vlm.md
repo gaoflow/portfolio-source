@@ -12,6 +12,7 @@ featured: false
 order: 6
 studySequence: 13
 heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg
+github: 'https://github.com/gaoflow/ground-effect-vlm'
 ---
 
 ## Origin: why does downforce surge when a wing approaches the road?
@@ -98,7 +99,16 @@ The next step should first add finite thickness and chordwise loading. Vehicle c
 
 The low-order result should remain a reference for sign and scale. It should not be recalibrated after seeing the RANS result.
 
+## Code and reproduction
 
+The source code is open source on GitHub: [gaoflow/ground-effect-vlm](https://github.com/gaoflow/ground-effect-vlm)
+
+```bash
+git clone https://github.com/gaoflow/ground-effect-vlm.git
+cd ground-effect-vlm
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+```
 
 ## Practical applications: exploring aerodynamic ground-effect windows for racecar wings
 
@@ -111,14 +121,3 @@ Using this image-vortex VLM, I swept 14 continuous ride heights from $h/c=0.25$ 
 The most valuable result was not the maximum lift, but the $h/c=0.25$ endpoint where the model was no longer worth trusting.
 
 I also learned to report fixed-incidence lift, absolute induced drag, and induced-drag cost per lift squared separately. These quantities answer different questions, and combining them into a single claim that “efficiency improved” would hide the actual change.
-
-## Code and reproduction
-
-The source code is open source on GitHub: [gaoflow/ground-effect-vlm](https://github.com/gaoflow/ground-effect-vlm)
-
-```bash
-git clone https://github.com/gaoflow/ground-effect-vlm.git
-cd ground-effect-vlm
-python3 -m unittest discover -s tests -v
-python3 scripts/analyse.py
-```

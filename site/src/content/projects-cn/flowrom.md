@@ -1,5 +1,5 @@
 ---
-title: '我怎样把 480 个流场压缩成少量模态'
+title: '我是如何把 480 个流场压缩成少量模态的'
 year: 2026
 date: '2026-05-30'
 status: complete
@@ -12,17 +12,16 @@ featured: false
 order: 4
 studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg
+github: 'https://github.com/gaoflow/flowrom'
 ---
 
-## 这件事的缘起：硬盘被几十个 G 的流场快照塞满之后
+做这套降阶工具之前，又一次我跑完一次非定常 CFD 模拟后，硬盘里几十个 G 的快照文件塞满了，因为每隔几毫秒就有一整张网格的数据，这些数据存起来极占地方，而且想看流场规律还得在后处理软件里一帧一帧慢吞吞地翻。
 
-做这套降阶工具的缘起，是我跑完一次非定常 CFD 模拟后，看着硬盘里被塞满的几十个 G 快照文件发愁：每隔几个毫秒就是一整张网格的数据，存起来极占地方，想看流场规律还得在后处理软件里一帧一帧慢吞吞地翻。
-
-当时我就在想：非定常流动明明有很强的周期性规律，为什么不能像压缩视频一样，把几百帧复杂的流场压缩成几个核心的空间形状？
+当时我就在想：非定常流动明明有很强的周期性规律，为什么不能像压缩视频一样，把几百帧复杂的流场压缩成几个核心的空间形状呢？
 
 为了实现流场数据的高倍压缩，并且能在不解复杂微分方程的情况下自主预测未来时段的流动演变，我搭建了这套基于 POD 和 DMD 的流场降阶流水线。
 
-## 480 个快照是怎么来的
+## 快照生成
 
 FlowLab 先让一个 $48\times48$、$Re=100$ 的顶盖驱动方腔收敛，然后以 400 次迭代为一个周期，对顶盖速度加正弦扰动。
 
@@ -123,10 +122,13 @@ FlowLab 既是出题人又是数据来源，如果只用它评卷，实现错了
 
 我也开始同时检查误差的分子和分母。同一个预测，换个分母就是 0.100% 或 1.41%——两个数都对，但回答的问题完全不同。
 
-## 怎么运行
+## 代码与运行
+
+本项目已开源在 GitHub: [gaoflow/flowrom](https://github.com/gaoflow/flowrom)
 
 ```bash
-cd projects/flowrom
+git clone https://github.com/gaoflow/flowrom.git
+cd flowrom
 node scripts/generate-snapshots.mjs
 python3 scripts/analyse.py
 ```

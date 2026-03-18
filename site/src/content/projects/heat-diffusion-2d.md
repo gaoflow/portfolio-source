@@ -12,6 +12,7 @@ featured: false
 order: 15
 studySequence: 7
 heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
+github: 'https://github.com/gaoflow/heat-diffusion-2d'
 ---
 
 ## Origin: a tiny time-step increase blew the field into NaN
@@ -159,7 +160,16 @@ The current model supports only constant isotropic diffusivity, uniform Cartesia
 
 Extending the solver beyond these limits would require new numerical treatment and new validation cases rather than assuming that the present checks still apply unchanged.
 
+## Code and reproduction
 
+The source code is open source on GitHub: [gaoflow/heat-diffusion-2d](https://github.com/gaoflow/heat-diffusion-2d)
+
+```bash
+git clone https://github.com/gaoflow/heat-diffusion-2d.git
+cd heat-diffusion-2d
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+```
 
 ## Practical applications: transient thermal diffusion in inverter modules and battery cold plates
 
@@ -172,14 +182,3 @@ This 2D explicit solver computes transient heat spreading and diffusion delays, 
 I originally expected temporal refinement to be a straightforward comparison with the analytical solution. Deriving the truncation term first showed that the comparison would not isolate the error I wanted to measure. Replacing the analytical reference with a fine-time result on the same grid allowed me to measure temporal order without folding the shared spatial error into it.
 
 I also learned to treat refusal as a valid numerical result. Rejecting the $r=0.26$ case is part of correct solver behaviour; the user should not have to discover an invalid time step only after the solution diverges.
-
-## Code and reproduction
-
-The source code is open source on GitHub: [gaoflow/heat-diffusion-2d](https://github.com/gaoflow/heat-diffusion-2d)
-
-```bash
-git clone https://github.com/gaoflow/heat-diffusion-2d.git
-cd heat-diffusion-2d
-python3 -m unittest discover -s tests -v
-python3 scripts/analyse.py
-```

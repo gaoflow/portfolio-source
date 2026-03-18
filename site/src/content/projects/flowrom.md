@@ -12,6 +12,7 @@ featured: false
 order: 4
 studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg
+github: 'https://github.com/gaoflow/flowrom'
 ---
 
 ## Origin: staring at tens of gigabytes of unsteady flowfield snapshots
@@ -117,7 +118,16 @@ Applying the same process to vehicle CFD would require data spanning multiple ri
 
 The current result demonstrates snapshot selection, leakage prevention, compression, reconstruction, frequency identification, autonomous continuation, and explicit error accounting under one operating condition. It does not claim production CFD fidelity.
 
+## Code and reproduction
 
+The source code is open source on GitHub: [gaoflow/flowrom](https://github.com/gaoflow/flowrom)
+
+```bash
+git clone https://github.com/gaoflow/flowrom.git
+cd flowrom
+node scripts/generate-snapshots.mjs
+python3 scripts/analyse.py
+```
 
 ## Practical applications: high-ratio compression and reduced-order forecasting for unsteady CFD
 
@@ -130,14 +140,3 @@ FlowROM applies Proper Orthogonal Decomposition (POD) to 480 flowfield snapshots
 The rank-1 result changed how I assess reduced-order models. Capturing 87.05% of the training fluctuation energy sounds strong, but the resulting model still missed 35.97% of the held-out fluctuation. The chronological holdout and the drop to 1.301% at rank 2 exposed a failure that the energy percentage alone would have approved.
 
 I also learned to inspect both the numerator and denominator of every reported error. The same DMD forecast scores 0.100% against the full velocity state and 1.41% against the fluctuations. Neither number replaces the other because they describe different aspects of the prediction.
-
-## Code and reproduction
-
-The source code is open source on GitHub: [gaoflow/flowrom](https://github.com/gaoflow/flowrom)
-
-```bash
-git clone https://github.com/gaoflow/flowrom.git
-cd flowrom
-node scripts/generate-snapshots.mjs
-python3 scripts/analyse.py
-```

@@ -12,6 +12,7 @@ featured: false
 order: 7
 studySequence: 8
 heroImage: /images/projects/airfoil-methods/lift-validation.svg
+github: 'https://github.com/gaoflow/airfoil-methods'
 ---
 
 ## 这件事的缘起：跑一次 CFD 等半天，几十年前的古老方法还管用吗？
@@ -112,17 +113,9 @@ NASA 用尾流测量得到的 $C_d$，从零升力附近的约 0.0065 一路涨�
 
 这让我确认：模型更复杂，不等于结果自动更准确。碰到差异，先分清它是离散误差还是模型缺失的物理，再决定是加密网格、改实现，还是直接换一个更高保真度的方法。
 
-
-
-## 实际应用场景：我在什么时候用到了它
-
-在设计赛车前翼和尾翼时，如果直接用三维 RANS（OpenFOAM）对几十种翼型方案跑 CFD，每次计算都需要数小时甚至数天。
-
-用这套薄翼理论和 Hess–Smith 面板法工具，可以在毫秒级内批量计算任意对称或弯度翼型在不同迎角下的线性升力斜率、全表面压力分布 $C_p$ 和压力中心，快速排除升力不足或吸力峰过尖的候选外形。随后再把筛选出的优质翼型送入高阶 CFD 进行黏性分离与网格收敛计算，大幅节省了计算资源。
-
 ## 代码与运行
 
-代码已开源在 GitHub：[gaoflow/airfoil-methods](https://github.com/gaoflow/airfoil-methods)
+本项目已开源在 GitHub: [gaoflow/airfoil-methods](https://github.com/gaoflow/airfoil-methods)
 
 ```bash
 git clone https://github.com/gaoflow/airfoil-methods.git
@@ -130,3 +123,9 @@ cd airfoil-methods
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
+
+## 实际应用场景：我在什么时候用到了它
+
+在设计赛车前翼和尾翼时，如果直接用三维 RANS（OpenFOAM）对几十种翼型方案跑 CFD，每次计算都需要数小时甚至数天。
+
+用这套薄翼理论和 Hess–Smith 面板法工具，可以在毫秒级内批量计算任意对称或弯度翼型在不同迎角下的线性升力斜率、全表面压力分布 $C_p$ 和压力中心，快速排除升力不足或吸力峰过尖的候选外形。随后再把筛选出的优质翼型送入高阶 CFD 进行黏性分离与网格收敛计算，大幅节省了计算资源。

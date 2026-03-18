@@ -12,6 +12,7 @@ featured: false
 order: 12
 studySequence: 6
 heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg
+github: 'https://github.com/gaoflow/steady-conduction-1d'
 ---
 
 ## Origin: when my first convergence study hit machine roundoff
@@ -102,14 +103,6 @@ The model is one-dimensional and steady, with constant material properties. It d
 
 The manufactured solution is a verification tool, not a physical operating condition. Extending the model to the omitted effects would require new equations, boundary treatments, and verification cases.
 
-
-
-## Practical applications: numerical foundation for cooling jacket and heatsink conduction
-
-When calculating steady temperature distributions across motor stator jackets and inverter heatsinks, conduction equations must be discretized with fixed-temperature or convective Robin boundaries.
-
-This 1D solver verified the half-control-volume boundary formulation, eliminating the half-cell offset distortion common in naive Robin discretizations, and delivered $\mathcal{O}(N)$ solution speed via the custom Thomas algorithm. Crucially, verifying second-order convergence (2.0002) via the Method of Manufactured Solutions (MMS) established a trusted discretization scheme for subsequent 2D and thermal network models.
-
 ## Code and reproduction
 
 The source code is open source on GitHub: [gaoflow/steady-conduction-1d](https://github.com/gaoflow/steady-conduction-1d)
@@ -120,3 +113,9 @@ cd steady-conduction-1d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
+
+## Practical applications: numerical foundation for cooling jacket and heatsink conduction
+
+When calculating steady temperature distributions across motor stator jackets and inverter heatsinks, conduction equations must be discretized with fixed-temperature or convective Robin boundaries.
+
+This 1D solver verified the half-control-volume boundary formulation, eliminating the half-cell offset distortion common in naive Robin discretizations, and delivered $\mathcal{O}(N)$ solution speed via the custom Thomas algorithm. Crucially, verifying second-order convergence (2.0002) via the Method of Manufactured Solutions (MMS) established a trusted discretization scheme for subsequent 2D and thermal network models.

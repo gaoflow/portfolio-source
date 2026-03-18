@@ -12,6 +12,7 @@ featured: false
 order: 7
 studySequence: 8
 heroImage: /images/projects/airfoil-methods/lift-validation.svg
+github: 'https://github.com/gaoflow/airfoil-methods'
 ---
 
 ## Origin: waiting hours for CFD—do vintage panel methods still hold up?
@@ -110,7 +111,16 @@ This low-order hierarchy is useful for checking geometry, force signs, linear li
 
 It is not suitable for ranking high-lift sections by drag or stall margin. Those decisions require a model that includes viscosity and transition, together with appropriate near-wall resolution and grid, turbulence-model, and transition-model sensitivity studies.
 
+## Code and reproduction
 
+The source code is open source on GitHub: [gaoflow/airfoil-methods](https://github.com/gaoflow/airfoil-methods)
+
+```bash
+git clone https://github.com/gaoflow/airfoil-methods.git
+cd airfoil-methods
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+```
 
 ## Practical applications: rapid low-cost screening for FSAE multi-element wing airfoils
 
@@ -125,14 +135,3 @@ I expected the geometry-resolved panel method to outperform thin-airfoil theory 
 The corrective action was not to keep adding panels. It was to identify the remaining discrepancy as a model-form limitation, restrict the model to questions it can support, and move to a viscous method when drag, transition, or separation matters.
 
 The broader lesson was that greater model complexity does not guarantee greater accuracy. I first need to decide whether a discrepancy comes from discretisation, implementation, or missing physics; only then can I choose between refining the mesh, correcting the solver, or using a higher-fidelity model.
-
-## Code and reproduction
-
-The source code is open source on GitHub: [gaoflow/airfoil-methods](https://github.com/gaoflow/airfoil-methods)
-
-```bash
-git clone https://github.com/gaoflow/airfoil-methods.git
-cd airfoil-methods
-python3 -m unittest discover -s tests -v
-python3 scripts/analyse.py
-```

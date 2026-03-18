@@ -12,6 +12,7 @@ featured: false
 order: 15
 studySequence: 7
 heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
+github: 'https://github.com/gaoflow/heat-diffusion-2d'
 ---
 
 ## 这件事的缘起：调大一点点步长，结果全屏瞬间炸成 NaN
@@ -106,17 +107,9 @@ $$
 
 这次改动让我养成了一个习惯：开始跑研究之前先问一句，我现在做的这个对比，能不能真正只测我想测的那个误差。它也让我确认了一件事：拒绝一个不稳定的算例，本身就是一个正确的结果，不该把发现问题这件事留给用户在发散之后去做。
 
-
-
-## 实际应用场景：我在什么时候用到了它
-
-在赛车急加速或电机大倍率放电时，逆变器 IGBT 模块和电池均温板会产生短时高热流冲击（如 6.0 kW 峰值热负荷持续 10 秒）。此时稳态分析不再适用，必须使用二维瞬态热扩散模型计算局部热堆积和扩散延迟。
-
-该求解器内置的 $r \le 0.25$ 稳定性自动防御与一阶时间精度验证，保证了在评估非稳态导热响应时绝不发生隐蔽的数值发散，为 FSAE 瞬态温升预估提供了可靠的时变计算核心。
-
 ## 代码与运行
 
-代码已开源在 GitHub：[gaoflow/heat-diffusion-2d](https://github.com/gaoflow/heat-diffusion-2d)
+本项目已开源在 GitHub: [gaoflow/heat-diffusion-2d](https://github.com/gaoflow/heat-diffusion-2d)
 
 ```bash
 git clone https://github.com/gaoflow/heat-diffusion-2d.git
@@ -124,3 +117,9 @@ cd heat-diffusion-2d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
+
+## 实际应用场景：我在什么时候用到了它
+
+在赛车急加速或电机大倍率放电时，逆变器 IGBT 模块和电池均温板会产生短时高热流冲击（如 6.0 kW 峰值热负荷持续 10 秒）。此时稳态分析不再适用，必须使用二维瞬态热扩散模型计算局部热堆积和扩散延迟。
+
+该求解器内置的 $r \le 0.25$ 稳定性自动防御与一阶时间精度验证，保证了在评估非稳态导热响应时绝不发生隐蔽的数值发散，为 FSAE 瞬态温升预估提供了可靠的时变计算核心。

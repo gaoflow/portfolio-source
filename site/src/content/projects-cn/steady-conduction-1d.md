@@ -12,6 +12,7 @@ featured: false
 order: 12
 studySequence: 6
 heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg
+github: 'https://github.com/gaoflow/steady-conduction-1d'
 ---
 
 ## 这件事的缘起：第一次收敛分析竟然卡在了舍入误差
@@ -100,15 +101,16 @@ $$
 
 制造解只是一个验证工具，不是真实的物理工况。
 
-## 怎么运行
+## 代码与运行
+
+本项目已开源在 GitHub: [gaoflow/steady-conduction-1d](https://github.com/gaoflow/steady-conduction-1d)
 
 ```bash
-cd projects/steady-conduction-1d
+git clone https://github.com/gaoflow/steady-conduction-1d.git
+cd steady-conduction-1d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
-python3 scripts/publish_site.py
 ```
-
 
 ## 实际应用场景：我在什么时候用到了它
 

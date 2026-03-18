@@ -12,6 +12,7 @@ featured: false
 order: 14
 studySequence: 2
 heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
+github: 'https://github.com/gaoflow/potential-flow-sandbox'
 ---
 
 ## Origin: the complex-potential magic on the chalkboard
@@ -97,7 +98,16 @@ Potential flow contains no viscosity or boundary layer, so it cannot reproduce t
 
 The circulation is also imposed rather than predicted. This model shows how a specified circulation changes the pressure field and lift, but it does not explain why a real airfoil acquires a particular value of $\Gamma$. A later airfoil model will need a Kutta condition to determine that circulation.
 
+## Code and reproduction
 
+The source code is open source on GitHub: [gaoflow/potential-flow-sandbox](https://github.com/gaoflow/potential-flow-sandbox)
+
+```bash
+git clone https://github.com/gaoflow/potential-flow-sandbox.git
+cd potential-flow-sandbox
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+```
 
 ## Practical applications: foundational verification for panel methods and VLM
 
@@ -112,14 +122,3 @@ The most important errors in this project would not have caused a crash. A rever
 I no longer treat a reasonable-looking streamline plot as validation. I check sign conventions through both contour integration and lift direction, and I check the integrator through a step-halving convergence experiment.
 
 This model reaches machine-precision agreement because it is linear and has closed-form solutions. Panel methods, vortex-lattice methods, and practical CFD do not offer the same convenience, so I chose to verify this foundation before adding more complicated geometry and physics.
-
-## Code and reproduction
-
-The source code is open source on GitHub: [gaoflow/potential-flow-sandbox](https://github.com/gaoflow/potential-flow-sandbox)
-
-```bash
-git clone https://github.com/gaoflow/potential-flow-sandbox.git
-cd potential-flow-sandbox
-python3 -m unittest discover -s tests -v
-python3 scripts/analyse.py
-```

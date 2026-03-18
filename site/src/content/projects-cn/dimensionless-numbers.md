@@ -12,6 +12,7 @@ featured: false
 order: 11
 studySequence: 1
 heroImage: /images/projects/dimensionless-numbers/reynolds-sweep.svg
+github: 'https://github.com/gaoflow/dimensionless-numbers'
 ---
 
 ## 这件事的缘起：一次算错五个数量级的手算
@@ -49,6 +50,18 @@ heroImage: /images/projects/dimensionless-numbers/reynolds-sweep.svg
 | 绝对温度不大于零 | 理想气体关系 $\beta=1/T$ 没法定义 |
 | 特征长度是零 | Re、Nu 和 Gr 就没有物理尺度了 |
 | 查物性查到了表格外 | 插值就没有来源撑腰了 |
+
+## 代码与运行
+
+本项目已开源在 GitHub: [gaoflow/dimensionless-numbers](https://github.com/gaoflow/dimensionless-numbers)
+
+```bash
+git clone https://github.com/gaoflow/dimensionless-numbers.git
+cd dimensionless-numbers
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+PYTHONPATH=src python3 -m dimensionless_numbers reynolds --rho 1.225 --u 50 --l 1.0 --mu 1.81e-5 --json
+```
 
 ## 实际应用场景：我在什么时候用到了它
 
@@ -104,15 +117,3 @@ $$
 这套工具最重要的部分不是那六个公式，而是它能拒绝错误输入。我自己手算时反反复复在黏度和单位上栽跟头，所以我先把“出错时怎么办”这条路设计好，再去设计正常计算的路。
 
 它还让我养成了之后一直用的习惯：检查程序不能只证明它能跑，还得故意喂错误输入，确认它会在正确的位置停下来。
-
-## 代码与运行
-
-代码已开源在 GitHub：[gaoflow/dimensionless-numbers](https://github.com/gaoflow/dimensionless-numbers)
-
-```bash
-git clone https://github.com/gaoflow/dimensionless-numbers.git
-cd dimensionless-numbers
-python3 -m unittest discover -s tests -v
-python3 scripts/analyse.py
-PYTHONPATH=src python3 -m dimensionless_numbers reynolds --rho 1.225 --u 50 --l 1.0 --mu 1.81e-5 --json
-```

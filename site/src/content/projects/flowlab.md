@@ -12,6 +12,7 @@ featured: false
 order: 5
 studySequence: 14
 heroImage: /images/projects/flowlab/cavity-vorticity.svg
+github: 'https://github.com/gaoflow/flowlab'
 ---
 
 ## Origin: web fluid toys look great, but why are they mostly fake physics?
@@ -110,7 +111,16 @@ FlowLab is a numerical-method study and teaching tool, not a replacement for an 
 
 If I later replace BGK with MRT or a regularised collision operator, I will need to repeat the three-grid study and the external reference checks rather than carrying the current validation claim over to the new method.
 
+## Code and reproduction
 
+The source code is open source on GitHub: [gaoflow/flowlab](https://github.com/gaoflow/flowlab)
+
+```bash
+git clone https://github.com/gaoflow/flowlab.git
+cd flowlab
+npm test
+npm run analyse
+```
 
 ## Practical applications: real-time interactive fluid visualization and cavity vortex exploration
 
@@ -123,14 +133,3 @@ FlowLab operates as a zero-dependency lattice-Boltzmann solver that serves two s
 The first 20,000-iteration run showed me that agreement with reference data and convergence of the internal state are not the same result. More iterations corrected the incomplete convergence, but lowering the acceptance standard would only have hidden it.
 
 The moving-lid problem taught the same lesson at the software boundary. The display layer cannot repair a boundary condition that is missing from the numerical core. Drawing the correct value does not mean that the populations and conservation relationships were updated correctly.
-
-## Code and reproduction
-
-The source code is open source on GitHub: [gaoflow/flowlab](https://github.com/gaoflow/flowlab)
-
-```bash
-git clone https://github.com/gaoflow/flowlab.git
-cd flowlab
-npm test
-npm run validate
-```

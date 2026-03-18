@@ -12,6 +12,7 @@ featured: false
 order: 11
 studySequence: 1
 heroImage: /images/projects/dimensionless-numbers/reynolds-sweep.svg
+github: 'https://github.com/gaoflow/dimensionless-numbers'
 ---
 
 ## Origin: a hand calculation off by five orders of magnitude
@@ -51,6 +52,18 @@ The same checks cover several other common input problems:
 | Absolute temperature at or below zero | The ideal-gas relation $\beta=1/T$ is undefined |
 | Zero characteristic length | $Re$, $Nu$, and $Gr$ lose their physical scale |
 | A property lookup outside the tabulated range | Extrapolation would no longer be supported by the source data |
+
+## Code and reproduction
+
+The source code is open source on GitHub: [gaoflow/dimensionless-numbers](https://github.com/gaoflow/dimensionless-numbers)
+
+```bash
+git clone https://github.com/gaoflow/dimensionless-numbers.git
+cd dimensionless-numbers
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+PYTHONPATH=src python3 -m dimensionless_numbers reynolds --rho 1.225 --u 50 --l 1.0 --mu 1.81e-5 --json
+```
 
 ## Practical applications: where I used this toolkit
 
@@ -117,15 +130,3 @@ The toolkit is mainly intended for incompressible-flow work. It can calculate Ma
 The most important part of this project was not implementing six formulas. It was making the toolkit refuse incorrect inputs before those errors could propagate.
 
 My own hand calculations repeatedly exposed opportunities to confuse viscosity definitions and units, so I designed the failure paths before the normal calculation paths. I also learned that validation should not merely show that a program runs. It should deliberately supply incorrect inputs and confirm that the program stops at the right place.
-
-## Code and reproduction
-
-The source code is open source on GitHub: [gaoflow/dimensionless-numbers](https://github.com/gaoflow/dimensionless-numbers)
-
-```bash
-git clone https://github.com/gaoflow/dimensionless-numbers.git
-cd dimensionless-numbers
-python3 -m unittest discover -s tests -v
-python3 scripts/analyse.py
-PYTHONPATH=src python3 -m dimensionless_numbers reynolds --rho 1.225 --u 50 --l 1.0 --mu 1.81e-5 --json
-```

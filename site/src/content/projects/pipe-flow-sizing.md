@@ -12,6 +12,7 @@ featured: false
 order: 13
 studySequence: 3
 heroImage: /images/projects/pipe-flow-sizing/moody.svg
+github: 'https://github.com/gaoflow/pipe-flow-sizing'
 ---
 
 ## Origin: a pump rated at 40 L/min, but how much flows in the car?
@@ -113,7 +114,16 @@ The minor-loss coefficients are handbook order-of-magnitude values and therefore
 
 These limitations identified the work still needed in the later cooling-system project: real pump and radiator data, parallel flow paths, thermal coupling, and transient temperature rise.
 
+## Code and reproduction
 
+The source code is open source on GitHub: [gaoflow/pipe-flow-sizing](https://github.com/gaoflow/pipe-flow-sizing)
+
+```bash
+git clone https://github.com/gaoflow/pipe-flow-sizing.git
+cd pipe-flow-sizing
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+```
 
 ## Practical applications: matching pump operating points for FSAE racecar cooling
 
@@ -126,14 +136,3 @@ Using this hydraulic network solver to couple component loss coefficients ($K$) 
 This was the first time I treated the pump and cooling loop as two separate curves instead of assuming that the pump's nominal flow was the system flow.
 
 It also established an order of work that I continued to use: verify the friction factor, implicit-equation residual, and network pressure closure before allowing those results into a more complex thermal-fluid model. If a foundational calculation is only almost correct, the final system-level conclusion can still be completely wrong.
-
-## Code and reproduction
-
-The source code is open source on GitHub: [gaoflow/pipe-flow-sizing](https://github.com/gaoflow/pipe-flow-sizing)
-
-```bash
-git clone https://github.com/gaoflow/pipe-flow-sizing.git
-cd pipe-flow-sizing
-python3 -m unittest discover -s tests -v
-python3 scripts/analyse.py
-```

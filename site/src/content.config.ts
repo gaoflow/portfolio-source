@@ -30,6 +30,7 @@ const projectSchema = z.object({
   featured: z.boolean().default(false),
   order: z.number().default(99),
   studySequence: z.number().int().positive().optional(),
+  github: z.string().url().optional(),
 });
 
 const projects = defineCollection({

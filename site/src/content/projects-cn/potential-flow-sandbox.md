@@ -12,6 +12,7 @@ featured: false
 order: 14
 studySequence: 2
 heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
+github: 'https://github.com/gaoflow/potential-flow-sandbox'
 ---
 
 ## 这件事的缘起：黑板上的复势戏法
@@ -103,17 +104,9 @@ $$
 
 这套模型能对到机器精度，是因为它线性、有闭式解。后面的面元法、涡格法和真实 CFD 都没这么舒服的条件，所以我选择先把这一层查清楚，再往上加几何和物理的复杂度。
 
-
-
-## 实际应用场景：我在什么时候用到了它
-
-在后面开发 Hess–Smith 翼型面元法（Airfoil Methods）和地面效应涡格法（Ground Effect VLM）时，算法需要大量依赖点源、偶极子、点涡的叠加原理与 Kutta–Joukowski 升力公式。如果在高阶三维网格上直接调试，一旦升力方向反了或者环量符号写错，很难分清是几何法向定义错、边界矩阵错还是底层公式错。
-
-用这套势流沙盒在标准圆柱解析解上提前把复势导数、符号约定（顺时针/逆时针积分）、停滞点位置和四阶流线追踪器验证到机器精度，为后续所有多翼型和三维涡格法打下了坚实无错的底层基础。
-
 ## 代码与运行
 
-代码已开源在 GitHub：[gaoflow/potential-flow-sandbox](https://github.com/gaoflow/potential-flow-sandbox)
+本项目已开源在 GitHub: [gaoflow/potential-flow-sandbox](https://github.com/gaoflow/potential-flow-sandbox)
 
 ```bash
 git clone https://github.com/gaoflow/potential-flow-sandbox.git
@@ -121,3 +114,9 @@ cd potential-flow-sandbox
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
+
+## 实际应用场景：我在什么时候用到了它
+
+在后面开发 Hess–Smith 翼型面元法（Airfoil Methods）和地面效应涡格法（Ground Effect VLM）时，算法需要大量依赖点源、偶极子、点涡的叠加原理与 Kutta–Joukowski 升力公式。如果在高阶三维网格上直接调试，一旦升力方向反了或者环量符号写错，很难分清是几何法向定义错、边界矩阵错还是底层公式错。
+
+用这套势流沙盒在标准圆柱解析解上提前把复势导数、符号约定（顺时针/逆时针积分）、停滞点位置和四阶流线追踪器验证到机器精度，为后续所有多翼型和三维涡格法打下了坚实无错的底层基础。

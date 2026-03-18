@@ -12,6 +12,7 @@ featured: false
 order: 6
 studySequence: 13
 heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg
+github: 'https://github.com/gaoflow/ground-effect-vlm'
 ---
 
 ## 这件事的缘起：为什么赛车翼面一贴近地面，下压力就会暴增？
@@ -98,7 +99,16 @@ $h/c=0.25$ 时，模型给出 $C_L=0.5419$，是自由空间的 2.07 倍，传�
 
 低阶结果继续做方向和量级的参考，而不是等 RANS 结果出来以后，再回头校准它。
 
+## 代码与运行
 
+本项目已开源在 GitHub: [gaoflow/ground-effect-vlm](https://github.com/gaoflow/ground-effect-vlm)
+
+```bash
+git clone https://github.com/gaoflow/ground-effect-vlm.git
+cd ground-effect-vlm
+python3 -m unittest discover -s tests -v
+python3 scripts/analyse.py
+```
 
 ## 实际应用场景：我在什么时候用到了它
 
@@ -111,14 +121,3 @@ $h/c=0.25$ 时，模型给出 $C_L=0.5419$，是自由空间的 2.07 倍，传�
 最有价值的不是最大升力那个数，而是 $h/c=0.25$ 这个“模型已经不值得继续相信”的端点。
 
 另外就是养成习惯：固定迎角升力、绝对诱导阻力、单位升力代价分开报告。三个量讲的是不同问题，合并成一句“效率提高”会掩盖真实变化。
-
-## 代码与运行
-
-代码已开源在 GitHub：[gaoflow/ground-effect-vlm](https://github.com/gaoflow/ground-effect-vlm)
-
-```bash
-git clone https://github.com/gaoflow/ground-effect-vlm.git
-cd ground-effect-vlm
-python3 -m unittest discover -s tests -v
-python3 scripts/analyse.py
-```
