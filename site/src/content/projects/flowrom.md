@@ -14,7 +14,6 @@ studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg
 github: 'https://github.com/gaoflow/flowrom'
 ---
-
 ## Building a custom solver
 
 I wanted an intuitive way to explore fluid dynamics directly inside the browser and terminal. Commercial CFD tools require tedious meshing and heavy differential equation solvers that are too slow for real-time interactive web experiments. So, I built a lightweight fluid solver from scratch in JavaScript: FlowLab. To keep it fast, I avoided solving the traditional Navier–Stokes equations and chose the Lattice Boltzmann Method (LBM). Once written, it ran at 60 FPS in the browser, letting me drag obstacles and watch cavity vortex structures evolve in real time.
@@ -27,8 +26,6 @@ I wondered: since periodic flows follow clear underlying rhythms, why can't we c
 
 To tackle this, I built the reduced-order modeling toolkit: FlowROM.
 
----
-
 ## Understanding the Lattice Boltzmann Method (LBM)
 
 While traditional CFD treats fluid as a continuous block and solves complex calculus equations, the Lattice Boltzmann Method models fluid as swarms of virtual particles bouncing around on a regular grid. I implemented the standard 2D model: D2Q9. The domain is divided into square cells where particles can move in 9 discrete directions (stationary at the center, 4 cardinal axes, and 4 diagonals).
@@ -39,8 +36,6 @@ In every time step, the algorithm executes two basic operations:
 2. Streaming: After colliding, particles hop along their directions to neighboring grid nodes.
 
 Summing the particles across all 9 directions yields the local fluid density, and taking their momentum-weighted average gives the macroscopic flow velocity. It completely avoids solving global pressure Poisson equations, making it naturally parallel and extremely fast. I set up a lid-driven cavity flow with a sinusoidal lid velocity perturbation. Once the flow settled into a stable limit cycle, I saved a snapshot every 10 steps, exporting 480 full flowfield snapshots to feed into the reduction pipeline.
-
----
 
 ## How FlowROM works
 
@@ -59,8 +54,6 @@ POD compresses historical flow fields, but cannot advance states forward in time
 - Catch the frequency: DMD automatically extracts the primary oscillation frequency with high precision;
 - Forecast autonomously: Starting from the end of the training data, DMD steps forward step by step on its own, forecasting four full cycles of flow evolution without calling the fluid solver.
 
----
-
 ## Partitioning training and test data
 
 I used the first 320 snapshots (the first 8 cycles) for training and set aside the final 160 snapshots (4 full cycles) as the unseen test exam.
@@ -72,8 +65,6 @@ I used the first 320 snapshots (the first 8 cycles) for training and set aside t
 In standard machine learning, people often randomly sample 20% of the data for testing. In periodic fluid dynamics, random frame sampling is severe data leakage. Because periodic flows repeat cyclically, a randomly sampled test frame shares near-identical flow states with the frames right before and after it in the training set. The model would not need to learn genuine physical evolution; it could achieve a cosmetically low error simply by interpolating between neighboring frames.
 
 Reserving four continuous cycles at the end forces the model to step into genuinely unobserved territory from a fixed starting point, proving whether it truly captured the physical dynamics.
-
----
 
 ## A valuable failure
 
@@ -91,8 +82,6 @@ Periodic vortex shedding in space is a closed rotational trajectory. Describing 
 
 Adding the 2nd mode caused the test error to plummet from 36% down to 1.3%. This failure made one thing clear: model truncation cannot be decided by cumulative energy on training data alone; it must be audited against unobserved test data and physical kinematics.
 
----
-
 ## Dual-denominator error analysis
 
 When evaluating DMD forecast accuracy across the 4 unobserved cycles, I deliberately report two distinct error figures:
@@ -108,8 +97,6 @@ In cavity flows, the steady mean flow contributes the majority of velocity magni
 
 However, evaluating the quality of dynamic forecasting requires isolating the fluctuations. Normalizing by fluctuation magnitude reveals the true dynamic error of 1.41%. Reporting only 0.10% would use the steady average to mask time-stepping discrepancies. Reporting both numbers provides an honest engineering assessment.
 
----
-
 ## Preventing the solver from grading its own homework
 
 FlowLab is both the data generator and the reference benchmark. If the reduction code has a subtle bug, relying solely on FlowLab data might leave it unnoticed.
@@ -120,8 +107,6 @@ To prevent self-referential validation, I added two independent mathematical syn
 
 Because these benchmark tests have undisputed mathematical solutions, any failure immediately isolates bugs in the reduction algorithms from physical data noise.
 
----
-
 ## What this project does not claim
 
 All data in this study comes from a coarse $48\times48$ lid-driven cavity with a single geometry, single Reynolds number ($Re=100$), and single operating condition. It is not complex turbulent external aerodynamics, and cannot be used directly as a surrogate model for a racecar wake.
@@ -129,8 +114,6 @@ All data in this study comes from a coarse $48\times48$ lid-driven cavity with a
 Applying this methodology to full-car CFD requires sweeping ride heights, speeds, and yaw angles, with test sets partitioned across distinct operating conditions.
 
 Nevertheless, the foundational workflow established here—leakage-free temporal partitioning, POD spatial compression, DMD frequency extraction, orthogonal modal matching, and dual-denominator error auditing—provides a solid, rigorous data analysis framework.
-
----
 
 ## Code and reproduction
 
