@@ -1,5 +1,5 @@
 ---
-title: 'A record of compressing 480 flow fields into a few modes'
+title: 'Reduced-Order Modeling: Compressing 480 Flow Fields into a Few Modes'
 year: 2026
 date: '2026-05-30'
 status: complete
@@ -89,7 +89,7 @@ Adding the 2nd mode caused the test error to plummet from 36% down to 1.3%. This
 
 ---
 
-## Why I report two different errors
+## Dual-denominator error analysis
 
 When evaluating DMD forecast accuracy across the 4 unobserved cycles, I deliberately report two distinct error figures:
 
@@ -137,8 +137,10 @@ node scripts/generate-snapshots.mjs
 python3 scripts/analyse.py
 ```
 
-## Practical applications: high-ratio compression and reduced-order forecasting for unsteady CFD
+## Practical applications
 
-Unsteady CFD simulations generate massive flowfield datasets across grid cells and time steps, creating multi-gigabyte storage footprints that cannot be deployed in real-time control loops.
+In unsteady CFD simulations, full flowfield transient datasets (velocity and pressure) can be massive (tens of gigabytes), making them costly to store and difficult to integrate directly into real-time control loops.
 
 FlowROM applies Proper Orthogonal Decomposition (POD) to 480 flowfield snapshots, capturing over 99.9% of fluctuating kinetic energy with just 8 spatial modes (a nearly 50x compression ratio); combined with Dynamic Mode Decomposition (DMD), it extracts dominant frequencies with high accuracy and forecasts future flow states without re-running full-order PDE solvers.
+
+As I encounter more complex cases in coursework and projects, I plan to continue extending this pipeline.
