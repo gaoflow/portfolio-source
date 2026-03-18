@@ -14,11 +14,13 @@ studySequence: 13
 heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg
 ---
 
-## Why I isolated ground effect
+## Origin: why does downforce surge when a wing approaches the road?
 
-When a race car runs close to the ground, both lift and induced drag change. In a complete car, however, the floor, tyres, diffuser, leakage, and viscous effects all interact, making it difficult to identify what the ground boundary alone changes.
+The origin of this project was studying racecar aerodynamics and watching F1 cars, where commentators constantly emphasize 'ground effect'—the dramatic surge in downforce as a wing approaches the road plane.
 
-I therefore built a low-order vortex lattice method (VLM) model containing only a finite wing and an ideal moving ground. My aim was not to predict race-car floor performance, but to check the sign, scale, and ride-height trend of ground effect before introducing more complex physics.
+I wanted to understand the clean physics: how does an impermeable boundary alter circulation and induce downforce without direct physical contact? Why does that benefit collapse at extreme proximity?
+
+On a full car, underfloors, rotating wheels, diffuser fences, and edge vortices obscure the pure ground interaction. To isolate this mechanism, I built an image-vortex Vortex Lattice Method (VLM).
 
 ## How I represented the ground with image vortices
 

@@ -14,17 +14,13 @@ studySequence: 7
 heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
 ---
 
-## Why I started with heat diffusion
+## Origin: a tiny time-step increase blew the field into NaN
 
-Before working on more complex unsteady flows, I wanted to build a time-dependent solver simple enough that I could test stability, temporal accuracy, and conservation separately.
+The origin of this solver was a coding session where I slightly increased the time step $\Delta t$. For the first dozens of steps, the transient cooling plate looked plausible; at step 100, the temperature field instantaneously blew up into a screen full of NaNs.
 
-The two-dimensional heat equation was a good fit:
+That experience demonstrated that the Von Neumann stability boundary ($r \le 0.25$) is an unforgiving physical constraint, not mere textbook theory.
 
-$$
-\frac{\partial T}{\partial t}=\alpha\nabla^2T.
-$$
-
-It has an analytical transient solution, a clear stability limit for an explicit scheme, and a conservation relationship that I could check by summing over the grid.
+To understand exactly why explicit solvers explode beyond this threshold, and how to isolate pure temporal error from spatial discretization, I built this guarded 2D explicit FTCS heat diffusion solver.
 
 ## How I updated the temperature
 

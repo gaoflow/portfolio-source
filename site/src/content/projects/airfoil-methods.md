@@ -14,13 +14,13 @@ studySequence: 8
 heroImage: /images/projects/airfoil-methods/lift-validation.svg
 ---
 
-## Why I compared a simple theory with a panel method
+## Origin: waiting hours for CFD—do vintage panel methods still hold up?
 
-Before moving to RANS, I wanted to understand which questions low-cost aerodynamic models can answer.
+The origin of this project was the computational cost of running 3D RANS CFD for racecar wing profiles, which takes hours per mesh. Classic aerodynamics textbooks, however, claimed: 'Thin-airfoil theory and panel methods can compute lift slopes and surface pressure in milliseconds.'
 
-I chose the NACA 0012 and compared thin-airfoil theory and a Hess–Smith panel method with one NASA wind-tunnel dataset at the same Mach number, Reynolds number, and transition condition.
+I was fascinated by this contrast: how accurate were the vintage tools engineers used before supercomputers? Where do they deliver genuine value, and where do their assumptions fail completely?
 
-My goal was not to identify one method that is always best. I wanted to see what capability each level adds and where essential physics is still missing.
+To evaluate these fidelity boundaries, I benchmarked thin-airfoil theory, the Hess-Smith panel method, and NASA TM-4074 wind tunnel data side by side.
 
 ## Wind-tunnel reference
 

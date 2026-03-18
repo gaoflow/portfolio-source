@@ -14,13 +14,13 @@ studySequence: 14
 heroImage: /images/projects/flowlab/cavity-vorticity.svg
 ---
 
-## Why I built a CFD solver for the browser
+## Origin: web fluid toys look great, but why are they mostly fake physics?
 
-It is easy to make a browser flow animation look like CFD. A convincing vorticity plot, however, does not prove that the velocity field, boundary conditions, or mass conservation are correct.
+The origin of this project was examining interactive fluid demos on the web. While visually striking, most are shader tricks or ad-hoc approximations that violate mass and momentum conservation.
 
-I wanted a solver small enough to inspect line by line but capable of running in both Node.js and the browser. The browser could not use a separate simplified implementation tuned for appearance: the validation program and interactive interface had to share the same numerical core.
+As a computational mechanics student, I asked: can we embed a rigorous, conservation-preserving CFD solver directly in the browser?
 
-I chose the lid-driven cavity at $Re=100$ because canonical centreline velocity data are available, and the case tests the walls, primary vortex, corner structures, and global mass conservation together.
+Could the exact same numerical core pass strict benchmark regressions in Node.js while driving a 60 FPS interactive canvas where users draw obstacles and watch vortex dynamics evolve in real time? That question led to FlowLab, a zero-dependency D2Q9 lattice-Boltzmann solver.
 
 ## How FlowLab advances one time step
 

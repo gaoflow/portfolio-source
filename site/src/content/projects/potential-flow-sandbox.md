@@ -14,13 +14,13 @@ studySequence: 2
 heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
 ---
 
-## Why I started with a potential-flow sandbox
+## Origin: the complex-potential magic on the chalkboard
 
-Before moving on to panel methods and vortex-lattice methods, I wanted to make sure I had implemented the underlying sources, doublets, point vortices, and linear superposition correctly.
+The origin of this sandbox was a fluid mechanics lecture where the professor wrote down the complex potentials for sources, doublets, and point vortices, then claimed: 'Superpose these simple singularities, and you get complete flow around a cylinder with lift.'
 
-These elements later support more complicated airfoil and finite-wing calculations. If the velocity direction, circulation sign, or integration convention is wrong at this level, the code can still produce convincing streamlines while giving the wrong lift direction and physical interpretation.
+It felt like a mathematical trick: how could adding idealized singularities produce physical lift? How do circulation sign conventions and velocity fields align to machine precision?
 
-I therefore built a small potential-flow sandbox. It only models two-dimensional, inviscid, incompressible flow, but every result can be compared directly with a closed-form analytical solution.
+To prove the theory to myself—and to establish an unshakeable foundation before building higher-order panel and vortex lattice solvers—I built this standalone potential-flow sandbox. It handles 2D, inviscid, incompressible flow, verifying every identity directly against closed-form analytic solutions.
 
 ## Building the elementary flows
 

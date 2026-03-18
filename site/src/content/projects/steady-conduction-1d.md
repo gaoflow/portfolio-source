@@ -14,13 +14,13 @@ studySequence: 6
 heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg
 ---
 
-## Why I started with a one-dimensional rod
+## Origin: when my first convergence study hit machine roundoff
 
-This was the first time I moved beyond evaluating a correlation and instead discretised a differential equation, assembled a linear system, and solved for a temperature field.
+The origin of this project was my first attempt at discretizing heat conduction with finite differences. Textbook derivations of tridiagonal systems and Robin boundaries looked clean, but I wanted to verify the mechanics myself from scratch.
 
-I deliberately chose a simple problem: a rod of length $L=0.5$ m with constant thermal conductivity $k=167$ W/(m·K) and uniform volumetric heat generation $q'''=2\times10^4$ W/m³. The left boundary is fixed at 350 K. At the right boundary, convection with $h_c=25$ W/(m²·K) transfers heat to an environment at 300 K.
+However, during my first mesh refinement study against the exact solution, the error flatlined at $10^{-11}$ K regardless of grid density.
 
-Because the physics is simple, I could derive a closed-form solution and focus on the numerical details: discretisation, boundary-condition assembly, the linear solver, and energy conservation.
+I soon realized why: the analytic solution is quadratic, for which central differencing is exact. I had measured floating-point noise rather than truncation error. To measure true second-order convergence, I implemented the Method of Manufactured Solutions (MMS) and built this verified 1D solver.
 
 ## How I discretised the equation
 

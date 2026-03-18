@@ -14,11 +14,13 @@ studySequence: 3
 heroImage: /images/projects/pipe-flow-sizing/moody.svg
 ---
 
-## Why I needed to solve the loop flow first
+## Origin: a pump rated at 40 L/min, but how much flows in the car?
 
-For my later FSAE cooling-system work, the radiator, pump, and engine water passages can only be assessed after I know how much coolant will actually flow through them. A pump's stated free-delivery flow is not the installed loop flow because the hoses, radiator, engine passages, and bends all create pressure losses.
+The origin of this hydraulic solver was a team discussion on racecar cooling, where a pump datasheet proudly claimed '40 L/min maximum free flow'. Some assumed we could size our heat exchanger directly for 40 L/min.
 
-I needed more than a system curve based on intuition. I wanted a hydraulic model whose individual parts I could check: straight-pipe friction, minor losses, a series network, and the intersection between the pump curve and the system resistance curve.
+I knew that assumption was flawed: once connected to convoluted hoses, dense radiator micro-tubes, and narrow motor cooling jackets, hydraulic resistance drops the delivery rate significantly.
+
+To calculate the actual coolant flow inside a real chassis, I built this hydraulic network solver. It couples Colebrook-White friction and component loss coefficients to find the exact intersection between pump curve and system resistance.
 
 ## How I calculated pipe friction
 

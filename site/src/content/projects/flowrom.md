@@ -14,13 +14,13 @@ studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg
 ---
 
-## Why I reduced the flow fields
+## Origin: staring at tens of gigabytes of unsteady flowfield snapshots
 
-An unsteady CFD simulation can produce large collections of velocity, pressure, and vorticity fields. Storing and comparing every grid value is expensive, so I wanted to test whether a small set of spatial modes could represent the flow while still reconstructing and predicting a time interval the model had not seen.
+The origin of this reduced-order modeling toolkit was running unsteady CFD simulations and staring at tens of gigabytes of raw snapshot files. Saving full-grid velocity fields every few milliseconds consumes vast storage and makes exploring dynamic patterns painfully slow.
 
-I used data generated with the FlowLab D2Q9 BGK lattice-Boltzmann solver to study two reduced-order methods. Proper orthogonal decomposition (POD) handled compression and reconstruction, while exact dynamic mode decomposition (DMD) identified temporal frequencies and advanced the flow beyond the training interval.
+I wondered: periodic unsteady flows exhibit coherent spatial structures—why can't we compress hundreds of flowfield frames into a handful of dominant modes, like video compression?
 
-The snapshots, decompositions, figures, metrics, and tests were generated in the FlowROM repository rather than copied or relabelled from another portfolio project.
+To achieve high-ratio data compression and forecast future flow states without re-running full-order PDE solvers, I built this Proper Orthogonal Decomposition (POD) and Dynamic Mode Decomposition (DMD) pipeline.
 
 ## How I generated and divided the 480 snapshots
 

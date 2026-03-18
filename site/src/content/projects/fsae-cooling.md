@@ -15,21 +15,13 @@ studySequence: 5
 heroImage: '/images/projects/fsae-cooling/thermal-screen.svg'
 ---
 
-## Why this study did not produce a procurement list
+## Origin: in 40 °C summer heat, how do we chill coolant down to 25 °C?
 
-I began with a seemingly simple question: could the available pumps, radiators and fans keep the motor and inverter within their permitted temperature limits?
+The origin of this research was joining the Vinci EcoDrive team and confronting a severe engineering bottleneck: the motor and inverter supplier specified a coolant inlet ceiling of 25 °C.
 
-As the model became more complete, I found that this was really three separate questions. Passing the hydraulic flow requirement did not guarantee acceptable temperatures. Closing the equations did not make catalogue components suitable for the car. Convergence in an idealised CFD duct did not validate the airflow through a real sidepod.
+Yet in a 40 °C summer race environment, a purely passive sidepod radiator cannot cool a fluid below ambient air temperature in steady state.
 
-I therefore divided the study into three versions:
-
-| Version | What I assessed | Conclusion |
-|---|---|---|
-| E3 | Passive Boyd / SPAL / CWA150 system at 40 °C ambient | Rejected: the flow requirements pass, but the KW26 temperature boundary fails |
-| E7 | Active low-temperature KW26 loop and passive high-temperature DD5 loop | Closes within the assumed ranges, but no hardware was selected |
-| E8 | Three-loop steady-state model based on public catalogue data | Passes the numerical checks, but some local margins are too narrow to approve procurement |
-
-Vinci Eco Drive approved publication of this bounded system study on 20 August 2026. It contains no team CAD, telemetry or unapproved hardware data.
+The passive architecture was physically contradictory before running any simulations. To provide clear engineering evidence for the team, I evaluated configurations from the passive E3 loop to the dual-temperature E7 and catalogue-anchored E8 models, proving why hardware could not be purchased blindly.
 
 ## E3: enough flow, but an impossible temperature target
 

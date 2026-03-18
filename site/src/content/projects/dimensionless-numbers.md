@@ -14,13 +14,13 @@ studySequence: 1
 heroImage: /images/projects/dimensionless-numbers/reynolds-sweep.svg
 ---
 
-## Why I started with dimensionless numbers
+## Origin: a hand calculation off by five orders of magnitude
 
-When I began studying fluid mechanics and CFD systematically, I found that many initial estimates start with dimensionless numbers. Reynolds number identifies the relevant flow scale, Mach number helps assess compressibility, and Prandtl, Nusselt, Grashof, and Rayleigh numbers appear in heat-transfer and natural-convection problems.
+The origin of this toolkit was a simple hand calculation for an FSAE wing and cooling duct, where I accidentally swapped dynamic viscosity $\mu$ for kinematic viscosity $\nu$. Although they differ only by density, the calculated Reynolds number was off by five full orders of magnitude—falsely turning high-speed turbulent flow into deep laminar flow.
 
-The formulas are short. The harder problem is supplying the right inputs. Dynamic viscosity and kinematic viscosity differ by a density relationship and have different dimensions. If I confuse them, a basic calculator can still return a plausible-looking Reynolds number while quietly leading later mesh choices, similarity arguments, and solver settings in the wrong direction.
+The formulas themselves are short; the real danger lies in the inputs. Because dimensional software blindly computes with raw floats, confusing two viscosities yields a plausible-looking number that silently corrupts downstream meshing, similarity matching, and solver boundaries.
 
-I therefore built a toolkit that checks units, numerical ranges, and property-data sources rather than a collection of formulas that accepts unlabelled numbers without question.
+Instead of writing another naive float-only calculator, I decided to build a guarded engineering tool that strictly enforces SI dimensions and traceable fluid properties.
 
 ## What the toolkit calculates
 
