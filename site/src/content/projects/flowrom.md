@@ -38,8 +38,6 @@ In every time step, the algorithm executes two basic operations:
 1. Collision: Particles arriving at the same node collide and redistribute their velocities toward local equilibrium;
 2. Streaming: After colliding, particles hop along their directions to neighboring grid nodes.
 
-![LBM D2Q9 discrete velocity lattice and collision-streaming mechanics](/images/projects/flowrom/lbm-d2q9-concept.svg)
-
 Summing the particles across all 9 directions yields the local fluid density, and taking their momentum-weighted average gives the macroscopic flow velocity. It completely avoids solving global pressure Poisson equations, making it naturally parallel and extremely fast. I set up a lid-driven cavity flow with a sinusoidal lid velocity perturbation. Once the flow settled into a stable limit cycle, I saved a snapshot every 10 steps, exporting 480 full flowfield snapshots to feed into the reduction pipeline.
 
 ---
@@ -67,7 +65,9 @@ POD compresses historical flow fields, but cannot advance states forward in time
 
 I used the first 320 snapshots (the first 8 cycles) for training and set aside the final 160 snapshots (4 full cycles) as the unseen test exam.
 
-![POD energy and holdout reconstruction error](/images/projects/flowrom/pod-spectrum.svg)
+![POD Modal Energy Spectrum](/images/projects/flowrom/pod-energy-spectrum.svg)
+
+![POD Held-Out Reconstruction Error vs Retained Rank](/images/projects/flowrom/pod-reconstruction-error.svg)
 
 In standard machine learning, people often randomly sample 20% of the data for testing. In periodic fluid dynamics, random frame sampling is severe data leakage. Because periodic flows repeat cyclically, a randomly sampled test frame shares near-identical flow states with the frames right before and after it in the training set. The model would not need to learn genuine physical evolution; it could achieve a cosmetically low error simply by interpolating between neighboring frames.
 
@@ -100,7 +100,9 @@ When evaluating DMD forecast accuracy across the 4 unobserved cycles, I delibera
 - Relative to the full velocity field: 0.10% (looks cosmetically perfect)
 - Relative to mean-subtracted dynamic fluctuations: 1.41% (honest reflection of time-stepping error)
 
-![DMD probe forecasts and modal frequencies](/images/projects/flowrom/dmd-forecast.svg)
+![DMD Time-Series Autonomous Prediction](/images/projects/flowrom/dmd-timeseries.svg)
+
+![DMD Eigenvalue Frequency Spectrum](/images/projects/flowrom/dmd-spectrum.svg)
 
 In cavity flows, the steady mean flow contributes the majority of velocity magnitude. Using full velocity as the denominator dilutes the forecasting error down to 0.10%.
 
