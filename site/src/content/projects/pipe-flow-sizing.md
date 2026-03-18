@@ -111,6 +111,14 @@ The minor-loss coefficients are handbook order-of-magnitude values and therefore
 
 These limitations identified the work still needed in the later cooling-system project: real pump and radiator data, parallel flow paths, thermal coupling, and transient temperature rise.
 
+
+
+## Practical applications: matching pump operating points for FSAE racecar cooling
+
+In the Vinci EcoDrive FSAE racecar cooling system, pump datasheets typically quote free-flow delivery (e.g. 40 L/min at zero head), but real vehicle installations incur major pressure drops through hoses, radiator micro-tubes, and motor jackets.
+
+Using this hydraulic network solver to couple component loss coefficients ($K$) with Colebrook-White pipe friction and bisect for the true intersection between pump curve and system resistance yielded the actual loop operating point: 26.22 L/min at 51.34 kPa. It revealed that 78% of loop resistance was concentrated in the core and water jacket, providing the exact mass flow boundary for subsequent thermal balance models.
+
 ## What I learned
 
 This was the first time I treated the pump and cooling loop as two separate curves instead of assuming that the pump's nominal flow was the system flow.

@@ -117,6 +117,14 @@ Applying the same process to vehicle CFD would require data spanning multiple ri
 
 The current result demonstrates snapshot selection, leakage prevention, compression, reconstruction, frequency identification, autonomous continuation, and explicit error accounting under one operating condition. It does not claim production CFD fidelity.
 
+
+
+## Practical applications: high-ratio compression and reduced-order forecasting for unsteady CFD
+
+Unsteady CFD simulations generate massive flowfield datasets across grid cells and time steps, creating multi-gigabyte storage footprints that cannot be deployed in real-time control loops.
+
+FlowROM applies Proper Orthogonal Decomposition (POD) to 480 flowfield snapshots, capturing over 99.9% of fluctuating kinetic energy with just 8 spatial modes (a 48.8x compression ratio, holdout error 0.123%). Combined with Dynamic Mode Decomposition (DMD), it extracts dominant frequencies to 0.00093% accuracy and autonomously forecasts future flow states without re-running full-order PDE solvers.
+
 ## What I learned
 
 The rank-1 result changed how I assess reduced-order models. Capturing 87.05% of the training fluctuation energy sounds strong, but the resulting model still missed 35.97% of the held-out fluctuation. The chronological holdout and the drop to 1.301% at rank 2 exposed a failure that the energy percentage alone would have approved.

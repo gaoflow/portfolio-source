@@ -97,6 +97,14 @@ Potential flow contains no viscosity or boundary layer, so it cannot reproduce t
 
 The circulation is also imposed rather than predicted. This model shows how a specified circulation changes the pressure field and lift, but it does not explain why a real airfoil acquires a particular value of $\Gamma$. A later airfoil model will need a Kutta condition to determine that circulation.
 
+
+
+## Practical applications: foundational verification for panel methods and VLM
+
+When developing the Hess–Smith airfoil panel method (Airfoil Methods) and the vortex lattice method (Ground Effect VLM), the higher-level algorithms rely fundamentally on source/vortex superpositions and the Kutta–Joukowski theorem. Debugging those directly on complex wing geometries risks confusing normal-vector conventions, matrix assembly bugs, or sign errors with fundamental theory mistakes.
+
+Using this potential-flow sandbox to verify complex-potential derivatives, circulation sign conventions, stagnation points, and 4th-order streamline tracking to machine precision provided an unshakeable foundation for every subsequent aerodynamic solver.
+
 ## What I learned
 
 The most important errors in this project would not have caused a crash. A reversed circulation sign gives lift with the correct magnitude but the wrong direction, while an integrator with degraded order can still produce a plausible streamline at one step size.

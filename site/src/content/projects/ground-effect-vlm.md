@@ -96,6 +96,14 @@ The next step should first add finite thickness and chordwise loading. Vehicle c
 
 The low-order result should remain a reference for sign and scale. It should not be recalibrated after seeing the RANS result.
 
+
+
+## Practical applications: exploring aerodynamic ground-effect windows for racecar wings
+
+Racecar wings operating close to the road experience powerful ground-effect coupling. Running full 3D CFD sweeps across ride heights and pitch angles is computationally demanding.
+
+Using this image-vortex VLM, I swept 14 continuous ride heights from $h/c=0.25$ to $h/c=50$ instantaneously, revealing spanwise circulation redistribution and demonstrating that at $h/c=0.5$, lift increases by 32.4% while induced drag per unit lift squared drops by 41.9%, providing directional guidance for wing clearance settings.
+
 ## What I learned
 
 The most valuable result was not the maximum lift, but the $h/c=0.25$ endpoint where the model was no longer worth trusting.

@@ -110,6 +110,14 @@ FlowLab is a numerical-method study and teaching tool, not a replacement for an 
 
 If I later replace BGK with MRT or a regularised collision operator, I will need to repeat the three-grid study and the external reference checks rather than carrying the current validation claim over to the new method.
 
+
+
+## Practical applications: real-time interactive fluid visualization and cavity vortex exploration
+
+When exploring lid-driven cavity flows, secondary corner vortex formation, and wall shear phenomena, traditional CFD pipelines require separate pre-processing, meshing, solver execution, and file exports.
+
+FlowLab operates as a zero-dependency lattice-Boltzmann solver that serves two simultaneous roles: it executes automated, rigorous benchmark validation in Node.js (matching Ghia data to $RMSE = 0.00286$), while powering a 60 FPS interactive canvas in the web browser. Users can draw obstacles, adjust lid speed, and modify Reynolds numbers to observe vortex evolution in real time.
+
 ## What I learned
 
 The first 20,000-iteration run showed me that agreement with reference data and convergence of the internal state are not the same result. More iterations corrected the incomplete convergence, but lowering the acceptance standard would only have hidden it.

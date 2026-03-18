@@ -163,6 +163,14 @@ The current model supports only constant isotropic diffusivity, uniform Cartesia
 
 Extending the solver beyond these limits would require new numerical treatment and new validation cases rather than assuming that the present checks still apply unchanged.
 
+
+
+## Practical applications: transient thermal diffusion in inverter modules and battery cold plates
+
+During hard acceleration or peak discharge bursts, inverter IGBT modules and battery cold plates face rapid transient heat spikes (e.g. 6.0 kW peak over 10 seconds). Steady-state models fail to capture this heat accumulation.
+
+This 2D explicit solver computes transient heat spreading and diffusion delays, while its automated $r \le 0.25$ Von Neumann stability guards and temporal order validation prevent subtle numerical blowups during transient thermal screening.
+
 ## What I learned
 
 I originally expected temporal refinement to be a straightforward comparison with the analytical solution. Deriving the truncation term first showed that the comparison would not isolate the error I wanted to measure. Replacing the analytical reference with a fine-time result on the same grid allowed me to measure temporal order without folding the shared spatial error into it.

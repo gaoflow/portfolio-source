@@ -110,6 +110,14 @@ This low-order hierarchy is useful for checking geometry, force signs, linear li
 
 It is not suitable for ranking high-lift sections by drag or stall margin. Those decisions require a model that includes viscosity and transition, together with appropriate near-wall resolution and grid, turbulence-model, and transition-model sensitivity studies.
 
+
+
+## Practical applications: rapid low-cost screening for FSAE multi-element wing airfoils
+
+When designing FSAE front and rear wings, running full 3D RANS CFD across dozens of candidate airfoils costs hours or days per iteration.
+
+Using this thin-airfoil and Hess-Smith panel method toolkit allows batch computation of linear lift slopes, surface pressure distributions ($C_p$), and aerodynamic centers in milliseconds. It rapidly filters out under-performing profiles or extreme suction spikes before committing promising geometries to expensive viscous CFD, drastically accelerating the aero design loop.
+
 ## What I learned
 
 I expected the geometry-resolved panel method to outperform thin-airfoil theory in the lift-slope comparison. The result was the opposite: the panel method had 13.83% slope error, while thin-airfoil theory had 3.81%, even though panel refinement had already reduced the 160-to-240-panel change to 0.0307%.
