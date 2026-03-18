@@ -102,11 +102,13 @@ The model is one-dimensional and steady, with constant material properties. It d
 
 The manufactured solution is a verification tool, not a physical operating condition. Extending the model to the omitted effects would require new equations, boundary treatments, and verification cases.
 
-## How to run it
+## Code and reproduction
+
+The source code is open source on GitHub: [gaoflow/steady-conduction-1d](https://github.com/gaoflow/steady-conduction-1d)
 
 ```bash
-cd projects/steady-conduction-1d
+git clone https://github.com/gaoflow/steady-conduction-1d.git
+cd steady-conduction-1d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
-python3 scripts/publish_site.py
 ```

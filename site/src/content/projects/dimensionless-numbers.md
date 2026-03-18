@@ -52,6 +52,14 @@ The same checks cover several other common input problems:
 | Zero characteristic length | $Re$, $Nu$, and $Gr$ lose their physical scale |
 | A property lookup outside the tabulated range | Extrapolation would no longer be supported by the source data |
 
+## Practical applications: where I used this toolkit
+
+In my subsequent FSAE racecar aerodynamics and cooling system projects, this toolkit directly solved two practical problems:
+
+1. **Evaluating aerodynamic wing flow regimes**: When selecting FSAE front and rear wing airfoils, low-speed cornering at 15 m/s (54 km/h) corresponds to $Re \approx 3.05 \times 10^5$ for a $c=0.3$ m chord, whereas top-speed straight running at 60 m/s (216 km/h) over the full car ($L=5$ m) reaches $Re \approx 2.03 \times 10^7$. Confusing dynamic viscosity $\mu$ and kinematic viscosity $\nu$ would distort Reynolds number calculations across different fluids or temperatures, risking an incorrect transition estimate and poor airfoil selection. The toolkit's dimensional guards directly prevent these errors.
+
+2. **Self-consistent property inputs for cooling calculations**: When sizing radiators and water cooling circuits across temperatures from 300 K to 360 K, calculating Prandtl ($Pr$), Nusselt ($Nu$), and Grashof ($Gr$) numbers requires verified fluid properties. The toolkit's Incropera anchors and NIST cross-checks prevent transcription typos and unverified temperature extrapolations, ensuring that property inputs for 1D pipe flow and CFD boundary conditions are 100% self-consistent.
+
 ## Property data and interpolation
 
 I transcribed five property anchors for air from 300–400 K and water from 300–320 K from Incropera, 7th edition, Tables A.4 and A.6. I cross-checked the values against the [NIST Chemistry WebBook](https://webbook.nist.gov/chemistry/).

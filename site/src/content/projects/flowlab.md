@@ -116,10 +116,13 @@ The first 20,000-iteration run showed me that agreement with reference data and 
 
 The moving-lid problem taught the same lesson at the software boundary. The display layer cannot repair a boundary condition that is missing from the numerical core. Drawing the correct value does not mean that the populations and conservation relationships were updated correctly.
 
-## How to run it
+## Code and reproduction
+
+The source code is open source on GitHub: [gaoflow/flowlab](https://github.com/gaoflow/flowlab)
 
 ```bash
-cd projects/flowlab
+git clone https://github.com/gaoflow/flowlab.git
+cd flowlab
 npm test
 npm run validate
 ```

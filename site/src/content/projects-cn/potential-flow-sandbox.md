@@ -103,13 +103,13 @@ $$
 
 这套模型能对到机器精度，是因为它线性、有闭式解。后面的面元法、涡格法和真实 CFD 都没这么舒服的条件，所以我选择先把这一层查清楚，再往上加几何和物理的复杂度。
 
-## 怎么跑起来
+## 代码与运行
+
+代码已开源在 GitHub：[gaoflow/potential-flow-sandbox](https://github.com/gaoflow/potential-flow-sandbox)
 
 ```bash
-cd projects/potential-flow-sandbox
+git clone https://github.com/gaoflow/potential-flow-sandbox.git
+cd potential-flow-sandbox
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
-python3 scripts/publish_site.py
 ```
-
-测试覆盖基本流动的手算值、表面不可穿透、远场衰减、环量符号和 RK4 四阶收敛。`analyse.py` 会重新生成数值结果和图表，检查不通过时会以非零状态退出。

@@ -112,10 +112,13 @@ NASA 用尾流测量得到的 $C_d$，从零升力附近的约 0.0065 一路涨�
 
 这让我确认：模型更复杂，不等于结果自动更准确。碰到差异，先分清它是离散误差还是模型缺失的物理，再决定是加密网格、改实现，还是直接换一个更高保真度的方法。
 
-## 如何运行
+## 代码与运行
+
+代码已开源在 GitHub：[gaoflow/airfoil-methods](https://github.com/gaoflow/airfoil-methods)
 
 ```bash
-cd projects/airfoil-methods
+git clone https://github.com/gaoflow/airfoil-methods.git
+cd airfoil-methods
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```

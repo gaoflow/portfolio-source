@@ -123,12 +123,13 @@ The rank-1 result changed how I assess reduced-order models. Capturing 87.05% of
 
 I also learned to inspect both the numerator and denominator of every reported error. The same DMD forecast scores 0.100% against the full velocity state and 1.41% against the fluctuations. Neither number replaces the other because they describe different aspects of the prediction.
 
-## How to run the study
+## Code and reproduction
+
+The source code is open source on GitHub: [gaoflow/flowrom](https://github.com/gaoflow/flowrom)
 
 ```bash
-cd projects/flowrom
+git clone https://github.com/gaoflow/flowrom.git
+cd flowrom
 node scripts/generate-snapshots.mjs
 python3 scripts/analyse.py
 ```
-
-The snapshot script generates the velocity fields. The analysis script fits both reduced-order models, evaluates the chronological holdout, regenerates the figures and JSON metrics, and enforces the acceptance gates.

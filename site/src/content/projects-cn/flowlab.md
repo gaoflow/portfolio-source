@@ -112,10 +112,13 @@ $\tau$ 一靠近 0.5，BGK 就会变脆；半格反弹还会带来随网格变�
 
 移动顶盖那次也提醒我：显示层不能替数值核心补边界条件。一个值画对了，不代表分布函数和守恒关系被正确更新。
 
-## 如何运行
+## 代码与运行
+
+代码已开源在 GitHub：[gaoflow/flowlab](https://github.com/gaoflow/flowlab)
 
 ```bash
-cd projects/flowlab
+git clone https://github.com/gaoflow/flowlab.git
+cd flowlab
 npm test
 npm run validate
 ```

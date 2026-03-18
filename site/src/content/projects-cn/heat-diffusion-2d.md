@@ -110,10 +110,13 @@ $$
 
 这次改动让我养成了一个习惯：开始跑研究之前先问一句，我现在做的这个对比，能不能真正只测我想测的那个误差。它也让我确认了一件事：拒绝一个不稳定的算例，本身就是一个正确的结果，不该把发现问题这件事留给用户在发散之后去做。
 
-## 如何运行
+## 代码与运行
+
+代码已开源在 GitHub：[gaoflow/heat-diffusion-2d](https://github.com/gaoflow/heat-diffusion-2d)
 
 ```bash
-cd projects/heat-diffusion-2d
+git clone https://github.com/gaoflow/heat-diffusion-2d.git
+cd heat-diffusion-2d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```

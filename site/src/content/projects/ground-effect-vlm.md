@@ -102,10 +102,13 @@ The most valuable result was not the maximum lift, but the $h/c=0.25$ endpoint w
 
 I also learned to report fixed-incidence lift, absolute induced drag, and induced-drag cost per lift squared separately. These quantities answer different questions, and combining them into a single claim that “efficiency improved” would hide the actual change.
 
-## How to run it
+## Code and reproduction
+
+The source code is open source on GitHub: [gaoflow/ground-effect-vlm](https://github.com/gaoflow/ground-effect-vlm)
 
 ```bash
-cd projects/ground-effect-vlm
+git clone https://github.com/gaoflow/ground-effect-vlm.git
+cd ground-effect-vlm
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```

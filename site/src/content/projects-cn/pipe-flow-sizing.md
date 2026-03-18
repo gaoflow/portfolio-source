@@ -115,11 +115,13 @@ $$
 
 我也确认了一个之后一直沿用的顺序：先把摩阻系数、隐式方程残差和网络闭合这些基础验证完，再让这些结果进入更复杂的热流体模型。基础模块如果只是"差不多对"，最后的系统结论还是可能完全错。
 
-## 如何运行
+## 代码与运行
+
+代码已开源在 GitHub：[gaoflow/pipe-flow-sizing](https://github.com/gaoflow/pipe-flow-sizing)
 
 ```bash
-cd projects/pipe-flow-sizing
+git clone https://github.com/gaoflow/pipe-flow-sizing.git
+cd pipe-flow-sizing
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
-python3 scripts/publish_site.py
 ```

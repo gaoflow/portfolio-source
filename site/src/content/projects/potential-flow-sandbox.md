@@ -105,13 +105,13 @@ I no longer treat a reasonable-looking streamline plot as validation. I check si
 
 This model reaches machine-precision agreement because it is linear and has closed-form solutions. Panel methods, vortex-lattice methods, and practical CFD do not offer the same convenience, so I chose to verify this foundation before adding more complicated geometry and physics.
 
-## How to run it
+## Code and reproduction
+
+The source code is open source on GitHub: [gaoflow/potential-flow-sandbox](https://github.com/gaoflow/potential-flow-sandbox)
 
 ```bash
-cd projects/potential-flow-sandbox
+git clone https://github.com/gaoflow/potential-flow-sandbox.git
+cd potential-flow-sandbox
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
-python3 scripts/publish_site.py
 ```
-
-The tests cover hand-calculated elementary-flow values, surface impermeability, far-field decay, circulation sign, and fourth-order RK4 convergence. `analyse.py` regenerates the numerical results and figures, and exits with a nonzero status if any check fails.

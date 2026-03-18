@@ -118,12 +118,13 @@ The corrective action was not to keep adding panels. It was to identify the rema
 
 The broader lesson was that greater model complexity does not guarantee greater accuracy. I first need to decide whether a discrepancy comes from discretisation, implementation, or missing physics; only then can I choose between refining the mesh, correcting the solver, or using a higher-fidelity model.
 
-## How to run
+## Code and reproduction
+
+The source code is open source on GitHub: [gaoflow/airfoil-methods](https://github.com/gaoflow/airfoil-methods)
 
 ```bash
-cd projects/airfoil-methods
+git clone https://github.com/gaoflow/airfoil-methods.git
+cd airfoil-methods
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
-
-The unit tests exercise the geometry and solver behaviour. The analysis script regenerates the reported metrics and figures.

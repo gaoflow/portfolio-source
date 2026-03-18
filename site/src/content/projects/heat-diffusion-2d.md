@@ -169,10 +169,13 @@ I originally expected temporal refinement to be a straightforward comparison wit
 
 I also learned to treat refusal as a valid numerical result. Rejecting the $r=0.26$ case is part of correct solver behaviour; the user should not have to discover an invalid time step only after the solution diverges.
 
-## How to run it
+## Code and reproduction
+
+The source code is open source on GitHub: [gaoflow/heat-diffusion-2d](https://github.com/gaoflow/heat-diffusion-2d)
 
 ```bash
-cd projects/heat-diffusion-2d
+git clone https://github.com/gaoflow/heat-diffusion-2d.git
+cd heat-diffusion-2d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
