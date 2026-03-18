@@ -1,11 +1,11 @@
 ---
-title: 'How I compressed 480 flow fields into a few modes'
+title: 'A record of compressing 480 flow fields into a few modes'
 year: 2026
 date: '2026-05-30'
 status: complete
 categories: [validation, tooling]
 tags: [CFD]
-summary: 'Unsteady CFD generates massive datasets that quickly fill hard drives. I built a lightweight particle-based fluid solver (FlowLab) from scratch, then created a reduced-order modeling toolkit (FlowROM): compressing hundreds of complex flow fields into 8 key mode shapes—much like video compression—and forecasting future flow evolution without re-running fluid solvers.'
+summary: 'While running unsteady CFD, I found hard drives filling up quickly. I first built a lightweight particle-based fluid solver (FlowLab), then developed a reduced-order modeling toolkit (FlowROM): compressing hundreds of complex flow fields into 8 key mode shapes—much like video compression—and forecasting future flow evolution without re-running fluid solvers.'
 role: 'Numerical Methods & Software Engineering'
 duration: 'Independent study'
 featured: false
@@ -15,103 +15,86 @@ heroImage: /images/projects/flowrom/pod-modes.svg
 github: 'https://github.com/gaoflow/flowrom'
 ---
 
-## Why I started by building my own solver
+## Building a custom solver
 
-I wanted an intuitive way to explore fluid dynamics directly inside the browser and terminal. Commercial CFD tools require tedious meshing and heavy differential equation solvers that are too slow for real-time interactive web experiments.
+I wanted an intuitive way to explore fluid dynamics directly inside the browser and terminal. Commercial CFD tools require tedious meshing and heavy differential equation solvers that are too slow for real-time interactive web experiments. So, I built a lightweight fluid solver from scratch in JavaScript: FlowLab. To keep it fast, I avoided solving the traditional Navier–Stokes equations and chose the Lattice Boltzmann Method (LBM). Once written, it ran at 60 FPS in the browser, letting me drag obstacles and watch cavity vortex structures evolve in real time.
 
-So, I built a lightweight fluid solver from scratch in JavaScript: **FlowLab**.
-
-To keep it fast, I avoided solving the traditional Navier–Stokes equations and chose the **Lattice Boltzmann Method (LBM)**. Once written, it ran at 60 FPS in the browser, letting me drag obstacles and watch cavity vortex structures evolve in real time.
-
-However, when I moved on to study **unsteady periodic flows**, I hit an immediate bottleneck: **the dataset grew too large for my storage to handle**.
-
-Recording how vortices evolve over time meant saving the velocity of every single cell every few milliseconds. A single simulation easily generated dozens of gigabytes of raw snapshot files. Storing this data was expensive, and analyzing flow patterns by stepping through thousands of frames in post-processing tools was painfully slow.
+However, when I moved on to study unsteady periodic flows, I hit an immediate bottleneck: the dataset grew too large for storage to handle. Recording how vortices evolve over time meant saving the velocity of every single cell every few milliseconds. A single simulation easily generated dozens of gigabytes of raw snapshot files. Storing this data was expensive, and analyzing flow patterns by stepping through thousands of frames in post-processing tools was painfully slow.
 
 I wondered: since periodic flows follow clear underlying rhythms, why can't we compress hundreds of 2D flow fields into a handful of core mode shapes—much like video compression? And could we forecast future flow evolution directly without re-running heavy fluid equations?
 
-To tackle this, I built the reduced-order modeling toolkit: **FlowROM**.
+To tackle this, I built the reduced-order modeling toolkit: FlowROM.
 
 ---
 
-## What exactly is the Lattice Boltzmann Method (LBM)?
+## Understanding the Lattice Boltzmann Method (LBM)
 
-While traditional CFD treats fluid as a continuous block and solves complex calculus equations, the Lattice Boltzmann Method models fluid as **swarms of virtual particles bouncing around on a regular grid**.
-
-I implemented the standard 2D model: **D2Q9**. The domain is divided into square cells where particles can move in 9 discrete directions (stationary at the center, 4 cardinal axes, and 4 diagonals).
+While traditional CFD treats fluid as a continuous block and solves complex calculus equations, the Lattice Boltzmann Method models fluid as swarms of virtual particles bouncing around on a regular grid. I implemented the standard 2D model: D2Q9. The domain is divided into square cells where particles can move in 9 discrete directions (stationary at the center, 4 cardinal axes, and 4 diagonals).
 
 In every time step, the algorithm executes two basic operations:
 
-1. **Collision**: Particles arriving at the same node collide and redistribute their velocities toward local equilibrium;
-2. **Streaming**: After colliding, particles hop along their directions to neighboring grid nodes.
+1. Collision: Particles arriving at the same node collide and redistribute their velocities toward local equilibrium;
+2. Streaming: After colliding, particles hop along their directions to neighboring grid nodes.
 
-Summing the particles across all 9 directions yields the local fluid density, and taking their momentum-weighted average gives the macroscopic flow velocity.
-
-Because LBM avoids solving global pressure Poisson equations, it is naturally parallel and extremely fast. I set up a lid-driven cavity flow with a sinusoidal lid velocity perturbation. Once the flow settled into a stable limit cycle, I saved a snapshot every 10 steps, exporting **480 full flowfield snapshots** to feed into the reduction pipeline.
+Summing the particles across all 9 directions yields the local fluid density, and taking their momentum-weighted average gives the macroscopic flow velocity. It completely avoids solving global pressure Poisson equations, making it naturally parallel and extremely fast. I set up a lid-driven cavity flow with a sinusoidal lid velocity perturbation. Once the flow settled into a stable limit cycle, I saved a snapshot every 10 steps, exporting 480 full flowfield snapshots to feed into the reduction pipeline.
 
 ---
 
 ## How FlowROM works
 
-FlowROM does not solve fluid dynamics equations. It is an algorithmic toolkit designed to compress flowfield data and forecast its evolution. It consists of two complementary components:
+FlowROM does not solve fluid dynamics equations. It is an algorithmic toolkit designed to compress flowfield data and forecast its evolution. I divided it into two main components:
 
-### 1. POD: extracting the core spatial modes
+### 1. POD (Proper Orthogonal Decomposition)
 POD works like dimensional reduction. After subtracting the mean flow from the 480 snapshots, it uses Singular Value Decomposition (SVD) to decompose the messy flow fields into a series of orthogonal spatial modes ranked by importance.
 
 - Raw flow fields contain thousands of velocity numbers per frame;
-- POD reduces this entire dataset to just **8 core spatial mode shapes** and their temporal coefficients;
-- Storage requirements drop by **nearly 50x**, while reconstructing unseen test flows with around 0.1% fluctuation error.
+- POD reduces this entire dataset to just 8 core spatial mode shapes and their temporal coefficients;
+- Storage requirements drop by nearly 50x, while reconstructing unseen test flows with around 0.1% fluctuation error.
 
-### 2. DMD: the temporal metronome
-POD compresses historical flow fields, but cannot advance states forward in time on its own. To forecast future dynamics, I integrated DMD.
+### 2. DMD (Dynamic Mode Decomposition)
+POD compresses historical flow fields, but cannot advance states forward in time on its own. To forecast future dynamics, I integrated DMD. DMD analyzes the sequential progression of snapshot frames and fits a linear operator to advance time:
 
-DMD analyzes the sequential progression of snapshot frames and fits a linear operator to advance time:
-- **First, catch the frequency**: DMD automatically extracts the primary oscillation frequency with high precision;
-- **Then, forecast autonomously**: Starting from the end of the training data, DMD steps forward step by step on its own, forecasting four full cycles of flow evolution without calling the fluid solver.
+- Catch the frequency: DMD automatically extracts the primary oscillation frequency with high precision;
+- Forecast autonomously: Starting from the end of the training data, DMD steps forward step by step on its own, forecasting four full cycles of flow evolution without calling the fluid solver.
 
 ---
 
-## How to split data: why random frame sampling is cheating
+## Partitioning training and test data
 
-When analyzing flowfield data, avoiding self-deception is paramount.
-
-I used the first 320 snapshots (the first 8 cycles) for training and strictly quarantined the final 160 snapshots (4 full cycles) as the unseen test exam.
+I used the first 320 snapshots (the first 8 cycles) for training and set aside the final 160 snapshots (4 full cycles) as the unseen test exam.
 
 ![POD energy and holdout reconstruction error](/images/projects/flowrom/pod-spectrum.svg)
 
-In standard machine learning, people often randomly sample 20% of the data for testing. **In periodic fluid dynamics, random frame sampling is severe data leakage**.
-
-Because periodic flows repeat cyclically, a randomly sampled test frame shares near-identical flow states with the frames right before and after it in the training set. The model would not need to learn genuine physical evolution; it could achieve a cosmetically low error simply by interpolating between neighboring frames.
+In standard machine learning, people often randomly sample 20% of the data for testing. In periodic fluid dynamics, random frame sampling is severe data leakage. Because periodic flows repeat cyclically, a randomly sampled test frame shares near-identical flow states with the frames right before and after it in the training set. The model would not need to learn genuine physical evolution; it could achieve a cosmetically low error simply by interpolating between neighboring frames.
 
 Reserving four continuous cycles at the end forces the model to step into genuinely unobserved territory from a fixed starting point, proving whether it truly captured the physical dynamics.
 
 ---
 
-## The most valuable failure: why keeping only one mode breaks down
+## A valuable failure
 
-When looking at the energy distribution, the 1st spatial mode accounts for **87%** of the fluctuating kinetic energy. Looking only at this number, one might assume that a single mode is enough to represent the flow.
-
-However, when I used only this 1st mode to reconstruct the unseen test set, the error spiked to **36%**—discarding over a third of the dynamic fluctuations!
+When looking at the energy distribution, the 1st spatial mode accounts for 87% of the fluctuating kinetic energy. Looking only at this number, one might assume that a single mode is enough to represent the flow. However, when I used only this 1st mode to reconstruct the unseen test set, the error spiked to 36%—discarding over a third of the dynamic fluctuations!
 
 | Modes Retained | Training Error | Unseen Test Error |
 |---:|---:|---:|
-| 1 mode | 35.98% | **35.97% (severe distortion)** |
-| 2 modes | 1.63% | **1.30% (instant recovery)** |
+| 1 mode | 35.98% | 35.97% (severe distortion) |
+| 2 modes | 1.63% | 1.30% (instant recovery) |
 | 4 modes | 0.39% | 0.47% |
 | 8 modes | 0.09% | 0.12% |
 
-**Why did 1 mode fail so dramatically?**
+Why did 1 mode fail so dramatically?
 Periodic vortex shedding in space is a closed rotational trajectory. Describing a full rotation requires at least a pair of orthogonal directions (just as plotting a circle requires both $\cos$ and $\sin$). With only one mode, the flow cannot physically rotate across phases.
 
-Adding the 2nd mode caused the test error to plummet from 36% down to 1.3%. This failure made one thing clear: **model truncation cannot be decided by cumulative energy on training data alone; it must be audited against unobserved test data and physical kinematics**.
+Adding the 2nd mode caused the test error to plummet from 36% down to 1.3%. This failure made one thing clear: model truncation cannot be decided by cumulative energy on training data alone; it must be audited against unobserved test data and physical kinematics.
 
 ---
 
-## Why I deliberately report two different errors
+## Why I report two different errors
 
-When evaluating DMD forecast accuracy across the 4 unobserved cycles, I report two distinct error figures:
+When evaluating DMD forecast accuracy across the 4 unobserved cycles, I deliberately report two distinct error figures:
 
-- Relative to the **full velocity field**: **0.10%** (looks cosmetically perfect)
-- Relative to **mean-subtracted dynamic fluctuations**: **1.41%** (honest reflection of time-stepping error)
+- Relative to the full velocity field: 0.10% (looks cosmetically perfect)
+- Relative to mean-subtracted dynamic fluctuations: 1.41% (honest reflection of time-stepping error)
 
 ![DMD probe forecasts and modal frequencies](/images/projects/flowrom/dmd-forecast.svg)
 
