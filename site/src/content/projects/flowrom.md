@@ -19,6 +19,8 @@ github: 'https://github.com/gaoflow/flowrom'
 
 I wanted an intuitive way to explore fluid dynamics directly inside the browser and terminal. Commercial CFD tools require tedious meshing and heavy differential equation solvers that are too slow for real-time interactive web experiments. So, I built a lightweight fluid solver from scratch in JavaScript: FlowLab. To keep it fast, I avoided solving the traditional Navier–Stokes equations and chose the Lattice Boltzmann Method (LBM). Once written, it ran at 60 FPS in the browser, letting me drag obstacles and watch cavity vortex structures evolve in real time.
 
+![FlowLab unsteady lid-driven cavity vortex dynamics](/images/projects/flowrom/flowlab-demo.gif)
+
 However, when I moved on to study unsteady periodic flows, I hit an immediate bottleneck: the dataset grew too large for storage to handle. Recording how vortices evolve over time meant saving the velocity of every single cell every few milliseconds. A single simulation easily generated dozens of gigabytes of raw snapshot files. Storing this data was expensive, and analyzing flow patterns by stepping through thousands of frames in post-processing tools was painfully slow.
 
 I wondered: since periodic flows follow clear underlying rhythms, why can't we compress hundreds of 2D flow fields into a handful of core mode shapes—much like video compression? And could we forecast future flow evolution directly without re-running heavy fluid equations?
@@ -35,6 +37,8 @@ In every time step, the algorithm executes two basic operations:
 
 1. Collision: Particles arriving at the same node collide and redistribute their velocities toward local equilibrium;
 2. Streaming: After colliding, particles hop along their directions to neighboring grid nodes.
+
+![LBM D2Q9 discrete velocity lattice and collision-streaming mechanics](/images/projects/flowrom/lbm-d2q9-concept.svg)
 
 Summing the particles across all 9 directions yields the local fluid density, and taking their momentum-weighted average gives the macroscopic flow velocity. It completely avoids solving global pressure Poisson equations, making it naturally parallel and extremely fast. I set up a lid-driven cavity flow with a sinusoidal lid velocity perturbation. Once the flow settled into a stable limit cycle, I saved a snapshot every 10 steps, exporting 480 full flowfield snapshots to feed into the reduction pipeline.
 
