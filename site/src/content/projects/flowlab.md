@@ -1,12 +1,12 @@
 ---
-title: 'FlowLab — Browser-Native Lattice-Boltzmann Validation'
+title: 'Building a custom solver: Bringing Lattice Boltzmann to the browser'
 year: 2026
 date: '2026-05-16'
 status: complete
 categories: [tooling, validation]
 tags: [CFD]
-summary: 'I wrote a dependency-free D2Q9 BGK solver in JavaScript so Node.js validation and browser animation could share one core; for the Re=100 cavity, the 64² grid achieved a centreline RMSE of 0.00286 and relative mass drift of 2.56e−12.'
-role: 'Numerical methods & software engineering'
+summary: 'Web fluid animations are mostly shader tricks with no mass or momentum conservation. I wrote a zero-dependency Lattice Boltzmann solver (FlowLab, D2Q9) from scratch in JavaScript: powering a 60 FPS interactive browser canvas while passing rigorous Ghia et al. benchmark regressions in Node.js.'
+role: 'Numerical Methods & Software Engineering'
 duration: 'Independent study'
 featured: false
 order: 5
@@ -15,101 +15,99 @@ heroImage: /images/projects/flowlab/cavity-vorticity.svg
 github: 'https://github.com/gaoflow/flowlab'
 ---
 
-## Origin: web fluid toys look great, but why are they mostly fake physics?
+## Why web fluid toys are mostly fake physics
 
-The origin of this project was examining interactive fluid demos on the web. While visually striking, most are shader tricks or ad-hoc approximations that violate mass and momentum conservation.
+The starting point of this project was examining interactive fluid demos on the web (such as stirring smoke with a mouse). While visually striking, looking at the code revealed they are mostly shader filters or heavily simplified approximations where mass and momentum are not conserved.
 
-As a computational mechanics student, I asked: can we embed a rigorous, conservation-preserving CFD solver directly in the browser?
+As a computational mechanics student, I wondered: could we build a serious, conservation-preserving CFD solver directly inside the browser?
 
 Could the exact same numerical core pass strict benchmark regressions in Node.js while driving a 60 FPS interactive canvas where users draw obstacles and watch vortex dynamics evolve in real time? That question led to FlowLab, a zero-dependency D2Q9 lattice-Boltzmann solver.
 
-## How FlowLab advances one time step
+## What happens in a single iteration step
 
-FlowLab uses a D2Q9 lattice with a single-relaxation-time BGK collision operator. Each iteration follows a fixed sequence:
+FlowLab uses a standard D2Q9 lattice with single-relaxation-time BGK collision. Each grid node stores 9 particle distribution functions, representing the population fractions moving along discrete lattice directions. The execution sequence per time step is fixed:
 
 ```text
-Recover density and velocity from the nine populations
-→ Build the equilibrium distribution
-→ Apply BGK collision
-→ Apply the moving-lid momentum correction
-→ Stream along the nine lattice directions
+Recover density and velocity from 9 distribution components
+→ Construct local equilibrium distributions
+→ BGK collision step
+→ Moving lid momentum correction
+→ Stream along 9 discrete lattice vectors
 → Recompute velocity and vorticity
-→ Check the residual
+→ Check residual convergence
 ```
 
-I calculate the kinematic viscosity from
+In plain terms: first count the particles at each cell to find density and bulk velocity; calculate the theoretical equilibrium state for each direction; execute collision by relaxing current distributions toward equilibrium at a rate governed by relaxation time $\tau$; apply lid momentum; stream particles to neighboring nodes; and recompute macroscopic fields to evaluate residuals.
+
+Kinematic viscosity is defined by
 
 $$
 \nu=\frac{U_{lid}L}{Re}
 $$
 
-and then obtain
+which converts to lattice relaxation time $\tau=0.5+3\nu$. Because BGK becomes numerically fragile as $\tau$ approaches 0.5, the solver refuses to run if inputs push $\tau$ too close to the stability limit.
 
-$$
-\tau=0.5+3\nu.
-$$
+## Moving lid: why overwriting velocity post-streaming is flawed
 
-The solver refuses to run when $\tau$ is too close to the BGK stability boundary.
+A naive shortcut is to run streaming, then manually overwrite the velocity of the top row to $U_{lid}$. Visually, the boundary condition appears satisfied. However, incoming distribution functions do not receive the corresponding momentum transfer, creating subtle mass and momentum leaks elsewhere in the domain.
 
-## The moving lid cannot be imposed by overwriting velocity
+I embedded the moving-wall momentum directly into the bounce-back step: stationary walls use halfway bounce-back, while the top lid adds a velocity-dependent correction to reflected populations. Boundary conditions remain an integral part of distribution updating rather than an ad-hoc post-processing patch.
 
-The most direct implementation is to overwrite the lid velocity after streaming. That makes the displayed boundary speed look correct, but it does not apply a consistent momentum change to the populations that strike the wall.
+## Why 20,000 steps was not yet converged
 
-I instead included the moving-wall momentum correction in the bounce-back step. Stationary walls use halfway bounce-back, while the lid adds a velocity correction as the populations are reflected.
+Every 250 iterations, the solver measures the RMS change across both velocity components, normalized by lid speed, to evaluate residuals.
 
-This makes the boundary condition part of the distribution update rather than a macroscopic value imposed after the flow field has been calculated.
+The first automated benchmark run stopped at 20,000 steps. While centerline profiles closely resembled reference data, the residual remained at $4.80\times10^{-7}$, failing the strict convergence criterion of $2.00\times10^{-7}$.
 
-## How I decided whether a run had converged
+Looking like the reference solution and reaching internal steady-state convergence are two different milestones. Rather than loosening acceptance thresholds to declare an early pass, I increased iteration budgets across all grids.
 
-Every 250 iterations, I compare the RMS change in both velocity components and normalise it by the lid speed.
+## Grid convergence results
 
-The first automated validation stopped after 20,000 iterations. Its centreline velocities were already close to the reference data, but the residual was still $4.80\times10^{-7}$, so it did not meet the convergence requirement I had set in advance.
+All three grid resolutions ran to true residual convergence:
 
-I did not relax that requirement. I increased the iteration budgets for the different grids instead. The final runs were:
-
-| Fluid grid | Iterations | Final residual | $u/U_{lid}$ RMSE | $v/U_{lid}$ RMSE |
+| Fluid Grid | Iterations | Final Residual | $u/U_{lid}$ RMSE | $v/U_{lid}$ RMSE |
 |---:|---:|---:|---:|---:|
 | 32² | 14,750 | $1.85\times10^{-7}$ | 0.00511 | 0.00404 |
 | 48² | 22,000 | $1.91\times10^{-7}$ | 0.00369 | 0.00208 |
 | 64² | 27,500 | $1.89\times10^{-7}$ | 0.00286 | 0.00202 |
 
-The streamwise error decreases with every grid refinement. The cross-stream error changes only slightly after 48², which suggests that the remaining discrepancy cannot be explained by overall grid resolution alone.
+Streamwise velocity error drops consistently with grid refinement. Normal velocity error plateaus after 48², indicating that residual discrepancies stem from spatial resolution limits rather than iteration count.
 
-## How I compared FlowLab with canonical data
+## Benchmarking against classic literature
 
-The reference values come from the lid-driven-cavity results published by Ghia, Ghia, and Shin in *Journal of Computational Physics* 48(3), 1982 ([DOI](https://doi.org/10.1016/0021-9991(82)90058-4)).
+Reference data comes from the classic lid-driven cavity benchmark by Ghia, Ghia, and Shin in the *Journal of Computational Physics* ([DOI](https://doi.org/10.1016/0021-9991(82)90058-4)).
 
-The published sampling coordinates do not generally coincide with FlowLab grid points. Before calculating RMSE, the validation program therefore interpolates the generated centreline velocities to the reference coordinates. It compares $u/U_{lid}$ along the vertical centreline and $v/U_{lid}$ along the horizontal centreline.
+Because published sampling coordinates do not fall directly on lattice nodes, the benchmark suite interpolates centerline velocities to exact literature coordinates before computing RMSE.
 
-![FlowLab centreline velocities against Ghia et al.](/images/projects/flowlab/centerline-validation.svg)
+![Vertical centerline u velocity: FlowLab vs Ghia et al.](/images/projects/flowlab/centerline-u.svg)
 
-On the 64² grid, both RMSE values are well below 0.01. The relative mass drift is $2.56\times10^{-12}$, also below the $10^{-9}$ requirement.
+![Horizontal centerline v velocity: FlowLab vs Ghia et al.](/images/projects/flowlab/centerline-v.svg)
 
-These checks answer different questions. The residual shows whether the solver’s internal state has stopped changing. The reference comparison shows whether its velocity field agrees with external data. Mass drift shows whether it is losing population mass globally.
+On the 64² grid, centerline RMSE across both components remains well below 1%, with a relative mass drift of $2.56\times10^{-12}$ (far below the $10^{-9}$ threshold).
 
-## Why a plausible primary vortex is not enough
+These three checks serve distinct auditing roles: residuals verify internal numerical steady state, reference datasets verify physical velocity alignment, and mass tracking confirms global conservation.
 
-Producing a primary vortex in a cavity is not difficult. Incorrect lid momentum, displaced corner structures, or biased centreline velocities can still produce a vorticity plot that looks reasonable.
+## Why a plausible vorticity plot is not enough
 
-I therefore use field images to understand the flow structure, not to decide whether a run passes validation. The centreline comparison and mass drift provide the quantitative checks.
+Producing a central recirculation vortex in a cavity is easy. Incorrect lid momentum, distorted corner vortices, or inaccurate centerline velocities can still produce a visually plausible contour map.
 
-## Performance and software structure
+Visual flowfields illustrate qualitative topology; quantitative validity is determined by centerline metrics and conservation tracking.
 
-On an Apple M4, the recorded 64² validation run sustained about 26.3 million lattice updates per second and completed 27,500 iterations in 4.28 seconds. This is a single workstation observation, not a cross-platform performance guarantee.
+## Performance and software architecture
 
-The browser version uses a 96×64 fluid grid, advances five iterations per animation frame, and reports the current frame rate.
+On Apple M4 hardware, the 64² benchmark run achieved approximately 26.3 million lattice updates per second, completing 27,500 steps in 4.28 seconds.
 
-The numerical core has no DOM or plotting dependency. Node.js runs the tests, grid study, and reference comparison. The browser reads velocity or vorticity arrays for rendering but cannot modify the distribution functions.
+The browser edition uses a 96×64 fluid lattice, advancing 5 iterations per animation frame with a live FPS counter.
 
-## What the solver cannot yet do
+The numerical core is strictly decoupled from the DOM and rendering logic. Node.js manages regression tests and benchmark validation; the browser UI reads velocity and vorticity buffers as read-only arrays without mutating distribution state.
 
-Only the steady $Re=100$ cavity has quantitative validation. Higher Reynolds numbers remain exploratory.
+## Limits and next work
 
-BGK becomes fragile as $\tau$ approaches 0.5. Halfway bounce-back also introduces a grid-dependent effective wall location. The lattice time is nondimensional and is not mapped to the physical time of a specific fluid.
+Quantitative verification is currently established for steady $Re=100$ cavity flow. Higher Reynolds numbers are supported as exploratory interactive demos.
 
-FlowLab is a numerical-method study and teaching tool, not a replacement for an industrial finite-volume solver.
+BGK becomes fragile as $\tau$ approaches 0.5, and halfway bounce-back introduces grid-dependent effective wall positions. Lattice time is also unmapped to physical dimensional seconds.
 
-If I later replace BGK with MRT or a regularised collision operator, I will need to repeat the three-grid study and the external reference checks rather than carrying the current validation claim over to the new method.
+It is a numerical demonstration and pedagogical tool, not a replacement for commercial finite-volume solvers. Migrating to Multi-Relaxation-Time (MRT) or regularized collision operators in the future will require re-running full grid convergence benchmarks.
 
 ## Code and reproduction
 
@@ -122,14 +120,14 @@ npm test
 npm run analyse
 ```
 
-## Practical applications: real-time interactive fluid visualization and cavity vortex exploration
+## Practical applications
 
 When exploring lid-driven cavity flows, secondary corner vortex formation, and wall shear phenomena, traditional CFD pipelines require separate pre-processing, meshing, solver execution, and file exports.
 
-FlowLab operates as a zero-dependency lattice-Boltzmann solver that serves two simultaneous roles: it executes automated, rigorous benchmark validation in Node.js (matching Ghia data to $RMSE = 0.00286$), while powering a 60 FPS interactive canvas in the web browser. Users can draw obstacles, adjust lid speed, and modify Reynolds numbers to observe vortex evolution in real time.
+FlowLab operates as a zero-dependency lattice-Boltzmann solver that serves two simultaneous roles: it executes automated, rigorous benchmark validation in Node.js (matching Ghia data to RMSE = 0.00286), while powering a 60 FPS interactive canvas in the web browser. Users can draw obstacles, adjust lid speed, and modify Reynolds numbers to observe vortex evolution in real time.
 
-## What I learned
+## What this project taught me
 
-The first 20,000-iteration run showed me that agreement with reference data and convergence of the internal state are not the same result. More iterations corrected the incomplete convergence, but lowering the acceptance standard would only have hidden it.
+Stopping early at 20,000 steps proved that looking close to reference data is not equivalent to reaching internal numerical convergence. Expanding the iteration budget allowed the solver to finish its convergence path without compromising acceptance standards.
 
-The moving-lid problem taught the same lesson at the software boundary. The display layer cannot repair a boundary condition that is missing from the numerical core. Drawing the correct value does not mean that the populations and conservation relationships were updated correctly.
+Refining the moving lid boundary also demonstrated that presentation layers must never patch numerical boundary conditions post-hoc. A visually correct surface value is meaningless unless distribution functions and conservation laws are updated consistently inside the solver core.
