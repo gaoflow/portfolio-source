@@ -5,7 +5,7 @@ date: '2026-05-16'
 status: complete
 categories: [tooling, validation]
 tags: [CFD]
-summary: 'To understand CFD from the code level and escape the black-box waiting times of commercial tools, I built a zero-dependency Lattice Boltzmann solver (FlowLab, D2Q9) from scratch in JavaScript: powering a 60 FPS interactive browser canvas while passing rigorous Ghia et al. benchmark regressions in Node.js.'
+summary: 'Driven by curiosity about the Lattice Boltzmann Method for low-speed cavity flows, I built this lightweight fluid sandbox (FlowLab) in JavaScript: exploring real-time vortex dynamics in the browser while verifying accuracy against classic benchmark data.'
 role: 'Numerical Methods & Software Engineering'
 duration: 'Independent study'
 featured: false
@@ -29,15 +29,15 @@ The concept was a revelation: rather than discretizing continuous Navier–Stoke
 
 This breakthrough solved my roadblock. To verify whether LBM lived up to its theoretical promise, I decided to write a zero-dependency solver from scratch in JavaScript, building the [FlowLab interactive in-browser solver](/labs/flowlab/) and benchmarking it rigorously against classic literature.
 
-## What problems did building this solver solve?
+## What I consider the value of this small tool
 
-Writing FlowLab from scratch addressed three concrete engineering challenges:
+This was never meant to be a grand engineering software project; it was simply a curiosity-driven numerical experiment. For me, it served a few very practical purposes.
 
-First, breaking free from commercial software black boxes. Pushing buttons in commercial GUI tools makes one an operator, not an engineer. Writing the 9 discrete distribution functions, the BGK collision relaxation, and the halfway bounce-back momentum exchange by hand provided a code-level grasp of how macroscopic pressure, velocity, and viscosity emerge from particle kinetics.
+First, it helped me understand the underlying physics from scratch. In commercial tools, a few clicks generate polished contour plots, but coding the 9 discrete distribution functions, collision relaxation, and bounce-back boundaries by hand gave me a direct feel for how macroscopic fluid dynamics emerges from simple particle rules.
 
-Second, eliminating the sluggish feedback loop of standard CFD. Traditional solvers are too heavy for real-time interaction. FlowLab leverages LBM's local structure to run at over 60 FPS directly in the browser canvas. I can slide my mouse to stir the fluid and watch vortex structures respond instantaneously, turning offline simulations into an interactive workbench.
+Second, it provided immediate, interactive feedback. Traditional CFD takes time to set up and solve, whereas this small solver runs at over 60 FPS right in the browser thanks to LBM's local formulation. Changing the Reynolds number or dragging a mouse across the canvas instantly shows how vortices deform and evolve, making it an engaging hands-on fluid workbench.
 
-Third, providing a fully controllable data generator for reduced-order modeling. In the downstream project (FlowROM), I needed hundreds of clean unsteady flow snapshots for POD compression and DMD forecasting. Commercial exports are bloated and hard to debug. FlowLab gives me a custom, fully controllable physics generator to export pure velocity matrices.
+It also naturally provided the data foundation for my next project. In the downstream study [Reduced-Order Modeling: Compressing 480 Flow Fields into a Few Modes (FlowROM)](/projects/flowrom), I needed hundreds of clean unsteady snapshots to test data reduction algorithms. Generating and exporting those datasets directly from my own solver was far simpler than wrestling with commercial export pipelines.
 
 ## What happens in a single iteration step
 
