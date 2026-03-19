@@ -15,17 +15,19 @@ heroImage: /images/projects/flowlab/cavity-vorticity.svg
 github: 'https://github.com/gaoflow/flowlab'
 ---
 
-## Origin: from long simulation queues to discovering a different fluid perspective
+## Origin: getting stuck on low-speed internal cavity flow
 
-Whenever I ran simulations in commercial CFD tools like Fluent or OpenFOAM, I was frustrated by the sluggish workflow: even to verify a simple physical intuition or tweak an inlet velocity, I had to mesh geometry, configure boundaries, and wait for iterative linear solvers to invert global pressure Poisson equations. A single check cost tens of minutes or hours, and the commercial solver remained a complete black box—behind the colorful contours, it was hard to feel how momentum actually diffused through the fluid.
+The genuine starting point of this project was hitting a frustrating wall while analyzing low-speed recirculating flow and secondary corner vortices inside a racecar cooling passage and closed cavity.
 
-While exploring lightweight fluid numerical methods, I discovered the Lattice Boltzmann Method (LBM).
+The flow speed was low (Reynolds number around Re ≈ 100), so the underlying physics should have been straightforward. Yet running standard commercial CFD tools was painful: boundary-layer meshing near cavity corners suffered from geometric distortion; once meshed, running pressure-based SIMPLE solvers struggled because weak pressure-velocity coupling at low speeds caused endless Poisson equation iterations and oscillating residuals, wasting hours and occasionally diverging.
 
-LBM offered a fundamentally different philosophy: instead of discretizing continuous partial differential equations (the Navier–Stokes equations), it models fluid as swarms of virtual particles colliding and streaming on a discrete lattice. It requires no global matrix inversions; every operation is purely local.
+I asked myself: for a geometrically simple, low-speed enclosed flow, why must conventional methods rely on tedious body-fitted meshing and computationally fragile global matrix inversions? Was there an alternative fluid algorithm that runs directly on clean Cartesian grids without solving global pressure Poisson equations?
 
-This sparked an exciting question: could I write an LBM solver from scratch in JavaScript and run it directly in a web browser?
+Searching through computational fluid mechanics literature led me to the Lattice Boltzmann Method (LBM).
 
-That was the starting point for the [FlowLab interactive in-browser solver](/labs/flowlab/).
+The concept was a revelation: rather than discretizing continuous Navier–Stokes partial differential equations, LBM models fluid as swarms of virtual particles colliding and streaming on a uniform Cartesian lattice. It eliminates body-fitted mesh generation; operations are purely local, explicit, and naturally conserve mass and momentum.
+
+This breakthrough solved my roadblock. To verify whether LBM lived up to its theoretical promise, I decided to write a zero-dependency solver from scratch in JavaScript, building the [FlowLab interactive in-browser solver](/labs/flowlab/) and benchmarking it rigorously against classic literature.
 
 ## What problems did building this solver solve?
 
