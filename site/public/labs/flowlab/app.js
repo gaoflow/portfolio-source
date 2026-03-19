@@ -30,12 +30,39 @@ function createSolver() {
 function colour(value, signed) {
   const normalised = Math.max(signed ? -1 : 0, Math.min(1, value));
   if (!signed) {
-    return [Math.round(15 + 220 * normalised), Math.round(118 + 112 * normalised), Math.round(110 - 75 * normalised)];
+    // Speed: 0 is ivory/paper (#faf9f5), mid is ink-teal (#0f766e), high is warm amber (#c2410c)
+    if (normalised < 0.5) {
+      const t = normalised * 2;
+      return [
+        Math.round(250 + (15 - 250) * t),
+        Math.round(249 + (118 - 249) * t),
+        Math.round(245 + (110 - 245) * t)
+      ];
+    } else {
+      const t = (normalised - 0.5) * 2;
+      return [
+        Math.round(15 + (194 - 15) * t),
+        Math.round(118 + (65 - 118) * t),
+        Math.round(110 + (12 - 110) * t)
+      ];
+    }
   }
-  const magnitude = Math.abs(normalised);
-  return normalised < 0
-    ? [Math.round(30 + 210 * magnitude), Math.round(90 - 55 * magnitude), Math.round(120 - 40 * magnitude)]
-    : [Math.round(30 + 210 * magnitude), Math.round(105 + 100 * magnitude), Math.round(130 + 80 * magnitude)];
+  // Signed vorticity: <0 is cool blue (#0284c7), 0 is ivory (#faf9f5), >0 is crimson (#dc2626)
+  if (normalised < 0) {
+    const t = -normalised;
+    return [
+      Math.round(250 + (2 - 250) * t),
+      Math.round(249 + (132 - 249) * t),
+      Math.round(245 + (199 - 245) * t)
+    ];
+  } else {
+    const t = normalised;
+    return [
+      Math.round(250 + (220 - 250) * t),
+      Math.round(249 + (38 - 249) * t),
+      Math.round(245 + (38 - 245) * t)
+    ];
+  }
 }
 
 function render() {
@@ -45,8 +72,13 @@ function render() {
   for (let y = 0; y < offscreen.height; y += 1) {
     for (let x = 0; x < offscreen.width; x += 1) {
       const cell = (y + 1) * solver.width + x + 1;
-      const raw = signed ? vorticity[cell] : Math.hypot(solver.ux[cell], solver.uy[cell]);
-      const [red, green, blue] = colour(raw * scale, signed);
+      let red, green, blue;
+      if (solver.solid[cell]) {
+        red = 41; green = 37; blue = 36; // solid obstacle (#292524)
+      } else {
+        const raw = signed ? vorticity[cell] : Math.hypot(solver.ux[cell], solver.uy[cell]);
+        [red, green, blue] = colour(raw * scale, signed);
+      }
       const pixel = ((offscreen.height - 1 - y) * offscreen.width + x) * 4;
       pixels.data[pixel] = red;
       pixels.data[pixel + 1] = green;
@@ -57,14 +89,16 @@ function render() {
   offscreenContext.putImageData(pixels, 0, 0);
   context.imageSmoothingEnabled = false;
   context.drawImage(offscreen, 0, 0, canvas.width, canvas.height);
-  context.strokeStyle = '#5eead4';
-  context.lineWidth = 3;
+  
+  // Draw top moving lid indicator arrow
+  context.strokeStyle = '#dc2626';
+  context.lineWidth = 2.5;
   context.beginPath();
-  context.moveTo(24, 16);
-  context.lineTo(canvas.width - 24, 16);
-  context.lineTo(canvas.width - 38, 9);
-  context.moveTo(canvas.width - 24, 16);
-  context.lineTo(canvas.width - 38, 23);
+  context.moveTo(24, 14);
+  context.lineTo(canvas.width - 24, 14);
+  context.lineTo(canvas.width - 36, 8);
+  context.moveTo(canvas.width - 24, 14);
+  context.lineTo(canvas.width - 36, 20);
   context.stroke();
 }
 
@@ -80,6 +114,36 @@ function animate(timestamp) {
   metrics.textContent = `Re ${solver.reynolds} · τ ${solver.relaxationTime.toFixed(4)} · ${solver.iteration.toLocaleString()} it · ${framesPerSecond} fps`;
   requestAnimationFrame(animate);
 }
+// Mouse / touch drag to draw obstacles
+let drawing = false;
+function addObstacle(e) {
+  const rect = canvas.getBoundingClientRect();
+  const px = Math.floor(((e.clientX - rect.left) / rect.width) * offscreen.width);
+  const py = Math.floor((1 - (e.clientY - rect.top) / rect.height) * offscreen.height);
+  for (let dy = -1; dy <= 1; dy += 1) {
+    for (let dx = -1; dx <= 1; dx += 1) {
+      const gx = px + dx;
+      const gy = py + dy;
+      if (gx > 1 && gx < offscreen.width - 1 && gy > 1 && gy < offscreen.height - 2) {
+        const cell = (gy + 1) * solver.width + gx + 1;
+        solver.solid[cell] = 1;
+        solver.ux[cell] = 0;
+        solver.uy[cell] = 0;
+      }
+    }
+  }
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  drawing = true;
+  addObstacle(e);
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (drawing) addObstacle(e);
+});
+window.addEventListener('pointerup', () => {
+  drawing = false;
+});
 
 reynoldsSelect.addEventListener('change', createSolver);
 displaySelect.addEventListener('change', render);

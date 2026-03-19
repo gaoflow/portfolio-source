@@ -21,10 +21,9 @@ The starting point of this project was examining interactive fluid demos on the 
 
 As a computational mechanics student, I wondered: could we build a serious, conservation-preserving CFD solver directly inside the browser?
 
-Could the exact same numerical core pass strict benchmark regressions in Node.js while driving a 60 FPS interactive canvas where users draw obstacles and watch vortex dynamics evolve in real time? That question led to FlowLab, a zero-dependency D2Q9 lattice-Boltzmann solver.
+Could the exact same numerical core pass strict benchmark regressions in Node.js while driving a 60 FPS interactive canvas where users draw obstacles and watch vortex dynamics evolve in real time? That question led to the [FlowLab interactive in-browser solver](/labs/flowlab/), a zero-dependency D2Q9 lattice-Boltzmann solver.
 
 ## What happens in a single iteration step
-
 FlowLab uses a standard D2Q9 lattice with single-relaxation-time BGK collision. Each grid node stores 9 particle distribution functions, representing the population fractions moving along discrete lattice directions. The execution sequence per time step is fixed:
 
 ```text

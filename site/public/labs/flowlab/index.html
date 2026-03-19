@@ -5,48 +5,172 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>FlowLab — Browser LBM</title>
   <style>
-    :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #0f172a; color: #e2e8f0; }
+    :root {
+      --color-bg: #f5f4ed;
+      --color-surface: #faf9f5;
+      --color-edge: #e8e6dc;
+      --color-ink: #141413;
+      --color-warm: #3d3d3a;
+      --color-muted: #504e49;
+      --color-stone: #6b6a64;
+      --color-accent: #1b365d;
+      --color-tag: #e4ecf5;
+      --font-serif: "Source Serif 4", Charter, Georgia, "Times New Roman", serif;
+      --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    }
     * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; }
-    main { width: min(1080px, 100%); }
-    header { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
-    .eyebrow { color: #5eead4; font: 600 12px/1.2 ui-monospace, monospace; letter-spacing: .16em; text-transform: uppercase; }
-    h1 { margin: 8px 0 4px; font-size: clamp(28px, 5vw, 52px); line-height: 1; }
-    p { color: #94a3b8; margin: 0; max-width: 700px; }
-    .panel { border: 1px solid #334155; background: #111c30; padding: 16px; }
-    canvas { width: 100%; aspect-ratio: 3 / 2; display: block; background: #020617; image-rendering: pixelated; }
-    .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 14px; }
-    label { display: flex; align-items: center; gap: 8px; color: #94a3b8; font: 12px ui-monospace, monospace; text-transform: uppercase; letter-spacing: .08em; }
-    select, button { border: 1px solid #475569; background: #0f172a; color: #e2e8f0; padding: 8px 10px; font: inherit; }
-    button { cursor: pointer; }
-    button:hover { border-color: #5eead4; }
-    output { margin-left: auto; color: #5eead4; font: 12px ui-monospace, monospace; }
-    .legend { height: 4px; margin-top: 12px; background: linear-gradient(90deg, #172554, #0f766e, #f8fafc, #fb923c, #7f1d1d); }
-    @media (max-width: 720px) { header { display: block; } output { width: 100%; margin: 0; } }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 48px 24px;
+      background: var(--color-bg);
+      color: var(--color-ink);
+      font-family: var(--font-serif);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    main { width: min(920px, 100%); }
+    header { margin-bottom: 24px; }
+    .nav-back {
+      color: var(--color-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-family: var(--font-mono);
+      display: inline-block;
+      margin-bottom: 12px;
+      transition: color 0.15s ease;
+    }
+    .nav-back:hover { color: var(--color-accent); }
+    .eyebrow {
+      color: var(--color-stone);
+      font: 500 12px/1.2 var(--font-serif);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 8px 0 6px;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--color-ink);
+      line-height: 1.1;
+    }
+    p {
+      color: var(--color-muted);
+      margin: 0;
+      max-width: 760px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .hint {
+      margin-top: 10px;
+      font-size: 13.5px;
+      color: var(--color-accent);
+      font-family: var(--font-mono);
+    }
+    .panel {
+      border: 1px solid var(--color-edge);
+      background: var(--color-surface);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px -2px rgba(20, 20, 19, 0.04);
+    }
+    canvas {
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      display: block;
+      background: #ffffff;
+      border: 1px solid var(--color-edge);
+      image-rendering: pixelated;
+      border-radius: 8px;
+      cursor: crosshair;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 18px;
+      margin-top: 18px;
+    }
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--color-stone);
+      font: 500 12px var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    select, button {
+      border: 1px solid var(--color-edge);
+      background: var(--color-surface);
+      color: var(--color-ink);
+      padding: 7px 12px;
+      font-family: var(--font-serif);
+      font-size: 14px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+    button {
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+    button:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      background: #ffffff;
+    }
+    output {
+      margin-left: auto;
+      color: var(--color-accent);
+      background: var(--color-tag);
+      font: 500 12.5px var(--font-mono);
+      padding: 5px 12px;
+      border-radius: 4px;
+    }
+    .legend {
+      height: 6px;
+      margin-top: 14px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #0284c7, #38bdf8, #faf9f5, #fb923c, #dc2626);
+      border: 1px solid var(--color-edge);
+    }
+    @media (max-width: 720px) {
+      body { padding: 24px 16px; }
+      output { width: 100%; margin-top: 8px; text-align: center; }
+    }
   </style>
 </head>
 <body>
   <main>
     <header>
       <div>
-        <div class="eyebrow">D2Q9 · BGK · halfway bounce-back</div>
+        <a href="/cn/projects/flowlab" class="nav-back">← 返回 FlowLab 项目文章</a>
+        <div class="eyebrow">D2Q9 · BGK · Halfway Bounce-Back · 60 FPS Canvas</div>
         <h1>FlowLab</h1>
-        <p>A real-time lid-driven cavity solver. The upper wall moves right; viscosity transfers momentum into a clockwise primary vortex.</p>
+        <p>基于格子玻尔兹曼方法（LBM D2Q9）的实时顶盖方腔流体求解器。顶部壁面以恒定速度向右滑动，通过黏性动量传递在方腔内部驱动顺时针旋转主涡。</p>
+        <div class="hint">交互提示：按住鼠标左键在画布内拖拽，可实时绘制固体障碍物并即时观察绕流与分离涡演化。</div>
       </div>
     </header>
     <section class="panel">
       <canvas id="field" width="384" height="256" aria-label="Interactive lattice Boltzmann flow field"></canvas>
       <div class="legend" aria-hidden="true"></div>
       <div class="controls">
-        <label>Reynolds number
+        <label>雷诺数 Reynolds
           <select id="reynolds"><option>100</option><option selected>400</option><option>1000</option></select>
         </label>
-        <label>Field
-          <select id="display"><option value="speed">Speed</option><option value="vorticity">Vorticity</option></select>
+        <label>显示物理量 Field
+          <select id="display"><option value="speed">流速幅值 Speed</option><option value="vorticity">旋度场 Vorticity</option></select>
         </label>
-        <button id="toggle" type="button">Pause</button>
-        <button id="reset" type="button">Reset</button>
-        <output id="metrics">initialising</output>
+        <button id="toggle" type="button">暂停 Pause</button>
+        <button id="reset" type="button">重置 Reset</button>
+        <output id="metrics">初始化中...</output>
       </div>
     </section>
   </main>
