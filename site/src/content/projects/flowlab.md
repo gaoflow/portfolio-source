@@ -5,7 +5,7 @@ date: '2026-05-16'
 status: complete
 categories: [tooling, validation]
 tags: [CFD]
-summary: 'Web fluid animations are mostly shader tricks with no mass or momentum conservation. I wrote a zero-dependency Lattice Boltzmann solver (FlowLab, D2Q9) from scratch in JavaScript: powering a 60 FPS interactive browser canvas while passing rigorous Ghia et al. benchmark regressions in Node.js.'
+summary: 'To understand CFD from the code level and escape the black-box waiting times of commercial tools, I built a zero-dependency Lattice Boltzmann solver (FlowLab, D2Q9) from scratch in JavaScript: powering a 60 FPS interactive browser canvas while passing rigorous Ghia et al. benchmark regressions in Node.js.'
 role: 'Numerical Methods & Software Engineering'
 duration: 'Independent study'
 featured: false
@@ -15,15 +15,30 @@ heroImage: /images/projects/flowlab/cavity-vorticity.svg
 github: 'https://github.com/gaoflow/flowlab'
 ---
 
-## Why web fluid toys are mostly fake physics
+## Origin: from long simulation queues to discovering a different fluid perspective
 
-The starting point of this project was examining interactive fluid demos on the web (such as stirring smoke with a mouse). While visually striking, looking at the code revealed they are mostly shader filters or heavily simplified approximations where mass and momentum are not conserved.
+Whenever I ran simulations in commercial CFD tools like Fluent or OpenFOAM, I was frustrated by the sluggish workflow: even to verify a simple physical intuition or tweak an inlet velocity, I had to mesh geometry, configure boundaries, and wait for iterative linear solvers to invert global pressure Poisson equations. A single check cost tens of minutes or hours, and the commercial solver remained a complete black box—behind the colorful contours, it was hard to feel how momentum actually diffused through the fluid.
 
-As a computational mechanics student, I wondered: could we build a serious, conservation-preserving CFD solver directly inside the browser?
+While exploring lightweight fluid numerical methods, I discovered the Lattice Boltzmann Method (LBM).
 
-Could the exact same numerical core pass strict benchmark regressions in Node.js while driving a 60 FPS interactive canvas where users draw obstacles and watch vortex dynamics evolve in real time? That question led to the [FlowLab interactive in-browser solver](/labs/flowlab/), a zero-dependency D2Q9 lattice-Boltzmann solver.
+LBM offered a fundamentally different philosophy: instead of discretizing continuous partial differential equations (the Navier–Stokes equations), it models fluid as swarms of virtual particles colliding and streaming on a discrete lattice. It requires no global matrix inversions; every operation is purely local.
+
+This sparked an exciting question: could I write an LBM solver from scratch in JavaScript and run it directly in a web browser?
+
+That was the starting point for the [FlowLab interactive in-browser solver](/labs/flowlab/).
+
+## What problems did building this solver solve?
+
+Writing FlowLab from scratch addressed three concrete engineering challenges:
+
+First, breaking free from commercial software black boxes. Pushing buttons in commercial GUI tools makes one an operator, not an engineer. Writing the 9 discrete distribution functions, the BGK collision relaxation, and the halfway bounce-back momentum exchange by hand provided a code-level grasp of how macroscopic pressure, velocity, and viscosity emerge from particle kinetics.
+
+Second, eliminating the sluggish feedback loop of standard CFD. Traditional solvers are too heavy for real-time interaction. FlowLab leverages LBM's local structure to run at over 60 FPS directly in the browser canvas. I can slide my mouse to stir the fluid and watch vortex structures respond instantaneously, turning offline simulations into an interactive workbench.
+
+Third, providing a fully controllable data generator for reduced-order modeling. In the downstream project (FlowROM), I needed hundreds of clean unsteady flow snapshots for POD compression and DMD forecasting. Commercial exports are bloated and hard to debug. FlowLab gives me a custom, fully controllable physics generator to export pure velocity matrices.
 
 ## What happens in a single iteration step
+
 FlowLab uses a standard D2Q9 lattice with single-relaxation-time BGK collision. Each grid node stores 9 particle distribution functions, representing the population fractions moving along discrete lattice directions. The execution sequence per time step is fixed:
 
 ```text
