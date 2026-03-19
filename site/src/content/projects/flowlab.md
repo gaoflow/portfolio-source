@@ -109,6 +109,8 @@ BGK becomes fragile as $\tau$ approaches 0.5, and halfway bounce-back introduces
 
 It is a numerical demonstration and pedagogical tool, not a replacement for commercial finite-volume solvers. Migrating to Multi-Relaxation-Time (MRT) or regularized collision operators in the future will require re-running full grid convergence benchmarks.
 
+When I used this solver to study unsteady periodic flows, the massive volume of snapshot files quickly consumed disk storage. To resolve dataset explosion and forecast future dynamics, I built the downstream reduced-order pipeline: [Reduced-Order Modeling: Compressing 480 Flow Fields into a Few Modes (FlowROM)](/projects/flowrom).
+
 ## Code and reproduction
 
 The source code is open source on GitHub: [gaoflow/flowlab](https://github.com/gaoflow/flowlab)

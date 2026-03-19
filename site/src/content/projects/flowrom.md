@@ -15,8 +15,7 @@ heroImage: /images/projects/flowrom/pod-modes.svg
 github: 'https://github.com/gaoflow/flowrom'
 ---
 ## Building a custom solver
-
-I wanted an intuitive way to explore fluid dynamics directly inside the browser and terminal. Commercial CFD tools require tedious meshing and heavy differential equation solvers that are too slow for real-time interactive web experiments. So, I built a lightweight fluid solver from scratch in JavaScript: FlowLab. To keep it fast, I avoided solving the traditional Navier–Stokes equations and chose the Lattice Boltzmann Method (LBM). Once written, it ran at 60 FPS in the browser, letting me drag obstacles and watch cavity vortex structures evolve in real time.
+I wanted an intuitive way to explore fluid dynamics directly inside the browser and terminal. Commercial CFD tools require tedious meshing and heavy differential equation solvers that are too slow for real-time interactive web experiments. So, I built a lightweight fluid solver from scratch in JavaScript: [Building a custom solver: Bringing Lattice Boltzmann to the browser (FlowLab)](/projects/flowlab). To keep it fast, I avoided solving the traditional Navier–Stokes equations and chose the Lattice Boltzmann Method (LBM). Once written, it ran at 60 FPS in the browser, letting me drag obstacles and watch cavity vortex structures evolve in real time.
 
 ![FlowLab unsteady lid-driven cavity vortex dynamics](/images/projects/flowrom/flowlab-demo.gif)
 
