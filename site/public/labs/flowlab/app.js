@@ -102,9 +102,9 @@ function updateAndRenderParticles() {
   const scaleX = canvas.width / GRID_W;
   const scaleY = canvas.height / GRID_H;
   
-  context.fillStyle = 'rgba(255, 255, 255, 0.75)';
-  context.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-  context.lineWidth = 1.2;
+  context.fillStyle = 'rgba(27, 54, 93, 0.24)';
+  context.strokeStyle = 'rgba(27, 54, 93, 0.24)';
+  context.lineWidth = 0.9;
   context.beginPath();
   
   for (let i = 0; i < NUM_PARTICLES; i += 1) {
@@ -216,62 +216,61 @@ let lastPointerY = 0;
 function handlePointerStart(clientX, clientY) {
   isDragging = true;
   const rect = canvas.getBoundingClientRect();
-  lastPointerX = ((clientX - rect.left) / rect.width) * GRID_W;
-  lastPointerY = (1 - (clientY - rect.top) / rect.height) * GRID_H;
+  lastPointerX = Math.max(0, Math.min(GRID_W - 1, ((clientX - rect.left) / rect.width) * GRID_W));
+  lastPointerY = Math.max(0, Math.min(GRID_H - 1, (1 - (clientY - rect.top) / rect.height) * GRID_H));
 }
 
 function handlePointerMove(clientX, clientY) {
   if (!isDragging) return;
   const rect = canvas.getBoundingClientRect();
-  const currGridX = ((clientX - rect.left) / rect.width) * GRID_W;
-  const currGridY = (1 - (clientY - rect.top) / rect.height) * GRID_H;
-  
-  if (lastPointerX !== 0 && lastPointerY !== 0) {
-    const deltaX = currGridX - lastPointerX;
-    const deltaY = currGridY - lastPointerY;
-    const dragSpeed = Math.hypot(deltaX, deltaY);
-    
-    if (dragSpeed > 0.05) {
-      const pushMagnitude = Math.min(0.14, dragSpeed * 0.06);
-      const pushUx = (deltaX / dragSpeed) * pushMagnitude;
-      const pushUy = (deltaY / dragSpeed) * pushMagnitude;
-      
-      const radius = 5;
-      const cx = Math.round(currGridX);
-      const cy = Math.round(currGridY);
-      
+  const currGridX = Math.max(0, Math.min(GRID_W - 1, ((clientX - rect.left) / rect.width) * GRID_W));
+  const currGridY = Math.max(0, Math.min(GRID_H - 1, (1 - (clientY - rect.top) / rect.height) * GRID_H));
+  const deltaX = currGridX - lastPointerX;
+  const deltaY = currGridY - lastPointerY;
+  const dragSpeed = Math.hypot(deltaX, deltaY);
+
+  if (dragSpeed > 0.05) {
+    const pushMagnitude = Math.min(0.14, dragSpeed * 0.06);
+    const pushUx = (deltaX / dragSpeed) * pushMagnitude;
+    const pushUy = (deltaY / dragSpeed) * pushMagnitude;
+    const sampleCount = Math.min(64, Math.max(1, Math.ceil(dragSpeed / 1.25)));
+    const radius = 6;
+    const particlesPerSample = Math.max(1, Math.ceil(24 / sampleCount));
+
+    // Fill the entire pointer path so quick drags cannot skip most of the fluid.
+    for (let sample = 1; sample <= sampleCount; sample += 1) {
+      const progress = sample / sampleCount;
+      const sampleX = lastPointerX + deltaX * progress;
+      const sampleY = lastPointerY + deltaY * progress;
+      const cx = Math.round(sampleX);
+      const cy = Math.round(sampleY);
+
       for (let dy = -radius; dy <= radius; dy += 1) {
         for (let dx = -radius; dx <= radius; dx += 1) {
           const gx = cx + dx;
           const gy = cy + dy;
-          if (gx >= 1 && gx < GRID_W - 1 && gy >= 1 && gy < GRID_H - 1) {
+          if (gx >= 0 && gx < GRID_W && gy >= 0 && gy < GRID_H) {
             const distSq = dx * dx + dy * dy;
             if (distSq <= radius * radius) {
-              const weight = Math.exp(-distSq / (2 * 2.2 * 2.2));
+              const weight = Math.exp(-distSq / 18);
               const cell = (gy + 1) * solver.width + gx + 1;
-              
-              solver.ux[cell] = Math.max(-0.16, Math.min(0.16, solver.ux[cell] + pushUx * weight * 1.5));
-              solver.uy[cell] = Math.max(-0.16, Math.min(0.16, solver.uy[cell] + pushUy * weight * 1.5));
-              
-              // Smoothly re-equilibrate distributions locally
-              for (let i = 0; i < 9; i += 1) {
-                solver.f[i * solver.size + cell] = solver.equilibrium(i, solver.rho[cell], solver.ux[cell], solver.uy[cell]);
-              }
+              const velocityX = Math.max(-0.16, Math.min(0.16, solver.ux[cell] + pushUx * weight * 1.8));
+              const velocityY = Math.max(-0.16, Math.min(0.16, solver.uy[cell] + pushUy * weight * 1.8));
+              solver.setVelocityAt(gx + 1, gy + 1, velocityX, velocityY);
             }
           }
         }
       }
-      
-      // Inject fresh particles at cursor
-      for (let i = 0; i < 20; i += 1) {
+
+      for (let i = 0; i < particlesPerSample; i += 1) {
         const pIdx = Math.floor(Math.random() * NUM_PARTICLES) * 4;
-        particles[pIdx] = currGridX + (Math.random() - 0.5) * 3;
-        particles[pIdx + 1] = currGridY + (Math.random() - 0.5) * 3;
+        particles[pIdx] = sampleX + (Math.random() - 0.5) * 3;
+        particles[pIdx + 1] = sampleY + (Math.random() - 0.5) * 3;
         particles[pIdx + 2] = 0;
       }
     }
   }
-  
+
   lastPointerX = currGridX;
   lastPointerY = currGridY;
 }

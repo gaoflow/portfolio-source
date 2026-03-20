@@ -74,6 +74,24 @@ export class LBMSolver {
     }
   }
 
+  setVelocityAt(x, y, velocityX, velocityY) {
+    if (x <= 0 || x >= this.width - 1 || y <= 0 || y >= this.height - 1) return false;
+    const cell = y * this.width + x;
+    if (this.solid[cell]) return false;
+
+    const density = this.rho[cell] || 1;
+    const velocitySquared = velocityX * velocityX + velocityY * velocityY;
+    this.ux[cell] = velocityX;
+    this.uy[cell] = velocityY;
+
+    for (let i = 0; i < 9; i += 1) {
+      const projection = CX[i] * velocityX + CY[i] * velocityY;
+      this.f[i * this.size + cell] = WEIGHTS[i] * density
+        * (1 + 3 * projection + 4.5 * projection * projection - 1.5 * velocitySquared);
+    }
+    return true;
+  }
+
   step(count = 1) {
     for (let substep = 0; substep < count; substep += 1) {
       this.#collide();
