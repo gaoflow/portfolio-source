@@ -100,8 +100,21 @@
       margin-top: 12px;
       border: 1px solid var(--color-edge);
       border-radius: 3px;
-      background: linear-gradient(90deg, #0284c7, #38bdf8, #faf9f5, #fb923c, #dc2626);
+      background: linear-gradient(90deg, #faf9f5, #0f766e, #c2410c);
     }
+    .visual[data-field="vorticity"] .legend {
+      background: linear-gradient(90deg, #0284c7, #faf9f5, #dc2626);
+    }
+    .legend-labels {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 8px;
+      margin-top: 6px;
+      color: var(--color-stone);
+      font: 500 10.5px/1.4 var(--font-mono);
+    }
+    .legend-labels span:nth-child(2) { color: var(--color-muted); }
+    .legend-labels span:last-child { text-align: right; }
     .controls {
       display: flex;
       min-width: 0;
@@ -208,14 +221,19 @@
       <div>
         <a href="/cn/projects/flowlab" class="nav-back">← 返回 FlowLab 项目文章</a>
         <h1>FlowLab Demo</h1>
-        <p>基于物理动量守恒的实时流体仿真求解器。顶部壁面以恒定速度向右滑动，通过黏性动量传递在方腔内部驱动顺时针旋转主涡。</p>
-        <div class="hint">按住鼠标左键在画布内滑动</div>
+        <p>这个演示想展示一件事：顶部边界持续向右移动，方腔里的流体会逐渐形成一个顺时针主涡。拖动鼠标相当于临时推了一下流体，可以观察主涡如何被扰动、再重新组织。</p>
+        <div class="hint">按住鼠标左键缓慢拖动，给流体施加短暂外力</div>
       </div>
     </header>
     <section class="panel">
       <div class="visual">
         <canvas id="field" width="384" height="256" aria-label="Interactive fluid flow field"></canvas>
         <div class="legend" aria-hidden="true"></div>
+        <div class="legend-labels">
+          <span id="legend-low">低速</span>
+          <span id="legend-centre">速度大小</span>
+          <span id="legend-high">高速</span>
+        </div>
       </div>
       <div class="controls">
         <div class="field-controls">

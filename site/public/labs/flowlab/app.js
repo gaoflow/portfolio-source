@@ -7,6 +7,10 @@ const displaySelect = document.querySelector('#display');
 const toggleButton = document.querySelector('#toggle');
 const resetButton = document.querySelector('#reset');
 const metrics = document.querySelector('#metrics');
+const visual = document.querySelector('.visual');
+const legendLow = document.querySelector('#legend-low');
+const legendCentre = document.querySelector('#legend-centre');
+const legendHigh = document.querySelector('#legend-high');
 
 // High resolution canvas setup
 const GRID_W = 96;
@@ -45,6 +49,14 @@ function createSolver() {
     lidVelocity: 0.08,
   });
   initParticles();
+}
+
+function updateLegend() {
+  const showingVorticity = displaySelect.value === 'vorticity';
+  visual.dataset.field = showingVorticity ? 'vorticity' : 'speed';
+  legendLow.textContent = showingVorticity ? '顺时针旋转' : '低速';
+  legendCentre.textContent = showingVorticity ? '零旋度' : '速度大小';
+  legendHigh.textContent = showingVorticity ? '逆时针旋转' : '高速';
 }
 
 // Kami warm paper fluid color ramp
@@ -119,7 +131,7 @@ function updateAndRenderParticles() {
     const speed = Math.hypot(vel.u, vel.v);
     
     // Advect particle along velocity field
-    const dt = 14;
+    const dt = 6;
     const nx = px + vel.u * dt;
     const ny = py + vel.v * dt;
     
@@ -194,7 +206,7 @@ function render() {
 }
 
 function animate(timestamp) {
-  if (running) solver.step(5);
+  if (running) solver.step(1);
   render();
   frameCount += 1;
   if (timestamp - lastTimestamp >= 1_000) {
@@ -230,12 +242,12 @@ function handlePointerMove(clientX, clientY) {
   const dragSpeed = Math.hypot(deltaX, deltaY);
 
   if (dragSpeed > 0.05) {
-    const pushMagnitude = Math.min(0.14, dragSpeed * 0.06);
+    const pushMagnitude = Math.min(0.07, dragSpeed * 0.025);
     const pushUx = (deltaX / dragSpeed) * pushMagnitude;
     const pushUy = (deltaY / dragSpeed) * pushMagnitude;
     const sampleCount = Math.min(64, Math.max(1, Math.ceil(dragSpeed / 1.25)));
-    const radius = 6;
-    const particlesPerSample = Math.max(1, Math.ceil(24 / sampleCount));
+    const radius = 5;
+    const particlesPerSample = Math.max(1, Math.ceil(20 / sampleCount));
 
     // Fill the entire pointer path so quick drags cannot skip most of the fluid.
     for (let sample = 1; sample <= sampleCount; sample += 1) {
@@ -252,10 +264,10 @@ function handlePointerMove(clientX, clientY) {
           if (gx >= 0 && gx < GRID_W && gy >= 0 && gy < GRID_H) {
             const distSq = dx * dx + dy * dy;
             if (distSq <= radius * radius) {
-              const weight = Math.exp(-distSq / 18);
+              const weight = Math.exp(-distSq / 12.5);
               const cell = (gy + 1) * solver.width + gx + 1;
-              const velocityX = Math.max(-0.16, Math.min(0.16, solver.ux[cell] + pushUx * weight * 1.8));
-              const velocityY = Math.max(-0.16, Math.min(0.16, solver.uy[cell] + pushUy * weight * 1.8));
+              const velocityX = Math.max(-0.1, Math.min(0.1, solver.ux[cell] + pushUx * weight));
+              const velocityY = Math.max(-0.1, Math.min(0.1, solver.uy[cell] + pushUy * weight));
               solver.setVelocityAt(gx + 1, gy + 1, velocityX, velocityY);
             }
           }
@@ -306,7 +318,10 @@ window.addEventListener('touchcancel', handlePointerEnd);
 
 // UI Event Listeners
 reynoldsSelect.addEventListener('change', createSolver);
-displaySelect.addEventListener('change', render);
+displaySelect.addEventListener('change', () => {
+  updateLegend();
+  render();
+});
 toggleButton.addEventListener('click', () => {
   running = !running;
   toggleButton.textContent = running ? '暂停 Pause' : '继续 Resume';
@@ -314,5 +329,6 @@ toggleButton.addEventListener('click', () => {
 resetButton.addEventListener('click', createSolver);
 
 // Initialize
+updateLegend();
 createSolver();
 requestAnimationFrame(animate);
