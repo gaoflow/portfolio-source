@@ -64,16 +64,6 @@
       line-height: 1.65;
     }
     header p + p { margin-top: 8px; }
-    .hint {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 7px 12px;
-      border: 1px solid #dce5ef;
-      border-radius: 6px;
-      background: #edf3f9;
-      color: var(--color-accent);
-      font: 500 12.5px/1.4 var(--font-mono);
-    }
     .panel {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 252px;
@@ -222,9 +212,9 @@
       <div>
         <a href="/cn/projects/flowlab" class="nav-back">← 返回 FlowLab 项目文章</a>
         <h1>FlowLab Demo</h1>
-        <p>可以把它想成一个装满黏性液体的透明方盒：顶部是一块持续向右滑动的平板。靠近顶板的液体先被带动，再把动量传给下方，最后在盒内形成顺时针主涡。鼠标拖动相当于用细棒短暂搅一下，可以观察主涡怎样被扰动、再重新组织。</p>
-        <p>颜色随显示模式变化：“流速幅值”中，米白表示低速、青绿表示中速、橙色表示高速；“旋度场”中，蓝色表示顺时针旋转、米白表示接近零旋度、红色表示逆时针旋转。颜色不表示温度或压力。</p>
-        <div class="hint">按住鼠标左键缓慢拖动，给流体施加短暂外力</div>
+        <p>想象这样一个场景：在一个装满油的透明方盒里，顶部有一块持续向右滑动的平板。靠近顶板的液体先被带动，再把动量传给下方，最后在盒内形成顺时针主涡。</p>
+        <p>此时，你想观察主涡怎样被扰动，然后再如何重新组织，你就可以用一根细棒短暂搅一下（鼠标拖动一下）。</p>
+        <p>在这个 demo 里，颜色随显示模式变化：“流速幅值”中，米白表示低速、青绿表示中速、橙色表示高速；“旋度场”中，蓝色表示顺时针旋转、米白表示接近零旋度、红色表示逆时针旋转。</p>
       </div>
     </header>
     <section class="panel">
