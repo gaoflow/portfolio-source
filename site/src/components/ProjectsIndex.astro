@@ -20,16 +20,6 @@ const sortedProjects = [...projects].sort(
 );
 const basePath = isChinese ? '/cn/projects' : '/projects';
 const alternatePath = hasAlternate ? (isChinese ? '/projects' : '/cn/projects') : undefined;
-const filters = [
-  { key: 'all', label: isChinese ? '全部' : 'All' },
-  { key: 'course-project', label: isChinese ? '课程项目' : 'Course projects' },
-  { key: 'full-car', label: isChinese ? '整车 CFD' : 'Full-car CFD' },
-  { key: 'fsae', label: 'FSAE' },
-  { key: 'component-cfd', label: isChinese ? '部件 CFD' : 'Component CFD' },
-  { key: 'tooling', label: isChinese ? '工具与自动化' : 'Tools & automation' },
-  { key: 'validation', label: isChinese ? '验证' : 'Validation' },
-  { key: 'design', label: isChinese ? '设计与 CAD' : 'Design & CAD' },
-];
 ---
 
 <Base
@@ -43,27 +33,15 @@ const filters = [
     <p class="mb-10 max-w-2xl text-muted">
       {isChinese ? '按时间从新到旧排列，从当前研究回到 2025 年 9 月第一学期的工程工具。' : 'Newest first — from the current F1 campaign back to my first-semester toolkit, September 2025.'}
     </p>
-    <div class="mb-8 flex flex-wrap gap-2" data-filters>
-      {filters.map((filter, index) => (
-        <button
-          data-filter={filter.key}
-          class="filter-btn font-serif text-xs px-3 py-1.5 border border-edge text-muted transition-colors hover:text-ink data-[on]:border-accent data-[on]:text-accent"
-          {...(index === 0 ? { 'data-on': '' } : {})}
-        >
-          {filter.label}
-        </button>
-      ))}
-    </div>
 
     {sortedProjects.length === 0 && isChinese ? (
       <p class="border border-edge bg-surface p-6 text-muted">中文项目文章尚未加入当前构建。</p>
     ) : (
-      <div class="grid gap-5 sm:grid-cols-2" data-grid>
+      <div class="grid gap-5 sm:grid-cols-2">
         {sortedProjects.map((project, index) => (
           <a
             href={`${basePath}/${project.id}`}
-            data-categories={[...project.data.categories, ...(project.data.academic ? ['course-project'] : [])].join(' ')}
-            class="group border border-edge bg-surface transition-shadow hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
+            class="project-card group"
           >
             {project.data.heroImage ? (
               <img
@@ -71,10 +49,10 @@ const filters = [
                 alt={project.data.title}
                 loading="lazy"
                 decoding="async"
-                class="aspect-[2/1] w-full border-b border-edge bg-white object-cover"
+                class="project-card-media"
               />
             ) : (
-              <span class="flex aspect-[2/1] w-full items-center justify-center border-b border-edge bg-tint">
+              <span class="project-card-media project-card-placeholder">
                 <span class="tag">{project.data.tags[0]}</span>
               </span>
             )}
@@ -93,19 +71,4 @@ const filters = [
       </div>
     )}
   </section>
-
-  <script>
-    const btns = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-    const rows = document.querySelectorAll<HTMLAnchorElement>('[data-grid] > [data-categories]');
-    btns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const key = btn.dataset.filter!;
-        btns.forEach((candidate) => (candidate === btn ? candidate.setAttribute('data-on', '') : candidate.removeAttribute('data-on')));
-        rows.forEach((row) => {
-          const show = key === 'all' || (row.dataset.categories ?? '').split(' ').includes(key);
-          row.classList.toggle('hidden', !show);
-        });
-      });
-    });
-  </script>
 </Base>

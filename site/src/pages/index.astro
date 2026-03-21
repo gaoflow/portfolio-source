@@ -48,7 +48,7 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
       {projects.map((p, i) => (
         <a
           href={`/projects/${p.id}`}
-          class="group border border-edge bg-surface transition-shadow hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)]"
+          class="project-card group"
         >
           {p.data.heroImage ? (
             <img
@@ -56,10 +56,10 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
               alt={p.data.title}
               loading="lazy"
               decoding="async"
-              class="aspect-[2/1] w-full border-b border-edge bg-white object-cover"
+              class="project-card-media"
             />
           ) : (
-            <span class="flex aspect-[2/1] w-full items-center justify-center border-b border-edge bg-tint">
+            <span class="project-card-media project-card-placeholder">
               <span class="tag">{p.data.tags[0]}</span>
             </span>
           )}
