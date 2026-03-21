@@ -23,6 +23,12 @@ github: 'https://github.com/gaoflow/ground-effect-vlm'
 
 在真车上，底板、轮胎挤流、扩散器和缝隙泄漏全混在一起，根本看不清“地面”本身的纯物理贡献。为了把这个物理机制单独剥离出来，我用镜像涡原理写了这个低阶涡格法（VLM）工具。
 
+## 先把 F1 规则背景说清楚
+
+这里容易混淆两件事。2022–2025 这一代 F1 赛车把下压力重点放回车底，[使用成形的 Venturi 地板隧道来加强地面效应](https://www.formula1.com/en/latest/article/10-things-you-need-to-know-about-the-all-new-2022-f1-car.4OLg8DrXyzHzdoGrbqp6ye)。到了 2026 年，[新规则取消了这种长地板隧道，改用更平的地板和更大的扩散器](https://www.formula1.com/en/latest/article/2026-regulations-explained-all-you-need-to-know-about-f1s-new-aerodynamics.7IAt0auc32UkCEFE5ypkTB)。F1 官方的解释也明确指出：地面效应没有因此消失，但已经明显减弱。
+
+所以，这个项目不是对 2022–2025 地效底板的复刻，也不是 2026 赛车底板模型。它只研究一个更基础的问题：当一个产生升力或下压力的翼面靠近不可穿透的地面时，地面边界怎样改变环量、升力和诱导阻力。这个机制可以帮助理解不同年代赛车中的近地气动现象，但本文的结果只能作为概念级趋势参考，不能直接代表任何一代 F1 整车。
+
 ## 镜像涡是怎么“假装”出地面的
 
 地面对空气来说只有一条要求：不许穿过去，也就是地面上的垂向速度必须是零。
