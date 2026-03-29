@@ -39,6 +39,9 @@ function drawScene() {
   for (let x = 0; x < width; x += 42) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); }
   for (let y = 0; y < height; y += 42) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
 
+  ctx.fillStyle = '#57534a'; ctx.font = '11px ui-monospace, monospace';
+  ctx.fillText('PARAMETERISED PLATE: c = 1 · b = 4c · α = 4° · 64 SPAN PANELS', 10, 17);
+
   ctx.strokeStyle = '#c2410c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(width, groundY); ctx.stroke();
   ctx.fillStyle = 'rgba(194,65,12,.08)'; ctx.fillRect(0, groundY, width, height - groundY);
   ctx.fillStyle = '#57534a'; ctx.font = '11px ui-monospace, monospace'; ctx.fillText('z = 0 / MOVING GROUND', 10, groundY - 10);
@@ -53,6 +56,15 @@ function drawScene() {
     ctx.restore();
   }
   wing(wingY, '#1b365d', 0.95, false); wing(imageY, '#c2410c', 0.26, true);
+
+  const dimensionY = wingY - chord * 1.35;
+  ctx.strokeStyle = '#57534a'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(centreX - halfSpan, dimensionY); ctx.lineTo(centreX + halfSpan, dimensionY); ctx.stroke();
+  for (const x of [centreX - halfSpan, centreX + halfSpan]) {
+    ctx.beginPath(); ctx.moveTo(x, dimensionY - 5); ctx.lineTo(x, dimensionY + 5); ctx.stroke();
+  }
+  ctx.fillStyle = '#57534a'; ctx.fillText('b = 4c', centreX - 22, dimensionY - 7);
+  ctx.fillText('BOUND VORTEX · x/c = 0.25', centreX - halfSpan, wingY + chord * .45);
 
   ctx.setLineDash([5, 5]); ctx.strokeStyle = '#57534a'; ctx.beginPath(); ctx.moveTo(centreX, wingY); ctx.lineTo(centreX, groundY); ctx.stroke(); ctx.setLineDash([]);
   ctx.fillStyle = '#1a1a18'; ctx.font = '12px ui-monospace, monospace'; ctx.fillText(`h/c ${currentCase.height.toFixed(currentCase.height < 1 ? 2 : 1)}`, centreX + 8, (wingY + groundY) / 2);
