@@ -11,7 +11,7 @@ duration: '独立研究'
 featured: false
 order: 6
 studySequence: 13
-heroImage: /images/projects/ground-effect-vlm/reference/mit-vortex-near-wall.gif
+heroImage: /images/projects/ground-effect-vlm/reference/faa-wake-vortex-generation.svg
 github: 'https://github.com/gaoflow/ground-effect-vlm'
 ---
 
@@ -49,16 +49,11 @@ github: 'https://github.com/gaoflow/ground-effect-vlm'
 
 机翼产生升力时，上表面压力较低，下表面压力较高。在翼尖附近，下面的高压空气可以绕过翼尖，跑到上面的低压区域。空气离开机翼以后，这股绕行的流动继续向下游卷起，最后形成一左一右、旋转方向相反的两条尾涡。[NASA 对下洗的解释](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/downwash-effects-on-lift/)和 [FAA 的尾流说明](https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap7_section_4.html)描述的是同一个过程。
 
-下面的动画把这个过程分成三步：先看上下表面的压力差怎样推动翼尖绕流，再看绕流怎样卷成向下游延伸的尾涡，最后看 VLM 怎样把真实尾流简化成一条束缚涡和两条尾涡。它是原理示意，不是 CFD 计算结果。
+页首的 FAA 示意图画出了机翼后方两条反向旋转的尾涡，以及它们共同造成的下洗。
 
-<iframe class="article-demo" src="/labs/ground-effect-vortex/" title="翼尖涡形成及其 VLM 马蹄涡表示的动画" loading="lazy"></iframe>
+为了把这件事讲得更直观，我用 AI 做了下面这个原理示意。动画先画上下表面的压力差怎样推动翼尖绕流，再画绕流怎样卷成向下游延伸的尾涡。它只解释基本过程，不是 CFD 计算结果。
 
-FAA 的静态示意图从另一个角度画出了同一件事：机翼后方留下两条反向旋转的尾涡，中间的气流被它们一起向下带走，也就是下洗。
-
-<figure>
-  <img src="/images/projects/ground-effect-vlm/reference/faa-wake-vortex-generation.svg" alt="FAA 的机翼尾涡和下洗示意图" loading="lazy">
-  <figcaption><a href="https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap7_section_4.html">FAA Aeronautical Information Manual: Wake Vortex Generation.</a></figcaption>
-</figure>
+<iframe class="article-demo" src="/labs/ground-effect-vortex/" title="翼尖涡形成动画" loading="lazy"></iframe>
 
 真实尾流并不会自动长成求解器里的三条笔直线。VLM 只是用“束缚涡加两条尾涡”去近似这套升力和下洗作用，这个组合通常叫马蹄涡。先把这层区别说清楚，后面的镜像涡才不会被误解成一团真的空气被复制到了地下。
 
@@ -70,7 +65,12 @@ FAA 的静态示意图从另一个角度画出了同一件事：机翼后方留�
 
 具体来讲是：矩形翼展弦比为 4，束缚涡放在四分之一弦长，控制点放在四分之三弦长，尾迹往后拖 80 个弦长。正式扫描用 64 个展向面元，迎角固定 $4^\circ$，高度从 $h/c=0.25$ 扫到 50，一共 14 个状态。
 
-页首示意图来自 [MIT 的势流课程](https://web.mit.edu/fluids-modules/www/potential_flows/LecturesHTML/lec1011/node37.html)。地面上方的 $\Gamma$ 是真实涡，地面下方的 $-\Gamma$ 是位置对称、旋转方向相反的镜像涡；两者到地面的距离都是 $b$。两套涡在地面上产生的法向速度正好抵消，这就是镜像涡“假装”出不可穿透地面的基本做法。
+下面这张图来自 [MIT 的势流课程](https://web.mit.edu/fluids-modules/www/potential_flows/LecturesHTML/lec1011/node37.html)。地面上方的 $\Gamma$ 是真实涡，地面下方的 $-\Gamma$ 是位置对称、旋转方向相反的镜像涡；两者到地面的距离都是 $b$。两套涡在地面上产生的法向速度正好抵消，这就是镜像涡“假装”出不可穿透地面的基本做法。
+
+<figure>
+  <img src="/images/projects/ground-effect-vlm/reference/mit-vortex-near-wall.gif" alt="MIT 势流课程中的墙面镜像涡示意图" loading="lazy">
+  <figcaption><a href="https://web.mit.edu/fluids-modules/www/potential_flows/LecturesHTML/lec1011/node37.html">MIT Potential Flow: Method of Images.</a></figcaption>
+</figure>
 
 求解器先把所有涡之间的相互影响组装成
 
@@ -109,9 +109,7 @@ $$
 
 把翼降到 $h/c=0.5$，三个数给出三个看似打架的答案：
 
-- 固定迎角下升力增加 32.4%，到 $C_L=0.3461$；
-- 绝对诱导阻力只增加 1.7%，变成 0.00559，几乎没动；
-- 而 $C_{D_i}/C_L^2$ 这个效率指标下降了 41.9%，看起来漂亮得多。
+固定迎角下，升力增加 32.4%，到 $C_L=0.3461$。绝对诱导阻力只增加 1.7%，变成 0.00559，几乎没动。与此同时，$C_{D_i}/C_L^2$ 这个效率指标下降了 41.9%，看起来漂亮得多。
 
 差别主要出在分母上。第三个数猛降，很大程度上是因为 $C_L^2$ 变大了，不是阻力真的变小了。所以模型真正支持的结论只有一句：拿到同样多的升力，诱导阻力的代价更低。它不支持“翼一贴地，绝对阻力就下降”。
 

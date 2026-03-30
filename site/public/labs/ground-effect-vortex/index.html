@@ -4,36 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#ffffff">
-  <title>How a finite wing creates trailing vortices</title>
+  <title>Wingtip vortex formation</title>
   <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="stylesheet" href="./style.css?v=1">
+  <link rel="stylesheet" href="./style.css?v=2">
 </head>
 <body>
   <main>
     <header class="toolbar">
-      <div class="stage-heading">
-        <span id="stage-number">01 / 03</span>
-        <strong id="stage-title">Pressure difference</strong>
-      </div>
+      <strong>Wingtip vortex formation</strong>
       <div class="controls">
         <button id="restart" type="button" title="Restart animation" aria-label="Restart animation">↻</button>
         <button id="toggle" type="button" title="Pause animation" aria-label="Pause animation">Ⅱ</button>
       </div>
     </header>
-
-    <canvas id="vortex-canvas" width="1440" height="810" aria-label="Animated schematic showing how pressure difference creates wingtip vortices and how VLM represents them"></canvas>
-
-    <nav class="stage-track" aria-label="Animation stages">
-      <button class="active" data-stage="0" type="button">Pressure difference</button>
-      <button data-stage="1" type="button">Wake roll-up</button>
-      <button data-stage="2" type="button">VLM model</button>
-    </nav>
-
-    <footer>
-      <span>SCHEMATIC, NOT CFD</span>
-      <span>FINITE WING · COUNTER-ROTATING WAKE</span>
-    </footer>
+    <canvas id="vortex-canvas" width="1440" height="810" aria-label="Animated schematic showing pressure-driven wingtip flow rolling into trailing vortices"></canvas>
   </main>
-  <script src="./app.js?v=1"></script>
+  <script src="./app.js?v=2"></script>
 </body>
 </html>

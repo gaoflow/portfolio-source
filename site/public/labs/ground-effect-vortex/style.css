@@ -3,23 +3,18 @@
   color: #1a1a18;
   background: #ffffff;
   --ink: #1a1a18;
-  --muted: #6b665c;
   --edge: #ddd9cf;
   --blue: #1b365d;
-  --teal: #0f766e;
-  --orange: #c2410c;
 }
 
 * { box-sizing: border-box; }
-
 html, body { margin: 0; min-height: 100%; background: #ffffff; }
-
 body { overflow: hidden; }
 
 main {
   min-height: 100vh;
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto 1fr;
   background: #ffffff;
 }
 
@@ -33,16 +28,7 @@ main {
   border-bottom: 1px solid var(--edge);
 }
 
-.stage-heading { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
-
-.stage-heading span,
-footer {
-  font: 700 10px ui-monospace, SFMono-Regular, Menlo, monospace;
-  color: var(--muted);
-  letter-spacing: 0.08em;
-}
-
-.stage-heading strong {
+.toolbar strong {
   overflow: hidden;
   color: var(--ink);
   font-size: 14px;
@@ -71,45 +57,12 @@ canvas {
   display: block;
   width: 100%;
   height: auto;
+  min-width: 0;
   align-self: center;
   background: #ffffff;
 }
 
-.stage-track {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid var(--edge);
-  border-bottom: 1px solid var(--edge);
-}
-
-.stage-track button {
-  min-width: 0;
-  min-height: 38px;
-  padding: 8px 6px;
-  border: 0;
-  border-right: 1px solid var(--edge);
-  background: #ffffff;
-  color: var(--muted);
-  font-size: 11px;
-  cursor: pointer;
-}
-
-.stage-track button:last-child { border-right: 0; }
-.stage-track button.active { box-shadow: inset 0 -3px 0 var(--orange); color: var(--ink); }
-.stage-track button:focus-visible { outline: 2px solid var(--blue); outline-offset: -3px; }
-
-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 14px;
-}
-
 @media (max-width: 480px) {
   .toolbar { min-height: 48px; padding: 8px 10px; }
-  .stage-heading { gap: 8px; }
-  .stage-heading strong { font-size: 12px; }
-  .stage-track button { font-size: 9px; }
-  footer { padding: 7px 10px; font-size: 8px; }
-  footer span:last-child { display: none; }
+  .toolbar strong { font-size: 12px; }
 }
