@@ -39,12 +39,9 @@ function drawScene() {
   for (let x = 0; x < width; x += 42) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke(); }
   for (let y = 0; y < height; y += 42) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke(); }
 
-  ctx.fillStyle = '#57534a'; ctx.font = '11px ui-monospace, monospace';
-  ctx.fillText('PARAMETERISED PLATE: c = 1 · b = 4c · α = 4° · 64 SPAN PANELS', 10, 17);
-
   ctx.strokeStyle = '#c2410c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(width, groundY); ctx.stroke();
   ctx.fillStyle = 'rgba(194,65,12,.08)'; ctx.fillRect(0, groundY, width, height - groundY);
-  ctx.fillStyle = '#57534a'; ctx.font = '11px ui-monospace, monospace'; ctx.fillText('z = 0 / MOVING GROUND', 10, groundY - 10);
+  ctx.fillStyle = '#57534a'; ctx.font = '13px ui-monospace, monospace'; ctx.fillText('z = 0 / GROUND PLANE', 10, groundY - 12);
 
   function wing(y, colour, alpha, image = false) {
     ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = colour; ctx.strokeStyle = colour; ctx.lineWidth = 1.5;
@@ -52,7 +49,7 @@ function drawScene() {
     ctx.lineTo(centreX + halfSpan * .92, y - chord * .45); ctx.lineTo(centreX - halfSpan * .92, y - chord * .45); ctx.closePath(); ctx.fill();
     ctx.beginPath(); ctx.moveTo(centreX - halfSpan * .94, y); ctx.lineTo(centreX + halfSpan * .94, y); ctx.stroke();
     for (const side of [-1, 1]) { ctx.beginPath(); ctx.moveTo(centreX + side * halfSpan * .94, y); ctx.lineTo(width * .98, y + (image ? 36 : -36)); ctx.stroke(); }
-    ctx.fillStyle = colour; ctx.font = '10px ui-monospace, monospace'; ctx.fillText(image ? '−Γ IMAGE' : '+Γ REAL', centreX - 24, y - chord - 7);
+    ctx.fillStyle = colour; ctx.font = '14px ui-monospace, monospace'; ctx.fillText(image ? '−Γ IMAGE VORTEX' : '+Γ REAL WING', centreX - 58, y - chord - 7);
     ctx.restore();
   }
   wing(wingY, '#1b365d', 0.95, false); wing(imageY, '#c2410c', 0.26, true);
@@ -63,27 +60,27 @@ function drawScene() {
   for (const x of [centreX - halfSpan, centreX + halfSpan]) {
     ctx.beginPath(); ctx.moveTo(x, dimensionY - 5); ctx.lineTo(x, dimensionY + 5); ctx.stroke();
   }
-  ctx.fillStyle = '#57534a'; ctx.fillText('b = 4c', centreX - 22, dimensionY - 7);
-  ctx.fillText('BOUND VORTEX · x/c = 0.25', centreX - halfSpan, wingY + chord * .45);
+  ctx.fillStyle = '#57534a'; ctx.font = '14px ui-monospace, monospace'; ctx.fillText('b = 4c', centreX - 28, dimensionY - 8);
+  ctx.font = '12px ui-monospace, monospace'; ctx.fillText('BOUND VORTEX · x/c = 0.25', centreX - halfSpan, wingY + chord * .45);
 
   ctx.setLineDash([5, 5]); ctx.strokeStyle = '#57534a'; ctx.beginPath(); ctx.moveTo(centreX, wingY); ctx.lineTo(centreX, groundY); ctx.stroke(); ctx.setLineDash([]);
-  ctx.fillStyle = '#1a1a18'; ctx.font = '12px ui-monospace, monospace'; ctx.fillText(`h/c ${currentCase.height.toFixed(currentCase.height < 1 ? 2 : 1)}`, centreX + 8, (wingY + groundY) / 2);
-  ctx.fillStyle = '#57534a'; ctx.font = '10px ui-monospace, monospace'; ctx.fillText('IMAGE CONSTRUCTION — NOT TO SCALE', 10, height - 12);
+  ctx.fillStyle = '#1a1a18'; ctx.font = '15px ui-monospace, monospace'; ctx.fillText(`h/c ${currentCase.height.toFixed(currentCase.height < 1 ? 2 : 1)}`, centreX + 9, (wingY + groundY) / 2);
+  ctx.fillStyle = '#57534a'; ctx.font = '12px ui-monospace, monospace'; ctx.fillText('SCHEMATIC — NOT TO SCALE', 10, height - 12);
 }
 
 function drawChart() {
   const { context: ctx, width, height } = canvasContext(chart);
   ctx.clearRect(0, 0, width, height);
-  const margin = { left: 45, right: 16, top: 20, bottom: 38 };
+  const margin = { left: 62, right: 24, top: 24, bottom: 48 };
   const plotWidth = width - margin.left - margin.right; const plotHeight = height - margin.top - margin.bottom;
-  ctx.strokeStyle = '#e5e3d8'; ctx.lineWidth = 1; ctx.fillStyle = '#57534a'; ctx.font = '10px ui-monospace, monospace';
+  ctx.strokeStyle = '#e5e3d8'; ctx.lineWidth = 1; ctx.fillStyle = '#57534a'; ctx.font = '13px ui-monospace, monospace';
   for (let i = 0; i <= 4; i++) {
     const y = margin.top + plotHeight * i / 4; ctx.beginPath(); ctx.moveTo(margin.left, y); ctx.lineTo(width - margin.right, y); ctx.stroke();
     ctx.fillText((1 - i / 4).toFixed(2), 7, y + 3);
   }
   for (const tick of [-0.5, -0.25, 0, 0.25, 0.5]) {
     const x = margin.left + (tick + .5) * plotWidth; ctx.beginPath(); ctx.moveTo(x, margin.top); ctx.lineTo(x, height - margin.bottom); ctx.stroke();
-    ctx.fillText(tick.toFixed(2), x - 14, height - 15);
+    ctx.fillText(tick.toFixed(2), x - 18, height - 16);
   }
   ctx.strokeStyle = '#1b365d'; ctx.lineWidth = 2.2; ctx.beginPath();
   currentCase.span.forEach((span, index) => {
@@ -91,7 +88,7 @@ function drawChart() {
     const y = margin.top + (1 - currentCase.circulation[index]) * plotHeight;
     index ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
   }); ctx.stroke();
-  ctx.fillStyle = '#57534a'; ctx.fillText('y/b', width - 38, height - 15); ctx.save(); ctx.translate(12, 90); ctx.rotate(-Math.PI / 2); ctx.fillText('Γ / Γmax', 0, 0); ctx.restore();
+  ctx.fillStyle = '#57534a'; ctx.fillText('y/b', margin.left + plotWidth / 2 - 10, height - 2); ctx.save(); ctx.translate(17, height * .58); ctx.rotate(-Math.PI / 2); ctx.fillText('Γ / Γmax', 0, 0); ctx.restore();
 }
 
 function update() {

@@ -23,14 +23,18 @@ github: 'https://github.com/gaoflow/ground-effect-vlm'
 
 2022–2025 这一代 F1 赛车把下压力重点放回车底，[使用成形的 Venturi 地板隧道来加强地面效应](https://www.formula1.com/en/latest/article/10-things-you-need-to-know-about-the-all-new-2022-f1-car.4OLg8DrXyzHzdoGrbqp6ye)。到了 2026 年，[新规则取消了这种长地板隧道，改用更平的地板和更大的扩散器](https://www.formula1.com/en/latest/article/2026-regulations-explained-all-you-need-to-know-about-f1s-new-aerodynamics.7IAt0auc32UkCEFE5ypkTB)。但 F1 官方的解释指出：地面效应没有因此消失，但已经明显减弱。所以，地面效应始终存在。当一个产生升力或下压力的翼面靠近不可穿透的地面时，地面边界怎样改变环量、升力和诱导阻力。这个机制可以帮助理解不同年代赛车中的近地气动现象。
 
+页首图展示的是这个项目的高度扫描结果，不是 F1 赛车的计算结果。横轴都是四分之一弦线离地高度 $h/c$，数值越小表示翼越靠近地面；左图看固定迎角下的升力相对自由空间放大了多少，右图看单位升力所付出的诱导阻力代价怎样变化。两张曲线合在一起，才是这次项目真正想解释的趋势。
+
+下面两张 F1 图片只负责交代规则背景。第一张标记 2022–2025 这一代赛车，第二张把视线拉到 2026 赛车的后部地板和扩散器；两张图都没有参与求解。
+
 <figure>
   <img src="/images/projects/ground-effect-vlm/reference/f1-2022-concept.webp" alt="Formula 1 官方发布的 2022 概念车资料图" loading="lazy">
-  <figcaption><a href="https://www.formula1.com/en/latest/article/10-things-you-need-to-know-about-the-all-new-2022-f1-car.4OLg8DrXyzHzdoGrbqp6ye">F1 官方 2022 概念车资料图</a>。这里只用来交代 2022–2025 规则背景，不是模型输入。</figcaption>
+  <figcaption><a href="https://www.formula1.com/en/latest/article/10-things-you-need-to-know-about-the-all-new-2022-f1-car.4OLg8DrXyzHzdoGrbqp6ye">F1 官方 2022 概念车资料图</a>。这张整车图只标记 2022–2025 地面效应规则的时代背景；本文没有使用它的外形做计算。</figcaption>
 </figure>
 
 <figure>
   <img src="/images/projects/ground-effect-vlm/reference/f1-2026-rear-floor.webp" alt="Formula 1 官方发布的 2026 赛车后部与地板资料图" loading="lazy">
-  <figcaption><a href="https://www.formula1.com/en/latest/article/2026-regulations-explained-all-you-need-to-know-about-f1s-new-aerodynamics.7IAt0auc32UkCEFE5ypkTB">F1 官方 2026 气动规则资料图</a>。这里只用来交代规则变化，不是模型输入。</figcaption>
+  <figcaption><a href="https://www.formula1.com/en/latest/article/2026-regulations-explained-all-you-need-to-know-about-f1s-new-aerodynamics.7IAt0auc32UkCEFE5ypkTB">F1 官方 2026 气动规则资料图</a>。图中是赛车后部的平地板和扩散器，用来说明 2026 年仍然依赖近地流动，但不再沿用 2022 年的长 Venturi 地板隧道；它同样不是模型输入。</figcaption>
 </figure>
 
 ## 这个项目到底算了什么
@@ -49,6 +53,13 @@ github: 'https://github.com/gaoflow/ground-effect-vlm'
 
 具体来讲是：矩形翼展弦比为 4，束缚涡放在四分之一弦长，控制点放在四分之三弦长，尾迹往后拖 80 个弦长。正式扫描用 64 个展向面元，迎角固定 $4^\circ$，高度从 $h/c=0.25$ 扫到 50，一共 14 个状态。
 
+下面先只看镜像构造。蓝色是真实翼和它的尾涡，橙色水平线是地面，地面下方的浅橙色部分是位置对称、环量相反的镜像。图中用 $h/c=1$ 举例；改变高度时，真实翼和镜像始终到地面等距。
+
+<figure>
+  <img src="/images/projects/ground-effect-vlm/image-vortex-boundary.png" alt="矩形翼、地面和反向镜像涡的几何关系" loading="lazy">
+  <figcaption>Image-vortex construction, h/c = 1.</figcaption>
+</figure>
+
 求解器先把所有涡之间的相互影响组装成
 
 $$
@@ -57,10 +68,14 @@ $$
 
 解出展向环量分布后，求解器用 Kutta–Joukowski 定理积分升力。诱导阻力则由尾涡产生的下洗估算：代码沿束缚涡线计算下洗速度，再把环量、下洗和面元宽度沿翼展积分。
 
+单个高度下，求解器首先得到 64 个面元各自的环量。下面是 $h/c=1$ 的结果：翼中部的环量最大，往两侧翼尖逐渐下降。这里把每个点除以本工况的最大环量，所以纵轴只表示载荷形状，不表示总升力大小。
+
 <figure>
-  <img src="/images/projects/ground-effect-vlm/image-vortex-explorer.png" alt="真实翼、反向镜像涡和归一化展向环量的交互页面截图" loading="lazy">
-  <figcaption>上图是代码里的零厚度矩形翼、地面和反向镜像，下图是对应的归一化展向环量。两部分都由同一套求解器数据生成，可直接打开<a href="/labs/ground-effect-vlm/">镜像涡交互页面</a>切换离地高度。</figcaption>
+  <img src="/images/projects/ground-effect-vlm/image-vortex-span-load.png" alt="h/c 等于 1 时的归一化展向环量" loading="lazy">
+  <figcaption>Normalised span loading, h/c = 1.</figcaption>
 </figure>
+
+同一组数据也放在<a href="/labs/ground-effect-vlm/">镜像涡交互页面</a>里，可以切换离地高度查看。
 
 求出环量后，我先问：离地高度降低时，载荷沿翼展怎样改变？下面这张图把各高度的环量除以各自最大值，让形状变化不被总升力变化盖住。
 
