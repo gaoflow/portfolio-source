@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="3.1825098in" height="2.4533333in" viewBox="0 0 259 195">
+<rect width="259" height="195" fill="#ffffff"/>
 <path fill-rule="evenodd" fill="rgb(13.729858%, 12.159729%, 12.548828%)" fill-opacity="1" d="M 39.339844 93.039062 L 39.058594 20.101562 L 243.460938 20.101562 L 243.460938 93.328125 L 193.5 93.328125 L 172.328125 93.179688 L 39.339844 93.039062 "/>
 <path fill="none" stroke-width="7.2" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(13.729858%, 12.159729%, 12.548828%)" stroke-opacity="1" stroke-miterlimit="11.4737" d="M 393.398438 1019.609375 L 390.585938 1748.984375 L 2434.609375 1748.984375 L 2434.609375 1016.71875 L 1935 1016.71875 L 1723.28125 1018.203125 Z M 393.398438 1019.609375 " transform="matrix(0.1, 0, 0, -0.1, 0, 195)"/>
 <path fill="none" stroke-width="7.2" stroke-linecap="butt" stroke-linejoin="miter" stroke="rgb(13.729858%, 12.159729%, 12.548828%)" stroke-opacity="1" stroke-miterlimit="11.4737" d="M 545.390625 1016.71875 L 700.898438 1016.71875 L 924.804688 1419.21875 " transform="matrix(0.1, 0, 0, -0.1, 0, 195)"/>
