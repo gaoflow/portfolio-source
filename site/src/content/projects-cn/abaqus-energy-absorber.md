@@ -17,7 +17,8 @@ academic:
   requirements:
     - '模拟汽车前纵梁的动态冲击。'
     - '使用课程提供的 energy absorber.stp 模型。'
-    - '参考 CRASH-UNIT09-W06-CurvedBeam.pdf，并绘制力–位移曲线。'
+    - '可参考 CRASH-UNIT09-W06-CurvedBeam.pdf 中的建模与结果检查方法。'
+    - '绘制力–位移曲线。'
     - '尝试不同形状，可参考 Fang 等人的 FGT 论文或 CRASH-UNIT06-W02-RailCrush.pdf。'
   media:
     - src: '/images/projects/abaqus-energy-absorber/assignment-front-rail.jpeg'
@@ -33,7 +34,15 @@ heroImage: /images/projects/abaqus-energy-absorber/baseline-geometry-dimensions.
 
 我们重新检查了完整归档：课程 README、`energy absorber.stp`、`CRASH-UNIT09-W06-CurvedBeam.pdf`、`CRASH-UNIT06-W02-RailCrush.pdf`、Fang 等人的功能梯度厚度（FGT）论文，以及项目目录中的 Abaqus 文件、结果动画和最终 LaTeX 报告。
 
-原始 README 的要求其实只有四项：模拟汽车前纵梁的动态冲击；使用给定的 STEP 几何；参考曲梁案例绘制力–位移曲线；再尝试不同形状，必要时参考 RailCrush 案例与 FGT 论文。任务书**没有**规定材料、冲击速度、冲击体质量、网格、评分细则或必须比较多少个方案。这些参数都是我们在建模过程中作出的选择，不能反写成老师的要求。
+原始 README 用五句话给出了作业要求：
+
+1. 模拟汽车前纵梁的动态冲击；
+2. 可参考 `CRASH-UNIT09-W06-CurvedBeam.pdf` 中的建模与结果检查方法；
+3. 以课程提供的 `energy absorber.stp` 几何为起点；
+4. 绘制力–位移曲线；
+5. 尝试不同形状，可参考 `CRASH-UNIT06-W02-RailCrush.pdf` 和 Fang 等人的 FGT 论文。
+
+任务书**没有**规定材料、冲击速度、冲击体质量、网格、评分细则或必须比较多少个方案。这些参数都是我们在建模过程中作出的选择，不能反写成老师的要求。
 
 页首几何图来自最终 LaTeX 报告引用的原始 PNG，而不是 PDF 页面截图。它标出了基准 Model A 的 1000 mm 长度、主要截面尺寸，以及 1.2 mm 帽形件与 0.8 mm 封板。
 
@@ -92,9 +101,9 @@ V3 是归档中最完整的单次冲击模型。帽形纵梁与封板都采用 1
   <figcaption>V3 原始 Abaqus 结果动画的网页优化片段：1000 kg 刚性壁以约 30 km/h 撞击 1 mm 纵梁装配。这里保留动画本身，而不是用静态截图代替。</figcaption>
 </figure>
 
-V3 的初始与最终总能量约为 34.72 和 34.70 kJ，整体能量账基本闭合；最终动能为 22.65 kJ。两者相差约 12.07 kJ，表示这部分动能转入模型的其他能量项，但不能在没有重新核对 ODB 分项的情况下把它全部称为内部能或塑性吸能。
+V3 的初始与最终总能量约为 34.72 和 34.70 kJ，整体能量账基本闭合；最终动能为 22.65 kJ。从初始动能 34.72 kJ 减到最终动能 22.65 kJ，动能共减少约 12.07 kJ。这部分能量转入了模型的其他能量项，但没有重新核对 ODB 分项前，不能把它全部称为内部能或塑性吸能。
 
-V3 仍不是生产级验证。归档建议使用超过 300,000 个增量并以双精度重跑，说明时间离散与精度仍是数值风险。它比 V2 更可信的原因是设置更清楚、没有固定质量缩放且作业完成，并不意味着已经完成网格收敛或所有能量项核验。
+V3 仍不是生产级验证。`.sta` 记录显示求解超过了 300,000 个增量，Abaqus 因此建议用双精度重跑，说明时间离散与精度仍是数值风险。它比 V2 更可信的原因是设置更清楚、没有固定质量缩放且作业完成，并不意味着已经完成网格收敛或所有能量项核验。
 
 ## 最终报告中的截面比较是另一组研究
 
