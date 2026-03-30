@@ -11,7 +11,7 @@ duration: '独立研究'
 featured: false
 order: 6
 studySequence: 13
-heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg
+heroImage: /images/projects/ground-effect-vlm/image-vortex-boundary.png
 github: 'https://github.com/gaoflow/ground-effect-vlm'
 ---
 
@@ -22,8 +22,6 @@ github: 'https://github.com/gaoflow/ground-effect-vlm'
 在真车上，底板、轮胎挤流、扩散器和缝隙泄漏全混在一起，根本看不清“地面”本身的纯物理贡献。为了把这个物理机制单独剥离出来，我尝试用镜像涡原理写了这个低阶涡格法（VLM）工具。
 
 2022–2025 这一代 F1 赛车把下压力重点放回车底，[使用成形的 Venturi 地板隧道来加强地面效应](https://www.formula1.com/en/latest/article/10-things-you-need-to-know-about-the-all-new-2022-f1-car.4OLg8DrXyzHzdoGrbqp6ye)。到了 2026 年，[新规则取消了这种长地板隧道，改用更平的地板和更大的扩散器](https://www.formula1.com/en/latest/article/2026-regulations-explained-all-you-need-to-know-about-f1s-new-aerodynamics.7IAt0auc32UkCEFE5ypkTB)。但 F1 官方的解释指出：地面效应没有因此消失，但已经明显减弱。所以，地面效应始终存在。当一个产生升力或下压力的翼面靠近不可穿透的地面时，地面边界怎样改变环量、升力和诱导阻力。这个机制可以帮助理解不同年代赛车中的近地气动现象。
-
-页首图展示的是这个项目的高度扫描结果，不是 F1 赛车的计算结果。横轴都是四分之一弦线离地高度 $h/c$，数值越小表示翼越靠近地面；左图看固定迎角下的升力相对自由空间放大了多少，右图看单位升力所付出的诱导阻力代价怎样变化。两张曲线合在一起，才是这次项目真正想解释的趋势。
 
 下面两张 F1 图片只负责交代规则背景。第一张标记 2022–2025 这一代赛车，第二张把视线拉到 2026 赛车的后部地板和扩散器；两张图都没有参与求解。
 
@@ -53,12 +51,7 @@ github: 'https://github.com/gaoflow/ground-effect-vlm'
 
 具体来讲是：矩形翼展弦比为 4，束缚涡放在四分之一弦长，控制点放在四分之三弦长，尾迹往后拖 80 个弦长。正式扫描用 64 个展向面元，迎角固定 $4^\circ$，高度从 $h/c=0.25$ 扫到 50，一共 14 个状态。
 
-下面先只看镜像构造。蓝色是真实翼和它的尾涡，橙色水平线是地面，地面下方的浅橙色部分是位置对称、环量相反的镜像。图中用 $h/c=1$ 举例；改变高度时，真实翼和镜像始终到地面等距。
-
-<figure>
-  <img src="/images/projects/ground-effect-vlm/image-vortex-boundary.png" alt="矩形翼、地面和反向镜像涡的几何关系" loading="lazy">
-  <figcaption>Image-vortex construction, h/c = 1.</figcaption>
-</figure>
+页首示意图只画镜像构造。蓝色是真实翼和它的尾涡，橙色水平线是地面，地面下方的浅橙色部分是位置对称、环量相反的镜像。图中用 $h/c=1$ 举例；改变高度时，真实翼和镜像始终到地面等距。
 
 求解器先把所有涡之间的相互影响组装成
 
@@ -85,6 +78,13 @@ $$
 </figure>
 
 ## 将三个数分开看
+
+下面这张高度扫描图汇总了 14 个离地高度。两边的横轴都是四分之一弦线离地高度 $h/c$，数值越小表示翼越靠近地面。左图看固定迎角下的升力相对自由空间放大了多少，右图看单位升力所付出的诱导阻力代价怎样变化。它们是矩形翼模型的结果，不是 F1 赛车的计算结果。
+
+<figure>
+  <img src="/images/projects/ground-effect-vlm/ground-sweep.svg" alt="离地高度变化时的升力放大与单位升力诱导阻力代价" loading="lazy">
+  <figcaption>Ride-height sweep: lift amplification and induced-drag cost per lift squared.</figcaption>
+</figure>
 
 先看自由空间的基准：$C_L=0.2615$、$C_{D_i}=0.00549$。
 
