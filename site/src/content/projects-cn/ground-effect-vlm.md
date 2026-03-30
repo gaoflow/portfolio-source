@@ -43,6 +43,25 @@ github: 'https://github.com/gaoflow/ground-effect-vlm'
 
 这个模型的用途，是把“地面靠近以后，趋势怎么变”单独看清楚。它不是 F1 地板性能预测工具，也没有黏性和流动分离，因此不能告诉我真实赛车会在哪个车高失速。后面的边界残差、远场恢复、理论量级、面元细化和载荷对称性检查，只是用来确认这把简化的尺子本身没有算歪。
 
+## 先说清楚，“涡”是什么
+
+大白话说，涡就是一团绕着某个中心打转的空气。空气不只往前走，还会一边往前走、一边绕圈。烟雾、云气或水汽能把这种旋转画出来，但烟本身不是涡，它只是跟着空气一起运动，让原本看不见的流动变得可见。
+
+机翼产生升力时，上表面压力较低，下表面压力较高。在翼尖附近，下面的高压空气可以绕过翼尖，跑到上面的低压区域。空气离开机翼以后，这股绕行的流动继续向下游卷起，最后形成一左一右、旋转方向相反的两条尾涡。[NASA 对下洗的解释](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/downwash-effects-on-lift/)和 [FAA 的尾流说明](https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap7_section_4.html)描述的是同一个过程。
+
+下面的动画把这个过程分成三步：先看上下表面的压力差怎样推动翼尖绕流，再看绕流怎样卷成向下游延伸的尾涡，最后看 VLM 怎样把真实尾流简化成一条束缚涡和两条尾涡。它是原理示意，不是 CFD 计算结果。
+
+<iframe class="article-demo" src="/labs/ground-effect-vortex/" title="翼尖涡形成及其 VLM 马蹄涡表示的动画" loading="lazy"></iframe>
+
+FAA 的静态示意图从另一个角度画出了同一件事：机翼后方留下两条反向旋转的尾涡，中间的气流被它们一起向下带走，也就是下洗。
+
+<figure>
+  <img src="/images/projects/ground-effect-vlm/reference/faa-wake-vortex-generation.svg" alt="FAA 的机翼尾涡和下洗示意图" loading="lazy">
+  <figcaption><a href="https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap7_section_4.html">FAA Aeronautical Information Manual: Wake Vortex Generation.</a></figcaption>
+</figure>
+
+真实尾流并不会自动长成求解器里的三条笔直线。VLM 只是用“束缚涡加两条尾涡”去近似这套升力和下洗作用，这个组合通常叫马蹄涡。先把这层区别说清楚，后面的镜像涡才不会被误解成一团真的空气被复制到了地下。
+
 ## 镜像涡是怎么“假装”出地面的
 
 地面对空气来说只有一条要求：不许穿过去，也就是地面上的垂向速度必须是零。VLM 里机翼被拆成一串马蹄涡。
