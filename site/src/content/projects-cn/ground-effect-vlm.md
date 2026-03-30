@@ -11,7 +11,7 @@ duration: '独立研究'
 featured: false
 order: 6
 studySequence: 13
-heroImage: /images/projects/ground-effect-vlm/image-vortex-boundary.png
+heroImage: /images/projects/ground-effect-vlm/reference/mit-vortex-near-wall.gif
 github: 'https://github.com/gaoflow/ground-effect-vlm'
 ---
 
@@ -51,7 +51,7 @@ github: 'https://github.com/gaoflow/ground-effect-vlm'
 
 具体来讲是：矩形翼展弦比为 4，束缚涡放在四分之一弦长，控制点放在四分之三弦长，尾迹往后拖 80 个弦长。正式扫描用 64 个展向面元，迎角固定 $4^\circ$，高度从 $h/c=0.25$ 扫到 50，一共 14 个状态。
 
-页首示意图只画镜像构造。蓝色是真实翼和它的尾涡，橙色水平线是地面，地面下方的浅橙色部分是位置对称、环量相反的镜像。图中用 $h/c=1$ 举例；改变高度时，真实翼和镜像始终到地面等距。
+页首示意图来自 [MIT 的势流课程](https://web.mit.edu/fluids-modules/www/potential_flows/LecturesHTML/lec1011/node37.html)。地面上方的 $\Gamma$ 是真实涡，地面下方的 $-\Gamma$ 是位置对称、旋转方向相反的镜像涡；两者到地面的距离都是 $b$。两套涡在地面上产生的法向速度正好抵消，这就是镜像涡“假装”出不可穿透地面的基本做法。
 
 求解器先把所有涡之间的相互影响组装成
 
