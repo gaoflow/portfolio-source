@@ -15,33 +15,33 @@ heroImage: /images/projects/ground-effect-vlm/reference/mit-vortex-near-wall.gif
 github: 'https://github.com/gaoflow/ground-effect-vlm'
 ---
 
-## F1 赛车地面效应
+## F1 赛车的地面效应
 
-在看 F1 时，总是听到大家强调“地面效应”，翼片只要一贴近地面，下压力就会显著飙升。但我心里一直有个疑问：地面明明只是一个平整不动的路面，它到底是通过什么机制让上方的机翼凭空产生更多下压力的？离地太近时为什么又会突然失控？
+当我们看 F1 时，总是听到大家强调“地面效应”，翼片只要一贴近地面，下压力就会显著飙升。但我心里一直有个疑问：地面明明只是一个平整不动的路面，它到底是通过什么机制让上方的机翼凭空产生更多下压力的？离地太近时为什么又会突然失控？
 
-在真车上，底板、轮胎挤流、扩散器和缝隙泄漏全混在一起，根本看不清“地面”本身的纯物理贡献。为了把这个物理机制单独剥离出来，我尝试用镜像涡原理写了这个低阶涡格法（VLM）工具。
+在 F1 真车上，底板、轮胎挤流、扩散器和缝隙泄漏全混在一起，根本看不清地面本身的纯物理贡献。为了把这个物理机制单独剥离出来，我尝试用镜像涡原理写了这个低阶涡格法（VLM）工具。
 
 2022–2025 这一代 F1 赛车把下压力重点放回车底，[使用成形的 Venturi 地板隧道来加强地面效应](https://www.formula1.com/en/latest/article/10-things-you-need-to-know-about-the-all-new-2022-f1-car.4OLg8DrXyzHzdoGrbqp6ye)。到了 2026 年，[新规则取消了这种长地板隧道，改用更平的地板和更大的扩散器](https://www.formula1.com/en/latest/article/2026-regulations-explained-all-you-need-to-know-about-f1s-new-aerodynamics.7IAt0auc32UkCEFE5ypkTB)。但 F1 官方的解释指出：地面效应没有因此消失，但已经明显减弱。所以，地面效应始终存在。当一个产生升力或下压力的翼面靠近不可穿透的地面时，地面边界怎样改变环量、升力和诱导阻力。这个机制可以帮助理解不同年代赛车中的近地气动现象。
 
-下面两张 F1 图片只负责交代规则背景。第一张标记 2022–2025 这一代赛车，第二张把视线拉到 2026 赛车的后部地板和扩散器；两张图都没有参与求解。
-
 <figure>
   <img src="/images/projects/ground-effect-vlm/reference/f1-2022-concept.webp" alt="Formula 1 官方发布的 2022 概念车资料图" loading="lazy">
-  <figcaption><a href="https://www.formula1.com/en/latest/article/10-things-you-need-to-know-about-the-all-new-2022-f1-car.4OLg8DrXyzHzdoGrbqp6ye">F1 官方 2022 概念车资料图</a>。这张整车图只标记 2022–2025 地面效应规则的时代背景；本文没有使用它的外形做计算。</figcaption>
+  <figcaption><a href="https://www.formula1.com/en/latest/article/10-things-you-need-to-know-about-the-all-new-2022-f1-car.4OLg8DrXyzHzdoGrbqp6ye">F1 官方 2022 概念车资料图</a></figcaption>
 </figure>
 
 <figure>
   <img src="/images/projects/ground-effect-vlm/reference/f1-2026-rear-floor.webp" alt="Formula 1 官方发布的 2026 赛车后部与地板资料图" loading="lazy">
-  <figcaption><a href="https://www.formula1.com/en/latest/article/2026-regulations-explained-all-you-need-to-know-about-f1s-new-aerodynamics.7IAt0auc32UkCEFE5ypkTB">F1 官方 2026 气动规则资料图</a>。图中是赛车后部的平地板和扩散器，用来说明 2026 年仍然依赖近地流动，但不再沿用 2022 年的长 Venturi 地板隧道；它同样不是模型输入。</figcaption>
+  <figcaption><a href="https://www.formula1.com/en/latest/article/2026-regulations-explained-all-you-need-to-know-about-f1s-new-aerodynamics.7IAt0auc32UkCEFE5ypkTB">F1 官方 2026 气动规则资料图</a> 图中是赛车后部的平地板和扩散器，用来说明 2026 年仍然依赖近地流动，但不再沿用 2022 年的长 Venturi 地板隧道。</figcaption>
 </figure>
 
-## 这个项目到底算了什么
+## 我想解决的问题
 
-这次项目只回答一个问题：固定迎角下，一个通用的有限矩形翼逐渐接近不可穿透的地面时，镜像边界会怎样改变展向环量、升力和诱导阻力代价？它算的不是 F1 地板，也没有使用 2022 或 2026 赛车几何。这个线性无黏模型同样不能解释真实低车高下的流动分离或失速。
+想象这样一个场景：一张薄薄的长方形翼，以固定角度迎着气流。开始时它离地很远，接着一点点往下降，其他条件都不变。翼越靠近地面，下面的空气就越不能像原来那样自由地向下流动。那翼上的载荷会不会重新分布？总升力会增加多少？为了得到同样的升力，要付出的诱导阻力代价又会怎样变化？这就是我想回答的问题。
 
-这里没有导入 CAD 模型。代码里的翼就是一张零厚度的长方形薄板：弦长取 $c=1$，翼展取 $b=4c$，没有后掠、扭转和翼型厚度，迎角固定为 $4^\circ$。我再沿翼展把它均匀切成 64 段，每段放一个马蹄涡。它的作用不是还原某辆赛车，而是把“有限翼接近地面”这个问题单独拿出来看。
+我没有导入 F1 赛车的 CAD，也没有照着 2022 或 2026 赛车去建地板。真车几何一进来，轮胎、扩散器、泄漏和车身干扰又会混在一起，反而看不清地面本身做了什么。所以代码里的翼被故意简化成一张没有厚度的长方形薄板：弦长取 $c=1$，翼展取 $b=4c$，没有后掠和扭转，迎角固定为 $4^\circ$。我再沿翼展把它均匀切成 64 段，每段放一个马蹄涡。
 
-流程只有五步：先算自由空间基准；再为真实涡加入环量相反的镜像涡；然后在 14 个离散的 $h/c$ 状态求解环量；接着比较 $C_L$、绝对 $C_{D_i}$ 和 $C_{D_i}/C_L^2$；最后用边界残差、远场恢复、理论量级、面元细化和载荷对称性做验证。
+计算也从最简单的情况开始。我先让翼离地足够远，算出一个几乎不受地面影响的基准；然后加入镜像涡，把翼从高处逐步降到接近地面，一共计算 14 个离地高度。每到一个高度，我都重新计算 64 段上的载荷，再比较升力、绝对诱导阻力和单位升力对应的诱导阻力代价。
+
+这个模型的用途，是把“地面靠近以后，趋势怎么变”单独看清楚。它不是 F1 地板性能预测工具，也没有黏性和流动分离，因此不能告诉我真实赛车会在哪个车高失速。后面的边界残差、远场恢复、理论量级、面元细化和载荷对称性检查，只是用来确认这把简化的尺子本身没有算歪。
 
 ## 镜像涡是怎么“假装”出地面的
 
