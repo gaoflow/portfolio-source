@@ -1,155 +1,352 @@
 ---
-title: '我们怎样用 Abaqus 分析汽车吸能器'
+title: '我们怎样用 Abaqus 做汽车前纵梁碰撞分析'
 year: 2026
 date: '2026-03-28'
 status: complete
 categories: [design, validation]
 tags: [有限元分析]
-summary: '我们从一个失败的初版模型出发，完成材料探索、归档完整的 30 km/h 冲击模型和三种截面比较；结果显示吸能、峰值力与结构质量必须一起判断。'
-role: '联合建模、结果核验与报告撰写'
+summary: '我们从一根课程给定的前纵梁出发，先学会读懂冲击曲线，再比较材料、冲击工况和截面厚度。结果里既有跑不起来的模型，也有看似吸能很好、却太重或峰值力太高的方案。'
+role: '共同建模、结果分析与报告撰写'
 team: '四人课程项目'
 duration: '6 周'
 academic:
   institution: 'ESILV'
   course: '计算固体力学'
   assignment: '汽车吸能器的动态冲击与形状探索'
-  note: '这是一个四人共同完成的计算固体力学课程项目。本文以联合作者口吻复盘归档模型、最终 LaTeX 报告和原始结果文件，并明确区分作业要求、建模选择与尚未验证的结论。'
+  note: '我们四人一起完成了这个计算固体力学课程项目，工作包括 Abaqus/Explicit 建模、材料与截面比较、结果检查和课程答辩。'
   requirements:
     - '模拟汽车前纵梁的动态冲击。'
-    - '使用课程提供的 energy absorber.stp 模型。'
-    - '可参考 CRASH-UNIT09-W06-CurvedBeam.pdf 中的建模与结果检查方法。'
+    - '参考 CRASH-UNIT09-W06-CurvedBeam.pdf 中的建模与结果检查方法。'
+    - '以课程提供的 energy absorber.stp 几何为起点。'
     - '绘制力–位移曲线。'
     - '尝试不同形状，可参考 Fang 等人的 FGT 论文或 CRASH-UNIT06-W02-RailCrush.pdf。'
-  media:
-    - src: '/images/projects/abaqus-energy-absorber/assignment-front-rail.jpeg'
-      alt: '课程任务书中用红色标出前纵梁位置的白车身图片'
-      caption: '图片嵌在课程任务书中，用来说明前纵梁在整车中的位置；归档文件没有保留它原始的外部出处。'
+  media: []
 featured: false
 order: 18
 studySequence: 10
-heroImage: /images/projects/abaqus-energy-absorber/baseline-geometry-dimensions.png
+heroImage: /images/projects/abaqus-energy-absorber/assignment-front-rail.jpeg
 ---
 
-## 先把作业要求和建模选择分开
+## 老师给了我们一根前纵梁
 
-我们重新检查了完整归档：课程 README、`energy absorber.stp`、`CRASH-UNIT09-W06-CurvedBeam.pdf`、`CRASH-UNIT06-W02-RailCrush.pdf`、Fang 等人的功能梯度厚度（FGT）论文，以及项目目录中的 Abaqus 文件、结果动画和最终 LaTeX 报告。
+正面碰撞时，前纵梁会先被压弯、起皱，再一层层折起来。金属从原来的形状变成回不去的形状，车的运动能量也就有一部分变成了永久变形。项目说明把前纵梁看作正碰中承担大约一半动能的部件；这个比例只是课程里的背景，不是所有车型都通用的定律。
 
-原始 README 用五句话给出了作业要求：
+老师给我们的任务很开放，只有五件事：模拟前纵梁的动态冲击；参考曲梁案例学习建模和看结果；从给定的 STEP 几何开始；画出力–位移曲线；最后再尝试不同形状。材料、速度、冲击体质量、网格和要做几个方案都没有写死，这些要靠我们自己决定。
 
-1. 模拟汽车前纵梁的动态冲击；
-2. 可参考 `CRASH-UNIT09-W06-CurvedBeam.pdf` 中的建模与结果检查方法；
-3. 以课程提供的 `energy absorber.stp` 几何为起点；
-4. 绘制力–位移曲线；
-5. 尝试不同形状，可参考 `CRASH-UNIT06-W02-RailCrush.pdf` 和 Fang 等人的 FGT 论文。
+页首的白车身图片就嵌在任务书里，用红色标出了前纵梁的位置。任务书没有保留这张图原来的外部出处，所以我们只把它当作位置说明，不把它当成仿真结果。
 
-任务书**没有**规定材料、冲击速度、冲击体质量、网格、评分细则或必须比较多少个方案。这些参数都是我们在建模过程中作出的选择，不能反写成老师的要求。
+我们想回答的问题也很直接：怎样让纵梁持续折叠，把更多动能吃进去，同时别在撞上的第一下产生太高的力？这三个目标彼此会打架：
 
-页首几何图来自最终 LaTeX 报告引用的原始 PNG，而不是 PDF 页面截图。它标出了基准 Model A 的 1000 mm 长度、主要截面尺寸，以及 1.2 mm 帽形件与 0.8 mm 封板。
+- 比吸收能 $SEA=E/M$ 越高，说明每千克结构吸收的能量越多；
+- 峰值压溃力 $F_{max}$ 越低，第一次冲击越温和；
+- 碰撞力效率 $CFE=F_{mean}/F_{max}$ 越高，说明后面的压溃平台越接近恒定。
 
-我们用三个常见指标解释结果：比吸收能 $SEA=E/M$ 衡量单位质量的吸能；峰值压溃力 $F_{max}$ 反映首次冲击有多猛烈；碰撞力效率 $CFE=F_{mean}/F_{max}$ 则衡量压溃平台是否稳定。力–位移曲线下的面积
+高 CFE 只代表“平台平”，不代表“力小”。如果平均力和峰值力都很高，曲线可以很平，乘员载荷仍然可能很大。
 
-$$
-W=\int F\,dx
-$$
+## 先把尺寸和单位弄对
 
-对应结构在该行程内做的功。好的设计不是单纯把力做大，而是在有限行程和质量约束下，控制峰值并维持稳定的压溃平台。
+课程给的纵梁长 1000 mm。基准帽形截面宽 100 mm，内部跨度 59 mm，总高 51.2 mm，翼缘宽 20.5 mm；帽形件厚 1.2 mm，封板厚 0.8 mm。后面把它们都改成 1.0 mm，或者把角部加厚，都是从这个基准变化出来的。
 
-单位也必须先讲清楚。归档模型采用 mm–tonne–s 制，Abaqus 输出的能量单位是 N·mm：
+<figure>
+  <img src="/images/projects/abaqus-energy-absorber/baseline-geometry-dimensions.png" alt="基准纵梁的长度、截面尺寸和 1.2/0.8 毫米板厚" loading="lazy">
+  <figcaption>基准纵梁尺寸。</figcaption>
+</figure>
+
+模型采用 mm–tonne–s 单位制。长度用 mm，力用 N，质量用 tonne，时间用 s，应力用 MPa。这个单位制最容易在能量上看错：Abaqus 输出的是 N·mm，不是 J。
+
+| 量 | 单位 |
+|---|---|
+| 长度 | mm |
+| 力 | N |
+| 质量 | tonne |
+| 时间 | s |
+| 应力 | MPa，也就是 N/mm² |
+| 能量 | N·mm |
 
 $$
 1\times10^6\ \text{N·mm}=1\ \text{kJ}.
 $$
 
-因此报告曲线上的 $3.5\times10^6$ N·mm 应写成 3.5 kJ，而不是 $3.5\times10^6$ J。
-
-## 三个归档版本：失败、探索与最终模型
-
-项目文件保留了 V1、V2 和 V3。它们不是同一个已经验证的模型逐步调参，而是可靠性不同的三个阶段。
-
-### V1：属性缺失，不能形成有效结果
-
-V1 有 328 个单元没有分配截面或材料属性，求解没有产生可用的冲击过程。它的意义只在于暴露建模检查清单中的第一项：提交作业前必须核对所有单元的 section assignment。我们不再把 V1 的任何画面或曲线当作成功结果。
-
-### V2：材料比较有方向性，但没有通过数值质量检查
-
-V2 使用 393 个 C3D8R 单元、902 个节点，冲击速度为 13,888 mm/s（约 50 km/h），分析时间 0.04 s，摩擦系数 0.3。归档中的四个作业都显示完成，但这不等于四种材料结果都有效：所谓 HLE 作业的吸能器仍引用 `material=Alu`，因此不能作为高强钢结果，本文将它排除。
-
-更严重的问题是 V2 使用了固定质量缩放系数 100，求解记录显示增加质量约 9900%。铝算例末期的人工能量与内能之比为
+力–位移曲线下面的面积就是做功：
 
 $$
-ALLAE/ALLIE\approx 15\%,
+W=\int F\,dx.
 $$
 
-已经足以动摇力峰值和能量分配的定量可信度。因此钢、铝、镁的结果只适合作为探索性材料筛选，不能写成经过验证的材料排名。
+所以图上 $3.5\times10^6$ N·mm 要读成 3.5 kJ，不能写成 $3.5\times10^6$ J。
+
+## 早期基线教会我们怎样看冲击曲线
+
+我们先做了一组 13,888 mm/s、也就是约 50 km/h 的基线。报告里的几张图把它叫作 V1，但模型文件里的 V1 实际没有跑起来，图名和模型名没有对齐。为了不把两件事混在一起，下面把这组有曲线的结果叫作“早期基线”。
+
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1rem;">
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/early-baseline-energy.png" alt="早期基线在 0.02 秒内的动能和内能变化" loading="lazy">
+    <figcaption>早期基线能量历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/early-baseline-displacement.png" alt="早期基线冲击体位移随时间近似线性下降" loading="lazy">
+    <figcaption>早期基线位移历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/early-baseline-reaction-force.png" alt="早期基线支座反力在接触后快速上升并伴随振荡" loading="lazy">
+    <figcaption>早期基线反力历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/early-baseline-force-displacement-raw.png" alt="早期基线未经平滑的力位移曲线" loading="lazy">
+    <figcaption>早期基线原始力–位移曲线。</figcaption>
+  </figure>
+</div>
+
+前 0.005 s，冲击体还没有真正压上纵梁，所以反力接近零。接触后先出现约 100 kN 的尖峰，随后纵梁继续折叠，力一边振荡一边上升，在 0.0199 s 左右达到 137.6 kN。冲击体在 0.02 s 内走了约 270 mm，位移几乎是直线，说明这段时间里速度还没有明显降下来。
+
+原始力曲线有很多高频锯齿。显式求解、接触、应力波和质量缩放都会把这种振荡带进结果。我们保留原始图看瞬间峰值，再用平滑图看整体平台，不能只挑一条更好看的曲线。
 
 <figure>
-  <img src="/images/projects/abaqus-energy-absorber/steel-aluminium-force-comparison.png" alt="V2 钢和铝模型的力位移曲线，钢曲线峰值高于铝" loading="lazy">
-  <figcaption>最终 LaTeX 报告使用的原始力–位移图：钢的峰值约 190 kN，铝约 115 kN；曲线面积约为 58×10⁶ 与 46×10⁶ N·mm，即 58 与 46 kJ。由于质量缩放过强，这些数值只能说明趋势。</figcaption>
+  <img src="/images/projects/abaqus-energy-absorber/force-displacement-preliminary.png" alt="早期基线经过平滑后的力位移曲线" loading="lazy">
+  <figcaption>早期基线平滑力–位移曲线。</figcaption>
 </figure>
 
-在相近压溃行程内，钢吸收的绝对能量较多、峰值也更高；铝密度更低，因而显示出更好的潜在质量效率。但这只是下一轮建模的依据，而不是“铝已经最优”的结论。要做可信的材料比较，仍需在相同几何、相同网格、相同冲击条件和可接受的人工能量水平下重跑。
+## 真正的 V1 连第一步都没跑完
 
-### V3：最完整、也最值得保留的冲击模型
+模型文件里的 V1 有 328 个单元没有分配材料或截面属性。Abaqus 在输入检查时就停了，后面没有可用的冲击过程。这次失败很基础，却很有用：模型树里有零件、有网格、有作业，不代表求解真的开始了。以后每次提交前，我们都会先检查 section assignment 有没有漏掉单元。
 
-V3 是归档中最完整的单次冲击模型。帽形纵梁与封板都采用 1 mm 厚度，两个部件以 Tie 约束连接；接触使用 general contact，摩擦系数 0.3。模型包含 405 个可变形单元和 961 个节点，刚性壁质量为 1.0 tonne（1000 kg），初速度 8333 mm/s（约 30 km/h），分析时间 0.06 s。与 V2 不同，V3 没有固定质量缩放，作业正常完成。
+## V2 能比较材料，但数字还不够干净
+
+V2 把模型补齐到 393 个 C3D8R 单元和 902 个节点，速度仍是 13,888 mm/s，分析时间延长到 0.04 s，接触摩擦系数为 0.3。四个作业都显示完成，但其中一个名为 HLE 的作业仍然调用铝材料，所以它不是高强钢结果，我们没有把它放进比较。
+
+先看钢。冲击体在 0.04 s 内移动约 500 mm，反力升到约 190 kN；动能下降时，内能随之上升。
+
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1rem;">
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/steel-displacement-history.png" alt="V2 钢模型冲击体位移随时间变化" loading="lazy">
+    <figcaption>钢模型位移历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/steel-reaction-force-history.png" alt="V2 钢模型反力随时间上升至约 190 千牛" loading="lazy">
+    <figcaption>钢模型反力历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/steel-energy-history.png" alt="V2 钢模型动能下降和内能上升的能量曲线" loading="lazy">
+    <figcaption>钢模型能量历程。</figcaption>
+  </figure>
+</div>
+
+铝的峰值低一些，大约 115 kN。图里的应力集中在弯曲和折叠区域，这正是薄壁件靠局部屈曲吸能的地方。
+
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1rem;">
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/aluminium-displacement-history.png" alt="V2 铝模型冲击体位移随时间变化" loading="lazy">
+    <figcaption>铝模型位移历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/aluminium-reaction-force-history.png" alt="V2 铝模型反力在接触后形成约 100 千牛的平台" loading="lazy">
+    <figcaption>铝模型反力历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/aluminium-energy-numerical-quality.png" alt="V2 铝模型人工能量和内能曲线" loading="lazy">
+    <figcaption>铝模型人工能量与内能。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/aluminium-energy-history.png" alt="V2 铝模型动能、内能和人工能量曲线" loading="lazy">
+    <figcaption>铝模型总能量历程。</figcaption>
+  </figure>
+</div>
+
+<figure>
+  <img src="/images/projects/abaqus-energy-absorber/aluminium-mises-impact.png" alt="V2 铝纵梁弯曲后的 Mises 应力分布" loading="lazy">
+  <figcaption>铝纵梁 Mises 应力。</figcaption>
+</figure>
+
+把钢和铝画到同一张力–位移图上，钢的峰值约 190 kN，铝约 115 kN。曲线积分得到的做功大约是 58 和 46 kJ。钢的密度是 7850 kg/m³，铝是 2500 kg/m³；如果几何体积相同，用密度把质量换算进去，铝的 SEA 约为钢的 2.48 倍。钢吃掉的绝对能量更多，铝则用更少的质量完成了相当一部分工作。
+
+<figure>
+  <img src="/images/projects/abaqus-energy-absorber/steel-aluminium-force-comparison.png" alt="V2 钢与铝的力位移曲线叠加比较" loading="lazy">
+  <figcaption>钢与铝力–位移对比。</figcaption>
+</figure>
+
+这些数字只能拿来找方向，不能当成精确排名。首先，部分能量图读出的数值和力–位移积分并不完全一致。其次，V2 使用了固定质量缩放系数 100，增加质量约 9900%；铝模型末期 $ALLAE/ALLIE\approx15\%$，人工能量已经不小。镁的反力平台大约 70 kN，也只是探索结果。要认真比较材料，必须把几何、网格、速度和冲击体都固定下来，并去掉这种过强的质量缩放。
+
+## 另一组 500 kg、50 km/h 的材料碰撞
+
+课程答辩里还有一组单独的壁面冲击。它用 500 kg 刚性冲击体，以 50 km/h 撞击吸能器，材料包括钢、Al 6061、Ti-6Al-4V 和聚丙烯。这组模型的质量、边界和行程与 V2、V3、A/B/D 截面比较都不同，所以数字不能混成一张总榜。
+
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1rem;">
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/wall-impact-aluminium.png" alt="500 千克冲击体工况下铝纵梁的 Mises 应力结果" loading="lazy">
+    <figcaption>Al 6061 冲击结果。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/wall-impact-polypropylene.png" alt="500 千克冲击体工况下聚丙烯纵梁的冲击结果" loading="lazy">
+    <figcaption>聚丙烯冲击结果。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/wall-impact-steel.png" alt="500 千克冲击体工况下钢纵梁的 Mises 应力结果" loading="lazy">
+    <figcaption>钢冲击结果。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/wall-impact-titanium.png" alt="500 千克冲击体工况下钛合金纵梁的冲击结果" loading="lazy">
+    <figcaption>Ti-6Al-4V 冲击结果。</figcaption>
+  </figure>
+</div>
+
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1rem;">
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/wall-impact-force-displacement.png" alt="钢、钛合金和铝在 500 千克冲击体工况下的力位移曲线" loading="lazy">
+    <figcaption>三种材料力–位移对比。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/wall-impact-energy-comparison.png" alt="钢、钛合金和铝在 500 千克冲击体工况下的能量曲线" loading="lazy">
+    <figcaption>三种材料能量对比。</figcaption>
+  </figure>
+</div>
+
+<div class="not-prose my-8 overflow-x-auto" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+  <table class="min-w-[720px] w-full border-collapse text-sm" style="min-width:720px;width:100%;border-collapse:collapse;">
+    <thead>
+      <tr class="border-b border-edge text-left">
+        <th class="px-3 py-2">材料</th>
+        <th class="px-3 py-2">质量（kg）</th>
+        <th class="px-3 py-2">峰值力（kN）</th>
+        <th class="px-3 py-2">CFE</th>
+        <th class="px-3 py-2">SEA（kJ/kg）</th>
+        <th class="px-3 py-2">行程（mm）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-edge-soft"><td class="px-3 py-2">钢</td><td class="px-3 py-2">2.73</td><td class="px-3 py-2">185</td><td class="px-3 py-2">95.2%</td><td class="px-3 py-2">17.3</td><td class="px-3 py-2">268</td></tr>
+      <tr class="border-b border-edge-soft"><td class="px-3 py-2">Al 6061</td><td class="px-3 py-2">0.94</td><td class="px-3 py-2">102</td><td class="px-3 py-2">60.5%</td><td class="px-3 py-2">50.8</td><td class="px-3 py-2">774</td></tr>
+      <tr><td class="px-3 py-2">Ti-6Al-4V</td><td class="px-3 py-2">1.54</td><td class="px-3 py-2">249</td><td class="px-3 py-2">92.5%</td><td class="px-3 py-2">27.9</td><td class="px-3 py-2">186</td></tr>
+    </tbody>
+  </table>
+</div>
+
+聚丙烯出现接触不稳定，力曲线不可信，所以没有放进表里。Al 6061 的峰值力最低，SEA 最高，但它需要 774 mm 的行程，几乎是钢的三倍。车头如果放不下这么长的压溃空间，再高的 SEA 也解决不了布置问题。钛合金和钢的平台更平，却伴随更高的力。材料选择从来不是只挑一列最大的数字。
+
+## V3 终于把 30 km/h 工况跑完
+
+V3 回到 30 km/h 工况。帽形纵梁和封板都设为 1 mm，两部分用 Tie 连在一起；接触使用 general contact，摩擦系数 0.3。模型有 405 个可变形单元、961 个节点，刚性壁质量为 1.0 tonne，也就是 1000 kg，初速度为 8333 mm/s，分析时间 0.06 s。V3 没有使用固定质量缩放，作业能够跑完。
 
 <figure>
   <video controls playsinline muted loop preload="metadata" style="display:block;width:100%;height:auto;">
     <source src="/images/projects/abaqus-energy-absorber/v3-crash-result.mp4" type="video/mp4">
     你的浏览器不支持 HTML5 视频。
   </video>
-  <figcaption>V3 原始 Abaqus 结果动画的网页优化片段：1000 kg 刚性壁以约 30 km/h 撞击 1 mm 纵梁装配。这里保留动画本身，而不是用静态截图代替。</figcaption>
+  <figcaption>V3 冲击结果动画。</figcaption>
 </figure>
 
-V3 的初始与最终总能量约为 34.72 和 34.70 kJ，整体能量账基本闭合；最终动能为 22.65 kJ。从初始动能 34.72 kJ 减到最终动能 22.65 kJ，动能共减少约 12.07 kJ。这部分能量转入了模型的其他能量项，但没有重新核对 ODB 分项前，不能把它全部称为内部能或塑性吸能。
+初始总能量约 34.72 kJ，结束时约 34.70 kJ，总量几乎没有漂走。最终动能还剩 22.65 kJ，因此约 12.07 kJ 动能转进了其他能量项。这里不能顺手把 12.07 kJ 全叫作塑性吸能：要回答能量究竟去了哪里，还得从 ODB 逐项查看内能、人工能量、接触能和其他分量。
 
-V3 仍不是生产级验证。`.sta` 记录显示求解超过了 300,000 个增量，Abaqus 因此建议用双精度重跑，说明时间离散与精度仍是数值风险。它比 V2 更可信的原因是设置更清楚、没有固定质量缩放且作业完成，并不意味着已经完成网格收敛或所有能量项核验。
+V3 也留下了数值问题。求解超过 300,000 个增量，Abaqus 建议用双精度重跑。它比 V2 少了激进的质量缩放，但我们仍然没有做网格收敛，不能因为总能量守恒就认为每一项结果都已经足够准确。
 
-## 最终报告中的截面比较是另一组研究
+## FGT 想把材料放到真正折叠的地方
 
-最终 LaTeX 报告还比较了不同截面。它与上面的 V3 版本记录相关，但表中 A、B、D 是一组独立的几何比较，不能把它们的数值直接移植到 V2 的材料曲线上。
-
-报告定义了四个几何概念：Model A 是 1.2/0.8 mm 的基准帽形纵梁；Model B 是统一 1.0 mm；Model C 是统一 2 mm 的多胞截面；Model D 是分段厚度的多胞截面。Model C 没有可用的最终结果，因此不能写成“已评估方案”。真正有数据的是 A、B 和 D：
-
-| 指标 | Model A：1.2/0.8 mm | Model B：统一 1.0 mm | Model D：角部 2 mm、壁面 1 mm |
-|---|---:|---:|---:|
-| 质量（kg） | 0.727 | 0.683 | 3.397 |
-| ALLIE（kJ） | 3.5 | 2.8 | 33.0 |
-| 剩余动能（kJ） | 31.0 | 32.0 | 0.5 |
-| SEA（kJ/kg） | 4.81 | 4.09 | 9.71 |
-| $F_{max}$（kN） | 32.0 | 32.5 | 280 |
-| $F_{mean}$（kN） | 11.6 | 7.7 | 264 |
-| CFE | 36.2% | 23.7% | 94.3% |
-| 最大位移（mm） | 300 | 360 | 125 |
+均匀加厚最省事，但薄壁件不是每个位置都同样重要。折叠通常从角部和筋板连接处开始，那里会形成塑性铰。FGT 的想法是把更多材料放在这些位置，把平直、受力较弱的壁面做薄，让局部屈曲按预期顺序发展。
 
 <figure>
-  <img src="/images/projects/abaqus-energy-absorber/model-a-energy-history.png" alt="Model A 的动能、内能和人工能量历程" loading="lazy">
-  <figcaption>Model A 原始能量历程：0.06 s 时内能约 3.5 kJ，仍保留约 31 kJ 动能。</figcaption>
+  <img src="/images/projects/abaqus-energy-absorber/fgt-regions-theory.png" alt="FGT 多胞截面中 Region I、II、III 和连续厚度参数示意" loading="lazy">
+  <figcaption>FGT 三个厚度区域。</figcaption>
 </figure>
 
-<figure>
-  <img src="/images/projects/abaqus-energy-absorber/model-b-energy-history.png" alt="Model B 的动能、内能和人工能量历程" loading="lazy">
-  <figcaption>Model B 原始能量历程：统一成 1.0 mm 后质量略降，但内能约 2.8 kJ，低于 Model A。</figcaption>
-</figure>
+论文把截面分成三类区域：Region I 是角部单元的外壁，Region II 是角部之间的连接外壁，Region III 是内部筋板。理论上，厚度可以从角部的 $t_{max}$ 连续过渡到平壁的 $t_{min}$：
 
-两张曲线说明，均匀厚度并没有自动带来更稳定的压溃。Model B 比 A 轻约 6%，但 ALLIE、SEA、平均力和 CFE 都更低。折叠模式取决于塑性铰形成的位置和顺序，而不只取决于平均板厚。
+$$
+t(s)=t_{min}+\left(t_{max}-t_{min}\right)\left(1-\frac{s}{H}\right)^{n_i}.
+$$
 
-<figure>
-  <img src="/images/projects/abaqus-energy-absorber/model-d-energy-history.png" alt="Model D 的动能、内能和人工能量历程" loading="lazy">
-  <figcaption>Model D 原始能量历程：内能升至约 33 kJ，末期剩余动能约 0.5 kJ；这仍需与其显著增加的质量和力峰值一起判断。</figcaption>
-</figure>
+$s$ 表示沿截面走了多远，$H$ 是这段壁面的长度，$n_i$ 决定厚度降得快还是慢。这个写法的重点不是把整根纵梁一起加厚，而是在总质量不变的理想条件下，把材料挪到更需要它的地方。
 
-<figure>
-  <img src="/images/projects/abaqus-energy-absorber/model-d-force-history.png" alt="Model D 在约 0.025 秒后形成的高压溃力平台" loading="lazy">
-  <figcaption>Model D 原始力历程：平均力约 264 kN、峰值约 280 kN，因此 94.3% 的 CFE 来自一个很高的力平台，并不等同于更低的乘员载荷。</figcaption>
-</figure>
+我们实际做出的 Model D 没有这么完整。模型只清楚记录了角部 2 mm、壁面 1 mm 的分段厚度，没有看到连续厚度函数真正写进 Abaqus，也没有固定质量约束下的参数搜索。因此它更准确的说法是“受 FGT 启发的分段厚度多胞截面”。
 
-Model D 的确在 125 mm 行程内转化了更多动能，SEA 也高于 A、B，但它不是无需条件的“最优解”。它重 3.397 kg，约为 Model A 的 4.7 倍；280 kN 峰值也远高于 A 的 32 kN。高 CFE 只说明平均力接近峰值，不能单独证明碰撞更安全。
+## 三种真正算完的截面：A、B 和 D
 
-还要区分论文概念与实际模型。Fang 等人的 FGT 方法用连续厚度规律和三个区域描述材料重新分配：角部单元外壁、角部之间的连接外壁和内部筋板，并讨论固定质量下的优化；归档中的 Model D 只明确记录了角部 2 mm、壁面 1 mm 的分段厚度。我们没有找到连续梯度实际写入模型或运行优化算法的证据，因此把 D 称为受 FGT 启发的分段厚度方案更准确。
+这组几何比较都看 0.06 s 时的结果。Model A 保留 1.2/0.8 mm 的基准厚度；Model B 把所有壁厚统一成 1.0 mm；Model D 用多胞截面，并把角部设为 2 mm、壁面设为 1 mm。还有一个统一 2 mm 的 Model C，但它没有可用的最终结果，所以不参加下面的比较。
 
-## 我们能保留的结论
+<div class="not-prose my-8 overflow-x-auto" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+  <table class="min-w-[820px] w-full border-collapse text-sm" style="min-width:820px;width:100%;border-collapse:collapse;">
+    <thead>
+      <tr class="border-b border-edge text-left">
+        <th class="px-3 py-2">指标</th>
+        <th class="px-3 py-2">Model A：1.2/0.8 mm</th>
+        <th class="px-3 py-2">Model B：统一 1.0 mm</th>
+        <th class="px-3 py-2">Model D：角部 2 mm、壁面 1 mm</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b border-edge-soft"><td class="px-3 py-2">质量（kg）</td><td class="px-3 py-2">0.727</td><td class="px-3 py-2">0.683</td><td class="px-3 py-2">3.397</td></tr>
+      <tr class="border-b border-edge-soft"><td class="px-3 py-2">ALLIE（kJ）</td><td class="px-3 py-2">3.5</td><td class="px-3 py-2">2.8</td><td class="px-3 py-2">33.0</td></tr>
+      <tr class="border-b border-edge-soft"><td class="px-3 py-2">剩余动能（kJ）</td><td class="px-3 py-2">31.0</td><td class="px-3 py-2">32.0</td><td class="px-3 py-2">0.5</td></tr>
+      <tr class="border-b border-edge-soft"><td class="px-3 py-2">ALLAE/ALLIE</td><td class="px-3 py-2">&lt;1%</td><td class="px-3 py-2">&lt;1%</td><td class="px-3 py-2">&lt;1%</td></tr>
+      <tr class="border-b border-edge-soft"><td class="px-3 py-2">SEA（kJ/kg）</td><td class="px-3 py-2">4.81</td><td class="px-3 py-2">4.09</td><td class="px-3 py-2">9.71</td></tr>
+      <tr class="border-b border-edge-soft"><td class="px-3 py-2">峰值力（kN）</td><td class="px-3 py-2">32.0</td><td class="px-3 py-2">32.5</td><td class="px-3 py-2">280</td></tr>
+      <tr class="border-b border-edge-soft"><td class="px-3 py-2">平均力（kN）</td><td class="px-3 py-2">11.6</td><td class="px-3 py-2">7.7</td><td class="px-3 py-2">264</td></tr>
+      <tr class="border-b border-edge-soft"><td class="px-3 py-2">CFE</td><td class="px-3 py-2">36.2%</td><td class="px-3 py-2">23.7%</td><td class="px-3 py-2">94.3%</td></tr>
+      <tr><td class="px-3 py-2">最大位移（mm）</td><td class="px-3 py-2">300</td><td class="px-3 py-2">360</td><td class="px-3 py-2">125</td></tr>
+    </tbody>
+  </table>
+</div>
 
-这次复盘留下三条有限但可靠的判断。第一，V1 证明完整的属性检查是显式动力学模型能否起跑的前提。第二，V2 暗示钢、铝之间存在峰值力、绝对吸能和质量效率的折中，但激进质量缩放与 15% 的人工能量使其只能用于探索。第三，V3 提供了目前最清楚的 30 km/h 装配、接触和能量记录；几何比较则说明材料分布会显著改变压溃平台，但 Model D 的吸能提升同时伴随约 4.7 倍质量和很高的峰值力。
+### Model A：基准件还能继续走很远
 
-如果继续研究，我们会把所有候选方案放到同一速度、同一冲击体、同一可用行程和固定质量预算下比较；进行网格收敛；从 ODB 逐项核对 ALLKE、ALLIE、ALLAE、接触与其他能量；以双精度和更充分的增量重跑；并彻底移除 V2 那种激进的固定质量缩放。完成这些检查之前，这些结果适合展示建模判断和失败修正，不足以支持量产吸能器的设计定案。
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1rem;">
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/model-a-energy-history.png" alt="Model A 在 0.06 秒内的动能、内能和人工能量" loading="lazy">
+    <figcaption>Model A 能量历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/model-a-force-history.png" alt="Model A 接触后的反力随时间变化" loading="lazy">
+    <figcaption>Model A 反力历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/model-a-displacement-history.png" alt="Model A 在约 0.025 秒接触后达到 300 毫米位移" loading="lazy">
+    <figcaption>Model A 位移历程。</figcaption>
+  </figure>
+</div>
+
+Model A 的内能到 3.5 kJ，平均力 11.6 kN，峰值 32 kN，走了 300 mm 后仍剩 31 kJ 动能。它建立了一个不算强、但容易理解的基准。
+
+### Model B：把厚度摊平均，结果反而更差
+
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1rem;">
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/model-b-energy-history.png" alt="Model B 在 0.06 秒内的动能、内能和人工能量" loading="lazy">
+    <figcaption>Model B 能量历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/model-b-force-history.png" alt="Model B 接触后的反力随时间变化" loading="lazy">
+    <figcaption>Model B 反力历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/model-b-displacement-history.png" alt="Model B 在约 0.025 秒接触后达到 360 毫米位移" loading="lazy">
+    <figcaption>Model B 位移历程。</figcaption>
+  </figure>
+</div>
+
+从 A 改成 B，质量只减少 6.1%，但 ALLIE 下降 20%，SEA 下降 15%，平均力下降 33.6%，CFE 少了 12.5 个百分点，行程反而增加 20%。原因不是“1 mm 一定不好”，而是原来 1.2/0.8 mm 的搭配改变了折叠起点。把材料平均摊开，可能让该形成塑性铰的位置不够硬，也让不需要加厚的位置白白带着质量。
+
+### Model D：吸收得多，但又重又硬
+
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1rem;">
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/model-d-energy-history.png" alt="Model D 的动能快速转成内能并在末期接近停止" loading="lazy">
+    <figcaption>Model D 能量历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/model-d-force-history.png" alt="Model D 在接触后形成约 264 千牛的高反力平台" loading="lazy">
+    <figcaption>Model D 反力历程。</figcaption>
+  </figure>
+  <figure>
+    <img src="/images/projects/abaqus-energy-absorber/model-d-displacement-history.png" alt="Model D 在冲击中达到约 125 毫米位移" loading="lazy">
+    <figcaption>Model D 位移历程。</figcaption>
+  </figure>
+</div>
+
+从 A 改到 D，质量变成 4.67 倍，ALLIE 变成 9.43 倍，SEA 变成 2.02 倍；同时峰值力变成 8.75 倍，平均力约变成 22.8 倍，行程缩短约 58%。D 的 94.3% CFE 确实说明平台很平，可这个平台在 264 kN 左右，峰值达到 280 kN。对吸能器来说，“持续用很大的力压溃”和“持续用合适的力压溃”不是一回事。
+
+这也是为什么我们把 D 看作一个明显的取舍，而不是最终答案。它能在较短行程里吃掉更多动能，但代价是质量和载荷都大幅增加。要知道厚度分配本身有没有价值，下一轮必须让不同截面使用相同的质量预算。
+
+## 这次项目真正教会我们的事
+
+第一，塑性变形不是越多越好，折叠顺序、压溃行程和力的大小必须一起看。第二，材料轻不代表一定适合，铝在两个材料工况里都显示出较高的质量效率，却也暴露了长行程问题。第三，均匀厚度看起来简单稳妥，实际可能破坏原本的折叠方式。第四，高 CFE 只说明平台平；Model D 把这个指标做高的同时，也把平均力推到了 264 kN。
+
+如果继续做，我们会先统一速度、冲击体、可用行程和结构质量，再比较材料与截面；用多套网格检查结果是否收敛；从 ODB 重新核对每一项能量；用双精度重跑 V3；并移除 V2 的固定质量缩放。做到这些以后，力峰、SEA 和 CFE 才能放在同一张表里认真比较。
