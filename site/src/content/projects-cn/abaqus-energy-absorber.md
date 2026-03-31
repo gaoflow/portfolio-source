@@ -206,25 +206,11 @@ V2 把模型补齐到 393 个 C3D8R 单元和 902 个节点，速度仍是 13,88
   <figcaption>能量</figcaption>
 </figure>
 
-<div class="not-prose my-8 overflow-x-auto" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-  <table class="min-w-[720px] w-full border-collapse text-sm" style="min-width:720px;width:100%;border-collapse:collapse;">
-    <thead>
-      <tr class="border-b border-edge text-left">
-        <th class="px-3 py-2">材料</th>
-        <th class="px-3 py-2">质量（kg）</th>
-        <th class="px-3 py-2">峰值力（kN）</th>
-        <th class="px-3 py-2">CFE</th>
-        <th class="px-3 py-2">SEA（kJ/kg）</th>
-        <th class="px-3 py-2">行程（mm）</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="border-b border-edge-soft"><td class="px-3 py-2">钢</td><td class="px-3 py-2">2.73</td><td class="px-3 py-2">185</td><td class="px-3 py-2">95.2%</td><td class="px-3 py-2">17.3</td><td class="px-3 py-2">268</td></tr>
-      <tr class="border-b border-edge-soft"><td class="px-3 py-2">Al 6061</td><td class="px-3 py-2">0.94</td><td class="px-3 py-2">102</td><td class="px-3 py-2">60.5%</td><td class="px-3 py-2">50.8</td><td class="px-3 py-2">774</td></tr>
-      <tr><td class="px-3 py-2">Ti-6Al-4V</td><td class="px-3 py-2">1.54</td><td class="px-3 py-2">249</td><td class="px-3 py-2">92.5%</td><td class="px-3 py-2">27.9</td><td class="px-3 py-2">186</td></tr>
-    </tbody>
-  </table>
-</div>
+| 材料 | 质量（kg） | 峰值力（kN） | CFE | SEA（kJ/kg） | 行程（mm） |
+|---|---:|---:|---:|---:|---:|
+| 钢 | 2.73 | 185 | 95.2% | 17.3 | 268 |
+| Al 6061 | 0.94 | 102 | 60.5% | 50.8 | 774 |
+| Ti-6Al-4V | 1.54 | 249 | 92.5% | 27.9 | 186 |
 
 聚丙烯出现接触不稳定，力曲线不可信，所以没有放进表里。Al 6061 的峰值力最低，SEA 最高，但它需要 774 mm 的行程，几乎是钢的三倍。车头如果放不下这么长的压溃空间，再高的 SEA 也解决不了布置问题。钛合金和钢的平台更平，却伴随更高的力。所以在这组结果里，不能只挑某一列最大的数字。
 
@@ -287,29 +273,17 @@ $s$ 表示沿截面走了多远，$H$ 是这段壁面的长度，$n_i$ 决定厚
 
 这组几何比较都看 0.06 s 时的结果。还有一个统一 2 mm 的 Model C，但它没有可用的最终结果，所以不参加下面的比较。
 
-<div class="not-prose my-8 overflow-x-auto" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-  <table class="min-w-[820px] w-full border-collapse text-sm" style="min-width:820px;width:100%;border-collapse:collapse;">
-    <thead>
-      <tr class="border-b border-edge text-left">
-        <th class="px-3 py-2">指标</th>
-        <th class="px-3 py-2">Model A：1.2/0.8 mm</th>
-        <th class="px-3 py-2">Model B：统一 1.0 mm</th>
-        <th class="px-3 py-2">Model D：角部 2 mm、壁面 1 mm</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="border-b border-edge-soft"><td class="px-3 py-2">质量（kg）</td><td class="px-3 py-2">0.727</td><td class="px-3 py-2">0.683</td><td class="px-3 py-2">3.397</td></tr>
-      <tr class="border-b border-edge-soft"><td class="px-3 py-2">ALLIE（kJ）</td><td class="px-3 py-2">3.5</td><td class="px-3 py-2">2.8</td><td class="px-3 py-2">33.0</td></tr>
-      <tr class="border-b border-edge-soft"><td class="px-3 py-2">剩余动能（kJ）</td><td class="px-3 py-2">31.0</td><td class="px-3 py-2">32.0</td><td class="px-3 py-2">0.5</td></tr>
-      <tr class="border-b border-edge-soft"><td class="px-3 py-2">ALLAE/ALLIE</td><td class="px-3 py-2">&lt;1%</td><td class="px-3 py-2">&lt;1%</td><td class="px-3 py-2">&lt;1%</td></tr>
-      <tr class="border-b border-edge-soft"><td class="px-3 py-2">SEA（kJ/kg）</td><td class="px-3 py-2">4.81</td><td class="px-3 py-2">4.09</td><td class="px-3 py-2">9.71</td></tr>
-      <tr class="border-b border-edge-soft"><td class="px-3 py-2">峰值力（kN）</td><td class="px-3 py-2">32.0</td><td class="px-3 py-2">32.5</td><td class="px-3 py-2">280</td></tr>
-      <tr class="border-b border-edge-soft"><td class="px-3 py-2">平均力（kN）</td><td class="px-3 py-2">11.6</td><td class="px-3 py-2">7.7</td><td class="px-3 py-2">264</td></tr>
-      <tr class="border-b border-edge-soft"><td class="px-3 py-2">CFE</td><td class="px-3 py-2">36.2%</td><td class="px-3 py-2">23.7%</td><td class="px-3 py-2">94.3%</td></tr>
-      <tr><td class="px-3 py-2">最大位移（mm）</td><td class="px-3 py-2">300</td><td class="px-3 py-2">360</td><td class="px-3 py-2">125</td></tr>
-    </tbody>
-  </table>
-</div>
+| 指标 | Model A：1.2/0.8 mm | Model B：统一 1.0 mm | Model D：角部 2 mm、壁面 1 mm |
+|---|---:|---:|---:|
+| 质量（kg） | 0.727 | 0.683 | 3.397 |
+| ALLIE（kJ） | 3.5 | 2.8 | 33.0 |
+| 剩余动能（kJ） | 31.0 | 32.0 | 0.5 |
+| ALLAE/ALLIE | <1% | <1% | <1% |
+| SEA（kJ/kg） | 4.81 | 4.09 | 9.71 |
+| 峰值力（kN） | 32.0 | 32.5 | 280 |
+| 平均力（kN） | 11.6 | 7.7 | 264 |
+| CFE | 36.2% | 23.7% | 94.3% |
+| 最大位移（mm） | 300 | 360 | 125 |
 
 #### Model A：基准件还能继续走很远
 
