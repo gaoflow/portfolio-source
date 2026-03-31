@@ -56,7 +56,10 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
               alt={p.data.title}
               loading="lazy"
               decoding="async"
-              class="project-card-media"
+              class:list={[
+                'project-card-media',
+                p.data.cardImageFit === 'cover' && 'project-card-media--cover',
+              ]}
             />
           ) : (
             <span class="project-card-media project-card-placeholder">

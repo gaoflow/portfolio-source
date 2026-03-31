@@ -34,6 +34,10 @@ ALLOWLIST = {
     'projects/space-rider/final-vehicle.png',
     # Abaqus viewport capture — the software's viewport is dark by design
     'projects/xc48-abaqus-twin/m2-necking-deformed.png',
+    # CC BY laboratory photograph — preserve the source image without retouching
+    'projects/steady-conduction-1d/reference/metal-rod-conduction-experiment.jpg',
+    # CC BY-SA flow-visualization photograph — preserve the source image unmodified
+    'projects/potential-flow-sandbox/reference/real-cylinder-wake-low-re.jpg',
 }
 
 

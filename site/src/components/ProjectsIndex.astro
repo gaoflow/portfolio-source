@@ -49,7 +49,10 @@ const alternatePath = hasAlternate ? (isChinese ? '/projects' : '/cn/projects') 
                 alt={project.data.title}
                 loading="lazy"
                 decoding="async"
-                class="project-card-media"
+                class:list={[
+                  'project-card-media',
+                  project.data.cardImageFit === 'cover' && 'project-card-media--cover',
+                ]}
               />
             ) : (
               <span class="project-card-media project-card-placeholder">

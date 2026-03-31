@@ -1,171 +1,207 @@
 ---
-title: '我怎样把一次拉伸试验重建成 Abaqus 数字孪生'
+title: '数字孪生实战：在 Abaqus 上还原拉伸试验'
 year: 2026
 date: '2026-04-04'
 status: complete
 categories: [validation, design]
 tags: [有限元分析]
-summary: '在四人课程项目中，我负责试验数据、材料卡片、ODB 后处理和报告工具链；修正试样尺寸后，最终 M2 + Dynamic Explicit + Smooth Step 模型以 R²=0.9663 复现实测曲线，但低模量和单试样标定仍限制结论。'
-role: '数据后处理与报告工具链'
-team: 'ESILV MMN1 小组——Nicolas Chang、Bing Gao、Sabin Karn、Nithor Bhowmik'
+summary: '课程作业记录，从真实拉伸试验到 Abaqus 分析'
 duration: '8 周'
 academic:
   institution: 'ESILV'
   course: '材料与行为'
-  assignment: 'XC48 拉伸实验与 Abaqus 数值重建'
-  note: '这是 ESILV 为期八周的材料与行为课程项目，由我与 Nicolas Chang、Sabin Karn 和 Nithor Bhowmik 四人组队完成。小组开展了物理拉伸试验并建立了 Abaqus 模型；我负责数据部分——从试验机原始输出到材料卡片的 Python 流水线、ODB 后处理以及报告工具链。'
+  assignment: 'XC48 拉伸试验与 Abaqus 数值重建'
   requirements:
-    - '开展 XC48 单轴拉伸试验直至断裂，并完成后处理。'
-    - '推导工程应力–应变、真实应力–应变和塑性应力–应变数据，并识别材料性能。'
-    - '建立试样的 Abaqus 模型，并将仿真结果与实测曲线比较。'
-    - '研究网格、求解器和加载幅值的敏感性，并说明所选配置。'
-  media:
-    - src: '/images/projects/xc48-abaqus-twin/source/laboratory-handout-summary.webp'
-      alt: 'XC48 提交报告中汇总实验室工作表、原始数据和试样草图的页面'
-      caption: '单独的原始任务书没有保存在当前归档中；提交报告复现了实验室工作表的关键面板。该页也保留了后来被数据流水线纠正的总长、直径和屈服强度笔误，因此它既是课程证据，也是误差来源。'
-    - src: '/images/projects/xc48-abaqus-twin/geometry-correction.svg'
-      alt: '占位尺寸与经验证的试样尺寸，以及由此得到的 UTS 值'
-      caption: '第一轮数据处理在内部自洽，但使用了占位几何尺寸。修正直径和标距后，UTS 从 489 MPa 变为 766 MPa。'
-    - src: '/images/projects/xc48-abaqus-twin/assignment-workflow.svg'
-      alt: '从拉伸实验、材料数据处理到 Abaqus 对比的工作流程'
-      caption: '这项工作是一条完整链路，而不是一次孤立的求解：试验、修正几何尺寸、推导真实/塑性数据、建立材料卡片，随后审查网格和求解器选择。'
-    - src: '/images/projects/xc48-abaqus-twin/solver-comparison.svg'
-      alt: '四种网格与 Static General 求解器的 R 平方比较'
-      caption: '中等密度的 M2 网格给出了最佳保留拟合结果。增加网格密度或采用名义上更简单的静力求解均未改善吻合度。'
+    - '记录拉伸机输出和断后试样尺寸，并描述颈缩与断裂。'
+    - '计算工程/真实应力–应变曲线，识别模量、屈服、极限和断裂强度。'
+    - '把实验材料数据写入 Abaqus，并比较实验与数值曲线。'
+    - '研究网格、求解器和加载幅值的影响，并说明最终配置。'
 featured: false
 order: 19
 studySequence: 11
-heroImage: /images/projects/xc48-abaqus-twin/stress-strain.svg
+heroVideo:
+  src: '/videos/projects/xc48-abaqus-twin/m2-von-mises-fracture.mp4'
+  poster: '/images/projects/xc48-abaqus-twin/m2-von-mises-fracture-poster.webp'
+  caption: 'M2 断裂演化'
+heroImage: /images/projects/xc48-abaqus-twin/xc48-fracture-hero-cn.webp
+cardImageFit: cover
 ---
 
-## 项目与分工
+这是我们在 2026 年春季学期 Materials and Behavior 课程中完成的一次拉伸试验记录。
 
-我们把一根 XC48 中碳钢试样夹在拉伸机上，一路拉到颈缩、拉断，把机器记下来的曲线整理成 Abaqus 能吃的材料数据，最后让数值模型把这条实验曲线重新演一遍。
+## 先做真实拉伸试验
 
-这是四人小组的八周课程项目。试验和 Abaqus 模型是小组一起做的；我负责数据部分，包括试验机原始输出、应力–应变转换、材料卡片、ODB 后处理和报告工具链。
+我们先对一根 XC48 钢哑铃形试样做单轴拉伸。试验机给出载荷和伸长，我们再记录断后尺寸，用 Excel 算出工程与真实应力–应变曲线。拿到这条实测曲线后，我们才开始搭 Abaqus 模型。想回答的问题很直接：数值曲线能不能跟上实测的硬化、颈缩和峰后下降？
 
-最终留下来的模型是 M2 网格、Dynamic Explicit 求解器加 Smooth Step 加载，对实验曲线的 $R^2=0.9663$。
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/source/teacher-handout-tensile-machine.png" alt="教师拉伸试验任务书中的拉伸机、夹具和哑铃形试样照片" loading="lazy">
+  <figcaption>拉伸试验设备</figcaption>
+</figure>
 
-## 占位尺寸造成的 489 MPa 曲线
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/source/teacher-handout-specimen-geometry.png" alt="教师任务书中的哑铃形拉伸试样尺寸图，标出总长、肩距、标距和缩颈段" loading="lazy">
+  <figcaption>试样尺寸定义</figcaption>
+</figure>
 
-试验机一共记了 1,129 个数据点，每个点包含时间、横梁位移和力，峰值载荷 38.41 kN。
+## 第一版曲线
 
-工程应力和应变按
+第一版计算保留了同一组 1,129 点源数据，却先用了 Ø10 mm 和 50 mm 标距的占位尺寸。曲线看起来完整，工程应力峰值却只有 489.09 MPa，真实应力峰值为 545.68 MPa。这个差距让我们回头检查计算输入，最后发现问题不在载荷数据，而在试样面积和标距。把几何尺寸改为实测的 Ø7.99 mm 和 70 mm 后，工程 UTS 变成 766.12 MPa。前两条曲线因此只保留为一次纠错记录，不再用于后面的材料输入。
 
 $$
 \varepsilon=\frac{\Delta L}{L_0},\qquad
-\sigma=\frac{F}{A_0}
+\sigma=\frac{F}{A_0},\qquad
+\varepsilon_T=\ln(1+\varepsilon),\qquad
+\sigma_T=\sigma(1+\varepsilon)
 $$
 
-算出来，再换成真实应力、真实应变和塑性应变。
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/initial-tp-engineering-stress-strain.png" alt="使用 Ø10 mm 和 50 mm 占位几何计算的早期工程应力应变曲线，峰值为 489.09 MPa" loading="lazy">
+  <figcaption>初版工程应力–应变曲线</figcaption>
+</figure>
 
-我的第一版脚本从头到尾跑得很顺，出来的曲线光滑漂亮，UTS 489.09 MPa，看上去没有任何问题。问题是我随手用了占位几何：直径 Ø10 mm、标距 50 mm，而这两个数就藏在公式的分母里。
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/initial-tp-true-stress-strain.png" alt="使用占位几何从同一组源数据换算的早期真实应力应变曲线，峰值为 545.68 MPa" loading="lazy">
+  <figcaption>初版真实应力–应变曲线</figcaption>
+</figure>
 
-试验电子表格里试样缩颈段的真实尺寸是 $L_0=70$ mm、$S_0=50.14$ mm²，换算过来直径只有 7.99 mm。截面面积差了一大截，应力自然差一大截。改过来之后，UTS 从 489.09 MPa 跳到 766.12 MPa。
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/geometry-correction.svg" alt="占位直径和标距与验证后试样尺寸的对比，以及工程 UTS 从 489.09 MPa 变为 766.12 MPa" loading="lazy">
+  <figcaption>试样尺寸纠正</figcaption>
+</figure>
 
-这件事让我记住一点：曲线平滑不代表输入是对的。错的分母照样能画出整洁的曲线。从那以后，我会把用到的标距和截面积直接打印在结果旁边，先对数再看图。
+## 确定实验结果
 
-## 实验数据
+尺寸修正后，我们保留以下实验结果，后面的 Abaqus 计算都以它们为基准。
 
 | 物理量 | 数值 | 说明 |
 |---|---:|---|
 | 杨氏模量 | 12.28 GPa | 受试验机和夹具柔度影响 |
-| 0.2% 偏移屈服强度 | 758.33 MPa | 报告曾误写为“7583” |
+| 0.2% 偏移屈服强度 | 758.33 MPa | 修正后的结果 |
 | 工程 UTS | 766.12 MPa | 工程应变 7.6% |
-| 真实应力峰值 | 828.4 MPa | 真实应变 8.2% |
+| 真实应力峰值 | 828.4 MPa | 由修正后的实验数据重算 |
 | 断裂强度 | 557.80 MPa | 最终载荷骤降前 |
 | 断裂应变 | 13.4% | 工程应变 |
-| 颈缩 | Ø7.99→5.77 mm | 截面积缩减 47.8% |
+| 颈缩 | Ø7.99 → 5.77 mm | 截面积缩减 47.8% |
 
-UTS 和颈缩率都在延性钢的合理范围里，但 12.28 GPa 的模量远远低于钢的典型值 210 GPa 左右，差了十几倍。
+杨氏模量只有 12.28 GPa，远低于钢常见的约 210 GPa。这里的横梁位移还包含试验机框架和夹具的变形，所以这条实测曲线比材料本身更“软”。Abaqus 模型沿用了这条斜率，因此后面的高 $R^2$ 只能说明数值曲线贴近本次试验。
 
-原因不神秘：应变是从横梁位移算出来的，而横梁位移里混着试验机框架和夹具自己的变形。所以这条又低又软的弹性段主要反映的是试验装置，不是 XC48 本身。数字孪生为了贴合实测曲线，只能照单继承这个斜率，也就是说，最后的 $R^2$ 里有一部分是在拟合测量伪影。
+有了这组实验基准，下一步才是把它变成 Abaqus 能理解的几何、材料和边界条件。
 
-## 材料卡片与后处理
+## Abaqus 结果分析
 
-材料卡片说白了就是喂给 Abaqus 的一张表：不用手册里的理想材料定律，而是直接告诉软件，应变到多少、应力是多少，从哪个点开始算损伤。我全部用实测曲线来填。
+我们建立了完整的三维哑铃形试样，并用 C3D4 线性四面体单元离散。试样一端完全固定，也就是 `ENCASTRE`；另一端只沿轴向拉伸，在 1 s 内移动 15 mm。拉伸到颈缩和断裂时，形状变化已经不能当作小变形处理，所以分析步启用了大变形选项 `nlgeom=YES`。
 
-模型是完整的哑铃形试样，用 C3D4 四面体单元。一端固定，另一端在 1 s 内拉 15 mm。
+材料设置分成峰值前和峰值后两段。峰值前，弹性参数和真实塑性数据决定材料怎样从弹性进入塑性、又怎样继续硬化；峰值后，损伤起始、损伤演化和单元删除决定曲线怎样变软，以及试样最后怎样分开。对应到材料卡片，我们采用 $E=12{,}283.5$ MPa、$\nu=0.3$、真实塑性数据、延性损伤、0.5 mm 位移型损伤演化和单元删除。最终加载幅值采用 Smooth Step，原因会在后面的能量检查中说明。
 
-卡片里写了 $E=12{,}283.5$ MPa、$\nu=0.3$、实测的真实塑性数据，再加一条延性损伤：等效塑性应变到 0.0821 时启动，按 0.5 mm 位移演化，配单元删除。这样模型才能走完颈缩、峰后软化，最后真的断开。
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/abaqus-baseline-meshed-specimen.png" alt="Abaqus 中完整哑铃形拉伸试样的基准 C3D4 四面体网格视图" loading="lazy">
+  <figcaption>基准四面体网格</figcaption>
+</figure>
 
-后处理是我自己写的 ODB 脚本：逐帧读 200 个场输出，挑出 70 mm 标距那一段，积分端部反力，生成工程应力–应变和真实应力–应变两条曲线。
+Abaqus 请求了 200 个场输出间隔，这样既能看到整体曲线，也能顺着时间观察颈缩和断裂。我们从加载端的位移和反力重建工程应力–应变曲线，再检查 70 mm 标距段内的应力和应变，得到用于对照的真实曲线。这样，数值结果和实验结果用的是同一套几何基准。
 
-脚本还顺手发现一个问题：数字模型的半径是 3.838 mm，物理试样是 3.995 mm，截面积小了约 8%。峰值对实验仍在 1% 以内，但这个几何差异必须记账，不能当没看见。
+曲线只能告诉我们整体上拉了多大力、伸长了多少，不能单独说明断裂过程是否合理。因此我们同时看四类结果：用应力 `S` 和等效塑性应变 `PEEQ` 找应力集中与塑性局部化；用损伤变量 `SDEG` 和单元状态 `STATUS` 跟踪损伤增长及单元删除；用位移和反力重建曲线；再用动能 `ALLKE` 和内能 `ALLIE` 做基本的惯性检查。
 
-## 最细网格的失败
+这也决定了后面的判断方式。$R^2$ 可以概括整条曲线的接近程度，但我们不会只看一个分数，还要一起看颈缩形状、应力集中位置和单元删除的节奏。
+
+## 对网格的研究
+
+由于电脑性能和 Abaqus Learning Edition 的规模限制，我们没有无限加密网格。M2 的近似全局种子尺寸为 4.5，并启用曲率控制；其余三套网格用来观察离散尺度会怎样改变曲线和断裂区域。
+
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/m2-global-seed-settings.png" alt="Abaqus 全局种子设置对话框，近似全局尺寸为 4.5，并启用曲率控制" loading="lazy">
+  <figcaption>全局种子设置</figcaption>
+</figure>
+
+我们用同一条实验曲线比较基准网格、M1、M2 和 M3。判断标准是曲线拟合度和断裂区域的变化。
 
 | 网格 | 单元数 | $R^2$ | 主要表现 |
 |---|---:|---:|---|
-| 基准网格 | Learning Edition 上限 | 0.9308 | 无损伤软化，峰值后继续硬化 |
-| M1 | 少于 1,000 | 0.9653 | 应变集中在少量单元 |
-| M2 | 约 2,000 | 0.9663 | 捕捉颈缩和峰后下降 |
-| M3 | 约 3,000 | 0.9497 | 过度局部化，稳定时间步最小 |
+| 基准网格 | 3,846 | 0.9308 | 峰后继续硬化 |
+| M1 | 830 | 0.9653 | 应变集中在少量单元 |
+| M2 | 1,975 | **0.9663** | 捕捉颈缩和峰后下降 |
+| M3 | 2,928 | 0.9497 | 过度局部化 |
 
-按直觉，网格越细应该越准。M3 最细、最贵，结果却最差。
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/abaqus-m1-von-mises-result.png" alt="Abaqus M1 网格在计算末帧的变形、Von Mises 应力云图和分离试样" loading="lazy">
+  <figcaption>M1 断裂结果</figcaption>
+</figure>
 
-原因出在损伤和单元删除上。网格一细，颈缩处的应变就挤进更少的单元里，局部化过头，损伤触发和单元删除的节奏全变了，曲线反而离实验更远。M2 刚好卡在中间：既解析得出颈缩，又不至于让畸变单元把应变全吞掉。
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/abaqus-m2-von-mises-fracture-stage.png" alt="Abaqus M2 网格在断裂阶段的颈缩、变形和 Von Mises 应力云图" loading="lazy">
+  <figcaption>M2 断裂结果</figcaption>
+</figure>
 
-![四种网格配置与实验曲线的拟合结果](/images/projects/xc48-abaqus-twin/mesh-r2-comparison.png)
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/abaqus-m3-von-mises-result.png" alt="Abaqus M3 更密四面体网格在计算末帧的变形和 Von Mises 应力云图" loading="lazy">
+  <figcaption>M3 断裂结果</figcaption>
+</figure>
 
-所以“一直加密到最好”在这类带损伤的问题里不成立。网格、损伤正则化和局部化行为得放在一起看，单拧网格这一个旋钮没用。
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/mesh-r2-comparison.png" alt="基准、M1、M2 和 M3 网格与实验真实应力应变曲线的拟合比较" loading="lazy">
+  <figcaption>网格敏感性对比</figcaption>
+</figure>
 
-## Static 的峰后中止
+M1 只有 830 个单元，塑性应变集中在少量单元中。M2 增加到 1,975 个单元后，曲线出现了实验中能看到的颈缩和峰后下降，$R^2=0.9663$。M3 继续加密到 2,928 个单元，损伤却更加局部，$R^2$ 反而降到 0.9497。基准网格虽然有 3,846 个单元，峰后仍继续硬化，和实验的下降趋势不符。
 
-Static General 死在峰后。它的真实应力到约 795 MPa 就进了平台，真实应变约 0.13 时直接收尾，$R^2=0.9595$，后面的软化段和断裂完全没有。
+这些结果说明，加入损伤和单元删除后，网格尺寸会改变局部化和删除发生的节奏。我们综合曲线、颈缩形状、应力集中和删除过程，保留了 M2。这是当前限制下的配置选择，不能写成已经得到网格收敛。
 
-这不是设置没调好，是求解方式本身决定的。Static 每一步都要求逆刚度矩阵、走 Newton–Raphson 迭代。一旦颈缩和损伤让刚度变负，迭代就找不到稳定的下一步，只能停在那里。
+网格定下来后，剩下的问题是：哪一种求解设置能把计算继续推进到材料变软并分离？
 
-Dynamic Explicit 不一样，它不用每步求逆刚度矩阵，靠显式时间积分往前推。损伤扩展、单元删除、载荷往下掉，它都能一步一步跟过去，所以峰后下降和最终断裂都追得到。
+## 两套求解设置
 
-物理实验是准静态的，但断裂这个过程本身是不稳定的。这正是这个作业里显式求解器更合适的原因。
+存档里保留了 Static General 和 Dynamic Explicit 两套解法。Static General 进入颈缩和损伤阶段后，材料软化带来的负刚度让迭代难以继续，曲线拟合为 $R^2=0.9595$。Dynamic Explicit 不依赖同样的静力迭代过程，可以继续算到损伤扩展和单元删除，参考计算达到 $R^2=0.9653$。
 
-## Explicit 的准静态检查
+这两份存档的位移和损伤设置并不完全相同，因此不能把它们当成只改了求解器的单变量敏感性试验。0.9653 也只是这次 Explicit 参考计算的结果，和最终 M2 组合的 0.9663 不是同一次计算。我们保留 Explicit，主要因为它能继续穿过峰后的软化和删除阶段，不是因为一个 $R^2$ 就能证明它普遍优于 Static。
 
-显式求解器本来是为碰撞、爆炸这类快过程准备的。拿它算缓慢的拉伸试验，就得先证明惯性没有混进来捣乱。
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/static-vs-explicit-comparison.png" alt="实验真实应力应变曲线与 Static General 和 Dynamic Explicit 数值结果的比较" loading="lazy">
+  <figcaption>Static 与 Explicit 对比</figcaption>
+</figure>
 
-我用的判据是能量：加载阶段动能 ALLKE 必须低于内能 ALLIE 的 5%。三种加载方式我都试了：
+但换成 Explicit 会带来一个新问题：真实拉伸是缓慢加载，显式计算却可能把一次拉伸算成冲击。下一步需要检查惯性有没有主导结果。
+
+## Explicit 还得通过基本的准静态检查
+
+我们用动能 `ALLKE` 和内能 `ALLIE` 检查惯性影响。Smooth Step 会把加载起点和终点的速度、加速度变化放缓；在线性 Ramp 中，速度突然建立，会激起开头的冲击和后续振荡；突然 Step 则更像直接撞上试样。
+
+在 Smooth Step 计算中，断裂前的 `ALLKE/ALLIE` 不超过 5%，能量尖峰主要出现在断裂时。它通过了这篇文章采用的基本准静态检查，但这不等于已经完成了所有显式动力学验证。
+
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/smooth-step-energy-history.png" alt="Smooth Step 显式计算中内能 ALLIE 与动能 ALLKE 随时间变化的曲线" loading="lazy">
+  <figcaption>Smooth Step 能量历史</figcaption>
+</figure>
+
+加载方式会直接影响这项检查。三种幅值的表现如下：
 
 | 加载方式 | 结果 |
 |---|---|
-| Smooth Step | 加载阶段 ALLKE 接近零，断裂时才出现物理尖峰 |
-| 线性 Ramp | 初始冲击和惯性振荡，过早失效 |
-| 突然 Step | 从第一个增量开始由动能主导，不再是准静态拉伸 |
+| Smooth Step | 断裂前 `ALLKE/ALLIE` 不超过 5% |
+| 线性 Ramp | 出现初始冲击和惯性振荡 |
+| 突然 Step | 加载表现接近冲击 |
 
-Smooth Step 两端的速度和加速度都是零，加载过程安安静静，被保留下来。断裂瞬间冒出来的动能尖峰是储存弹性能释放，属于物理现象，不是加载冲击。
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/loading-amplitude-comparison.png" alt="实验曲线与 Smooth Step、Ramp 和 Step 三种加载幅值的真实应力应变比较" loading="lazy">
+  <figcaption>加载幅值对比</figcaption>
+</figure>
 
-线性 Ramp 一上来就撞出惯性振荡，试样提前失效；突然 Step 更直接，从头就是动能主导，算的根本不是拉伸试验。
+因此，我们把 Smooth Step 留在最终配置中。到这里，几何、材料、网格、求解器和加载方式都有了各自的选择依据，最后才能回到整条实验曲线。
 
-## 最终拟合结果
+## 最终曲线到底对上了多少
 
-M2 + Dynamic Explicit + Smooth Step 拿到 $R^2=0.9663$。仿真真实应力峰值约 820 MPa，实验 828 MPa，差约 1%。
+最终组合是 M2 + Dynamic Explicit + Smooth Step，整条曲线的 $R^2=0.9663$。在峰值之前，数值曲线跟上了实验的塑性硬化趋势；数值真实应力峰值约 820 MPa，实验峰值为 828.4 MPa，相差约 1%。
 
-颈缩开始、峰后软化、最终断裂，模型全都复现了。`.sta` 文件记了 71,965 个增量，稳定增量约 13.8 µs，壁钟时间 77 s。
+过峰之后，试样开始颈缩，损伤增长，随后发生单元删除，数值曲线也随之下降。这里仍有看得见的差距：数值曲线的尾段下降得更慢，保持在偏高的位置。因此，$R^2=0.9663$ 表示整条曲线总体接近，不表示每一段都完全重合。峰值附近的吻合较好，峰后的软化和断裂尾段只能作为趋势上的重建。
 
-![M2 模型在断裂时的颈缩形状](/images/projects/xc48-abaqus-twin/m2-necking-deformed.png)
+<figure>
+  <img src="/images/projects/xc48-abaqus-twin/final-numerical-experimental-validation.png" alt="最终 M2 Dynamic Explicit Smooth Step 数值曲线与实验真实应力应变曲线比较，R 平方为 0.9663" loading="lazy">
+  <figcaption>最终数值与实验曲线</figcaption>
+</figure>
 
-剩下的最大差异在最后断裂那一段：仿真比实验略硬一点。这是整条曲线上最清楚的没对上的地方。
+## 小结
 
-## 我保留的失败和数据问题
+回看这门课程的实验，我们先纠正试样几何，用修正后的实验曲线建立材料数据；再通过曲线、颈缩、应力集中和单元删除选择 M2；随后保留能继续计算软化与断裂的 Explicit，并用 Smooth Step 控制加载冲击。最后再把数值曲线放回实验基准中，分别看硬化、峰值和峰后下降。
 
-除了占位几何搞出来的 489 MPa 假曲线，报告草稿还把试样总长 114.23 mm 当成标距用过，屈服强度一度被写成 7583304756 MPa，提交版里又写成“7583”。正确值是 758.33 MPa。
+这项结果有很多受限条件，比如它来自单根试样的一次实验，没有重复性区间，损伤参数也取自同一条曲线。偏低的模量说明部分拟合来自试验机和夹具柔度；Learning Edition 版本的 Abaqus 也限制了网格规模。
 
-这些错全是手工复制出来的，不是算错的。我的处理方式是让几何尺寸和关键材料值都从同一份电子表格进脚本，人不再当搬运工。
-
-归档里还有一点值得记下：Static 和 Explicit 用的是同一张材料卡片。Static 没开损伤和单元删除，所以它的平台不代表材料被改过，只是求解路径不同。
-
-## 这个数字孪生还不能证明什么
-
-只有一根试样、一次实验，没有重复性区间。损伤参数又是拿同一条曲线标定的，所以验证只在当前几何和加载速率下算数。
-
-Learning Edition 卡住了网格上限，M3 再往细的收敛行为是未知数。报告没留断口照片，延性判断只能靠 47.8% 的截面积缩减、实验曲线和仿真颈缩撑着。
-
-最大的限制还是那个低模量。模型把测得的曲线复现得很好，但其中一部分拟合的是试验机柔度。塑性和峰后段比弹性斜率更有验证意义。
-
-## 先核对输入
-
-应力就是力除以某个人敲进去的截面积。面积敲错了，曲线照样漂亮，所以关键输入必须在分析一开始就摆出来核对。
-
-M3 输给 M2，让我不再把“网格更细”当成自动改进。碰上损伤、局部化和单元删除，物理行为、正则化和计算成本得一起查。
-
-最后，先看 `.sta` 和 ODB，再相信 CAE 模型树。模型在界面里看着做完了，不代表它真的跑过一个增量。
+不过，这门课程过后，我们知道了试样为什么会在这些设置下断开，也知道曲线的哪些部分可以相信、哪些部分仍要保留判断。还是一次非常不错的 Abaqus 数字孪生实战过程。

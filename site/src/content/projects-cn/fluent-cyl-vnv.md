@@ -1,59 +1,51 @@
 ---
-title: '我怎样用精确解、网格和实验数据检查 Fluent'
+title: '用精确解、网格和实验数据对比分析 Fluent 结果'
 year: 2026
 date: '2026-04-11'
 status: complete
 categories: [component-cfd, validation]
 tags: [CFD]
-summary: '我先用 Poiseuille 精确解检查 Fluent 管流，再对圆柱绕流做网格、计算域和 Re=0.1–20 扫描；Cd 在 40,000 单元后稳定到 2.7973，但六个实验对比中只有 Re=20 进入 5% 误差范围。'
-role: '仿真与报告负责人'
-team: 'ESILV MMN1 小组——Bing Gao、Nicolas Chang、Daphné Baray'
-duration: '7 周（TD1+TD4）'
+summary: ''
+role: 'Fluent 仿真、数据验证与报告整理'
+duration: '7 周'
 academic:
   institution: 'ESILV'
   course: '计算流体力学'
-  assignment: 'TD1 管流验证 + TD4 圆柱验证研究'
-  note: '这是我在 ESILV 一年级 CFD 课程中的验证部分（TD1 和 TD4 辅导课），由我与 Nicolas Chang、Daphné Baray 三人组队完成。我运行了 Fluent 仿真并撰写了两份报告；小组共同审查了设置并交叉核对表格。课程结束后，我根据报告表格和保留下来的控制台日志重新生成了本页的每一张图，因此每个数值都可以通过脚本复现。'
+  assignment: '管流精确解验证与圆柱绕流验证研究'
+  note: '用 Poiseuille 精确解检查 Fluent 管流计算，再对圆柱绕流做网格、计算域和 Re=0.1–20 扫描，并与实验数据比较。'
   requirements:
     - '根据 Poiseuille 速度、壁面剪切力、压降和入口段长度验证层流管流。'
     - '在 Re=10 时确认圆柱网格无关性。'
     - '确认远场计算域无关性。'
     - '将雷诺数从 0.1 扫描至 20，并在课程规定的 5% 门槛下与给定实验表中的阻力进行比较。'
-  media:
-    - src: '/images/projects/fluent-cyl-vnv/source/td1-submitted-report-cover.webp'
-      alt: 'ESILV CFD TD1 管流验证提交报告封面'
-      caption: 'TD1 归档保存的是提交报告而不是单独任务书。封面锁定了 Poiseuille 管流验证范围；正文中的数值继续以报告和控制台日志为准。'
-    - src: '/images/projects/fluent-cyl-vnv/source/td4-submitted-report-cover.webp'
-      alt: 'ESILV CFD TD4 圆柱网格与雷诺数扫描提交报告封面'
-      caption: 'TD4 报告摘要明确区分两项任务：Re=10 的网格/计算域平台，以及固定算例网格上的 Re=0.1–20 扫描；讲义实验表只用于最后的 5% 外部检查。'
-    - src: '/images/projects/fluent-cyl-vnv/assignment-workflow.svg'
-      alt: '从具有精确解的管流算例，经网格与计算域扫描，直至实验对比的工作流程'
-      caption: '这项作业逐步递进：先在具有精确解的问题上验证求解器，再界定网格和计算域效应，最后解释与实验之间剩余的差距。'
-    - src: '/images/projects/fluent-cyl-vnv/velocity-re20.png'
-      alt: '雷诺数为 20 时圆柱周围的 ANSYS Fluent 速度大小云图'
-      caption: '在 Re=20 时，尾流清晰可见，阻力对比也终于进入作业规定的 5% 实验误差带。'
-    - src: '/images/projects/fluent-cyl-vnv/pressure-re20.png'
-      alt: '雷诺数为 20 时圆柱周围的 ANSYS Fluent 静压云图'
-      caption: '压力在上游驻点达到峰值，并沿圆柱肩部下降；该压力场解释了积分得到的压差阻力结果。'
 featured: true
 order: 16
 studySequence: 12
-heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
+heroImage: /images/projects/fluent-cyl-vnv/velocity-re20.png
 ---
 
-## 我为什么先做管流，再做圆柱
+这是我 2026 年春季学期 Computation Fluid Dynamics 课程的实验记录。
+## 老师要求
 
-这两次 CFD 辅导课回答的是同一个问题：Fluent 吐出来的数字，什么时候值得信。
+课程任务先给了我们一根长 10 m、直径 0.4 m 的圆管：流体以均匀的 1 m/s 速度进入，然后在管壁摩擦下逐渐发展为充分发展流。老师要求先算 Reynolds 数和解析入口段长度，判断管子是否足够长；再检查收敛、质量守恒、速度剖面、壁面剪切和压力下降，最后与 Poiseuille 精确解对比。课程示意图把这个过程画得很直接：两侧边界层从入口开始变厚，在入口段末端汇合，之后速度剖面保持抛物线形状。这也是学习 CFD 非常好的入门案例。
 
-我先做管流，因为 Poiseuille 层流管流有精确解，每个数都能跟理论答案直接对。求解器要是连这种有标准答案的题都做不对，后面就没得谈了。第二步才换圆柱绕流，这题没有闭式解，只能分别去查网格、计算域和外部实验的差异。
+<figure>
+  <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/course-pipe-entrance-region.png" alt="课程资料中管道边界层发展和入口段长度的示意图" loading="lazy">
+  <figcaption>课程资料中的管流入口段示意图</figcaption>
+</figure>
 
-这是三人小组作业。我跑 Fluent 仿真、写两份报告，小组一起检查设置和结果表格。
+圆柱绕流任务把问题换成了没有闭式解的外流：外边界要足够远，圆柱边缘和整个流体域要有明确的网格规模，结果还要检查收敛、质量守恒、流场以及阻力，并与课程给定的光滑圆柱阻力曲线比较。
 
-## TD1：拿精确解给整个流程打底
+<figure>
+  <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/course-cylinder-drag-reference.png" alt="课程资料给出的光滑圆柱与球体阻力系数随 Reynolds 数变化的参考曲线" loading="lazy">
+  <figcaption>课程给出的光滑圆柱阻力参考曲线</figcaption>
+</figure>
 
-管道长 10 m、半径 0.2 m，入口平均速度 1 m/s，密度 1 kg/m³，动力黏度 0.004 Pa·s，所以 $Re=100$。
+接下来，我先用有精确解的管流检查计算流程，再换到圆柱绕流，逐一查网格、计算域和实验差异。然后我在思考 Fluent 给出的数字是否可信？
 
-保留下来的那次运行用了 500 个四边形单元、561 个节点。
+## 用管流校准计算流程
+
+管道长 10 m、半径 0.2 m，入口平均速度 1 m/s，密度 1 kg/m³，动力黏度 0.004 Pa·s，所以 $Re=100$。在 Fluent 我用了 500 个四边形单元、561 个节点。对比结果如下：
 
 | 检查内容 | 解析值 | Fluent 结果 |
 |---|---:|---:|
@@ -64,21 +56,42 @@ heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
 | 充分发展压降 | 8 Pa | 8.65 Pa |
 | 入口段长度 | 2.4 m | 约 2.4 m |
 
-中心线速度差了 1%。多出来的 0.65 Pa 压降来自入口区：速度剖面还没长成抛物线之前，壁面处的速度梯度更大，摩擦自然更大。
+先看速度场，检查均匀入流是否真的逐步发展成了 Poiseuille 抛物线剖面。
 
-入口段长度我最初是在图上目测的，读了个约 2 m。最终报告改成明确定义——“中心线速度达到最终值的 99%”——量出来约 2.4 m，跟解析关系一致。
+<div class="space-y-8">
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/pipe-velocity-development.png" alt="管道内速度从均匀入口向抛物线剖面发展的云图" loading="lazy">
+    <figcaption>管内速度从均匀入口逐步发展</figcaption>
+  </figure>
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/pipe-velocity-profiles.png" alt="管道入口附近与下游位置的轴向速度剖面对比" loading="lazy">
+    <figcaption>入口区与充分发展区的速度剖面</figcaption>
+  </figure>
+</div>
 
-这让我确认一件事：写清楚的判据比“看着差不多”可靠得多。
+中心线速度差了 1%。多出来的 0.65 Pa 压降来自入口区：速度剖面还没长成抛物线之前，壁面处的速度梯度更大，摩擦自然更大。从图上目测，入口段长度约为 2 m。中心线速度几乎达到最终值的 99%，结果约为 2.4 m，所以与解析关系一致。
 
-## TD4：圆柱模型尽量保持简单
+<div class="space-y-8">
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/pipe-centerline-velocity.png" alt="管道中心线速度沿轴向逐渐趋近最终值的曲线" loading="lazy">
+    <figcaption>中心线速度沿管长的变化</figcaption>
+  </figure>
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/pipe-pressure-drop.png" alt="管道中心线静压沿轴向下降的曲线" loading="lazy">
+    <figcaption>中心线静压沿管长的变化</figcaption>
+  </figure>
+</div>
 
-圆柱直径 1 m，外部流体域是一个直径 $D_2$ 的圆。密度 1 kg/m³，动力黏度 $10^{-3}$ Pa·s，靠改入口速度来换 Reynolds 数。
+## 检查没有精确解的圆柱算例
 
-模型是二维、稳态、层流、不可压缩。入口给均匀速度，出口给零表压，圆柱壁面无滑移。
+圆柱直径 1 m，外部流体域是一个直径 $D_2$ 的圆。密度 1 kg/m³，动力黏度 $10^{-3}$ Pa·s，靠改入口速度来换 Reynolds 数。模型是二维、稳态、层流、不可压缩。入口给均匀速度，出口给零表压，圆柱壁面无滑移。
 
-我的顺序是先在 $Re=10$ 下把网格和计算域的平台找出来，再固定这套设置，从 $Re=0.1$ 扫到 20。
+我先在 $Re=10$ 下把网格和计算域的平台找出来，再固定这套设置，从 $Re=0.1$ 扫到 20。
 
-## 粗网格点让我看清平台
+<figure>
+  <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/cylinder-domain-geometry.png" alt="圆柱外流计算域中内圆和外圆的直径参数" loading="lazy">
+  <figcaption>圆柱与可调外边界的参数化几何</figcaption>
+</figure>
 
 | 单元数 | 50 | 200 | 450 | 800 | 12,800 | 28,800 | 40,000 |
 |---|--:|--:|--:|--:|--:|--:|--:|
@@ -88,11 +101,7 @@ heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
 
 ![Re=10 下的网格敏感性](/images/projects/fluent-cyl-vnv/mesh-sensitivity.svg)
 
-这里有个容易踩的坑。从 12,800 加密到 28,800，变化只有 0.05%，两个点靠得很近。但两个接近的细网格点并不能证明平台存在——它们可能只是碰巧都还没到。
-
-所以我反过来往粗的方向扫。50 单元的网格给出 3.1328，比最终值高了约 12%。正是这个粗网格点说明结果确实随分辨率变化，变化的方向和幅度都看得见，平台才真正有说服力。
-
-## 外边界也会改变圆柱阻力
+值得注意的是，从 12,800 加密到 28,800，变化只有 0.05%，两个点靠得很近。但两个接近的细网格点并不能证明平台存在，它们可能只是碰巧都还没到。所以我反过来往粗的方向扫。50 单元的网格给出 3.1328，比最终值高了约 12%。正是这个粗网格点说明结果确实随分辨率变化，变化的方向和幅度都看得见，这才真正有说服力。
 
 固定网格之后，我把外部区域的直径从 100 m 加到 200 m：
 
@@ -106,8 +115,6 @@ heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
 
 更小的 20–80 m 计算域会把 $C_D$ 抬到约 3.05，说明外边界确实会勒住流动。不过这几个低端点同时用了更粗的边界划分，所以它们只能说明计算域效应的量级，没法把它和网格效应彻底分开。
 
-## 固定算例上的 Reynolds 数扫描
-
 扫描用的是同一套约 20,200 节点的网格和 $D_2=50$ m。$Re$ 从 0.1 涨到 20，$C_D$ 从 92.4 降到 2.06。
 
 | $Re$ | 入口速度（m/s） | 阻力（N） | $C_D$ |
@@ -119,51 +126,68 @@ heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
 | 10 | $10^{-2}$ | $1.43\times10^{-4}$ | 2.85 |
 | 20 | $2\times10^{-2}$ | $4.11\times10^{-4}$ | 2.06 |
 
-## 六个实验对比，只过一个
+下面两个动画依次播放 $Re=0.1$、0.5、1、5、10 和 20 的真实 Fluent 输出。
 
-跟课程讲义的实验表一比，六个点里只有 $Re=20$ 进了 5% 误差范围：
+<div class="space-y-8">
+  <figure>
+    <video class="w-full rounded-xl shadow-sm" controls autoplay muted loop playsinline preload="metadata" aria-label="Reynolds 数从 0.1 增加到 20 时圆柱周围速度场的工况扫描动画">
+      <source src="/videos/projects/fluent-cyl-vnv/reynolds-velocity-sweep.mp4" type="video/mp4">
+      你的浏览器不支持 HTML5 视频播放。
+    </video>
+    <figcaption>Re=0.1–20 的速度场扫描</figcaption>
+  </figure>
+  <figure>
+    <video class="w-full rounded-xl shadow-sm" controls autoplay muted loop playsinline preload="metadata" aria-label="Reynolds 数从 0.1 增加到 20 时圆柱周围静压场的工况扫描动画">
+      <source src="/videos/projects/fluent-cyl-vnv/reynolds-pressure-sweep.mp4" type="video/mp4">
+      你的浏览器不支持 HTML5 视频播放。
+    </video>
+    <figcaption>Re=0.1–20 的静压场扫描</figcaption>
+  </figure>
+</div>
 
+端点图把两端的差异展开来看。$Re=0.1$ 时，黏性影响扩散到很大的范围，圆柱后方只有平滑的低速区；到 $Re=20$ 时，尾流更集中，上游驻点高压和下游低压也更清楚。
+
+<div class="space-y-8">
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/velocity-re0.1.png" alt="雷诺数为 0.1 时圆柱周围的 Fluent 速度大小云图" loading="lazy">
+    <figcaption>Re=0.1 的速度场</figcaption>
+  </figure>
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/velocity-re20.png" alt="雷诺数为 20 时圆柱周围的 Fluent 速度大小云图" loading="lazy">
+    <figcaption>Re=20 的速度场</figcaption>
+  </figure>
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/pressure-re0.1.png" alt="雷诺数为 0.1 时圆柱周围的 Fluent 静压云图" loading="lazy">
+    <figcaption>Re=0.1 的静压场</figcaption>
+  </figure>
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/pressure-re20.png" alt="雷诺数为 20 时圆柱周围的 Fluent 静压云图" loading="lazy">
+    <figcaption>Re=20 的静压场</figcaption>
+  </figure>
+</div>
+
+## 对比 6 个实验
+
+跟课程讲义的实验表进行比对，六个点里只有 $Re=20$ 进了 5% 误差范围：
 | $Re$ | 0.1 | 0.5 | 1 | 5 | 10 | 20 |
 |---|--:|--:|--:|--:|--:|--:|
 | 相对误差 | 81.2% | 51.1% | 48.9% | 32.4% | 17.5% | 3.83% |
 
-五个没通过。这个结果我没有靠调参藏起来，原样留在报告里。
+另外五个点都没有通过 :(
 
-为什么低雷诺数差得最多？一层原因是设置：扫描网格比 $Re=10$ 那套 40,000 单元的参考网格粗，计算域也更小。光是这些设置差异，就把 $Re=10$ 的 $C_D$ 从 2.7973 抬到了 2.85。
+为什么低雷诺数差得最多？我事后分析一层原因是设置：扫描网格比 $Re=10$ 那套 40,000 单元的参考网格粗，计算域也更小。光是这些设置差异，就把 $Re=10$ 的 $C_D$ 从 2.7973 抬到了 2.85。另一个可能原因来自模型假设。$Re\le1$ 时，稳态二维是个更强的假设。$Re=0.1$ 那次运行，连续性残差还停滞了，速度残差只压到 $10^{-3}$，所以 92.4 这个数是六个结果里最不可信的。
 
-另一层原因是模型本身。$Re\le1$ 时，稳态二维是个更强的假设。$Re=0.1$ 那次运行，连续性残差还停滞了，速度残差只压到 $10^{-3}$，所以 92.4 这个数是六个结果里最不可信的。
+<figure>
+  <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/re-0.1-residuals.png" alt="雷诺数为 0.1 时连续性和速度残差的迭代历程" loading="lazy">
+  <figcaption>Re=0.1 的残差历程</figcaption>
+</figure>
 
-所以实验差异里混着离散误差、计算域效应和模型形式三样东西，不能赖给其中任何一个。
+管流文字记录写的是 1,000 单元网格，唯一保留的控制台日志则来自 500 单元算例。本文按日志的工况口径使用数据。另一处差异来自圆柱表面压力系数 $C_p$ 曲线：标为 $Re=20$ 的导出图与 $Re=10$ 文件相同。因此，本文不用这张 $C_p$ 曲线支持 $Re=20$ 的判断。$Re=20$ 的静压云图和力数据表仍与该工况对应。因此，我们可以看到，每个数字都要先对上具体工况。文件名和图注只是线索，日志和原始结果才能确定数据归属。
 
-## 报告里对不上的记录
+## 小结
 
-TD1 的草稿写的是 1,000 单元网格，但唯一保留下来的控制台日志来自 500 单元那次运行。本文采用日志对应的数据，不沿用文字里没法核对的网格描述。
+这项作业是我建立 CFD 验证思路的起点。我先做了两类相对简单的稳态问题：用 Poiseuille 精确解检查管流，再用网格、计算域和外部参考值检查低 Reynolds 数圆柱绕流。这一阶段先解决一个基础问题：一个稳态 CFD 结果，要经过哪些检查才值得信。
 
-类似的事还有一桩：报告里一张 $Re=20$ 的压力图，实际重复用了 $Re=10$ 导出的文件。阻力结论来自力数据表，照样成立，但那张图证明不了 $Re=20$ 的压力场。
+网格平台也不能只看两个靠得很近的细网格点。我还要往粗网格方向扫，看到结果明显离开平台；计算域也要单独改变，才能判断外边界是否还在影响阻力。6 个 Reynolds 数工况中，只有 $Re=20$ 进入 5% 误差范围。这说明残差收敛只是起点，不代表模型、网格和计算域已经足够准。
 
-这些对不上的地方让我把“这个数字属于哪一次运行”当成验证的一部分。文件名、草稿和图注，都替代不了日志和原始结果。
-
-## 我保留的验证结论
-
-| 检查内容 | 结果 |
-|---|---|
-| TD1 中心线速度 | 比解析值低 1% |
-| TD1 剪切力、入口段和压降趋势 | 与解析结果一致 |
-| $Re=10$ 网格平台 | 超过 40,000 单元后变化低于 0.1% |
-| $Re=10$ 计算域平台 | $D_2\ge100$ m 后变化低于 1% |
-| $Re=20$ 与讲义阻力对比 | 误差 3.83%，通过 5% 要求 |
-| $Re\le10$ 与讲义阻力对比 | 误差 17.5%–81.2%，未通过 |
-
-## 这项作业还不能证明什么
-
-圆柱扫描只覆盖 $Re\le20$，不能外推到更高 Reynolds 数和非定常涡脱落。二维模型也忽略了可能存在的三维尾流结构。
-
-TD1 的均匀网格够完成现有的解析检查，但不是近壁分辨率的最优方案。更合理的下一步是在壁面加膨胀层。
-
-本文图表由报告表格和保留日志重新生成，没有重跑 Fluent。实验曲线来自课程讲义表，所以这里只能复核已保存的数据。
-
-## 我从这两次作业中学到什么
-
-平台不是靠两个接近的细网格点自动成立的。往粗网格方向扫，看到结果明显离开平台，反而更能说明最终的设置足够稳。
-
-我也不再用“结果跟理论吻合，所以网格最优”这种循环论证。更准确的说法是：当前网格够完成已经做过的检查；至于是不是最优，得靠独立的成本和误差比较来回答。
+这里的研究停在 $Re\le20$ 的二维稳态层流。建立好这套验证顺序后，我才在后续作业中把同一个圆柱问题推到更高 Reynolds 数：先用 $Re=40$ 建立稳态尾流基准，再用 $Re=150$ 研究非定常涡脱落、升阻力历程和 Strouhal 数。这样的递进关系很清楚：先判断稳态结果是否可信，再研究流动如何随时间发生变化。

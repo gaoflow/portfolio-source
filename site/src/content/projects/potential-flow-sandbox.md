@@ -12,6 +12,7 @@ featured: false
 order: 14
 studySequence: 2
 heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
+cardImageFit: cover
 github: 'https://github.com/gaoflow/potential-flow-sandbox'
 ---
 

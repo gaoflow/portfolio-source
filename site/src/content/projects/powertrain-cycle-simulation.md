@@ -1,88 +1,100 @@
 ---
-title: 'How I Compared Energy Use and CO₂ Across Four Powertrains'
+title: 'ESILV Powertrain Course Assignment: Comparing Four Powertrain Architectures'
 year: 2025
 date: '2025-12-06'
 status: complete
 categories: [tooling, validation]
-tags: [Coding]
-summary: 'I parameterised the course-provided point-by-point Excel simulator, built the Spa cycle, ran four powertrain scenarios, and post-processed the results with pandas. A charged PHEV used the least fuel on the Spa ECO lap, but an empty battery made it thirstier than the conventional petrol car.'
-role: 'Individual parameter study and post-processing'
+tags: [Powertrain simulation]
+summary: 'For our ESILV Powertrain Excel assignment, we used the teacher-supplied cycle and powertrain workbooks to compare ICE, HEV, PHEV, and BEV energy use and CO₂.'
+role: 'Course-assignment modelling, validation, and interpretation'
 duration: '4 weeks'
 academic:
   institution: 'ESILV'
   course: 'Powertrains & Vehicle Dynamics'
   assignment: 'Energy consumption and CO₂ simulation across driving cycles'
-  note: 'The original course brief required a team of three to complete the base model and presentation, with each student adding an individual parameter study. My traceable work includes the Excel parameterisation, Spa speed profile, scenario runs for all four powertrains, pandas post-processing, and the studies of initial SOC and empty-battery dead weight. The surviving archive does not record the other two students’ names, so I do not speculate about the team roster.'
   requirements:
-    - 'Run ICE, BEV, HEV and PHEV versions of one vehicle over supplied Spa, NEDC and WLTP-style cycles.'
-    - 'Resolve inertia, rolling resistance, aerodynamic drag and grade at each cycle point.'
-    - 'Report fuel, electrical energy and CO₂ per distance for each architecture.'
-    - 'Complete an individual parameter study; this submission investigates battery SOC and empty-battery dead weight.'
-  media:
-    - src: '/images/projects/powertrain-cycle-simulation/source/original-assignment-page-1.webp'
-      alt: 'First page of the original powertrain-cycle course assignment'
-      caption: 'The original brief asks students to compare ICE, BEV, HEV and PHEV vehicles over specified cycles and report energy use and CO₂ per distance. It also states that the base presentation is team work for three students and that each student must add an individual parameter study.'
-    - src: '/images/projects/powertrain-cycle-simulation/assignment-workflow.svg'
-      alt: 'Cycle inputs passing through road-load and powertrain calculations to energy and carbon dioxide outputs'
-      caption: 'The assignment chain: speed, grade and distance become road-load forces, followed by wheel power, powertrain energy and CO₂.'
-    - src: '/images/projects/powertrain-cycle-simulation/spa-eco-profile.svg'
-      alt: 'Spa ECO speed and elevation profiles plotted against lap distance'
-      caption: 'The Spa input is highly nonuniform. Every acceleration, braking zone and elevation change enters the point-by-point model.'
+    - 'Run ICE, BEV, HEV, and PHEV versions of one vehicle over the supplied Spa and NEDC cycles.'
+    - 'Resolve inertia, rolling resistance, aerodynamic drag, and grade at each cycle point.'
+    - 'Report fuel, electrical energy, and CO₂ per distance for each architecture.'
+    - 'Investigate how PHEV state of charge and depleted-battery mass change the result.'
 featured: false
 order: 20
 studySequence: 4
-heroImage: /images/projects/powertrain-cycle-simulation/cycle-comparison.svg
+heroImage: /images/projects/powertrain-cycle-simulation/spa-francorchamps-aerial.jpg
+cardImageFit: cover
 ---
 
-## What I wanted to find out
+## This was an Excel-based course assignment
 
-The course asked us to compare four versions of the same vehicle under the same driving conditions: a conventional petrol car, or ICE; a hybrid electric vehicle, or HEV; a plug-in hybrid, or PHEV; and a battery electric vehicle, or BEV.
+The teacher did not ask us to write a complex vehicle simulator from scratch. The assignment started from 18 prepared Excel workbooks. Most of the calculation chain was already in place. Our job was to understand the sheets, choose the right files, change the inputs, check the outputs, and compare energy use and CO₂ across powertrains.
 
-The base model and presentation were assigned to a team of three, while each student also had to complete an individual parameter study. The course supplied the point-by-point Excel simulator, adapted from a ULiege vehicle-performance teaching project.
+The supplied workbooks fell into the following groups:
 
-My traceable contribution covers the vehicle parameterisation, the Spa speed profile, the four powertrain scenarios, CSV and pandas post-processing, and two PHEV studies: the effect of initial state of charge and the penalty of carrying an empty battery.
+| File | What the teacher supplied | What we could do with it |
+|---|---|---|
+| `02 Distances acceleration et freinage.xlsx` | Time, distance, and braking calculations for several 0–100 km/h acceleration times | Place acceleration and braking zones around Spa |
+| `05 ICE efficiency model.xlsx` | An estimated relationship between engine load and efficiency | Convert engine output energy into fuel use and test different efficiency assumptions |
+| `03` and `04` Spa empty cycles | SPORT and ECO distance, elevation, and speed traces | Run different vehicles on the same Spa route |
+| `06`, `07`, `09`, and `10` | Complete Spa ECO sheets for BEV, ICE, PHEV, and HEV | Compare the four powertrains under economical driving |
+| `12`, `13`, `14`, and `15` | The four Spa SPORT powertrain sheets | Measure the effect of higher speed and stronger acceleration and braking |
+| `31`–`35` | The raw NEDC cycle and connected BEV, ICE, PHEV, and HEV sheets | Use a common, largely completed standard cycle |
+| `36 WLTP empty.xlsx` | Raw WLTC Class 1, 2, and 3 speed and acceleration traces | Extend the model to WLTP after connecting a powertrain calculation |
 
-## How I turned a lap into energy use
+The Spa and NEDC vehicle sheets already connect the main calculations. They start with distance, elevation, and speed; calculate acceleration, grade, rolling resistance, aerodynamic drag, and inertia; find wheel power; and then convert that demand into engine or motor power, fuel, electricity, and CO₂. We could change wheel diameter, gear ratios, vehicle and driver mass, battery mass and capacity, frontal area, drag coefficient, drivetrain efficiency, motor power, engine efficiency, and initial SOC.
 
-The model is backward-facing and quasi-static. I first define the vehicle's speed and the road grade at each point, then work backwards to calculate the power that the wheels and powertrain must provide.
+The real task was therefore to use an existing model correctly, not to rebuild the solver. We selected Spa ECO, Spa SPORT, and NEDC; compared a conventional petrol vehicle (ICE), a hybrid electric vehicle (HEV), a plug-in hybrid (PHEV), and a battery electric vehicle (BEV); and then focused on PHEV starting charge and depleted-battery operation.
 
-For the Spa ECO profile, I estimated cornering speed from the tyre friction limit:
+## How we made the comparison fair
+
+A fair comparison needs the same route and speed trace. Otherwise, a difference in consumption could come from the driver or the route rather than the powertrain. We therefore asked every vehicle model to follow the same prescribed trace.
+
+We used the supplied backward quasi-static model. In plain terms, we started with the vehicle's speed, elevation, and distance at each point. We worked backwards to find the force needed at the wheels, then the wheel power, and finally the fuel or electricity required by each powertrain.
+
+The broad 4×3 comparison uses the course reference model. The focused SOC and depleted-battery study uses a Peugeot 308 parameter set. We therefore interpret absolute values within each study rather than mixing the two sets.
+
+For the focused Peugeot 308 study, the archived workbook used these inputs:
+
+| Input | ICE | PHEV |
+|---|---:|---:|
+| Aerodynamic drag coefficient | 0.28 | 0.28 |
+| Frontal area | 2.25 m² | 2.25 m² |
+| Wheel diameter | 0.64 m | 0.64 m |
+| Base vehicle mass | 1280 kg | 1443 kg |
+| Electric motor mass | — | 50 kg |
+| Archived battery mass | — | 110 kg |
+| Maximum engine power | 96 kW | 110 kW |
+| Gear ratios | 13.5 / 7.1 / 4.8 / 3.6 / 2.7 | 13.5 / 7.1 / 4.8 / 3.6 / 2.7 |
+| Battery capacity | — | 12.4 kWh |
+| Electric motor power | — | 81 kW |
+| Battery / motor efficiency | — | 0.95 / 0.90 |
+
+Using the same aerodynamics, wheels, and gear ratios makes the effects of architecture, mass, and energy management easier to compare. The power and mass values still differ, so this is not a perfect component-for-component controlled experiment.
+
+For Spa, we estimated corner speed from the tyre-friction limit:
 
 $$
 v=\sqrt{\mu gR}.
 $$
 
-ECO mode limits the 0–100 km/h acceleration time to 20 seconds, braking deceleration to 0.4 g, and top speed to 90 km/h. SPORT mode allows faster acceleration, raises braking to about 0.6 g, and sets top speed according to engine capability. I found the SPORT braking points by iteration.
+Here, $\mu$ is the tyre–road friction coefficient, $g$ is gravitational acceleration, and $R$ is corner radius. The ECO profile used a 20 s 0–100 km/h acceleration, 0.4 g braking, and a 90 km/h maximum speed. SPORT allowed faster acceleration, about 0.6 g braking, and a maximum speed set by engine capability. We placed the SPORT braking points by manual iteration.
 
-At each trajectory point, the model calculates four road-load terms:
+![Spa ECO speed and elevation profile](/images/projects/powertrain-cycle-simulation/spa-eco-profile.svg)
+
+At each point, we calculated road load with:
 
 $$
 F=ma+fmg+\frac{1}{2}\rho C_xSv^2+mg\sin\theta.
 $$
 
-These terms represent inertia, rolling resistance, aerodynamic drag, and grade resistance. Wheel power is $Fv$. The model then uses drivetrain efficiency, engine efficiency, and the fuel's lower heating value to calculate fuel consumption. Petrol CO₂ is based on an emission factor of 2392 g per litre.
+The four terms are inertia, rolling resistance, aerodynamic drag, and grade resistance. Wheel power is $Fv$. The model then applies drivetrain and conversion efficiencies to calculate fuel or electrical energy. Petrol CO₂ uses 2392 g per litre of fuel. The hybrid calculations also include the motor and battery efficiency chain. The PHEV uses available battery energy before relying more heavily on its engine.
 
-The hybrid models add a motor and battery efficiency chain. In my parameterisation, battery efficiency is 0.95 and motor efficiency is 0.90. The PHEV uses the battery first and progressively brings in the engine when the available charge is no longer sufficient.
+## How we checked the numbers
 
-## Vehicle parameters
+Before comparing the outputs, we had to decide which exported values we could trust. The files used a regional number format, and our first reading did not preserve the decimal values correctly. We also found that the point-by-point fuel sum was exactly twice the workbook summary.
 
-The course reference ICE is a compact car weighing about 1300 kg, with $C_x=0.31$, a frontal area of 2.69 m², 115 CV, and a five-speed gearbox.
+We did not use the doubled total. After putting the numbers into one format, we kept only the workbook results that agreed with one another. Fuel use and fuel-derived CO₂ had to match the 2392 g/l factor. The per-kilometre value also had to reproduce the workbook total when applied to the 7.0 km lap. Only values whose energy, CO₂, distance, and totals all agreed entered the comparison.
 
-My own parameterisation used Peugeot 308 data. The petrol version weighs 1280 kg. The hybrid version adds a 50 kg electric machine and a 110 kg, 12.4 kWh battery. Its electric motor is rated at 81 kW.
-
-The main 4×3 comparison uses the reference vehicle from the assignment. The SOC and empty-battery mass studies use my 308 parameterisation. Absolute values should therefore be compared within each study, not across the parameter-set boundary.
-
-## Two problems in the exported data
-
-My first pandas import failed because every parsed column became `NaN`. The exported files used French regional formatting: semicolons separated the fields, while commas marked decimal values. The default `read_csv` settings could not interpret that structure correctly.
-
-I corrected the loader so that it detects the separator and converts decimal commas before processing the numerical columns.
-
-A second problem was less obvious. Summing the point-by-point fuel column in a CSV produced exactly twice the total recorded in the summary workbook. The workbook's own fuel and CO₂ values remained internally consistent. For example, a 7.0 km lap at 225.6 g CO₂/km gives 1579.2 g of CO₂ over the lap. This showed that the discrepancy came from the point-by-point export's counting convention rather than the normalised workbook result.
-
-I therefore retained the normalised results from the summary workbooks. I checked all 15 petrol-vehicle rows by multiplying fuel consumption in l/100km by 23.92 to recover CO₂ in g/km. I also checked that each SOC workbook total agreed with its per-kilometre result over the same 7.0 km distance.
-
-## Results across four powertrains
+## What the four powertrains showed
 
 | Cycle | ICE | HEV | PHEV | BEV |
 |---|---|---|---|---|
@@ -90,65 +102,86 @@ I therefore retained the normalised results from the summary workbooks. I checke
 | Spa SPORT | 15.60 l / 373.1 g | 15.19 l / 363.3 g | 8.19 l / 196.0 g | 32.68 kWh / 148.4 g |
 | NEDC | 6.62 l / 158.3 g | 6.46 l / 154.5 g | 0.79 l / 18.9 g | 15.30 kWh / 67.3 g |
 
-Fuel consumption is in l/100km, BEV energy consumption is in kWh/100km, and CO₂ is in g/km.
+Fuel consumption is in l/100km, BEV energy consumption is in kWh/100km, and CO₂ is in g/km. The ICE, HEV, and PHEV CO₂ values are fuel-derived tailpipe emissions. The BEV value is an electricity-side scenario result, not a tailpipe value.
 
-Three results stand out.
+![Four powertrains across three driving cycles](/images/projects/powertrain-cycle-simulation/cycle-comparison.svg)
 
-First, the HEV improvement is small. On Spa SPORT, it saves 0.41 l/100km compared with the ICE. On NEDC, the saving is only 0.16 l/100km. The 1.5 kWh buffer battery can smooth the engine load, but it cannot transfer much energy, while its additional mass offsets part of the benefit.
+The HEV improvement is modest in these cases. It saves 0.41 l/100km relative to the ICE on Spa SPORT and 0.16 l/100km on NEDC. Its small buffer battery can smooth engine operation and recover some braking energy, but its limited energy capacity and added mass constrain the benefit.
 
-Second, the charged PHEV has a clear advantage. It uses 86% less fuel than the ICE on Spa ECO and 88% less on NEDC because the battery covers almost the whole cycle.
+The PHEV with usable charge uses much less fuel: 86% less than the ICE on Spa ECO and 88% less on NEDC. These are fuel and tailpipe-CO₂ comparisons, not full life-cycle claims, because the table excludes the emissions associated with charging the PHEV.
 
-Third, cycle severity affects every architecture. The Spa SPORT ICE result is roughly twice its NEDC consumption. BEV energy use rises from 15.30 kWh/100km on NEDC to 32.68 kWh/100km on Spa SPORT. Aerodynamic drag grows with $v^2$, while the power needed to overcome it grows approximately with $v^3$, so high speed and aggressive acceleration increase energy demand for all four powertrains.
+Harder driving increased energy use for every architecture. The Spa SPORT ICE result is about twice its NEDC fuel consumption, while BEV electricity use rises from 15.30 to 32.68 kWh/100km. Aerodynamic drag grows with $v^2$, and the power needed to overcome it grows approximately with $v^3$. High speed and strong acceleration therefore raise demand whatever the energy source.
 
-## How initial charge changes the PHEV result
+![BEV energy use on NEDC and Spa](/images/projects/powertrain-cycle-simulation/bev-cycle-energy.png)
 
-I reran the Spa ECO cycle at four initial states of charge:
+The PHEV looks best in the table, but only while it has usable charge. That led to the next question: how much did the starting state of charge change the result?
+
+## How starting SOC changed the PHEV
+
+We tested 11 initial SOC values on Spa ECO, from 0% to 100% in 10% steps. The table keeps the transition points and endpoints.
 
 | Initial SOC | Fuel consumption (l/100km) | CO₂ (g/km) |
-|---|---:|---:|
-| 0, empty | 10.9 | 260.0 |
-| 0.25 | 8.5 | 202.2 |
-| 0.30 | 5.3 | 126.3 |
-| 1.00, full | 0.0 | 1.2 |
+|---:|---:|---:|
+| 0% | 11.3 | 270.7 |
+| 10% | 11.3 | 270.7 |
+| 20% | 9.1 | 218.7 |
+| 30% | 3.7 | 88.3 |
+| 40% | 1.4 | 34.2 |
+| 100% | 1.4 | 34.2 |
 
-![Effect of initial PHEV state of charge on fuel consumption and CO₂](/images/projects/powertrain-cycle-simulation/soc-sensitivity.svg)
+Every tested point from 40% through 100% rounded to the same result: 1.4 l/100km and 34.2 g/km. For this vehicle on this 7.0 km cycle, the transition lies roughly between 20% and 40% initial SOC. It is not an exact or universal threshold. Below this range, the engine supplies a rapidly growing share of traction energy. Above it, more starting charge does not lower the rounded fuel result for this lap.
 
-The largest change occurs between SOC 0.25 and 0.30. Once the battery can no longer cover the whole lap, the engine runs for increasingly long sections. As SOC falls further, the PHEV behaves more like a heavier HEV.
+The SOC traces also show how the controller behaves during the lap. From initial values of 0%, 10%, and 20%, SOC rises and ends at about 6%, 16%, and 22%. The 30% case also finishes near 22%, while the 40% case falls to about 28%. In plain terms, the model protects or rebuilds some charge when SOC is low and draws more traction power from the battery when SOC is higher. These values describe this control logic on this lap only.
 
-The remaining 1.2 g/km at full charge comes from the small amount of fuel still recorded by the controller. The complete lap CSV contains 0.006 l of fuel use in that case.
+The low-SOC results raised another question. What happens when the vehicle still carries the battery and motor mass but has little usable electric energy?
 
-## Why an empty battery becomes a mass penalty
+## What happened when the battery was depleted
 
-The battery and electric machine add about 160 kg. When the battery has charge, that mass provides electric-driving capability. Once the battery is empty, the engine must carry the additional weight without receiving the same electric benefit.
-
-| Cycle | PHEV charged | PHEV empty |
+| Cycle | PHEV with charge | PHEV depleted |
 |---|---|---|
 | Spa ECO | 1.43 l / 34.2 g | 11.32 l / 270.6 g |
 | Spa SPORT | 8.19 l / 196.0 g | 17.13 l / 409.4 g |
 | NEDC | 0.79 l / 18.9 g | 7.20 l / 171.5 g |
 
-![Charged and empty-battery PHEV comparison](/images/projects/powertrain-cycle-simulation/deadweight-comparison.svg)
+With the battery depleted, the PHEV uses more fuel than the ICE on Spa ECO: 11.32 versus 10.27 l/100km. The same reversal appears on NEDC: 7.20 versus 6.62 l/100km.
 
-The empty PHEV uses more fuel than the conventional ICE on all three cycles. On Spa ECO, the comparison is 11.32 against 10.27 l/100km. On NEDC, it is 7.20 against 6.62 l/100km.
+![PHEV with usable charge and with a depleted battery](/images/projects/powertrain-cycle-simulation/deadweight-comparison.svg)
 
-This is why a representative PHEV fuel figure cannot be separated from its initial SOC. The results of 1.43 and 11.32 l/100km come from the same parameterised vehicle; the difference is whether the battery begins the cycle with enough charge.
+Extra mass increases the energy needed for acceleration and rolling resistance. Regenerative braking can recover part of the vehicle's kinetic energy, but it cannot remove rolling losses or the conversion losses incurred as energy passes through the motor and battery. With little usable battery energy left, the engine carries that mass without receiving the full electric-driving benefit.
 
-## Limits
+In the defence presentation, cumulative wheel traction energy over the 7 km lap ends at about 1.9 kWh for the petrol case and about 2.3 kWh for both hybrid cases. These approximate, model-specific values show the mass effect at the wheels. Changing the starting SOC changes where the energy comes from, but it does not change the wheel energy needed to move the same heavier PHEV along the same speed trace.
 
-The model assumes that the vehicle follows the prescribed speed profile exactly. It does not include gear-shift transients, wheel slip, thermal state, or a driver model. I also found the SPORT braking points through manual iteration.
+The Spa topography plot adds another detail: PHEV SOC stays roughly between 29% and 32% and briefly rises during several braking or descending sections. This is consistent with regeneration recovering some energy. The plot does not quantify how much energy was recovered, however, and it cannot prove that altitude alone caused each SOC increase.
 
-The BEV CO₂ results depend on one assumed grid carbon intensity. Working backwards from the workbook gives about 450 g CO₂/kWh. If I instead use the assignment's French value of 56 g/kWh, the BEV's NEDC result falls from 67.3 to about 8 g/km. The powertrain ranking remains the same, but the difference between the architectures changes substantially.
+![Spa elevation and battery SOC](/images/projects/powertrain-cycle-simulation/spa-topography-soc.png)
 
-Excel makes the row-by-row calculations transparent, but it is fragile as a long-term engineering solver. Regional number formats, manual discretisation, and the lack of version control all increase the chance of errors.
+## What the model cannot tell us
 
-The project also uses two parameter sets. The 4×3 comparison and the individual 308 studies support comparisons within their respective tables, but their absolute results should not be mixed.
+These results stay inside the model's boundaries. The vehicle follows a prescribed speed trace exactly. The model does not include shift transients, tyre slip, a driver model, cabin loads, thermal behaviour, or component ageing. We set the SPORT braking points by manual iteration, so the trajectory includes our judgement. Regeneration follows simplified control and efficiency assumptions; the model does not show that all physically available braking energy can be recovered.
 
-## What I learned
+The parameter records also differ between the archived workbook and the final presentation. The workbook records a 110 kg battery and a total mass of about 1683 kg. The presentation reports 165.3 kg and 1718 kg. It also labels 1443 kg as the hybrid unladen mass, then adds the battery and motor masses to reach 1718 kg. We therefore compare absolute values only within the same table or study. Cross-study absolute comparisons require one unified parameter set, and the simulated mass components need explicit definitions next time.
 
-This project showed me why hybrid performance cannot be reduced to one representative fuel-consumption figure. The conclusion changes with the PHEV's initial charge, the severity of the driving cycle, and whether the additional battery mass still provides useful electric propulsion.
+## How to read these results in Europe
 
-It also changed how I treat post-processing. A spreadsheet can contain a complete calculation while its exports, regional formatting, or summary conventions still produce incorrect final numbers. Parsing and cross-checking the outputs are therefore part of the model, not just presentation work.
+The model boundaries matter when we put the results into a European context. NEDC gives us a common laboratory case, but the [European Commission explains that WLTP represents real driving better](https://climate.ec.europa.eu/news-other-reads/news/car-and-van-manufacturers-meet-co2-emissions-targets-2016-2018-01-18_en). WLTP became mandatory for new vehicle types in September 2017 and for all new passenger cars in September 2018. EU CO₂ targets have used WLTP since 2021. Our NEDC result is therefore a comparison case, not a prediction of present-day European use.
 
-## Regenerating the figures
+Charging behaviour also changes how a PHEV should be read. The [European Commission's first real-world monitoring report](https://climate.ec.europa.eu/document/download/b644dafe-1385-4b56-98d9-21e7e9f3601b_en?filename) reported that 2021 PHEVs averaged 139.5 g CO₂/km in real use and 39.5 g/km under WLTP. The real-world value was 3.5 times higher. Actual charging and the electric share of travel are central to this gap, and EU utility-factor revisions apply in stages from 2025 and 2027. Our SOC sweep shows why the starting charge and charging assumption must be stated with a PHEV result.
 
-`python3 research/esilv-powertrain/plot_cycle_results.py` reads the three summary workbooks in `research/esilv-powertrain/data/`, prints the parsed tables, and regenerates the main comparison, SOC, and empty-battery figures.
+The electricity mix changes the BEV result as well. The workbook uses a fixed factor of about 450 g CO₂/kWh. The [European Environment Agency reports](https://www.eea.europa.eu/en/analysis/indicators/greenhouse-gas-emission-intensity-of-1) an EU average of 183.44 g CO₂e/kWh in 2024, 11% below 2023. National values ranged from 36 in France to 566 in Poland. A European BEV comparison must therefore state the country, time period, and accounting boundary. Our BEV table is one electricity scenario, not a universal carbon ranking.
+
+## What the course assignment showed
+
+With those limits in place, the original question has a clear answer. The powertrain, driving cycle, and available battery charge all changed the result. The PHEV with usable charge had the lowest fuel and tailpipe-CO₂ values in the retained cases, but the depleted PHEV used more fuel than the ICE on Spa ECO and NEDC. Harder speed traces increased energy use for every architecture. The BEV carbon value depended on the assumed electricity mix.
+
+The data check was part of that answer. We kept the results whose fuel, CO₂, distance, and workbook summaries agreed, rather than every value we could export.
+
+## What we would study next in Europe
+
+The following items are future work, not completed parts of this assignment:
+
+- Replace NEDC with WLTP and measured European urban, rural, motorway, and mountain trips.
+- Model charging behaviour, utility factors, and realistic initial-SOC distributions instead of one starting condition.
+- Use country- and time-dependent electricity intensity instead of one fixed factor, especially for systems as different as France and Poland.
+- Add ambient temperature, cabin heating and cooling, battery and engine thermal states, and battery ageing.
+- Add route-level charging opportunities. Under the [EU Alternative Fuels Infrastructure Regulation](https://transport.ec.europa.eu/transport-themes/clean-transport/alternative-fuels-sustainable-mobility-europe/alternative-fuels-infrastructure/questions-and-answers-regulation-deployment-alternative-fuels-infrastructure-eu-20231804_en), consecutive light-duty charging pools on the TEN-T network are to be no more than 60 km apart. A cross-border study could test route, dwell time, charger power, and availability.
+- Validate the model with a real vehicle using on-board fuel consumption monitoring (OBFCM) or synchronized CAN data, then quantify error by cycle and operating condition.

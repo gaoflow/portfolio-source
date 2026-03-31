@@ -1,164 +1,240 @@
 ---
-title: 'Heat Diffusion 2-D — Explicit FTCS with a Hard Stability Gate'
+title: 'Why One Larger Time Step Broke My 2-D Heat Solver'
 year: 2026
 date: '2026-02-07'
 status: complete
 categories: [validation]
 tags: [CFD]
-summary: 'My explicit FTCS heat-diffusion solver matches the analytical slab transient to 1.38e−5 and refuses any run outside its r≤0.25 stability bound.'
+summary: 'I built a small 2-D heat-diffusion solver, watched an unsafe time step destroy an otherwise plausible result, and then used an analytical solution and targeted tests to work out what I could trust.'
 role: 'Numerical methods & validation'
 duration: 'Independent study'
 featured: false
 order: 15
 studySequence: 7
-heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
+heroImage: /images/projects/heat-diffusion-2d/temperature-profiles.svg
 github: 'https://github.com/gaoflow/heat-diffusion-2d'
 ---
 
-## Origin: a tiny time-step increase blew the field into NaN
+## Why I wanted to watch heat move
 
-The origin of this solver was a coding session where I slightly increased the time step $\Delta t$. For the first dozens of steps, the transient cooling plate looked plausible; at step 100, the temperature field instantaneously blew up into a screen full of NaNs.
+My previous heat-conduction model answered a steady question: after enough time has passed, what temperature does each point settle at? That was useful, but it skipped the part I found more interesting. A cold patch spreads. A hot spot fades. Different parts of an object respond at different times.
 
-That experience demonstrated that the Von Neumann stability boundary ($r \le 0.25$) is an unforgiving physical constraint, not mere textbook theory.
+This project was my first attempt in the study sequence to solve a partial differential equation that changes with time. I wanted to see that change happen one small step at a time instead of asking a library solver for the final field.
 
-To understand exactly why explicit solvers explode beyond this threshold, and how to isolate pure temporal error from spatial discretization, I built this guarded 2D explicit FTCS heat diffusion solver.
+The immediate trigger was less tidy. During an early coding session, I increased the time step by what looked like a small amount. The temperature field looked reasonable at first, then collapsed into `NaN` values. The code had run long enough to produce a believable picture before it failed.
 
-## How I updated the temperature
+That bothered me more than an immediate error. A smooth colour plot can be wrong. I wanted to understand why the update became unstable, make the solver refuse unsafe input, and build checks that could catch mistakes even when the result looked plausible.
 
-I used a uniform Cartesian grid of square, cell-centred control volumes. I wrote the explicit FTCS update as differences between the four face fluxes:
+## What heat diffusion looks like outside a graph
+
+Heat diffusion is easy to miss because the material itself does not move. One everyday trace appears after snowfall. Paving slabs can show through the snow before the nearby ground does because heat stored below reaches the surface at different rates.
+
+![Snow melting at different rates above paving slabs and nearby ground](/images/projects/heat-diffusion-2d/snow-melting-over-paving-stones.jpg)
+
+*The outlines of the paving slabs become visible as the snow melts. This is a real example of heat moving through solids, not a validation image for my solver. Photo by [Martinvl](https://commons.wikimedia.org/wiki/User:Martinvl), from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:SnowMeltingOnPavingStones.jpg), licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)*
+
+My numerical test removes most of that real-world complexity. It uses one material, a simple shape, and idealised boundaries. That gives me a problem with a known answer.
+
+## I reduced the problem to one warm plate
+
+Imagine a thin metal plate that starts at one uniform temperature. Its left edge touches a cold block. The other three edges are insulated, so heat can leave only through the left side. Cooling starts there and moves into the plate.
+
+I used normalised temperatures. The plate starts at $T=1$, and the cold edge stays at $T=0$. These are not literal kelvin values. Because this version of the heat equation is linear, the result can be rescaled to another pair of temperatures.
+
+The setup is simpler than a real tray, heatsink, or battery cold plate. It leaves out heat loss to air, contact resistance, internal heat generation, and changes in material properties. I chose it because the temperature has an analytical solution. That gave me an independent reference for the code.
+
+I set one question for the project:
+
+> Can I write a simple explicit 2-D solver that follows the correct transient, keeps all heat inside a fully insulated plate, and refuses an unsafe time step before the calculation starts?
+
+## One time step means four heat exchanges
+
+The model solves the two-dimensional heat equation,
 
 $$
-\begin{aligned}
-T_{j,i}^{n+1}
-&=T_{j,i}^{n}
-+r\big[
-\Delta T_{x,\,i+1/2}
--\Delta T_{x,\,i-1/2}\
-&\qquad+
-\Delta T_{y,\,j+1/2}
--\Delta T_{y,\,j-1/2}
-\big],
-\qquad
+\frac{\partial T}{\partial t}
+=\alpha\left(
+\frac{\partial^2 T}{\partial x^2}
++\frac{\partial^2 T}{\partial y^2}
+\right),
+$$
+
+where $T$ is temperature and $\alpha$ is thermal diffusivity. In plain language, a cell changes temperature when it is hotter or colder than the cells around it.
+
+I split the plate into square cells and stored one temperature at the centre of each cell. During one time step, a cell exchanges heat with its left, right, top, and bottom neighbours. The forward-time centred-space method, or FTCS, writes that update as
+
+$$
+T_{j,i}^{n+1}=T_{j,i}^{n}
++r\left[
+\left(T_{j,i+1}^{n}-2T_{j,i}^{n}+T_{j,i-1}^{n}\right)
++\left(T_{j+1,i}^{n}-2T_{j,i}^{n}+T_{j-1,i}^{n}\right)
+\right],
+$$
+
+with
+
+$$
 r=\frac{\alpha\Delta t}{\Delta x^2}.
-\end{aligned}
 $$
 
-Writing the update this way makes conservation structural. The same interior-face contribution leaves one cell and enters its neighbour, so the contributions cancel in pairs when I sum over the whole grid.
+My code calculates the same update as temperature differences across cell faces. This form makes the heat bookkeeping easy to inspect. Heat that leaves one interior cell enters its neighbour as the same floating-point value. Those internal exchanges cancel when I sum the whole grid.
 
-For fixed-temperature boundaries, I used a linear ghost cell. For insulated boundaries, I set the normal face flux to exactly zero instead of copying a boundary temperature.
+At a fixed-temperature edge, I use a linear ghost cell so that the requested temperature lies on the boundary face. At an insulated edge, I set the normal face flux to zero. This directly says that no heat crosses that edge.
 
-Von Neumann analysis gives the amplification factor
+## The time step has a hard limit
+
+The diffusion number $r$ compares the amount of diffusion allowed in one update with the size of a grid cell. A larger time step raises $r$. A finer grid also raises it because $\Delta x$ is squared in the denominator.
+
+For a square 2-D grid, Von Neumann analysis gives the amplification factor
 
 $$
 g=1-4r\left[
 \sin^2\left(\frac{k_x\Delta x}{2}\right)
-+\sin^2\left(\frac{k_y\Delta y}{2}\right)
++\sin^2\left(\frac{k_y\Delta x}{2}\right)
 \right].
 $$
 
-On a square two-dimensional grid, the explicit stability limit is therefore
+The most rapidly alternating grid pattern is the dangerous one. Keeping every mode within $|g|\leq1$ requires
 
 $$
 r\leq0.25.
 $$
 
-## Why the solver rejects unstable input
+This is a numerical stability limit for FTCS, not a physical law. Beyond it, tiny grid-scale errors can grow after every update. A run may look smooth at the start because those errors begin small.
 
-The most dangerous behaviour for an explicit solver is not an immediate error. It is a run that appears reasonable for hundreds of steps before the temperature begins to diverge.
+![Worst-mode amplification against diffusion number](/images/projects/heat-diffusion-2d/stability-limit.svg)
 
-I therefore check $r$ before allocating the time arrays or starting the integration. If a user requests $r=0.26$, `check_stability` raises `StabilityError` and records the reason for the refusal. The solver does not generate a result that initially looks plausible and then blows up.
+*The dashed boundary is $r=0.25$. The validation run uses $r=0.20$. A requested run at $r=0.26$ lies outside the stable range*
 
-I treat this as part of the solver’s input contract, not as an optional warning.
+I check $r$ before starting the integration. A request at $r=0.26$ raises `StabilityError` and records why it was refused. A request exactly at $r=0.25$ is accepted.
 
-## Comparing the solver with an analytical transient
+I chose a hard stop instead of a warning because the unstable field may look useful for a while. Refusing the run is part of the numerical result.
 
-My reference case was a slab with a uniform initial temperature. The west face was held at a fixed temperature, while the other three faces were insulated. I used a $100\times20$ grid, $r=0.2$, and a final time of 0.05 s.
+## I built the checks from small to large
 
-The one-dimensional analytical transient is represented by the Fourier series
+I did not start with the full analytical comparison. That would have made a failure harder to locate. I added the pieces in this order:
+
+1. I created a square, cell-centred grid and rejected grids whose cell widths did not match in $x$ and $y$.
+2. I implemented fixed-temperature and zero-flux boundaries.
+3. I held the two ends of a channel at fixed temperatures and ran it to steady state. The result had to become a straight temperature line.
+4. I insulated all four sides of a plate. Its temperature could spread out, but its total heat could not change.
+5. I used a cosine-shaped temperature field whose decay rate can be calculated exactly for the discrete update.
+6. I compared the full transient with the analytical slab solution.
+7. I refined the time step to measure temporal accuracy.
+
+The test suite now has 13 behavioural tests. Each one looks for a specific problem: an unsafe time step, a shifted index, a wrong boundary sign, a non-conservative update, or a validation study that measures the wrong error.
+
+## The full transient matched the analytical solution
+
+For the main case, I used a $1\times0.2$ plate with $\alpha=1$. The $100\times20$ grid has square cells with $\Delta x=0.01$. The plate starts at $T=1$. The west face stays at $T=0$, and the other three faces are insulated.
+
+I ran at $r=0.2$ to $t=0.05$. This required 2500 explicit steps. Because the setup has no variation along $y$, the 2-D calculation should reproduce the one-dimensional slab transient
 
 $$
-\begin{aligned}
-\theta(x,t)
-&=\sum_{n=0}^{\infty}
+\theta(x,t)=\sum_{n=0}^{\infty}
 \frac{4}{(2n+1)\pi}
 \sin(\lambda_n x)
-e^{-\alpha\lambda_n^2t},\
-\lambda_n
-&=\frac{(2n+1)\pi}{2L}.
-\end{aligned}
+e^{-\alpha\lambda_n^2t},
+\qquad
+\lambda_n=\frac{(2n+1)\pi}{2L}.
 $$
 
-I truncated the series when the remaining term envelope fell below $10^{-14}$. Since $|\sin|\leq1$, this also bounds the neglected tail.
+Here $\theta=(T-T_w)/(T_0-T_w)$. The code stops adding terms when the next term's envelope falls below $10^{-14}$. I then compare the analytical temperature with every cell centre in the numerical result.
 
-At $t=0.05$ s, the maximum difference between the numerical and analytical temperatures was
+![Numerical and analytical temperature profiles at the final time](/images/projects/heat-diffusion-2d/analytical-validation.svg)
 
-$$
-L^\infty=1.384\times10^{-5},
-$$
+*At $t=0.05$, the numerical markers lie on the analytical curve at this scale. The largest difference is $1.384\times10^{-5}$ on the $100\times20$ grid*
 
-which was below my predefined requirement of $5\times10^{-5}$. Because the upper and lower boundaries were insulated, the two-dimensional solution remained exactly uniform in the transverse direction.
+I had set the acceptance limit to $5\times10^{-5}$ before using the result. The measured error passed that limit. The field also stayed exactly uniform across $y$. Any transverse pattern would have pointed to an indexing or boundary error.
 
-## Why my first temporal-refinement plan was wrong
+## My first refinement plan mixed two errors
 
-FTCS is first-order accurate in time and second-order accurate in space. My initial plan was to keep the grid fixed, reduce the time step, and compare every result directly with the analytical solution.
+After the analytical comparison passed, I wanted to check that FTCS was first-order accurate in time. My first plan sounded simple: keep the grid fixed, halve the time step several times, and compare each result with the analytical solution.
 
-That comparison would not isolate temporal accuracy. The leading error contains the coupled term
+Before running that study, I wrote out the leading truncation error. It contains
 
 $$
-\frac{\alpha\Delta x^2}{12}(6r-1)\,\frac{\partial^4T}{\partial x^4}.
+\frac{\alpha\Delta x^2}{12}(6r-1)
+\frac{\partial^4T}{\partial x^4}.
 $$
 
-Because its coefficient depends on $r$, changing the time step also changes how the spatial truncation error appears in the total error. A direct comparison with the analytical solution would therefore mix spatial and temporal effects and could assign spatial error to the time integrator.
+The coefficient depends on $r$. Changing the time step changes $r$, so it also changes how the spatial error appears in the total error. A direct comparison with the analytical solution would mix time error and space error. It would not isolate the temporal order I wanted to measure.
 
-I corrected the study by using a fine-time numerical solution on the same grid as the reference. I set the reference to $r=10^{-3}$ and compared it with runs at
+I changed the experiment. I kept the same $100\times20$ grid for every run and produced a fine-time numerical reference at $r=0.001$. I compared runs at
 
 $$
-r\in\{0.20,\ 0.10,\ 0.05,\ 0.025\}.
+r\in\{0.20,\ 0.10,\ 0.05,\ 0.025\}
 $$
 
-The shared spatial error largely cancels when solutions on the same grid are differenced. The observed temporal order was 1.017, consistent with first-order time integration.
+with that reference at $t=0.02$. All five calculations use the same spatial grid, so most of their shared spatial error cancels when I subtract the fields.
 
-![Error versus time step with a first-order reference line](/images/projects/heat-diffusion-2d/temporal-refinement.svg)
+![Maximum temperature difference against time-step size](/images/projects/heat-diffusion-2d/temporal-refinement.svg)
 
-## Separate checks for conservation and indexing errors
+*Halving the time step roughly halves the error. A least-squares fit gives an observed temporal order of 1.017, inside the acceptance band of 0.9 to 1.1*
 
-The analytical transient does not test every part of the implementation independently, so I added two more targeted checks.
+The four maximum differences were $1.370\times10^{-4}$, $6.817\times10^{-5}$, $3.374\times10^{-5}$, and $1.653\times10^{-5}$. The corrected study measured the expected first-order behaviour.
 
-First, I ran a grid with insulated boundaries on every side. After 576 steps, the drift in discrete total energy was 0.0. This directly checks that interior fluxes cancel in pairs and that no energy enters or leaves through the boundaries.
+This was the main change in my research process. The solver had passed its first comparison, but my planned refinement study could not answer the next question. I had to change the reference, not the result.
 
-Second, I used a discrete cosine mode on the insulated grid. This mode is an exact eigenvector of the discrete FTCS operator, with theoretical per-step amplification
+## Three focused checks looked for different bugs
+
+The analytical profile tests the complete calculation. I kept three smaller checks because each one isolates a different part of the code.
+
+### Does an insulated plate keep its heat?
+
+I started a $48\times48$ insulated grid with a smooth two-mode temperature pattern and advanced it for 576 steps at $r=0.2$. The pattern flattened, but the initial and final discrete energies were both 300.0. The relative drift was 0.0 in double precision, against a limit of $10^{-12}$.
+
+This test checks the face-flux bookkeeping. No heat can cross the outer boundary, and every interior exchange should cancel when the cells are summed.
+
+### Does the update use the right signs and neighbours?
+
+I initialised an insulated grid with a discrete cosine mode. For this field, one FTCS step should multiply the whole pattern by a known factor,
 
 $$
 g=1-4r\sin^2\left(\frac{\pi}{2n_x}\right).
 $$
 
-The solver reproduced this amplification factor to $10^{-14}$. This test can expose sign or indexing mistakes that might appear only as an unclear change in the error constant during a comparison with the analytical solution.
+The automated test compares the computed decay with this exact discrete rate to an absolute tolerance of $10^{-12}$. It can expose a wrong sign or a shifted index that a final colour map might hide.
 
-## Results I retained
+### Does a one-dimensional field stay one-dimensional?
 
-| Check | Observed result | Requirement |
+I copied an analytical 1-D profile across all 20 rows, started at $t=0.01$, and advanced it to $t=0.04$. The maximum difference between rows remained 0.0, with a declared tolerance of $10^{-14}$. The final maximum error against the analytical profile was $8.60\times10^{-6}$.
+
+Together, the checks answer separate questions about accuracy, time integration, conservation, indexing, and boundary treatment.
+
+## The results I kept
+
+| Question | Observed result | Requirement |
 |---|---:|---:|
-| Maximum error against the analytical series at $t=0.05$ s | $1.384\times10^{-5}$ | $\leq5\times10^{-5}$ |
-| Temporal order on a fixed grid | 1.017 | 0.9–1.1 |
-| Energy drift after 576 steps on an insulated grid | 0.0 | $\leq10^{-12}$ |
-| Attempted run at $r=0.26$ | Refused and logged | Must refuse |
-| Transverse variation in the two-dimensional field | 0.0 | $<10^{-14}$ |
+| Does the main transient match the analytical slab? | $L^\infty=1.384\times10^{-5}$ | $\leq5\times10^{-5}$ |
+| Does the time-step study show first-order behaviour? | Order 1.017 | 0.9–1.1 |
+| Does a fully insulated grid conserve discrete energy? | Relative drift 0.0 | $\leq10^{-12}$ |
+| Does the solver reject an unsafe input? | $r=0.26$ refused | Must refuse |
+| Does a 1-D field remain uniform across the 2-D grid? | Variation 0.0 | $<10^{-14}$ |
 
-Each check answers a different question. The analytical solution checks the overall temperature field and boundary treatment. The fine-time reference isolates temporal order. The insulated case checks conservation. The discrete mode checks signs and indexing. The stability gate verifies that invalid input is rejected before integration begins.
+These are not five versions of the same test. The analytical comparison checks the complete transient. The refinement study checks time accuracy. The insulated case checks conservation. The cosine mode checks the update operator. The rejection test checks the calculation before it begins.
 
-## Limits and further work
+## Where this model is useful
 
-The explicit scheme requires
+The plate example captures a common engineering question: after one surface is suddenly cooled or heated, how long does the rest of a solid take to respond? The same basic transient appears in plates, heatsink bases, cold plates, and thin enclosure walls.
+
+This solver is a transparent learning and verification tool. Every update is visible, small grids run quickly, and the analytical case gives a baseline for checking boundary conditions and time-step logic.
+
+It is not a complete inverter-module or battery-pack design model. A real design may need three-dimensional geometry, internal heat generation, convection, contact resistance, cooling flow, and temperature-dependent material data. This project gives me a tested numerical building block for those later models.
+
+## What the model still leaves out
+
+The explicit method becomes expensive as the grid is refined. Its stability rule requires
 
 $$
-\Delta t\propto\Delta x^2
+\Delta t\propto\Delta x^2.
 $$
 
-to remain within $r\leq0.25$. As the grid is refined, the number of required time steps therefore grows quickly. The 0.05 s production validation required 2500 steps.
+If I halve the cell width, I need about four times as many steps to cover the same physical time. The main $0.05$-second validation already needed 2500 steps.
 
-The current model supports only constant isotropic diffusivity, uniform Cartesian grids with square cells, fixed-temperature boundaries, and zero-flux boundaries. It does not include advection, heat sources, phase change, non-uniform materials, or non-uniform grids.
+The code also assumes constant, isotropic diffusivity and a uniform Cartesian grid made of square cells. It supports fixed-temperature and zero-flux boundaries. It does not include convection boundaries, internal heat sources, phase change, moving material, or non-uniform properties.
 
-Extending the solver beyond these limits would require new numerical treatment and new validation cases rather than assuming that the present checks still apply unchanged.
+Adding those effects would change the numerical treatment. A source term needs a new balance and new reference cases. Non-uniform materials change the face fluxes. Larger models may need an implicit or semi-implicit time integrator, followed by a new set of validation tests.
 
 ## Code and reproduction
 
@@ -171,14 +247,10 @@ python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
 
-## Practical applications: transient thermal diffusion in inverter modules and battery cold plates
-
-During hard acceleration or peak discharge bursts, inverter IGBT modules and battery cold plates face rapid transient heat spikes (e.g. 6.0 kW peak over 10 seconds). Steady-state models fail to capture this heat accumulation.
-
-This 2D explicit solver computes transient heat spreading and diffusion delays, while its automated $r \le 0.25$ Von Neumann stability guards and temporal order validation prevent subtle numerical blowups during transient thermal screening.
-
 ## What I learned
 
-I originally expected temporal refinement to be a straightforward comparison with the analytical solution. Deriving the truncation term first showed that the comparison would not isolate the error I wanted to measure. Replacing the analytical reference with a fine-time result on the same grid allowed me to measure temporal order without folding the shared spatial error into it.
+Numerical instability can be deceptive. The early frames of a bad calculation may look smooth, so the stability limit belongs in the input checks before the first time step.
 
-I also learned to treat refusal as a valid numerical result. Rejecting the $r=0.26$ case is part of correct solver behaviour; the user should not have to discover an invalid time step only after the solution diverges.
+The refinement study taught me a second lesson. The analytical solution was the strongest reference for the full transient, but it was the wrong reference for isolating time error on a fixed grid. The reference has to match the question.
+
+I now treat validation as a sequence of small questions aimed at different ways the code can fail. That made this modest solver more useful than a single successful plot or animation.

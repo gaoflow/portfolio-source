@@ -1,115 +1,218 @@
 ---
-title: 'I Calculated NACA 0012 Three Ways—and the Simplest Was Closer to NASA'
+title: 'I Compared Two Airfoil Models with NASA—and the Simpler One Was Closer'
 year: 2026
 date: '2026-02-28'
 status: complete
 categories: [validation, tooling]
 tags: [CFD]
-summary: 'I compared thin-airfoil theory, a Hess–Smith panel method, and NASA wind-tunnel data at the same test condition. The lift-slope errors were 3.81% and 13.83%, while the stall and drag results exposed the limits of inviscid models.'
+summary: 'I used one NACA 0012 case to show, step by step, what thin-airfoil theory and a Hess–Smith panel method can predict. The simpler model matched NASA’s linear lift slope more closely; the pressure and drag results explain why the more detailed model is still useful—and where both models fail.'
 role: 'Aerodynamic methods & validation'
 duration: 'Independent study'
 featured: false
 order: 7
 studySequence: 8
-heroImage: /images/projects/airfoil-methods/lift-validation.svg
+heroImage: /images/projects/airfoil-methods/source/nasa-ltpt-exterior-1971.jpg
 github: 'https://github.com/gaoflow/airfoil-methods'
 ---
 
-## Origin: waiting hours for CFD—do vintage panel methods still hold up?
+## Why I built a small model before running more CFD
 
-The origin of this project was the computational cost of running 3D RANS CFD for racecar wing profiles, which takes hours per mesh. Classic aerodynamics textbooks, however, claimed: 'Thin-airfoil theory and panel methods can compute lift slopes and surface pressure in milliseconds.'
+My starting problem was practical. A three-dimensional RANS calculation for a race-car wing can take hours, and a design study may contain dozens of candidate sections, angles, and mesh settings. I did not want to spend those hours only to discover that the geometry had the wrong sign, the expected lift scale was unreasonable, or the pressure loading looked obviously wrong.
 
-I was fascinated by this contrast: how accurate were the vintage tools engineers used before supercomputers? Where do they deliver genuine value, and where do their assumptions fail completely?
+So I went back to two much cheaper methods:
 
-To evaluate these fidelity boundaries, I benchmarked thin-airfoil theory, the Hess-Smith panel method, and NASA TM-4074 wind tunnel data side by side.
+- thin-airfoil theory, which reduces the airfoil to a line and gives a lift estimate almost immediately;
+- a Hess–Smith panel method, which keeps the airfoil shape and calculates pressure around its surface.
 
-## Wind-tunnel reference
+I then compared both models with one public wind-tunnel series for the NACA 0012 airfoil. My question was not “Which method wins?” It was: **what question can each method answer honestly before I need viscous CFD?**
 
-The experimental reference is Table I of Charles L. Ladson’s [NASA TM-4074](https://ntrs.nasa.gov/citations/19880019495), measured with free transition at $M=0.15$ and $Re=5.97\times10^6$.
+## The whole project in one 4.18° example
 
-I transcribed all 16 points directly from the same table. I did not digitise plotted curves or combine data from different Reynolds numbers or transition conditions. Lift and pitching moment were obtained by integrating surface pressures; drag came from a wake survey.
+Before describing the solver, it helps to look at one ordinary data point.
 
-NASA reports repeated zero-angle precision of 0.0002 in $C_d$, 0.004 in normal-force coefficient, and 0.0002 in moment coefficient.
+NACA 0012 is a symmetric airfoil: the first two digits, `00`, mean it has no camber, and `12` means its maximum thickness is 12% of the chord. An angle of attack of $4.18^\circ$ means that the incoming flow meets the chord line at a small upward angle.
 
-Keeping every point within one test condition made it possible to distinguish model differences from incompatible experimental conditions.
+At that angle, all three comparisons use the same Mach number, $M=0.15$. The NASA measurement also has a Reynolds number of $5.97\times10^6$ and free boundary-layer transition.
 
-## What each level can calculate
+| At $\alpha=4.18^\circ$ | Lift coefficient, $C_l$ | Difference from NASA |
+|---|---:|---:|
+| NASA wind tunnel | 0.4520 | — |
+| Thin-airfoil theory + compressibility correction | 0.4636 | +2.6% |
+| Hess–Smith panel method + compressibility correction | 0.5096 | +12.8% |
 
-For the symmetric section, thin-airfoil theory gives
+The lift coefficient is not a force by itself. It is the force after removing air density, speed, and reference area:
 
 $$
-C_l=2\pi\alpha.
+L=\frac{1}{2}\rho V^2 S C_l.
 $$
 
-I applied a Prandtl–Glauert correction for $M=0.15$. This gives a quick linear lift slope, but it does not represent the airfoil’s 12% thickness or produce a surface-pressure distribution.
+That is why I can compare a formula, a numerical model, and a wind-tunnel test using the same dimensionless number.
 
-The Hess–Smith potential-flow model uses the analytical NACA 0012 geometry and 160 cosine-spaced surface panels. Each panel has a constant source strength, while the complete airfoil shares one global circulation or vortex-sheet unknown. Collocation enforces no penetration, and a trailing-edge Kutta condition closes the system.
+The result already contains the main lesson. The one-line theory is closer to the measured lift at this angle. The panel method is less accurate for this single number, but it can also show *where* low and high pressure occur on the airfoil. That extra information is the reason to keep it.
 
-Cosine spacing concentrates panels near the leading and trailing edges without changing the physical geometry. I evaluated non-self panel influences using twelve-point Gauss–Legendre quadrature and handled singular self-influence with analytical half-jump terms.
+## What I actually did
 
-After solving for surface tangential velocity, I calculated
+I kept the workflow small enough that every step could be checked:
+
+1. I transcribed one internally consistent set of NASA measurements instead of mixing points from different tests.
+2. I generated the NACA 0012 coordinates from the standard four-digit geometry equation.
+3. I calculated lift with thin-airfoil theory.
+4. I built a Hess–Smith source-and-vortex panel solver and integrated its surface pressure.
+5. I checked symmetry, zero-angle lift, pressure drag, and panel refinement before looking at agreement with NASA.
+6. I compared the models first in the nearly linear lift range, then at high angle of attack and in drag—the places where inviscid assumptions should become visible.
+
+This order mattered. If I had started by comparing curves, a coding error, an under-resolved surface, and missing physics could all have looked like the same “model error.”
+
+## I chose one wind-tunnel series and did not mix conditions
+
+The experimental reference is Table I of Charles L. Ladson’s [NASA TM-4074](https://ntrs.nasa.gov/citations/19880019495). The report contains a large NACA 0012 database covering several Mach numbers, Reynolds numbers, and transition settings. I used only the 16-point free-transition series at $M=0.15$ and $Re=5.97\times10^6$, from $-4.05^\circ$ to $17.35^\circ$.
+
+The opening photograph shows the Langley Low-Turbulence Pressure Tunnel in 1971, a few years before this NACA 0012 test programme. NASA’s [facility history](https://www.nasa.gov/history/low-turbulence-pressure-tunnel-building-582a/) identifies it as photograph L-71-6093. The large pressure shell allowed the tunnel to vary Reynolds number without changing Mach number in lockstep.
+
+Those conditions need some explanation:
+
+- Mach number compares flow speed with the speed of sound. At $M=0.15$, compressibility is small but not exactly zero, so I applied a Prandtl–Glauert correction to both inviscid models.
+- Reynolds number compares inertia with viscosity. It influences the boundary layer, transition, drag, and separation, even though the two models in this project do not solve those viscous effects.
+- Free transition means NASA did not force the boundary layer to become turbulent at a fixed chordwise position.
+
+I copied the values from the table rather than digitising a plotted curve. Lift and pitching moment in the report came from integrated surface pressures; drag came from a wake survey. That distinction becomes important later because my panel method also integrates pressure, but it has no viscous wake.
+
+The TM-4074 model spanned the tunnel between rotating circular sidewall plates. The small end view in the drawing shows the NACA 0012 section and its quarter-chord mounting point.
+
+![NASA TM-4074 drawing of the NACA 0012 model mounted between the wind-tunnel sidewalls](/images/projects/airfoil-methods/source/nasa-tm4074-airfoil-mount.png)
+
+*NASA TM-4074, figure 1: NACA 0012 model installation*
+
+A separate NASA Langley NACA 0012 model makes the measurement hardware easier to see. The small holes near midspan are pressure orifices, and the tube bundles carry those pressures to the instruments. This model came from another NASA test, so it is not the larger TM-4074 model or the source of the data used here.
+
+![NASA Langley photograph of a pressure-tapped NACA 0012 wind-tunnel model and its tubing](/images/projects/airfoil-methods/source/nasa-naca0012-pressure-tap-model.webp)
+
+*NASA Langley pressure-tapped NACA 0012 model*
+
+The photograph comes from [NASA NTRS 19880005556](https://ntrs.nasa.gov/citations/19880005556), printed page 233.
+
+NASA reports repeatability at zero angle of 0.0002 in $C_d$, 0.004 in normal-force coefficient, and 0.0002 in moment coefficient. Repeatability tells me how closely repeated measurements agreed; it is not the same as a complete uncertainty estimate for every point. I therefore use NASA as the experimental reference, not as an error-free truth source.
+
+## Model 1: turn the airfoil into one line
+
+For a symmetric airfoil, thin-airfoil theory gives
+
+$$
+C_l=2\pi\alpha,
+$$
+
+with $\alpha$ in radians. At $4.18^\circ$, the incompressible result is 0.4584. The Prandtl–Glauert factor at $M=0.15$ is 1.0114, which raises the estimate slightly to 0.4636.
+
+This model is useful precisely because it is so stripped down. It gives me a sign, a scale, and a linear lift slope. It does not know that NACA 0012 is 12% thick. It cannot tell me the surface pressure, drag, transition point, or stall angle.
+
+I treat it as a first arithmetic check, not as a small CFD solver.
+
+## Model 2: replace the smooth surface with short straight panels
+
+The panel method keeps the NACA 0012 outline. I split the upper and lower surfaces into 160 straight segments, with more points near the leading and trailing edges where the geometry and pressure change quickly.
+
+The implementation follows the source-and-circulation family introduced by Hess and Smith. In plain language, I ask the solver to find two things:
+
+- one source strength on each panel, which keeps flow from passing through the solid surface;
+- one shared vortex-sheet strength, which supplies the circulation needed to create lift.
+
+At the midpoint of every panel, the velocity normal to the surface must be zero. At the trailing edge, I apply a Kutta condition so the upper- and lower-surface flow leaves consistently instead of wrapping around the sharp edge. These conditions form one linear system, which I solve for the unknown strengths.
+
+I evaluated the influence of one panel on another using 12-point Gauss–Legendre quadrature. A panel acting on its own midpoint is singular, so I used the analytical half-jump term instead of asking numerical quadrature to integrate through the singularity.
+
+Once I have the tangential surface velocity, I calculate pressure coefficient from
 
 $$
 C_p=1-\left(\frac{V_t}{V_\infty}\right)^2.
 $$
 
-Integrating pressure around the surface then gives lift, pressure drag, and quarter-chord pitching moment.
+Lower $C_p$ means stronger suction. Integrating that pressure around the airfoil gives lift, pressure drag, and quarter-chord pitching moment.
 
-The NASA wind-tunnel data is the external experimental reference, not a third numerical model.
+![Upper- and lower-surface pressure coefficients from the panel method at 4.18 degrees](/images/projects/airfoil-methods/pressure-distribution.svg)
 
-## Checking the panel method before comparing it with NASA
+*Surface pressure coefficient at 4.18°*
 
-I first checked that the generated geometry was closed and symmetric, with a maximum thickness of 12%. I also required near-zero lift at zero angle, the correct sign and scale of small-angle lift, and inviscid pressure drag at the level of discretisation error.
+The vertical axis is inverted by aerodynamic convention, so stronger suction appears higher. At positive angle of attack, the upper surface carries the stronger suction. This pressure distribution is the panel method’s main extra value. Thin-airfoil theory gave me one lift number; the panel method lets me inspect how the loading is distributed along the chord.
 
-Doubling the surface discretisation from 80 to 160 panels changed lift by less than 1%. A separate 40/80/160/240-panel refinement sequence gave $C_l=0.48773$ with 160 panels and 0.48788 with 240 panels at $4^\circ$. The relative change was only 0.0307%.
+## I checked the implementation before judging the physics
 
-This showed that panel count was no longer controlling the lift comparison. Adding more panels could refine the same inviscid solution, but it could not repair an incorrect singular term or Kutta condition, and it could not add missing viscous physics.
+I first checked whether the generated outline closed at the trailing edge, stayed symmetric, and reached 12% thickness. At zero angle, the symmetric airfoil produced lift indistinguishable from zero. Its pressure drag also stayed near zero, which is the expected inviscid result.
 
-![Pressure distributions and panel refinement](/images/projects/airfoil-methods/pressure-and-refinement.svg)
+Then I changed the surface from 40 to 80, 160, and 240 panels. At $4^\circ$, the lift values were 0.48646, 0.48727, 0.48773, and 0.48788. Moving from 160 to 240 panels changed $C_l$ by only 0.0307%.
 
-## The simplest model was closer to the measured lift slope
+![Lift coefficient at 4 degrees as the panel count increases from 40 to 240](/images/projects/airfoil-methods/panel-refinement.svg)
 
-I fitted the lift curves over the declared linear range, $-4.1^\circ\leq\alpha\leq10.2^\circ$:
+*Lift coefficient at 4° as panel count increases*
+
+This check answers a narrow but important question: was the later disagreement with NASA mainly caused by using too few panels? The answer was no. It does not mathematically prove that every line of the solver is correct, but it makes panel count a very unlikely explanation for a 13.83% lift-slope error.
+
+More panels can converge the same inviscid equations more tightly. They cannot repair a wrong Kutta condition, and they cannot add viscosity or separation to equations that do not contain them.
+
+## The simpler model was closer over the full linear range
+
+I fitted a straight line to the declared comparison range, $-4.1^\circ\leq\alpha\leq10.2^\circ$.
 
 | Result | NASA | Thin airfoil + P–G | Hess–Smith + P–G |
 |---|---:|---:|---:|
-| Lift slope / degree | 0.10684 | 0.11092 | 0.12162 |
+| Lift slope per degree | 0.10684 | 0.11092 | 0.12162 |
 | Slope error | — | 3.81% | 13.83% |
 | Linear-range $C_l$ RMSE | — | 0.0226 | 0.0824 |
 
-Thin-airfoil theory was closer to the measured integral lift slope. The more complex panel method did not automatically produce a more accurate scalar result.
+![NASA lift measurements compared with thin-airfoil theory and the Hess–Smith panel method](/images/projects/airfoil-methods/lift-validation.svg)
 
-What the panel method added was different: it represented airfoil thickness, produced an inspectable $C_p$ distribution, and showed how loading varied over the surface. More complexity provided more outputs, but not better accuracy for every output.
+*NASA lift measurements and two inviscid predictions*
 
-## Stall exposed the missing physics
+I had expected the geometry-resolved model to win. It did not. Thin-airfoil theory was closer to the measured integral lift slope, even though it ignored thickness entirely.
 
-When I included all 16 experimental points, the panel-model lift RMSE increased to 0.225.
+The conclusion is not that panel methods are useless. It is that extra model detail only helps when that detail addresses the output I care about. The panel method added a pressure distribution and geometry sensitivity. It did not add the viscous boundary-layer effects that influence the measured lift slope.
 
-At $17.35^\circ$, NASA measured $C_l=1.660$. The inviscid panel model continued rising almost linearly to 2.085 because it had no boundary layer or separation mechanism and therefore could not produce physical stall.
+## High angle of attack exposed the missing physics
 
-This was a model-form failure rather than a panel-resolution problem. Further refinement would only converge more closely to the same inviscid equations. It would not restore the missing effects of viscosity, boundary-layer displacement, transition, or separation.
+Across all 16 NASA points, the panel-model lift RMSE increased from 0.082 in the linear range to 0.225.
 
-## Near-zero pressure drag was not a low-drag prediction
+At $17.35^\circ$, NASA measured $C_l=1.660$, while the panel model predicted 2.085. The measured curve was already bending away from the inviscid straight-line trend, but the panel solution kept climbing because it has no boundary layer and no way to separate the flow from the surface.
 
-NASA’s wake-survey $C_d$ increased from about 0.0065 near zero lift to 0.0275. The panel method’s pressure drag remained below 0.0008, apart from discretisation error.
+This dataset ends at $17.35^\circ$ and the listed lift has not yet fallen, so it does not show a complete post-stall curve. I therefore use it to demonstrate high-angle nonlinearity and the growing influence of separation—not to claim that I measured the exact stall angle.
 
-That result did not mean the model had found an exceptionally low-drag airfoil. It was d’Alembert’s paradox: potential flow contains no viscous drag and cannot represent a separated wake.
+This is a model-form limit. Refining the surface only gives a more precise answer to the inviscid problem. Predicting the real high-angle behaviour requires a method that includes viscosity, transition, and separation.
 
-![Measured drag beside the inviscid blind spot](/images/projects/airfoil-methods/drag-blind-spot.svg)
+## Near-zero pressure drag was a warning, not a good prediction
 
-I could have made the panel method look uniformly successful by showing only the linear lift range and omitting drag. Instead, I retained both the stall overshoot and the near-zero pressure-drag curve because they define the model’s capability boundary.
+The mismatch is even clearer in drag. Near zero lift, NASA measured $C_d$ around 0.0065. At $17.35^\circ$, it measured 0.0275. The panel method’s pressure drag stayed below 0.0008 over the plotted range.
 
-## What I retained for engineering use
+NASA measured drag with a rake downstream of the model. Its closely spaced probes sampled the momentum loss through the wake, which an inviscid panel method does not contain.
 
-| Method | Useful for | Not suitable for |
+![NASA TM-4074 drawing of the wake-survey rake behind the airfoil](/images/projects/airfoil-methods/source/nasa-tm4074-wake-rake.png)
+
+*NASA TM-4074, figure 2: wake-survey rake*
+
+![NASA wake-survey drag compared with the panel method's near-zero pressure drag](/images/projects/airfoil-methods/drag-blind-spot.svg)
+
+*NASA drag measurements and panel-method pressure drag*
+
+This is d’Alembert’s paradox in a practical plot: ideal, steady, inviscid potential flow produces no net drag on a closed body. The small non-zero panel values are discretisation error, not a prediction of real aerodynamic drag.
+
+At the simple $4.18^\circ$ example, NASA measured $C_d=0.0076$, while the panel pressure drag was about 0.00021. A result can therefore look numerically clean and still answer the wrong physical question.
+
+## What I would use each method for
+
+| Method | What I trust it to do | What I would not ask it to do |
 |---|---|---|
-| Thin-airfoil theory | Linear lift slope, sign conventions, and quick lift-scale estimates | Thickness effects, surface pressure, drag, and stall |
-| Hess–Smith panel method | Geometry checks, $C_p$, surface loading, and integrated inviscid loads | Viscous drag, transition, separated flow, and stall |
-| NASA wind-tunnel data | Measured behaviour of this airfoil at this test condition | Direct extrapolation to other geometries or conditions |
+| Thin-airfoil theory | Check lift sign, rough linear lift slope, and order of magnitude | Surface pressure, thickness effects, drag, or high-angle behaviour |
+| Hess–Smith panel method | Check a single-element 2D geometry, inspect $C_p$, compare inviscid loading, and calculate integrated inviscid loads | Skin-friction drag, transition, separated flow, stall, or a multi-element wing without extending the formulation |
+| NASA wind-tunnel series | Show measured NACA 0012 behaviour at this exact Mach, Reynolds number, and transition condition | Stand in for another airfoil, another Reynolds number, or a three-dimensional race-car wing |
 
-This low-order hierarchy is useful for checking geometry, force signs, linear lift scale, and surface loading before more expensive CFD.
+For early design work, I would use the two low-order models as filters and debugging tools. They can reject a reversed geometry, a wrong angle convention, an implausible lift scale, or an extreme pressure spike before I build a costly mesh.
 
-It is not suitable for ranking high-lift sections by drag or stall margin. Those decisions require a model that includes viscosity and transition, together with appropriate near-wall resolution and grid, turbulence-model, and transition-model sensitivity studies.
+I would not use this code to rank candidate sections by real drag or stall margin. I would also not claim that this single-element solver directly handles an FSAE multi-element wing. Those jobs need a formulation built for multiple elements and, for drag and separation, a viscous method with suitable grid and model-sensitivity studies.
+
+## What this project does not prove
+
+This comparison covers one symmetric airfoil, one Mach number, one Reynolds number, and one transition condition. It does not validate cambered sections, rough surfaces, laminar separation bubbles, flap gaps, ground effect, or three-dimensional wings.
+
+The tests check useful behaviours, but they are not a formal proof of the solver. Agreement at zero angle and convergence with panel count could still coexist with a shared modelling or implementation mistake. The external NASA comparison reduces that risk, while the pressure and drag failures make the remaining capability boundary visible.
+
+My strongest conclusion is therefore modest: the code is useful as a fast inviscid checking tool within the demonstrated range. It is not a replacement for viscous analysis or experiments.
 
 ## Code and reproduction
 
@@ -122,16 +225,9 @@ python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
 
-## Practical applications: rapid low-cost screening for FSAE multi-element wing airfoils
+The analysis script regenerates the metrics and figures. It exits with an error if the geometry, linear-lift comparison, panel-refinement check, or explicit drag blind-spot check falls outside the declared limits.
 
-When designing FSAE front and rear wings, running full 3D RANS CFD across dozens of candidate airfoils costs hours or days per iteration.
+## References—and what each one supports
 
-Using this thin-airfoil and Hess-Smith panel method toolkit allows batch computation of linear lift slopes, surface pressure distributions ($C_p$), and aerodynamic centers in milliseconds. It rapidly filters out under-performing profiles or extreme suction spikes before committing promising geometries to expensive viscous CFD, drastically accelerating the aero design loop.
-
-## What I learned
-
-I expected the geometry-resolved panel method to outperform thin-airfoil theory in the lift-slope comparison. The result was the opposite: the panel method had 13.83% slope error, while thin-airfoil theory had 3.81%, even though panel refinement had already reduced the 160-to-240-panel change to 0.0307%.
-
-The corrective action was not to keep adding panels. It was to identify the remaining discrepancy as a model-form limitation, restrict the model to questions it can support, and move to a viscous method when drag, transition, or separation matters.
-
-The broader lesson was that greater model complexity does not guarantee greater accuracy. I first need to decide whether a discrepancy comes from discretisation, implementation, or missing physics; only then can I choose between refining the mesh, correcting the solver, or using a higher-fidelity model.
+1. Charles L. Ladson, [*Effects of Independent Variation of Mach and Reynolds Numbers on the Low-Speed Aerodynamic Characteristics of the NACA 0012 Airfoil Section*](https://ntrs.nasa.gov/citations/19880019495), NASA TM-4074, 1988. I use Table I for the 16 measured lift, drag, and moment points and the report text for the tunnel conditions and repeatability statement.
+2. J. L. Hess and A. M. O. Smith, [*Calculation of Potential Flow About Arbitrary Bodies*](https://www.sciencedirect.com/science/article/pii/0376042167900036), *Progress in Aerospace Sciences*, volume 8, 1967, pages 1–138. This is the historical method reference for representing a body with distributed singularities; it does not validate my particular implementation, which is why I also kept behavioural tests and the NASA comparison.

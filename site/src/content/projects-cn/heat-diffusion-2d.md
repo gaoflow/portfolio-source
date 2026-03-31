@@ -11,7 +11,7 @@ duration: '独立研究'
 featured: false
 order: 15
 studySequence: 7
-heroImage: /images/projects/heat-diffusion-2d/temperature-field.svg
+heroImage: /images/projects/heat-diffusion-2d/temperature-profiles.svg
 github: 'https://github.com/gaoflow/heat-diffusion-2d'
 ---
 

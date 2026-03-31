@@ -9,7 +9,13 @@ const projectSchema = z.object({
   categories: z.array(z.enum(['fsae', 'full-car', 'component-cfd', 'tooling', 'validation', 'design'])),
   tags: z.array(z.string()).default([]),
   summary: z.string(),
+  heroVideo: z.object({
+    src: z.string(),
+    poster: z.string(),
+    caption: z.string(),
+  }).optional(),
   heroImage: z.string().optional(),
+  cardImageFit: z.enum(['contain', 'cover']).default('contain'),
   model3d: z.string().optional(),
   role: z.string().optional(),
   team: z.string().optional(),

@@ -79,6 +79,9 @@ article video {
   background: #fff;
   object-fit: contain;
 }
+.project-card-media--cover {
+  object-fit: cover;
+}
 .project-card-placeholder {
   display: flex;
   align-items: center;

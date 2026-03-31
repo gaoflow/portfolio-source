@@ -46,6 +46,26 @@ const alternatePath = hasAlternate
       </div>
     </header>
 
+    {d.heroVideo && (
+      <figure class="mb-10">
+        <video
+          autoplay
+          loop
+          muted
+          playsinline
+          controls
+          preload="metadata"
+          poster={d.heroVideo.poster}
+          aria-label={d.title}
+          class="block w-full h-auto rounded-xl shadow-sm"
+        >
+          <source src={d.heroVideo.src} type="video/mp4" />
+          {isChinese ? '你的浏览器不支持 HTML5 视频。' : 'Your browser does not support HTML5 video.'}
+        </video>
+        <figcaption class="mt-2 font-mono text-xs leading-relaxed text-stone">{d.heroVideo.caption}</figcaption>
+      </figure>
+    )}
+
     {d.academic?.note && (
       <p class="mb-10 border-l-2 border-accent pl-5 text-lg leading-relaxed text-muted">{d.academic.note}</p>
     )}
@@ -60,7 +80,7 @@ const alternatePath = hasAlternate
       </div>
     )}
 
-    {d.model3d && (
+    {!d.heroVideo && d.model3d && (
       <ModelViewer
         src={d.model3d}
         alt={d.title}
@@ -68,7 +88,7 @@ const alternatePath = hasAlternate
         caption={isChinese ? '在线预览 3D' : 'Interactive 3D — drag to rotate and scroll to zoom.'}
       />
     )}
-    {d.heroImage && !d.model3d && (
+    {!d.heroVideo && d.heroImage && !d.model3d && (
       <img src={d.heroImage} alt={d.title} class="w-full rounded-xl shadow-sm mb-10" loading="lazy" />
     )}
 

@@ -12,6 +12,7 @@ featured: true
 order: 0
 studySequence: 19
 heroImage: /images/projects/3dexperience-rb22/sidepod/sidepod_r1_iso.jpg
+cardImageFit: cover
 ---
 
 在亲身去参观了一场 F1 的比赛，并且近距离看到了 F1 2026 的 1:1 真车模型之后，我便有了在 3DExperience 上重建 F1 2026 赛车的打算。
