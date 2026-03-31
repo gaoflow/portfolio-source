@@ -280,6 +280,16 @@ $s$ 表示沿截面走了多远，$H$ 是这段壁面的长度，$n_i$ 决定厚
 
 论文里的 FGT 是连续厚度设计。我们在 Abaqus 里做的是简化版本：角部 2 mm，壁面 1 mm。我们没有完成连续厚度函数的实现，也没有在固定质量约束下做参数搜索。因此，Model D 是受 FGT 启发的分段厚度多胞截面。
 
+这是答辩中使用的原始 FGT 结果动画。播放时，中部弯折位置继续变形，Mises 应力颜色从蓝色逐渐向绿色、橙色和红色移动。
+
+<figure>
+  <video controls playsinline muted loop autoplay preload="metadata" style="display:block;width:100%;height:auto;">
+    <source src="/images/projects/abaqus-energy-absorber/fgt-model-d-deformation.mp4" type="video/mp4">
+    你的浏览器不支持 HTML5 视频。
+  </video>
+  <figcaption>FGT：变形</figcaption>
+</figure>
+
 ### 比较 A、B 和 D
 
 这组几何比较都看 0.06 s 时的结果。Model A 保留 1.2/0.8 mm 的基准厚度；Model B 把所有壁厚统一成 1.0 mm；Model D 用多胞截面，并把角部设为 2 mm、壁面设为 1 mm。还有一个统一 2 mm 的 Model C，但它没有可用的最终结果，所以不参加下面的比较。
