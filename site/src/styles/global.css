@@ -294,6 +294,8 @@ article video {
 /* Prose robustness on narrow viewports: tables scroll */
 .prose table {
   display: block;
+  width: fit-content;
   max-width: 100%;
+  margin-inline: auto;
   overflow-x: auto;
 }
