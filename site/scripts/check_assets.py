@@ -38,6 +38,53 @@ ALLOWLIST = {
     'projects/steady-conduction-1d/reference/metal-rod-conduction-experiment.jpg',
     # CC BY-SA flow-visualization photograph — preserve the source image unmodified
     'projects/potential-flow-sandbox/reference/real-cylinder-wake-low-re.jpg',
+    # Event photographs — preserve the original night/stage lighting
+    'projects/3dexperience-rb22/f1-photos/IMG_4739.jpg',
+    'projects/3dexperience-rb22/f1-photos/IMG_4753.jpg',
+    'projects/3dexperience-rb22/f1-photos/IMG_4756.jpg',
+    'projects/3dexperience-rb22/f1-photos/IMG_4765.jpg',
+    # Abaqus viewport captures — the software's viewport is dark by design
+    'projects/abaqus-energy-absorber/wall-impact-aluminium.png',
+    'projects/abaqus-energy-absorber/wall-impact-polypropylene.png',
+    'projects/abaqus-energy-absorber/wall-impact-steel.png',
+    'projects/abaqus-energy-absorber/wall-impact-titanium.png',
+    'projects/xc48-abaqus-twin/abaqus-baseline-meshed-specimen.png',
+    'projects/xc48-abaqus-twin/abaqus-m1-von-mises-result.png',
+    'projects/xc48-abaqus-twin/abaqus-m2-von-mises-fracture-stage.png',
+    'projects/xc48-abaqus-twin/abaqus-m3-von-mises-result.png',
+    # Fluent plots and viewport captures — original solver output
+    'projects/fluent-cyl-vnv/source/pipe-centerline-velocity.png',
+    'projects/fluent-cyl-vnv/source/pipe-pressure-drop.png',
+    'projects/fluent-cyl-vnv/source/pipe-velocity-development.png',
+    'projects/fluent-cyl-vnv/source/pipe-velocity-profiles.png',
+    'projects/fluent-cylinder-vortex/source/developed-vorticity.png',
+    'projects/fluent-cylinder-vortex/source/steady-velocity-magnitude.png',
+    'projects/fluent-cylinder-vortex/source/transverse-velocity-patch.png',
+    # Reference photographs selected as project-card covers
+    'projects/pipe-flow-sizing/reference/pump-cutaway.jpg',
+    'projects/powertrain-cycle-simulation/spa-francorchamps-aerial.jpg',
+    # Official/reference spacecraft imagery and Blender renders
+    'projects/space-rider/reference/esa-earth-render.jpg',
+    'projects/space-rider/reference/esa-official-render.jpg',
+    'projects/space-rider/reference/ixv.jpg',
+    'projects/space-rider/reference/nose-pillars.jpg',
+    'projects/space-rider/report/animation-ready.png',
+    'projects/space-rider/report/blueprint-calibration.png',
+    'projects/space-rider/report/official-blueprint.png',
+    'projects/space-rider/report/tail-junction.png',
+    'projects/space-rider/versions/detail-flap.jpg',
+    'projects/space-rider/versions/detail-nozzle.jpg',
+    'projects/space-rider/versions/detail-tail.jpg',
+    'projects/space-rider/versions/detail-wings-full.jpg',
+    'projects/space-rider/versions/v2-720-cinematic.jpg',
+    'projects/space-rider/versions/v5-049-tail-closeup.jpg',
+    'projects/space-rider/versions/v5-050-persp.jpg',
+    'projects/space-rider/versions/v5-050-side.jpg',
+    'projects/space-rider/versions/v5.015-wide.jpg',
+    'projects/space-rider/versions/v5.027-wide.jpg',
+    'projects/space-rider/versions/v5.044-wide.jpg',
+    'projects/space-rider/versions/v5.046-wide.jpg',
+    'projects/space-rider/versions/v5.049-wide.jpg',
 }
 
 
