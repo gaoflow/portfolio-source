@@ -17,11 +17,7 @@ github: 'https://github.com/gaoflow/airfoil-methods'
 
 ## Why run a lightweight check before full CFD
 
-A standard computational fluid dynamics (CFD) workflow is lengthy: selecting an airfoil section, drawing the geometry, generating volume meshes, setting up boundary conditions and turbulence models, and waiting for a RANS solver to converge. A single calculation often takes hours; a complex 3D wing or vehicle setup can take days.
-
-![CFD simulation of pressure and velocity fields around an airfoil](/images/projects/airfoil-methods/source/airfoil-cfd-simulation.webp)
-
-*CFD provides detailed viscous flow and pressure fields, but demands heavy meshing and long compute times*
+A standard computational fluid dynamics (CFD) workflow is lengthy: selecting an airfoil section, drawing fluid domain geometries in CAD, generating volume meshes, setting up boundary conditions and turbulence models, and waiting for a RANS solver to converge. A single calculation often takes hours; complex 3D wings or full vehicle assemblies can take days.
 
 The long wait itself is manageable, but discovering an early input mistake after hours of computing is not:
 
@@ -47,11 +43,17 @@ To make the pre-check as lightweight as possible, I implemented two foundational
 1. **Thin-Airfoil Theory**: reduces the airfoil to a zero-thickness camber line and estimates lift in milliseconds via $C_l = 2\pi\alpha$;
 2. **Hess–Smith Panel Method**: discretizes the real airfoil contour into straight line segments, distributing source and vortex singularities to compute both total lift and surface pressure coefficient ($C_p$).
 
+![NACA 0012 airfoil surface discretized into straight line panels with flow angle arrow](/images/projects/airfoil-methods/geometry-and-panels.svg)
+
+*Airfoil surface discretized into panels with flow angle notation*
+
+The figure above illustrates the geometric discretization: the continuous airfoil curve is divided into interconnected line segments, with cosine clustering at the leading and trailing edges where curvature is highest.
+
 To understand how much trust to place in this demo, I benchmarked it against an authoritative dataset: Charles L. Ladson’s wind-tunnel measurements for the NACA 0012 section from [NASA TM-4074](https://ntrs.nasa.gov/citations/19880019495).
 
 ## A 4.18° baseline example
 
-Before examining the solver code, look at a representative single-point comparison at a moderate angle of attack ($\alpha = 4.18^\circ$).
+Before examining solver details, look at a representative single-point comparison at a moderate angle of attack ($\alpha = 4.18^\circ$).
 
 NACA 0012 is a standard symmetric section: `00` denotes zero camber, and `12` means maximum thickness is 12% of the chord. All three cases use Mach number $M=0.15$. The NASA experiment was conducted at Reynolds number $Re=5.97\times10^6$ with free boundary-layer transition.
 
@@ -73,26 +75,23 @@ This simple example reveals a surprising outcome: **the one-line formula that ig
 
 Why did the more geometrically detailed model perform worse on scalar lift? The answer is that thin-airfoil theory outputs only a single lift value, while the panel method provides the complete chordwise pressure distribution.
 
-## What I actually built
-
-To ensure the verification was clear and reproducible, I organized the workflow into six steps:
-
-1. **Transcribed a single NASA test series**: selected the 16-point dataset from NASA TM-4074 (free transition, $M=0.15$, $Re=5.97\times10^6$, $\alpha \in [-4.05^\circ, 17.35^\circ]$) without mixing test runs;
-2. **Generated analytical geometry**: computed the symmetric NACA 0012 profile from standard 4-digit equations;
-3. **Applied thin-airfoil theory**: evaluated lift with a Prandtl–Glauert compressibility correction;
-4. **Implemented the Hess–Smith solver**: subdivided the airfoil into 160 panels, built source and vortex influence matrices with non-penetration and trailing-edge Kutta conditions, and integrated surface pressures;
-5. **Self-checked solver behaviour**: verified zero-angle symmetry, near-zero pressure drag, and panel grid convergence (from 40 to 240 panels);
-6. **Analyzed physical limits**: evaluated linear lift slopes, high-angle stall divergence, and the inviscid drag blind spot.
-
 ## The experimental reference
 
-The experimental data comes from Charles L. Ladson's [NASA TM-4074](https://ntrs.nasa.gov/citations/19880019495) Table I.
+The experimental benchmark comes from Charles L. Ladson's [NASA TM-4074](https://ntrs.nasa.gov/citations/19880019495) test report.
+
+This testing was conducted at the NASA Langley Low-Turbulence Pressure Tunnel (LTPT).
+
+![NASA Langley Low-Turbulence Pressure Tunnel exterior in 1971](/images/projects/airfoil-methods/source/nasa-ltpt-exterior-1971.jpg)
+
+*Exterior view of the NASA Langley Low-Turbulence Pressure Tunnel in 1971 (NASA photograph L-71-6093)*
+
+This large pressure vessel allowed Reynolds number variations independent of Mach number, ensuring high data purity and low freestream turbulence.
 
 ![NASA TM-4074 drawing of the NACA 0012 airfoil model mounted between wind-tunnel sidewalls](/images/projects/airfoil-methods/source/nasa-tm4074-airfoil-mount.png)
 
 *NASA TM-4074 figure 1: NACA 0012 model mounted between rotating tunnel sidewall plates*
 
-The test was run in the NASA Langley Low-Turbulence Pressure Tunnel. The model spanned the full test section with a 23.66-inch chord and 81 surface pressure taps. Lift and pitching moments were derived by integrating surface tap pressures; drag was measured separately via a downstream wake rake.
+The test model spanned the full test section with a 23.66-inch chord and 81 surface pressure taps. Lift and pitching moments were derived by integrating surface tap pressures; drag was measured separately via a downstream wake rake.
 
 ![NASA Langley photograph of a pressure-tapped NACA 0012 model and tubing](/images/projects/airfoil-methods/source/nasa-naca0012-pressure-tap-model.webp)
 
@@ -120,7 +119,7 @@ This model ignores airfoil thickness, skin friction, and pressure peaks. Its str
 
 To inspect surface pressure peaks and confirm geometric orientation, the model must retain the surface contour.
 
-I divided the airfoil into 160 straight panels with cosine spacing to concentrate resolution at the leading and trailing edges:
+I divided the airfoil into 160 straight panels:
 
 1. **Non-penetration condition**: surface-normal velocity at each panel midpoint is enforced to zero;
 2. **Circulation & Kutta condition**: a uniform vortex sheet enforces smooth flow departure at the sharp trailing edge;
