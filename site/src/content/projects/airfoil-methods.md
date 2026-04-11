@@ -27,21 +27,21 @@ The long wait itself is manageable, but discovering an early input mistake after
 
 If a basic error slips into step one, all subsequent compute time is wasted.
 
-My goal was straightforward: **before launching an expensive, multi-hour CFD run, build a fast, millisecond-level sanity check to catch common setup blunders.**
+My goal was straightforward: before launching an expensive, multi-hour CFD run, build a fast, millisecond-level sanity check to catch common setup blunders.
 
 It does not need three-decimal precision, but it must immediately answer three questions:
 1. Is the lift acting in the intended direction?
 2. Is the estimated lift magnitude within a reasonable range?
 3. Where is the main surface suction peak located?
 
-This article is a set of **learning notes** documenting that low-order workflow, alongside a self-contained Python demo.
+This article is a set of learning notes documenting that low-order workflow, alongside a self-contained Python demo.
 
 ## The small demo: two classical inviscid methods
 
 To make the pre-check as lightweight as possible, I implemented two foundational potential-flow models:
 
-1. **Thin-Airfoil Theory**: reduces the airfoil to a zero-thickness camber line and estimates lift in milliseconds via $C_l = 2\pi\alpha$;
-2. **Hess–Smith Panel Method**: discretizes the real airfoil contour into straight line segments, distributing source and vortex singularities to compute both total lift and surface pressure coefficient ($C_p$).
+1. Thin-Airfoil Theory: reduces the airfoil to a zero-thickness camber line and estimates lift in milliseconds via $C_l = 2\pi\alpha$;
+2. Hess–Smith Panel Method: discretizes the real airfoil contour into straight line segments, distributing source and vortex singularities to compute both total lift and surface pressure coefficient ($C_p$).
 
 ![NACA 0012 airfoil surface discretized into straight line panels with flow angle arrow](/images/projects/airfoil-methods/geometry-and-panels.svg)
 
@@ -71,7 +71,7 @@ $$
 
 This allows direct comparison across analytical formulas, numerical solvers, and experimental measurements.
 
-This simple example reveals a surprising outcome: **the one-line formula that ignores airfoil thickness has an error of only 2.6%, whereas the 160-panel method that models the 12% thickness profile overshoots by 12.8%.**
+This simple example reveals a surprising outcome: the one-line formula that ignores airfoil thickness has an error of only 2.6%, whereas the 160-panel method that models the 12% thickness profile overshoots by 12.8%.
 
 Why did the more geometrically detailed model perform worse on scalar lift? The answer is that thin-airfoil theory outputs only a single lift value, while the panel method provides the complete chordwise pressure distribution.
 
@@ -113,7 +113,7 @@ where $\alpha$ is in radians (approximately 0.1097 per degree).
 
 At $\alpha = 4.18^\circ$ (0.07295 rad), the incompressible result is 0.4584. Applying the Prandtl–Glauert factor $1/\sqrt{1-M^2} \approx 1.0114$ at $M=0.15$ yields $C_l = 0.4636$.
 
-This model ignores airfoil thickness, skin friction, and pressure peaks. Its strength lies in **immediate feedback**—confirming the direction and order of magnitude of lift in less than a millisecond.
+This model ignores airfoil thickness, skin friction, and pressure peaks. Its strength lies in immediate feedback—confirming the direction and order of magnitude of lift in less than a millisecond.
 
 ## Method 2: Hess–Smith Panel Method
 
@@ -121,10 +121,10 @@ To inspect surface pressure peaks and confirm geometric orientation, the model m
 
 I divided the airfoil into 160 straight panels:
 
-1. **Non-penetration condition**: surface-normal velocity at each panel midpoint is enforced to zero;
-2. **Circulation & Kutta condition**: a uniform vortex sheet enforces smooth flow departure at the sharp trailing edge;
-3. **Linear system solution**: source and vortex strengths are resolved simultaneously;
-4. **Surface pressure coefficient calculation**:
+1. Non-penetration condition: surface-normal velocity at each panel midpoint is enforced to zero;
+2. Circulation & Kutta condition: a uniform vortex sheet enforces smooth flow departure at the sharp trailing edge;
+3. Linear system solution: source and vortex strengths are resolved simultaneously;
+4. Surface pressure coefficient calculation:
 
 $$
 C_p = 1 - \left(\frac{V_t}{V_\infty}\right)^2.
@@ -142,17 +142,17 @@ By aerodynamic convention, the $C_p$ vertical axis is inverted. At positive angl
 
 Before comparing with NASA, I verified solver correctness through three baseline checks:
 
-1. **Symmetry**: at $\alpha=0^\circ$, lift is zero and upper/lower pressure distributions coincide;
-2. **Inviscid drag**: pressure drag numerically integrates to the $10^{-4}$ level;
-3. **Panel refinement**: solved across 40, 80, 160, and 240 panels.
+1. Symmetry: at $\alpha=0^\circ$, lift is zero and upper/lower pressure distributions coincide;
+2. Inviscid drag: pressure drag numerically integrates to the $10^{-4}$ level;
+3. Panel refinement: solved across 40, 80, 160, and 240 panels.
 
 ![Lift coefficient at 4 degrees as panel count increases from 40 to 240](/images/projects/airfoil-methods/panel-refinement.svg)
 
 *Lift coefficient convergence with increasing panel density at 4°*
 
-At $4^\circ$, $C_l$ evaluated to 0.48646 (40 panels), 0.48727 (80 panels), 0.48773 (160 panels), and 0.48788 (240 panels). Increasing from 160 to 240 panels changed $C_l$ by only **0.0307%**.
+At $4^\circ$, $C_l$ evaluated to 0.48646 (40 panels), 0.48727 (80 panels), 0.48773 (160 panels), and 0.48788 (240 panels). Increasing from 160 to 240 panels changed $C_l$ by only 0.0307%.
 
-This confirms grid independence: **any difference against wind-tunnel data stems from model physics, not spatial discretization.**
+This confirms grid independence: any difference against wind-tunnel data stems from model physics, not spatial discretization.
 
 ## Physics takeaways & surprises
 
@@ -165,17 +165,17 @@ Fitting a linear slope over the $-4.1^\circ \leq \alpha \leq 10.2^\circ$ range:
 | Linear range ($-4.1^\circ \sim 10.2^\circ$) | NASA | Thin Airfoil + P–G | Hess–Smith + P–G |
 |---|---:|---:|---:|
 | Lift slope per degree | 0.10684 | 0.11092 | 0.12162 |
-| Relative slope error | — | **+3.81%** | **+13.83%** |
-| Linear-range $C_l$ RMSE | — | **0.0226** | **0.0824** |
+| Relative slope error | — | +3.81% | +13.83% |
+| Linear-range $C_l$ RMSE | — | 0.0226 | 0.0824 |
 
 ![NASA lift measurements compared with thin-airfoil theory and the Hess–Smith panel method](/images/projects/airfoil-methods/lift-validation.svg)
 
 *NASA lift measurements compared against both inviscid models*
 
 Why does the panel method overestimate the lift slope?
-- **Inviscid overprediction**: thickness accelerates flow over the upper surface; in ideal potential flow with a sharp Kutta condition, this extra circulation is retained without penalty.
-- **Viscous decambering in reality**: real air forms a boundary layer that thickens toward the trailing edge, decambering the effective section and reducing real circulation.
-- **Thin-airfoil cancellation**: thin-airfoil theory ignores thickness entirely, and this omission fortuitously offsets the lack of viscous decambering.
+- Inviscid overprediction: thickness accelerates flow over the upper surface; in ideal potential flow with a sharp Kutta condition, this extra circulation is retained without penalty.
+- Viscous decambering in reality: real air forms a boundary layer that thickens toward the trailing edge, decambering the effective section and reducing real circulation.
+- Thin-airfoil cancellation: thin-airfoil theory ignores thickness entirely, and this omission fortuitously offsets the lack of viscous decambering.
 
 The panel method remains valuable because it yields the surface pressure profile needed to catch geometry errors.
 
@@ -199,7 +199,7 @@ NASA measured real momentum loss in the wake, finding $C_d \approx 0.0065$ near 
 
 *NASA measured drag vs. panel-method near-zero pressure drag*
 
-The panel method's integrated pressure drag remained below 0.0008. This is **d’Alembert’s Paradox**: an ideal, steady, inviscid potential flow around a closed 2D body produces zero net pressure drag.
+The panel method's integrated pressure drag remained below 0.0008. This is d’Alembert’s Paradox: an ideal, steady, inviscid potential flow around a closed 2D body produces zero net pressure drag.
 
 ## Scope and practical takeaways
 
@@ -207,12 +207,11 @@ This study provides clear guidelines for when to use these low-order tools:
 
 | Method | What it is suited for (Pre-CFD sanity check) | What it must not be used for |
 |---|---|---|
-| **Thin-Airfoil Theory** | Instant sanity checks on lift sign and linear magnitude | Surface pressure, thickness effects, drag, or stall |
-| **Hess–Smith Panel Method** | Checking geometry orientation, curvature smoothness, and $C_p$ suction peaks | Skin-friction drag, boundary-layer transition, stall angles, or multi-element slot flows |
-| **Viscous CFD / Wind Tunnel** | Computing skin friction, separated flows, 3D downwash, and vehicle aero | Checking basic angle-of-attack sign conventions (too costly and slow) |
+| Thin-Airfoil Theory | Instant sanity checks on lift sign and linear magnitude | Surface pressure, thickness effects, drag, or stall |
+| Hess–Smith Panel Method | Checking geometry orientation, curvature smoothness, and $C_p$ suction peaks | Skin-friction drag, boundary-layer transition, stall angles, or multi-element slot flows |
+| Viscous CFD / Wind Tunnel | Computing skin friction, separated flows, 3D downwash, and vehicle aero | Checking basic angle-of-attack sign conventions (too costly and slow) |
 
-**Conclusion:**
-Spending 0.01 seconds running this Python demo before starting a multi-hour OpenFOAM or Fluent simulation prevents costly setup mistakes at near-zero cost.
+Conclusion: spending 0.01 seconds running this Python demo before starting a multi-hour OpenFOAM or Fluent simulation prevents costly setup mistakes at near-zero cost.
 
 ## Code and reproduction
 
