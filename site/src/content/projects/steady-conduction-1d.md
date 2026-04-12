@@ -11,7 +11,8 @@ duration: 'Independent study'
 featured: false
 order: 12
 studySequence: 6
-heroImage: /images/projects/steady-conduction-1d/temperature-profile.svg
+heroImage: /images/projects/steady-conduction-1d/reference/metal-bar-induction-heating.jpg
+cardImageFit: cover
 github: 'https://github.com/gaoflow/steady-conduction-1d'
 ---
 
