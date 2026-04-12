@@ -11,7 +11,7 @@ duration: '独立构建'
 featured: false
 order: 14
 studySequence: 2
-heroImage: /images/projects/potential-flow-sandbox/streamlines-cylinder.svg
+heroImage: /images/projects/potential-flow-sandbox/source/prandtl-tietjens-magnus-cylinder-1926.png
 cardImageFit: cover
 github: 'https://github.com/gaoflow/potential-flow-sandbox'
 ---
@@ -24,13 +24,18 @@ github: 'https://github.com/gaoflow/potential-flow-sandbox'
 
 先不管复数，想象水绕过一根圆桥墩。离桥墩很远，水大致从左往右流。到了桥墩正前方，水慢下来，再分成上下两路绕过去。如果上下两路完全对称，桥墩前后各有一个速度为零的点，也就是停滞点。如果再让整片水流带一点顺时针旋转，上下两侧的速度会变得不一样：一侧更快、压力更低，另一侧更慢、压力更高，于是出现向上的合力。
 
+头图就是一张这样的真实照片：1926 年 Prandtl 和 Tietjens 在水槽里拍下的旋转圆柱绕流。圆柱一转，就相当于给流动加上了环量——照片里流线上下明显不对称，这就是能产生升力的马格努斯效应。我在本文里用公式拼出来再逐项核对的，正是这张照片背后的那件事。（原图来自 NACA TM 364，公有领域。）
+
 ## 我只想回答一个问题
 
 把几种基本流动叠成圆柱绕流后，这套代码能不能同时守住圆柱边界，并算对压力、停滞点、环量、升力和流线？
 
 ## 四块积木怎么拼出圆柱
 
-势流方程是线性的，几个简单流动可以直接相加。我先做了四块积木：均匀流把整片流体往一个方向带；源让流体从一点向外散开；偶极子可以理解成靠得很近的一对源和汇；点涡让流体绕着一点旋转。
+势流方程是线性的，几个简单流动可以直接相加。我先做了四块积木：均匀流把整片流体往一个方向带；源让流体从一点向外散开；偶极子可以理解成靠得很近的一对源和汇；点涡让流体绕着一点旋转。四块积木各自的流线长这样：
+
+![四种基本流动的流线示意：均匀流、源、偶极子、点涡](/images/projects/potential-flow-sandbox/building-blocks.svg)
+*按复势公式直接画出的四种基本流动示意，不是验收图。点涡箭头为顺时针，对应正文采用的正环量约定。*
 
 写成复势 $W(z)$ 后，$z=x+iy$，速度由
 
@@ -55,7 +60,9 @@ $$
 W(z)=U\left(z+\frac{R^2}{z}\right)+\frac{i\Gamma}{2\pi}\ln z.
 $$
 
-首页图画的是无环量情况：流体从左边来，绕过圆柱，前后两个橙色点是停滞点。这张图只展示流动长什么样，是否算对还要继续往下查。
+下面这张图画的是无环量情况：流体从左边来，绕过圆柱，前后两个橙色点是停滞点。这张图只展示流动长什么样，是否算对还要继续往下查。
+
+![无环量圆柱绕流的流线：流体从左侧来，绕过圆柱，橙色点为前后停滞点](/images/projects/potential-flow-sandbox/streamlines-cylinder.svg)
 
 ## 先查积木，再查圆柱边界
 
@@ -119,7 +126,7 @@ $$
 
 “阻力为零”不是对桥墩或真实圆柱的预测。势流模型拿掉了黏性，这个零阻力结果就是达朗贝尔悖论。模型里没有边界层、分离和尾迹，而真实圆柱的阻力恰恰主要来自这些现象。
 
-下面的实验图能看出这个差别。黏性流动在圆柱后方交替脱落成卡门涡街；首页的理想势流图前后对称，没有真正的尾流。
+下面的实验图能看出这个差别。黏性流动在圆柱后方交替脱落成卡门涡街；上面的理想势流图前后对称，没有真正的尾流。
 
 ![真实黏性流动绕过圆柱后形成卡门涡街](/images/projects/potential-flow-sandbox/reference/real-cylinder-wake-low-re.jpg)
 
