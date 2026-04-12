@@ -11,7 +11,7 @@ duration: '独立开发'
 featured: false
 order: 11
 studySequence: 1
-heroImage: /images/projects/dimensionless-numbers/reynolds-sweep.svg
+heroImage: /images/projects/dimensionless-numbers/source/reynolds-observations-1883.svg
 github: 'https://github.com/gaoflow/dimensionless-numbers'
 ---
 
@@ -27,6 +27,8 @@ github: 'https://github.com/gaoflow/dimensionless-numbers'
 
 > 一个很小的工程计算工具，能不能既方便手算复核，又能主动拦住单位和物性输入错误？
 
+头图就是雷诺 1883 年论文里的原始插图：同一根玻璃管里，速度低的时候染料拉成一条直线（层流），速度上去以后染料突然散开、混成一片（湍流）。他正是从这类观察里意识到，决定流态的不是速度、管径或黏度中的任何一个单独量，而是它们组合起来的比例——也就是后来以他命名的雷诺数。（原图来自 Wikimedia Commons，公有领域。）
+
 ## 先用一个桌面上的例子理解它
 
 想象一台桌面风扇，以大约 3 m/s 的速度吹过一张 15 cm 宽的卡片。取海平面空气密度 $\rho=1.225\ \mathrm{kg/m^3}$、动力黏度 $\mu=1.81\times10^{-5}\ \mathrm{Pa\cdot s}$，那么：
@@ -37,11 +39,11 @@ Re=\frac{\rho uL}{\mu}
 \approx3.05\times10^4.
 $$
 
-这个数字没有单位。它表达的是“流体往前冲的惯性”和“黏性把流动抹平的能力”之间的比例。NASA Glenn 对 [雷诺数和相似参数](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/similarity-parameters/) 的解释也强调了这一点：如果两个问题的关键相似参数接近，里面几种力的相对重要性才有可比性。
+这个数字没有单位。它表达的是“流体往前冲的惯性”和“黏性把流动抹平的能力”之间的比例。NASA Glenn 对 [雷诺数和相似参数](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/similarity-parameters/) 的解释也强调了这一点：只要两个问题的关键相似参数接近，流动里几种力的相对大小才有可比性。
 
 桌面风扇、赛车翼和整车看起来完全不是一回事，却可以放进同一个比例里比较。下面这张图没有尝试预测转捩，只是把三个尺度放到同一条对数轴上，让数量级变得直观。
 
-![Everyday airflow and racecar Reynolds-number examples](/images/projects/dimensionless-numbers/reynolds-examples.svg)
+![桌面风扇、赛车翼和整车三种尺度下的雷诺数对比](/images/projects/dimensionless-numbers/reynolds-examples.svg)
 
 ## 我把六个常用问题放进了同一套接口
 
@@ -162,7 +164,7 @@ PYTHONPATH=src python3 -m dimensionless_numbers reynolds \
 
 ## 最后保留下来的四项结果
 
-![Validation checks retained after the study](/images/projects/dimensionless-numbers/validation-summary.svg)
+![本研究最终保留的四项验证检查](/images/projects/dimensionless-numbers/validation-summary.svg)
 
 | 检查 | 实际结果 | 通过条件 |
 |---|---:|---:|
@@ -177,9 +179,12 @@ PYTHONPATH=src python3 -m dimensionless_numbers reynolds \
 
 在同样的海平面空气物性下，0.3 m 翼弦在 15 m/s 时是 $Re\approx3.05\times10^5$；如果只是做一个 5 m 特征长度、60 m/s 的整车尺度参考，结果是 $Re\approx2.03\times10^7$。速度放大 4 倍、长度放大约 16.7 倍，雷诺数就一起放大约 66.7 倍。
 
+![三条长度尺度下雷诺数随速度的变化：0.3 m 翼弦、1 m 侧箱和 5 m 整车](/images/projects/dimensionless-numbers/reynolds-sweep.svg)
+*速度和长度一起决定雷诺数的量级。三条曲线分别取 0.3 m 翼弦、1 m 侧箱和 5 m 整车长度，两个标记点就是上面算过的两个参考值。*
+
 这个数量级差异会提醒我：一块翼、一条冷却通道和整车不能因为都在空气里，就直接套用同一套经验判断。先把速度、长度和物性放进同一个无量纲比例，至少能避免在完全不同的尺度上盲目类比。
 
-但我不会仅凭雷诺数宣布流动已经层流、转捩或完全湍流。真实结果还受几何形状、表面粗糙度、压力梯度、来流湍流度和边界条件影响。头图里的曲线只展示尺度变化，不是转捩预测器。
+但我不会仅凭雷诺数宣布流动已经层流、转捩或完全湍流。真实结果还受几何形状、表面粗糙度、压力梯度、来流湍流度和边界条件影响。上面这张图只展示尺度随速度和长度的变化，不是转捩预测器。
 
 ## 这套工具明确做不到什么
 

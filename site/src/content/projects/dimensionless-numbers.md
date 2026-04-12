@@ -11,7 +11,7 @@ duration: 'Independent build'
 featured: false
 order: 11
 studySequence: 1
-heroImage: /images/projects/dimensionless-numbers/reynolds-sweep.svg
+heroImage: /images/projects/dimensionless-numbers/source/reynolds-observations-1883.svg
 github: 'https://github.com/gaoflow/dimensionless-numbers'
 ---
 
@@ -26,6 +26,8 @@ That problem matched a habit I brought from software engineering. I did not want
 The real question was therefore not “Can Python calculate Reynolds number?” It was:
 
 > Can a very small engineering tool remain easy to check by hand while actively catching unit and property-input mistakes?
+
+The header image is the original illustration from Reynolds' 1883 paper: in the same glass tube, the dye streak stays a straight line at low speed (laminar flow) and suddenly breaks up and mixes at higher speed (turbulent flow). From observations like this he concluded that the flow regime is set not by speed, diameter, or viscosity alone, but by the ratio they form together — the number later named after him. (Image: Wikimedia Commons, public domain.)
 
 ## An everyday example first
 
@@ -177,9 +179,12 @@ The checks answer four different questions: Does the base equation calculate cor
 
 With the same sea-level air properties, a 0.3 m chord at 15 m/s gives $Re\approx3.05\times10^5$. A separate full-car-scale reference using a 5 m length and 60 m/s gives $Re\approx2.03\times10^7$. Multiplying speed by 4 and length by about 16.7 multiplies Reynolds number by about 66.7.
 
+![Reynolds number versus velocity for three characteristic lengths: a 0.3 m wing chord, a 1 m sidepod, and a 5 m full car](/images/projects/dimensionless-numbers/reynolds-sweep.svg)
+*Speed and length together set the Reynolds-number scale. The three curves use a 0.3 m wing chord, a 1 m sidepod, and a 5 m full-car length; the two markers are the reference values calculated above.*
+
 That difference reminds me not to transfer intuition blindly between a wing element, a cooling passage, and a whole vehicle just because they all involve air. Putting speed, length, and fluid properties into the same dimensionless ratio at least exposes when two cases occupy very different scales.
 
-I still do not use Reynolds number alone to declare a flow laminar, transitional, or fully turbulent. Geometry, surface roughness, pressure gradient, free-stream turbulence, and boundary conditions all matter. The hero chart shows a scale sweep, not a transition predictor.
+I still do not use Reynolds number alone to declare a flow laminar, transitional, or fully turbulent. Geometry, surface roughness, pressure gradient, free-stream turbulence, and boundary conditions all matter. The chart above only shows how the scale changes with speed and length; it is not a transition predictor.
 
 ## What this toolkit cannot do
 
