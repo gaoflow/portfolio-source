@@ -1,5 +1,5 @@
 ---
-title: '调大一点点时间步长，却让二维热扩散求解器瞬间崩溃？'
+title: '从积雪按砖块轮廓融化到热扩散求解器'
 year: 2026
 date: '2026-02-07'
 status: complete
@@ -11,17 +11,14 @@ duration: '独立研究'
 featured: false
 order: 15
 studySequence: 7
-heroImage: /images/projects/heat-diffusion-2d/thermal-spreading-infrared.jpg
+heroImage: /images/projects/heat-diffusion-2d/snow-melting-over-paving-stones.jpg
+cardImageFit: cover
 github: 'https://github.com/gaoflow/heat-diffusion-2d'
 ---
 
 ## 从铺路石上的积雪说起
 
 热量在固体里扩散是看不见的，但雪停之后，铺路石上方的积雪往往比周围泥土上的先融化，甚至能清楚印出每一块砖的轮廓。原因是砖石和泥土的导热能力不同，地下储存的热量沿砖块向上传得更快，雪面温度分布因此出现差异。
-
-![铺路石上方积雪按砖块轮廓融化的实景照片](/images/projects/heat-diffusion-2d/snow-melting-over-paving-stones.jpg)
-
-*铺路石上的积雪按砖块轮廓融化*
 
 我真正想研究的就是这个现象。同一个机制也出现在工程里：芯片下方的均温板、电池包的散热底板，都是局部热源先把热量聚在一处，再靠固体导热慢慢摊平。但真实的积雪融化还涉及融化潜热、雪层厚度不均和复杂的材料界面，变量太多，不适合直接上手。我把它简化成一个能严格对账的问题：一块单侧受冷的二维金属板。我要写的，就是把这个随时间摊平的过程算出来的求解器。
 
@@ -36,6 +33,10 @@ github: 'https://github.com/gaoflow/heat-diffusion-2d'
 ## 简化模型：一块单侧受冷的金属板
 
 把积雪问题简化后的模型是这样的：一块二维金属板，初始全场温度 $T=1$；在 $t=0$ 瞬间，左边界贴上恒温 $T=0$ 的冷源，其余三边全部绝热，板内热量只能从左侧这唯一的通道散失。
+
+![红外热成像下平板上的局部热点向四周扩散](/images/projects/heat-diffusion-2d/thermal-spreading-infrared.jpg)
+
+*红外热成像下的平板，局部热点的热量向四周扩散*
 
 这里的温度经过无量纲化，结果可以等比缩放到任意真实工况。这个模型保留了积雪问题的核心物理——热量在固体内部随时间扩散、逐渐摊平温度起伏——但去掉了潜热、复杂几何和材料界面，并且有严格的傅里叶级数解析解，可以随时把数值解拉出来逐点对账。
 
