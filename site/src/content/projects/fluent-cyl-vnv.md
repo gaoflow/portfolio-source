@@ -1,7 +1,7 @@
 ---
 title: 'How I Checked Fluent with Exact Solutions, Mesh Studies and Experimental Data'
 year: 2026
-date: '2026-04-11'
+date: '2026-03-12'
 status: complete
 categories: [component-cfd, validation]
 tags: [CFD]
@@ -37,7 +37,7 @@ academic:
       caption: 'Pressure peaks at the upstream stagnation point and falls around the cylinder shoulders, explaining the integrated pressure-drag result.'
 featured: true
 order: 16
-studySequence: 12
+studySequence: 9
 heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
 ---
 

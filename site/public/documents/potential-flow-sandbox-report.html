@@ -136,7 +136,11 @@ isolates the vortex term.</p>
 <p><strong>Streamline tracing.</strong> A fixed-step classical RK4
 integrator marches along the unit velocity field from
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>−</mi><mn>3</mn><mo>,</mo><mn>1.2</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(-3, 1.2)</annotation></semantics></math>
-around the cylinder. At step
+around the cylinder. A computed step-halving series from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><mn>0.08</mn></mrow><annotation encoding="application/x-tex">h = 0.08</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.005</mn><annotation encoding="application/x-tex">0.005</annotation></semantics></math>
+checks the slope rather than one visually smooth path. At step
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo>=</mo><mn>0.01</mn></mrow><annotation encoding="application/x-tex">h = 0.01</annotation></semantics></math>
 the maximum drift of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ψ</mi><annotation encoding="application/x-tex">\psi</annotation></semantics></math>
@@ -221,6 +225,12 @@ style="text-align: right;"><math display="inline" xmlns="http://www.w3.org/1998/
 hand values, surface impermeability, the far-field decay, the
 circulation sign convention, and the fourth-order convergence of the
 tracer.</p>
+<p>The analysis also regenerates four single-panel SVG figures: a
+no-circulation streamline overview, a circulation-and-lift view, the
+computed RK4 convergence series, and a
+surface-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>p</mi></msub><annotation encoding="application/x-tex">C_p</annotation></semantics></math>
+comparison. The plotted convergence data are stored in
+<code>results/analysis.json</code> alongside the acceptance metrics.</p>
 <h2 id="limitations">Limitations</h2>
 <ul>
 <li>The model is inviscid, irrotational, and incompressible; there is no

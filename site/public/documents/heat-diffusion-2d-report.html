@@ -95,6 +95,12 @@ raises <code>StabilityError</code> and logs the refusal <em>before</em>
 any integration when
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>&gt;</mo><mn>0.25</mn></mrow><annotation encoding="application/x-tex">r&gt;0.25</annotation></semantics></math>.
 A diverging field is never produced silently.</p>
+<figure>
+<img src="/images/projects/heat-diffusion-2d/stability-limit.svg"
+alt="Worst-mode amplification and the FTCS stability limit" />
+<figcaption aria-hidden="true">Worst-mode amplification and the FTCS
+stability limit</figcaption>
+</figure>
 <h3 id="analytical-reference">Analytical reference</h3>
 <p>Validation uses the transient in a slab
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn><mo>≤</mo><mi>x</mi><mo>≤</mo><mi>L</mi></mrow><annotation encoding="application/x-tex">0\leq x\leq L</annotation></semantics></math>
@@ -172,11 +178,22 @@ and
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>n</mi><mi>x</mi></msub><mo>=</mo><mn>200</mn></mrow><annotation encoding="application/x-tex">n_x=200</annotation></semantics></math>
 scale the error by the expected factor of four, consistent with
 second-order space.</p>
+<p>The three profiles below show the physical story before the numerical
+comparison: the fixed-temperature wall cools first, then the cooling
+front moves toward the insulated end.</p>
 <figure>
-<img src="/images/projects/heat-diffusion-2d/temperature-field.svg"
-alt="Temperature field at t = 0.05 s" />
-<figcaption aria-hidden="true">Temperature field at t = 0.05
-s</figcaption>
+<img src="/images/projects/heat-diffusion-2d/temperature-profiles.svg"
+alt="Temperature profiles at three times" />
+<figcaption aria-hidden="true">Temperature profiles at three
+times</figcaption>
+</figure>
+<p>The direct overlay uses the analytical curve and sparse numerical
+markers so that any visible separation would be easy to spot.</p>
+<figure>
+<img src="/images/projects/heat-diffusion-2d/analytical-validation.svg"
+alt="FTCS result overlaid on the analytical slab solution" />
+<figcaption aria-hidden="true">FTCS result overlaid on the analytical
+slab solution</figcaption>
 </figure>
 <h3 id="b-temporal-order">(b) Temporal order</h3>
 <p>FTCS applied to the heat equation carries the combined leading error
@@ -236,7 +253,7 @@ s shows a maximum cross-direction variation of exactly
 (tolerance
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10</mn><mrow><mi>−</mi><mn>14</mn></mrow></msup><annotation encoding="application/x-tex">10^{-14}</annotation></semantics></math>)
 and remains within
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>8.60</mn><mo>×</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>5</mn></mrow></msup></mrow><annotation encoding="application/x-tex">8.60\times10^{-5}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>8.60</mn><mo>×</mo><msup><mn>10</mn><mrow><mi>−</mi><mn>6</mn></mrow></msup></mrow><annotation encoding="application/x-tex">8.60\times10^{-6}</annotation></semantics></math>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>L</mi><mi>∞</mi></msup><annotation encoding="application/x-tex">L^\infty</annotation></semantics></math>
 of the analytical solution at the final time.</p>
 <h2 id="acceptance-summary">Acceptance summary</h2>

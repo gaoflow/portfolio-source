@@ -1,7 +1,7 @@
 ---
 title: '在 Fluent 中模拟卡门涡街'
 year: 2026
-date: '2026-03-12'
+date: '2026-04-11'
 status: complete
 categories: [component-cfd, validation]
 tags: [CFD]
@@ -19,7 +19,7 @@ academic:
     - '将受力结果与提供的实验参考值比较，并讨论差异。'
 featured: true
 order: 17
-studySequence: 9
+studySequence: 12
 heroImage: /images/projects/fluent-cylinder-vortex/source/developed-vorticity.png
 ---
 

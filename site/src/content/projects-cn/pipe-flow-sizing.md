@@ -11,7 +11,7 @@ duration: '独立研究'
 featured: false
 order: 13
 studySequence: 3
-heroImage: /images/projects/pipe-flow-sizing/reference/pump-cutaway.jpg
+heroImage: /images/projects/pipe-flow-sizing/reference/car-water-pump.jpg
 cardImageFit: cover
 github: 'https://github.com/gaoflow/pipe-flow-sizing'
 ---
@@ -28,13 +28,11 @@ github: 'https://github.com/gaoflow/pipe-flow-sizing'
 
 当时没有实测泵曲线、散热器压降和水套数据，所以这项研究先验证计算方法。文中的泵曲线和部件阻力都是明确写出的替代值，26.22 L/min 不是车辆实测流量。
 
-页首是一台离心水泵剖面展示件，不是车队使用的水泵。照片：S.J. de Waard，[CC BY 2.5](https://creativecommons.org/licenses/by/2.5/)，经 [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pump_(Cut-Away).JPG)。
+页首是一台真实的发动机驱动冷却水泵，与 FSAE 燃油车使用的类型相同，但不是车队自己的水泵。照片：Maly LOLek，[CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)，经 [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pompa_wody2.jpg)。
 
 ## 水先要走完这条路
 
 要算流量，我先把回路拆成四段：吸入软管、散热器芯体、发动机水道和回流软管。它们首尾相接，水依次流过每一段，最后回到泵里。
-
-![串联冷却回路](/images/projects/pipe-flow-sizing/cooling-loop-schematic.svg)
 
 串联回路有一个好处：每一段的流量相同。我只要算出四段各自损失多少压力，再把它们相加，就得到整条回路在这个流量下需要多少压力。
 
@@ -111,7 +109,7 @@ $$
 
 换一批流量重复计算，就得到系统曲线。流量越大，回路消耗的压力越高，所以这条曲线向上走。
 
-水泵提供的是另一条曲线。页首剖面图能看到电机、叶轮和泵壳。叶轮给水加能，但水泵不会在所有阻力下都强行送出同一个流量。本项目用一条简单的二次曲线代替真实泵数据：
+水泵提供的是另一条曲线。页首那台水泵由发动机通过皮带轮驱动，泵壳内的叶轮负责给水加能。但水泵不会在所有阻力下都强行送出同一个流量。本项目用一条简单的二次曲线代替真实泵数据：
 
 $$
 \Delta p_{pump}=90\ \text{kPa}-cQ^2.

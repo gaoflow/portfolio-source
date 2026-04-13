@@ -1,18 +1,17 @@
 ---
 title: '用精确解、网格和实验数据对比分析 Fluent 结果'
 year: 2026
-date: '2026-04-11'
+date: '2026-03-12'
 status: complete
 categories: [component-cfd, validation]
 tags: [CFD]
-summary: ''
+summary: '用 Poiseuille 精确解检查 Fluent 管流计算，再对圆柱绕流做网格、计算域和 Re=0.1–20 扫描，并与实验数据比较。'
 role: 'Fluent 仿真、数据验证与报告整理'
 duration: '7 周'
 academic:
   institution: 'ESILV'
   course: '计算流体力学'
   assignment: '管流精确解验证与圆柱绕流验证研究'
-  note: '用 Poiseuille 精确解检查 Fluent 管流计算，再对圆柱绕流做网格、计算域和 Re=0.1–20 扫描，并与实验数据比较。'
   requirements:
     - '根据 Poiseuille 速度、壁面剪切力、压降和入口段长度验证层流管流。'
     - '在 Re=10 时确认圆柱网格无关性。'
@@ -20,7 +19,7 @@ academic:
     - '将雷诺数从 0.1 扫描至 20，并在课程规定的 5% 门槛下与给定实验表中的阻力进行比较。'
 featured: true
 order: 16
-studySequence: 12
+studySequence: 9
 heroImage: /images/projects/fluent-cyl-vnv/velocity-re20.png
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: 'How I Triggered and Measured a Kármán Vortex Street in Fluent'
 year: 2026
-date: '2026-03-12'
+date: '2026-04-11'
 status: complete
 categories: [component-cfd, validation]
 tags: [CFD]
@@ -28,7 +28,7 @@ academic:
       caption: 'Four retained Fluent frames show the imposed asymmetry growing into a developed Kármán vortex street.'
 featured: true
 order: 17
-studySequence: 9
+studySequence: 12
 heroImage: /images/projects/fluent-cylinder-vortex/force-history.svg
 ---
 

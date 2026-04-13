@@ -61,7 +61,7 @@ ALLOWLIST = {
     'projects/fluent-cylinder-vortex/source/steady-velocity-magnitude.png',
     'projects/fluent-cylinder-vortex/source/transverse-velocity-patch.png',
     # Reference photographs selected as project-card covers
-    'projects/pipe-flow-sizing/reference/pump-cutaway.jpg',
+    'projects/pipe-flow-sizing/reference/car-water-pump.jpg',
     'projects/powertrain-cycle-simulation/spa-francorchamps-aerial.jpg',
     # Official/reference spacecraft imagery and Blender renders
     'projects/space-rider/reference/esa-earth-render.jpg',

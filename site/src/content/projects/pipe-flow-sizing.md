@@ -11,7 +11,7 @@ duration: 'Independent study'
 featured: false
 order: 13
 studySequence: 3
-heroImage: /images/projects/pipe-flow-sizing/reference/pump-cutaway.jpg
+heroImage: /images/projects/pipe-flow-sizing/reference/car-water-pump.jpg
 cardImageFit: cover
 github: 'https://github.com/gaoflow/pipe-flow-sizing'
 ---
@@ -28,13 +28,11 @@ If I overestimated the flow here, the later thermal model could be numerically p
 
 I did not yet have measured pump, radiator or water-jacket data. This study therefore checks the calculation method with declared substitute inputs. The result of 26.22 L/min is not a measured vehicle flow rate.
 
-The header shows a cutaway centrifugal-pump display, not team hardware. Photo: S.J. de Waard, [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pump_(Cut-Away).JPG).
+The header shows a real engine-driven coolant pump, the type used in FSAE combustion cars, not the team's own pump. Photo: Maly LOLek, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pompa_wody2.jpg).
 
 ## The route the coolant must follow
 
 I split the loop into four elements: a suction hose, radiator core, engine gallery and return hose. They connect end to end, so the coolant passes through each one before returning to the pump.
-
-![Series cooling loop](/images/projects/pipe-flow-sizing/cooling-loop-schematic.svg)
 
 A series loop has one useful property: the flow rate is the same through every element. I can calculate the pressure lost in each part, add the four losses, and obtain the pressure required by the complete loop at that flow rate.
 
@@ -111,7 +109,7 @@ $$
 
 Repeating this calculation over a range of flows produces the system curve. Higher flow means higher loop loss, so the curve rises.
 
-The pump supplies the other curve. The cutaway at the top shows a motor, impeller and casing. The impeller adds energy to the coolant, but a pump does not force one fixed flow through every level of resistance. For this study, I used a simple quadratic curve in place of measured pump data:
+The pump supplies the other curve. The pump in the header is driven by the engine through a pulley, and an impeller inside the casing adds energy to the coolant. But a pump does not force one fixed flow through every level of resistance. For this study, I used a simple quadratic curve in place of measured pump data:
 
 $$
 \Delta p_{pump}=90\ \text{kPa}-cQ^2.
