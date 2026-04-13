@@ -30,8 +30,6 @@ github: 'https://github.com/gaoflow/steady-conduction-1d'
 
 ![Metal-rod conduction experiment with LM35 sensors and Arduino](/images/projects/steady-conduction-1d/reference/metal-rod-conduction-experiment.jpg)
 
-*Damaira 等人的金属棒导热实验（2024）· [DOI](https://doi.org/10.1088/1742-6596/2684/1/012006) · CC BY 3.0*
-
 照片里是端部加热，我的模型是整根棒均匀发热，工况不一样，但物理是同一回事：热量在金属里靠温差传导，在边界上和外界交换。
 
 我的模型参数：
