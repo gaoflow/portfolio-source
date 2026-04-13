@@ -11,7 +11,7 @@ duration: 'Independent build'
 featured: false
 order: 14
 studySequence: 2
-heroImage: /images/projects/potential-flow-sandbox/source/prandtl-tietjens-magnus-cylinder-1926.png
+heroImage: /images/projects/potential-flow-sandbox/source/karman-vortex-street-yakushima-2012.jpg
 cardImageFit: cover
 github: 'https://github.com/gaoflow/potential-flow-sandbox'
 ---
@@ -24,7 +24,7 @@ I wanted to walk through the process myself instead of just memorizing the final
 
 Forget the complex numbers for a moment and picture water flowing around a round bridge pier. Far from the pier, the water moves roughly left to right. Right in front of the pier, it slows down and splits into two branches that pass above and below. If the two branches are perfectly symmetric, there is one point of zero velocity at the front and one at the back — the stagnation points. Now give the whole flow a slight clockwise rotation: the two sides no longer move at the same speed. One side gets faster and its pressure drops; the other side slows down and its pressure rises. The result is an upward net force.
 
-The header image is a real photograph of exactly that: flow around a rotating cylinder, captured by Prandtl and Tietjens in a water channel in 1926. Spinning the cylinder is a way of adding circulation to the flow — the streamlines in the photo are visibly asymmetric between top and bottom. That is the Magnus effect, the mechanism behind the lift. What I assemble from formulas and then check line by line in this article is the physics behind that photograph. (Image: NACA TM 364, public domain.)
+The header image shows what this problem looks like in the real atmosphere: in November 2012, NASA's Terra satellite watched the wind sweep past Yakushima Island, Japan, and the cloud layer downstream rolled into a long train of alternating vortices — a Kármán vortex street. The island is the "cylinder" here. This article starts with the simplest idealized version of that problem: take viscosity away, build the flow around a cylinder from four elementary flows, and check every step. (Image: NASA, public domain.)
 
 ## The one question I wanted to answer
 
@@ -126,7 +126,7 @@ The drag is zero to machine precision.
 
 "Zero drag" is not a prediction for a bridge pier or a real cylinder. The potential-flow model removes viscosity, and this zero-drag result is d'Alembert's paradox. There is no boundary layer, no separation, and no wake in the model — yet those are exactly where most of a real cylinder's drag comes from.
 
-The experiment below shows the difference. The viscous flow sheds an alternating Kármán vortex street behind the cylinder; the ideal potential-flow figure above is symmetric front to back and has no real wake at all.
+The experiment below shows the difference. The viscous flow sheds an alternating Kármán vortex street behind the cylinder — the pattern the satellite caught in the header image; the ideal potential-flow figure above is symmetric front to back and has no real wake at all.
 
 ![Real viscous flow around a cylinder forming a Kármán vortex street](/images/projects/potential-flow-sandbox/reference/real-cylinder-wake-low-re.jpg)
 
