@@ -27,7 +27,7 @@ The real question was therefore not “Can Python calculate Reynolds number?” 
 
 > Can a very small engineering tool remain easy to check by hand while actively catching unit and property-input mistakes?
 
-The header image is the original illustration from Reynolds' 1883 paper: in the same glass tube, the dye streak stays a straight line at low speed (laminar flow) and suddenly breaks up and mixes at higher speed (turbulent flow). From observations like this he concluded that the flow regime is set not by speed, diameter, or viscosity alone, but by the ratio they form together — the number later named after him. (Image: Wikimedia Commons, public domain.)
+The header image is the original illustration from Reynolds' 1883 paper: in the same glass tube, the dye streak stays a straight line at low speed (laminar flow) and suddenly breaks up and mixes at higher speed (turbulent flow). From observations like this he concluded that the flow regime is set not by speed, diameter, or viscosity alone, but by the ratio they form together — the number later named after him.
 
 ## An everyday example first
 

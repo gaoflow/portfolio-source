@@ -11,7 +11,7 @@ duration: '独立构建'
 featured: false
 order: 14
 studySequence: 2
-heroImage: /images/projects/potential-flow-sandbox/source/karman-vortex-street-yakushima-2012.jpg
+heroImage: /images/projects/potential-flow-sandbox/source/karman-vortex-street-lab.jpg
 cardImageFit: cover
 github: 'https://github.com/gaoflow/potential-flow-sandbox'
 ---
@@ -24,7 +24,7 @@ github: 'https://github.com/gaoflow/potential-flow-sandbox'
 
 先不管复数，想象水绕过一根圆桥墩。离桥墩很远，水大致从左往右流。到了桥墩正前方，水慢下来，再分成上下两路绕过去。如果上下两路完全对称，桥墩前后各有一个速度为零的点，也就是停滞点。如果再让整片水流带一点顺时针旋转，上下两侧的速度会变得不一样：一侧更快、压力更低，另一侧更慢、压力更高，于是出现向上的合力。
 
-头图展示的是这件事在真实大气里的样子：2012 年 11 月，NASA 的 Terra 卫星拍到风掠过日本屋久岛，下游的云层卷出一长串交替的漩涡——卡门涡街。这时的岛就是一个巨大的"圆柱"。本文先做它最简单的理想版本：把黏性拿掉，只用四种基本流动拼出绕圆柱的势流，再逐项核对。（原图：NASA，公有领域。）
+头图是实验室里拍下的真实圆柱尾迹：圆柱后方的流体交替脱落，卷成两列旋转方向相反的漩涡——卡门涡街。本文先做它最简单的理想版本：把黏性拿掉，只用四种基本流动拼出绕圆柱的势流，再逐项核对。
 
 ## 我只想回答一个问题
 
@@ -126,11 +126,9 @@ $$
 
 “阻力为零”不是对桥墩或真实圆柱的预测。势流模型拿掉了黏性，这个零阻力结果就是达朗贝尔悖论。模型里没有边界层、分离和尾迹，而真实圆柱的阻力恰恰主要来自这些现象。
 
-下面的实验图能看出这个差别。黏性流动在圆柱后方交替脱落成卡门涡街——头图里卫星拍到的那种图案；上面的理想势流图前后对称，没有真正的尾流。
+真实流动会在圆柱后方交替脱落出两列漩涡，也就是卡门涡街；同样的图案在大气里也能看到。2012 年 11 月，NASA 的 Terra 卫星拍到风掠过日本屋久岛，下游云层卷出一长串交替的漩涡。这时的岛就是一个巨大的"圆柱"，而上面的理想势流图前后对称，没有真正的尾流。
 
-![真实黏性流动绕过圆柱后形成卡门涡街](/images/projects/potential-flow-sandbox/reference/real-cylinder-wake-low-re.jpg)
-
-*真实圆柱尾迹（原图未经修改），作者：[Jürgen Wagner / Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Karmansche_Wirbelstr_kleine_Re.JPG)，许可：[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)*
+![卫星云图显示屋久岛下游的卡门涡街](/images/projects/potential-flow-sandbox/source/karman-vortex-street-yakushima-2012.jpg)
 
 环量也是我手动输入的。这个沙盒只能回答“给定环量后，压力和升力怎么变”，不能回答真实翼型为什么会选择某个环量；翼型模型还需要 Kutta 条件。它只处理二维、不可压缩、无旋、无黏流动，不能代表有限展长物体、可压缩效应或真实湍流。
 
