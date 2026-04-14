@@ -169,6 +169,16 @@ article video {
   line-height: 1.45;
   color: var(--color-olive, var(--color-muted));
   margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* Tables: caption-style display text centred across header and body cells.
+   CSS text-align wins over the `align` attribute markdown emits. */
+.prose :where(table) {
+  margin-inline: auto;
+}
+.prose :where(th, td) {
+  text-align: center;
 }
 .prose :where(.article-demo) {
   display: block;
