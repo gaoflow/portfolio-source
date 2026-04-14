@@ -169,7 +169,7 @@ $$
 2. 警惕新能源车的“负重代价”：PHEV 在电量耗尽后，因背负数百公斤的电驱死重，其实际油耗反而高于传统燃油车。
 3. 数据一致性校验是工程仿真的第一道防线：任何仿真分析都必须先确立能量守恒与化学当量的校核机制，避免由于换算或导出误差得出失真的技术判断。
 
-后续拓展方向：
+老师给到的后续拓展方向：
 - 引入完整的 WLTP 全段工况与真实路测行程（RDE），覆盖城市、乡村、高速及连续山区等多变路况。
 - 引入统计学的充电行为模型与出行链分布，构建更真实的 PHEV 初始 SOC 概率分布。
 - 结合[欧盟替代燃料基础设施法规（AFIR）](https://transport.ec.europa.eu/transport-themes/clean-transport/alternative-fuels-sustainable-mobility-europe/alternative-fuels-infrastructure/questions-and-answers-regulation-deployment-alternative-fuels-infrastructure-eu-20231804_en)关于主要走廊（TEN-T）每 60 km 布局快充站的要求，仿真长途跨国旅行中的补能停留、充电功率与电网动态负荷。
