@@ -26,9 +26,9 @@ github: 'https://github.com/gaoflow/pipe-flow-sizing'
 
 > 已知一条泵曲线和一条串联回路，在哪个流量下，水泵给出的压力刚好补上整条回路损失的压力？
 
-当时没有实测泵曲线、散热器压降和水套数据，所以这项研究先验证计算方法。文中的泵曲线和部件阻力都是明确写出的替代值，26.22 L/min 不是车辆实测流量。
+先说清楚一件事：当时没有实测的泵曲线和部件数据，所以这项研究验证的是计算方法本身。文中的泵曲线和部件阻力都是明确声明的替代值，算出来的 26.22 L/min 不是实车流量。
 
-页首是一台真实的发动机驱动冷却水泵，与 FSAE 燃油车使用的类型相同，但不是车队自己的水泵。照片：Maly LOLek，[CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)，经 [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pompa_wody2.jpg)。
+页首是一台真实的发动机驱动冷却水泵，和 FSAE 燃油车用的是同一类，但不是车队自己的那台。
 
 ## 水先要走完这条路
 
@@ -49,7 +49,7 @@ github: 'https://github.com/gaoflow/pipe-flow-sizing'
 
 <figure>
   <img src="/images/projects/pipe-flow-sizing/reference/automobile-radiator.jpg" alt="铝制汽车散热器" loading="lazy" style="max-width: 529px; margin-inline: auto;">
-  <figcaption>汽车铝制散热器 · Bill Wrigley · <a href="https://commons.wikimedia.org/wiki/File:Automobile_radiator.jpg">Wikimedia Commons</a> · 公有领域</figcaption>
+  <figcaption>汽车铝制散热器</figcaption>
 </figure>
 
 ## 把每个部件换算成压降
@@ -60,7 +60,7 @@ $$
 \Delta p=\left(f\frac{L}{D}+K\right)\frac{\rho V^2}{2}.
 $$
 
-这条式子可以拆成两本账。$fL/D$ 是水沿管壁流动产生的摩擦，$K$ 是弯头、入口和部件内部流道带来的额外损失。最后的 $\rho V^2/2$ 跟水速有关，水跑得越快，压降长得越快。[Hydraulic Institute 的系统曲线说明](https://datatool.pumps.org/pump-fundamentals/sys-curves)也采用这种拆法。
+这条式子可以拆成两本账。$fL/D$ 是水沿管壁流动产生的摩擦，$K$ 是弯头、入口和部件内部流道带来的额外损失。最后的 $\rho V^2/2$ 跟水速有关，水跑得越快，压降长得越快。
 
 长度、直径、密度和速度都能直接代入。真正麻烦的是摩阻系数 $f$，所以我没有急着求整条回路，而是先把 $f$ 单独拿出来检查。
 
@@ -125,13 +125,13 @@ $$
 
 ![泵曲线与系统曲线](/images/projects/pipe-flow-sizing/pump-operating-point.svg)
 
-两条曲线在 **26.22 L/min、51.34 kPa** 相交。也就是说，在这组替代参数下，40 L/min 的自由流量接入回路后少了大约三分之一。
+两条曲线在 26.22 L/min、51.34 kPa 相交。也就是说，在这组替代参数下，40 L/min 的自由流量接入回路后，实际只剩三分之一左右。
 
 ## 再用最笨的办法找一遍
 
 数值求解器能给出很多位小数，但小数多不等于设置一定正确。我又在 0 到 40 L/min 之间均匀取了 4096 个点，直接寻找两条曲线一上一下穿过去的位置。
 
-这个慢扫描把交点夹在 26.2173 到 26.2271 L/min 之间，前面的结果落在其中。保留的运行中，泵压力与系统压降最多相差 $2.18\times10^{-11}$ Pa。
+这个慢扫描把交点夹在 26.2173 到 26.2271 L/min 之间，Newton 迭代的结果落在其中。在这个工作点上，泵压力和系统压降最多只差 $2.18\times10^{-11}$ Pa。
 
 我还检查了几条最基本的物理关系。流量增加时，系统压降必须上升；额外加上 10 kPa 静压后，工作流量必须下降；整条回路的压降必须等于四段压降之和。工作点和另外 24 个流量上的加和误差都是 0.0 Pa。
 
