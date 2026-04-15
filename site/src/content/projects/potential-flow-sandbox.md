@@ -71,7 +71,7 @@ I started with a few hand-checkable locations for the four elementary flows. Uni
 
 Then I combined uniform flow and the doublet into the cylinder. On the cylinder surface, the normal velocity should be close to zero and the stream function should stay constant; at a distance of $1000R$, the velocity should return to the uniform free stream. Only when both the surface and the far field agree can I say the two elementary flows really did build a cylinder.
 
-With those two layers passing, I computed the pressure coefficient from the surface velocity. Without circulation, the analytical answer is $C_p=1-4\sin^2\theta$. Across 4097 measurement points on the cylinder surface, the largest difference between the program and this curve was $2.66\times10^{-15}$.
+With those two layers passing, I computed the pressure coefficient from the surface velocity. Without circulation, the analytical answer is $C_p=1-4\sin^2\theta$. Across 4097 measurement points on the cylinder surface, the largest difference between the program and this curve was $2.66\times10^{-15}$. How small is that? Double-precision floats carry a rounding error around $10^{-16}$ on their own, and $2.66\times10^{-15}$ is only about ten times larger — so the program and the analytical formula agree down to the limit of what the computer can distinguish. What remains is floating-point noise, not a mistake in the formula or the code.
 
 ## Then circulation, stagnation points, and lift direction
 
@@ -87,7 +87,7 @@ My numerical contour runs counter-clockwise, so recovering the "clockwise is pos
 
 The lift case uses $U=1$, $R=1$, $\rho=1.225$, and $\Gamma=2\pi$ throughout — the header image is the flow field for exactly these parameters. From $\sin\theta=-\Gamma/(4\pi UR)$, the stagnation points should move from $0^\circ$ and $180^\circ$ without circulation to $-30^\circ$ and $-150^\circ$.
 
-The two stagnation points the program found were $-150.0^\circ$ and $-30.0^\circ$, at most $8.9\times10^{-16}$ rad away from the theoretical angles.
+The two stagnation points the program found were $-150.0^\circ$ and $-30.0^\circ$, at most $8.9\times10^{-16}$ rad away from the theoretical angles — again floating-point noise, not a wrongly located point.
 
 I also ran a 4096-point contour integral on a circle at $r=2.5R$. Uniform flow and the doublet should each contribute zero circulation around the loop, so whatever remains can only come from the vortex. The integral recovered a circulation of 6.3 — the imposed value $2\pi$ also rounds to 6.3 at one decimal, and the two differ by only $8.9\times10^{-16}$.
 
