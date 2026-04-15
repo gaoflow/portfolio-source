@@ -1,11 +1,11 @@
 ---
-title: 'How I Estimated Cooling-Loop Flow Before the Hardware Existed'
+title: 'Estimating Cooling-Loop Flow Without the Hardware'
 year: 2025
 date: '2025-11-29'
 status: complete
 categories: [tooling]
 tags: [CFD]
-summary: 'A pump labelled 40 L/min will not deliver 40 L/min after it is connected to hoses, a radiator and cooling passages. I added those restrictions one by one, found a representative operating point of 26.22 L/min at 51.34 kPa, and checked the friction, loop loss and curve intersection.'
+summary: 'A cooling-system pump labelled 40 L/min will not deliver 40 L/min once hoses, a radiator, and water passages are connected. I added those resistances to the model section by section, arrived at 26.22 L/min and 51.34 kPa, and checked the friction factor, the loop pressure drop, and the intersection of the two curves.'
 role: 'Hydraulics & numerical methods'
 duration: 'Independent study'
 featured: false
@@ -16,154 +16,120 @@ cardImageFit: cover
 github: 'https://github.com/gaoflow/pipe-flow-sizing'
 ---
 
-## The pump says 40 L/min. What reaches the car?
+## The datasheet's 40 L/min is not the real number
 
-I built this project in the third month after moving from software engineering into mechanical engineering. At the time, the team was discussing the FSAE racecar cooling system. One pump datasheet listed a maximum flow of 40 L/min. The easy option was to copy that number into the radiator calculation.
+I built this project in the third month of my first year of the mechanical engineering master's. The team was discussing the FSAE race car's cooling system, and a pump datasheet said "maximum flow 40 L/min". My job was to verify what 40 L/min actually delivers in practice.
 
-The number came with a condition: almost no resistance at the outlet. Once installed, the coolant must pass through hoses, bends, a radiator and narrow cooling passages. A garden hose behaves in the same way. A short, straight hose fills a bucket quickly. Make it longer, add several bends and squeeze one section, and the same water supply delivers less flow.
+That number has a condition attached: almost no resistance at the outlet. Once installed in the car, the water has to pass through hoses, bends, a radiator, and narrow water passages. It is a lot like a garden hose. Short and straight, the bucket fills quickly; make the hose longer, wind it around bends, and pinch one section narrower, and the flow drops even though the water source hasn't changed.
 
-If I overestimated the flow here, the later thermal model could be numerically precise and still describe the wrong condition. The question I wanted to answer was:
+If I overestimated the flow here, the thermal calculations downstream could be full of decimal places and still describe the wrong working condition. So I needed to solve this problem:
 
-> Given a pump curve and a series loop, what flow rate makes the pump pressure exactly equal to the pressure lost around the loop?
+> Given a pump curve and a series loop, at what flow rate does the pressure the pump delivers exactly make up for the pressure lost around the whole loop?
 
-I did not yet have measured pump, radiator or water-jacket data. This study therefore checks the calculation method with declared substitute inputs. The result of 26.22 L/min is not a measured vehicle flow rate.
+## The water circuit
 
-The header shows a real centrifugal pump — a large industrial one, but a car's coolant pump is the same kind of machine scaled down.
+To compute the flow, I first split the loop into four segments: suction hose, radiator core, engine water passages, and return hose. They connect end to end; the water flows through each one in turn and finally returns to the pump.
 
-## The route the coolant must follow
-
-I split the loop into four elements: a suction hose, radiator core, engine gallery and return hose. They connect end to end, so the coolant passes through each one before returning to the pump.
-
-A series loop has one useful property: the flow rate is the same through every element. I can calculate the pressure lost in each part, add the four losses, and obtain the pressure required by the complete loop at that flow rate.
+A series loop has one convenient property: the flow rate is the same in every segment. I only need to compute how much pressure each of the four segments loses, add them up, and get the pressure the whole loop needs at that flow rate.
 
 | Element | Length | Internal diameter | $K$ |
 |---|---:|---:|---:|
 | Suction hose | 0.40 m | 16 mm | 1.5 |
 | Radiator core | 0.15 m | 16 mm | 8.0 |
-| Engine gallery | 0.50 m | 14 mm | 4.0 |
+| Engine water passages | 0.50 m | 14 mm | 4.0 |
 | Return hose | 0.60 m | 16 mm | 2.0 |
 
-The example uses water properties at 20 °C. The dimensions and $K$ values are representative inputs for checking the method, not measurements from the car.
-
-A real radiator makes this restriction easier to picture. Coolant does not cross one large empty chamber. It divides between many narrow internal passages.
+The radiator adds obvious resistance: the coolant does not cross one big open cavity; it has to split into many narrow passages.
 
 <figure>
   <img src="/images/projects/pipe-flow-sizing/reference/automobile-radiator.jpg" alt="Aluminium automotive radiator" loading="lazy" style="max-width: 529px; margin-inline: auto;">
-  <figcaption>Aluminium automotive radiator</figcaption>
+  <figcaption>An aluminium automotive radiator</figcaption>
 </figure>
 
-## Turning every element into a pressure loss
+## Converting each component into a pressure drop
 
-I calculated the pressure loss of each element with the same Darcy-Weisbach form:
+I used the same Darcy–Weisbach form to compute the pressure drop of every element:
 
 $$
 \Delta p=\left(f\frac{L}{D}+K\right)\frac{\rho V^2}{2}.
 $$
 
-The equation keeps two accounts. The term $fL/D$ covers friction along the pipe wall. The coefficient $K$ covers bends, entrances and restrictive passages inside components. The final term, $\rho V^2/2$, sets the pressure scale. As the coolant moves faster, the loss rises quickly. The [Hydraulic Institute system-curve guide](https://datatool.pumps.org/pump-fundamentals/sys-curves) uses the same separation.
+The equation splits into two parts. $fL/D$ is the friction of water moving along the pipe wall; $K$ is the extra loss from bends, entrances, and the passages inside components. The final $\rho V^2/2$ depends on the water speed — the faster the water moves, the faster the pressure drop grows. Length, diameter, density, and velocity can all be plugged in directly. The genuinely awkward part is the friction factor $f$, so instead of rushing to solve the whole loop, I pulled $f$ out and checked it on its own first.
 
-Length, diameter, density and velocity can be inserted directly. The awkward part is the friction factor $f$. Before solving the complete loop, I checked this part on its own.
+## Computing the friction factor
 
-## Checking the hardest part first
-
-When the flow is laminar, $f$ has a direct solution:
+When the flow is calm, $f$ can be computed directly:
 
 $$
 f=\frac{64}{Re}.
 $$
 
-The Reynolds number $Re$ is a scale for the flow regime. At lower values, viscosity dominates. As it rises and the flow becomes turbulent, pipe roughness also begins to affect friction.
+You can read this as a scale for the flow regime: at low values, viscosity dominates; as the number rises, the flow enters turbulence and wall roughness starts to affect friction. I took 200 points between $Re=100$ and 2300, and the program's results differed from $64/Re$ by 0.0.
 
-I tested 200 points between $Re=100$ and 2300. The computed values differed from $64/Re$ by 0.0.
+Turbulence is more complicated. In the Colebrook equation, $f$ appears on both sides of the equals sign, so it needs repeated iteration. I used the [Haaland formula](https://doi.org/10.1115/1.3240948) to get a starting value close to the answer, then tightened it with Newton iteration. If it hasn't converged after 50 tries, the program raises an error rather than leaving behind a plausible-looking number. After solving, I substituted every $f$ back into the Colebrook equation. Across 150 combinations of Reynolds number and relative roughness, up to $Re=10^8$, the largest residual was $3.55\times10^{-15}$. At least as far as the equation itself is concerned, the solved $f$ holds up.
 
-Turbulent flow is less direct. The friction factor appears on both sides of the Colebrook equation, so the program must approach the answer through iteration. I used the [Haaland formula](https://doi.org/10.1115/1.3240948) for a close starting value, then refined it with Newton iteration. If it has not converged after 50 iterations, the program raises an error instead of keeping a plausible-looking number.
+![Friction factors for laminar flow, a smooth pipe, and a rough pipe](/images/projects/pipe-flow-sizing/moody.svg)
 
-I then substituted every calculated $f$ back into the Colebrook equation. Across 150 combinations of Reynolds number and relative roughness, reaching $Re=10^8$, the largest residual was $3.55\times10^{-15}$. The values therefore satisfied the equation they were meant to solve.
+## Fixing the range of the check
 
-![Friction factors for laminar flow, a smooth pipe and a rough pipe](/images/projects/pipe-flow-sizing/moody.svg)
-
-Substitution checks only whether I solved the equation correctly. I still needed a second route to judge the result.
-
-## The first comparison failed because I tested the wrong range
-
-I used the explicit [Swamee-Jain formula](https://doi.org/10.1061/JYCEAJ.0004542) as that second route. Its reported accuracy is $\pm3\%$, within this range:
+I used the explicit [Swamee–Jain formula](https://doi.org/10.1061/JYCEAJ.0004542) as a second route. Its declared accuracy is $\pm3\%$, but it is only guaranteed inside this range:
 
 $$
 5\times10^3\le Re\le10^8,\qquad
 10^{-6}\le\varepsilon/D\le10^{-2}.
 $$
 
-My first comparison used a wider range. At very low roughness near $Re=4\times10^3$, the two results differed by more than 3%. I first suspected the Colebrook solver. The failing points, however, were outside the range where Swamee-Jain claimed that accuracy.
+On the first comparison I had set the range too wide. Where the roughness was very low and $Re$ was close to $4\times10^3$, the two results differed by more than 3%. I first suspected my Colebrook solver was wrong, and only later realised those points had already run outside Swamee–Jain's accuracy promise. So I pulled the 3% acceptance range back inside the formula's declared interval, and the largest difference became 2.83%. That failure didn't change the Colebrook solver; it changed the test range. It also reminded me: a reference formula has boundaries too — don't let it act as judge over all working conditions just because it comes from a paper.
 
-I restricted the 3% acceptance check to the published range. The largest difference was then 2.83%. The Colebrook solver did not change; the test range did. A published reference still has limits, and outside them it cannot serve as the judge.
+With the friction factor past both checks, I could reconnect the four pipe segments.
 
-Only after these two checks passed did I reconnect the four loop elements.
+## Pinning down the flow rate
 
-## The flow is fixed where the pump and loop meet
-
-I chose a trial flow, calculated the pressure loss of all four elements, and added them:
+I first guessed a trial flow rate, computed the four pressure drops in turn, and added them up:
 
 $$
 \Delta p_{sys}(Q)=\sum_i \Delta p_i(Q).
 $$
 
-Repeating this calculation over a range of flows produces the system curve. Higher flow means higher loop loss, so the curve rises.
-
-The pump supplies the other curve. The pump in the header is driven by the engine through a pulley, and an impeller inside the casing adds energy to the coolant. But a pump does not force one fixed flow through every level of resistance. For this study, I used a simple quadratic curve in place of measured pump data:
+Repeating the calculation over a batch of flow rates gives the system curve. The larger the flow, the more pressure the loop consumes, so this curve climbs. The pump supplies another curve. The pump at the top of this page is driven by the engine through a pulley, and the impeller inside the casing adds energy to the water. But a pump does not force the same flow out against every level of resistance. This project replaces real pump data with a simple quadratic curve:
 
 $$
 \Delta p_{pump}=90\ \text{kPa}-cQ^2.
 $$
 
-It provides 90 kPa at zero flow and reaches zero pressure at 40 L/min. The installed flow is where the two curves meet:
+It delivers 90 kPa at zero flow, and the pressure falls to zero at 40 L/min. The flow the system can actually reach is the intersection of the pump curve and the system curve:
 
 $$
 \Delta p_{pump}(Q)-\Delta p_{sys}(Q)=0.
 $$
 
-The program starts with Newton iteration. If the next step leaves the known interval, it returns to the interval midpoint and uses bisection as a safe fallback.
+The program first looks for the intersection with Newton iteration. If the next step runs out of the known interval, it falls back to the interval midpoint and uses bisection as a safety net.
 
 ![Pump curve and system curve](/images/projects/pipe-flow-sizing/pump-operating-point.svg)
 
-The curves meet at **26.22 L/min and 51.34 kPa**. With these substitute inputs, connecting the loop cuts the 40 L/min free-delivery value by about one third.
+The two curves intersect at 26.22 L/min and 51.34 kPa. In other words, with these substitute parameters, connecting the 40 L/min free flow to the loop loses about a third of it.
 
-## Finding the same answer the slow way
-
-A numerical root finder can return many decimal places even when the setup is wrong. I therefore sampled the complete range from 0 to 40 L/min at 4096 points and looked directly for the place where one curve crossed the other.
-
-This scan bracketed the crossing between 26.2173 and 26.2271 L/min. The earlier solution fell inside that interval. Across the retained runs, the pump pressure and loop loss differed by no more than $2.18\times10^{-11}$ Pa at the solution.
-
-I also checked the basic behaviour of the model. Loop loss had to increase with flow. Adding 10 kPa of static pressure had to reduce the operating flow. The total loop loss also had to equal the sum of the four element losses. That sum differed by 0.0 Pa at the operating point and at 24 additional flow values.
-
-These checks do not show that the substitute inputs represent a real car. They do show that the model is internally consistent. Once the crossing survived them, I could ask the practical question: which part of the loop is most restrictive?
+A numerical solver can give you many decimal places, but more decimals don't mean the setup is right. So I took 4096 evenly spaced points between 0 and 40 L/min and directly looked for where the two curves cross from one side to the other. This slow scan bracketed the intersection between 26.2173 and 26.2271 L/min, and the Newton result fell inside it. At this operating point, the pump pressure and the system pressure drop differ by at most $2.18\times10^{-11}$ Pa. I also checked a few of the most basic physical relations. When the flow increases, the system pressure drop must rise; adding 10 kPa of static pressure must push the operating flow down; and the whole loop's pressure drop must equal the sum of the four segments. Only after confirming the intersection did the study return to the most practical question: which segment hurts the most?
 
 ## Where the 51.34 kPa goes
 
-![Pressure loss across the four loop elements](/images/projects/pipe-flow-sizing/pressure-loss-breakdown.svg)
+![Pressure loss of the four loop elements](/images/projects/pipe-flow-sizing/pressure-loss-breakdown.svg)
 
-At the operating point, the suction hose loses 4.89 kPa, the radiator core 19.37 kPa, the engine gallery 20.33 kPa, and the return hose 6.75 kPa. Together they give 51.34 kPa.
+At the operating point, the suction hose loses 4.89 kPa, the radiator core loses 19.37 kPa, the engine water passages lose 20.33 kPa, and the return hose loses 6.75 kPa. The four add up to 51.34 kPa. The radiator core and the engine water passages together account for 39.70 kPa, about 77% of the total drop. Across the whole loop, the $K$ terms account for 43.19 kPa, or 84.1%; straight-pipe friction accounts for 8.14 kPa, or 15.9%.
 
-The radiator core and engine gallery account for 39.70 kPa, or about 77% of the total. Across the complete loop, the $K$ terms contribute 43.19 kPa, or 84.1%, while straight-pipe friction contributes 8.14 kPa, or 15.9%. With these assumptions, reducing resistance in the core and gallery would matter more than shortening a small length of hose.
+So, under these assumptions, reducing the resistance of the core and the water passages first is more effective than shortening the hoses a little more. But that judgement only holds for the current geometry and $K$ values; with measured parts, the proportions could change.
 
-This ranking applies only to the current geometry and $K$ values. Measured components could change it.
+## Summary
 
-## How far this result can be used
+To sum up: 40 L/min is just the pump's free flow when there is almost no resistance. Connected into a real loop, the operating point lands at 26.22 L/min and 51.34 kPa — about a third less. And I traced where the pressure is spent: about 77% of the 51.34 kPa is lost in the radiator core and the engine water passages, so if you want to improve the flow, that's where you have to start.
 
-The calculation shows why a thermal model should not copy a pump's free-delivery flow. Given a pump curve, diameters, lengths, roughness and component losses, the same method can find the operating point.
+When we see a flow number, we need to ask what pressure goes with it, and then look at how much pressure the real plumbing needs. Only when the pump and the loop are considered together does a flow rate mean anything. The failed Swamee–Jain comparison also reminds us: when results don't line up, check the object you're computing and the applicable range of the reference formula together.
 
-It does not establish that the racecar will flow at 26.22 L/min. The pump curve is a substitute, and the $K$ values are handbook-scale estimates rather than bench measurements. The model covers steady, incompressible, single-phase flow. It has no cavitation, air-entrainment, efficiency or NPSH check. It also switches directly between laminar and turbulent formulas at $Re=2300$ and handles only series loops, not parallel branches.
+That said, 26.22 L/min is not necessarily the design flow of the real car. Many things are still simplified: the pump curve is a substitute quadratic; the $K$ values are handbook orders of magnitude, not bench measurements; the model only covers steady, incompressible, single-phase flow, with no cavitation, entrained air, or NPSH checks; and the loop can only be in series. The next step is to swap in the real pump curve and measured component pressure-drop data, then add parallel branches and a thermal model, and check further.
 
-The next useful step would be to insert measured pump and component curves, add parallel branches, and couple the resulting flow to the thermal model. I did not complete those steps in this study.
+## Code
 
-## What changed in how I work
-
-Before this project, I looked at a pump and saw one flow-rate number. I now ask what pressure goes with that number and how much pressure the installed route requires. The pump and loop must be considered together before the flow has meaning.
-
-The failed Swamee-Jain comparison also changed my checking order. When two results disagree, I check both the calculation and the reference method's range. Only after the basic hydraulic calculation passes those checks do I use it in a larger thermal model.
-
-## Reproduction and sources
-
-The complete code and tests are available in [gaoflow/pipe-flow-sizing](https://github.com/gaoflow/pipe-flow-sizing):
+The complete code and tests are in [gaoflow/pipe-flow-sizing](https://github.com/gaoflow/pipe-flow-sizing):
 
 ```bash
 git clone https://github.com/gaoflow/pipe-flow-sizing.git
@@ -172,4 +138,4 @@ python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
 
-The friction references are the Haaland estimate, the Swamee-Jain cross-check, and the original [Colebrook paper](https://doi.org/10.1680/ijoti.1939.13150).
+References: the formulas come from the Haaland friction estimate, the Swamee–Jain cross-check, and the original [Colebrook paper](https://doi.org/10.1680/ijoti.1939.13150).

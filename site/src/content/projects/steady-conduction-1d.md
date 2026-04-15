@@ -1,11 +1,11 @@
 ---
-title: 'How I Verified My First Finite-Difference Heat-Conduction Model'
+title: 'How I Verified a Finite-Difference Model'
 year: 2026
 date: '2026-01-17'
 status: complete
 categories: [validation]
 tags: [CFD]
-summary: 'I used central differences and a Thomas algorithm to solve an internally heated rod, discovered that my original grid study measured only roundoff, then used a manufactured solution to verify second-order convergence and checked conservation and implementation independently.'
+summary: 'I wrote a one-dimensional finite-difference model of a metal rod with a fixed-temperature left end, internal heat generation, and air cooling at the right end.'
 role: 'Heat transfer & numerical methods'
 duration: 'Independent study'
 featured: false
@@ -16,97 +16,141 @@ cardImageFit: cover
 github: 'https://github.com/gaoflow/steady-conduction-1d'
 ---
 
-## Origin: when my first convergence study hit machine roundoff
+## "It runs" doesn't mean "it's right"
 
-The origin of this project was my first attempt at discretizing heat conduction with finite differences. Textbook derivations of tridiagonal systems and Robin boundaries looked clean, but I wanted to verify the mechanics myself from scratch.
+I used to do software engineering and later moved into mechanical and thermal engineering. When I first switched, the hardest thing to adjust to was this: in software, if the code runs and the tests are all green, that basically means it's written correctly; but in numerical computing, code can run perfectly smoothly, throw no errors, draw very smooth curves — and still be wrong. For example, half a cell of heat left out at a boundary, or one sign flipped in an equation.
 
-However, during my first mesh refinement study against the exact solution, the error flatlined at $10^{-11}$ K regardless of grid density.
+To figure out "how to prove a numerical program computes correctly", I picked the smallest problem I could still work out by hand all the way: a metal rod that heats itself. It was the first partial differential equation solver I wrote.
 
-I soon realized why: the analytic solution is quadratic, for which central differencing is exact. I had measured floating-point noise rather than truncation error. To measure true second-order convergence, I implemented the Method of Manufactured Solutions (MMS) and built this verified 1D solver.
+This article records exactly that: how I verified a hand-written finite-difference model, step by step, until I could trust it.
 
-## How I discretised the equation
+## Starting from a metal rod that heats itself
 
-The governing equation is
+There are plenty of examples in daily life: the heating core of a soldering iron, the heating wire inside an electric blanket. Current flows through the metal and the whole rod generates heat everywhere inside. The case I set up: the rod's left end is fixed on a 350 K (about 77 °C) cooling block, and the right end sits in 300 K (about 27 °C) air, losing heat naturally. A heat-conduction experiment looks roughly like this: heat a metal rod with a candle, place temperature sensors along it, and collect the data with an Arduino.
 
-$$
-kT''+q'''=0.
-$$
+![Metal-rod conduction experiment with LM35 sensors and Arduino](/images/projects/steady-conduction-1d/reference/metal-rod-conduction-experiment.jpg)
 
-I divided the rod into a uniform grid and used central differences at the interior nodes. At the convective end, I used a half-control-volume balance that includes conduction through the final interior face, heat generation within half a cell, and convection from the surface.
+I simplified the model to uniform heat generation throughout the rod, with heat conducted by temperature differences inside the metal and exchanged with the surroundings at the boundaries. The model parameters:
 
-That treatment matters because the physical convective boundary lies half a grid spacing beyond the final node centre. Applying the Robin condition directly at that node would shift the boundary by half a cell.
+- rod length $L = 0.5$ m, thermal conductivity $k = 167$ W/(m·K) (aluminium-alloy scale)
+- uniform internal heat generation $q''' = 20{,}000$ W/m³
+- left end fixed at $T_{\text{left}} = 350$ K
+- right-side air $T_\infty = 300$ K, convection coefficient $h_c = 25$ W/(m²·K)
 
-The discretisation produces a tridiagonal linear system. I implemented the Thomas algorithm from scratch, including forward elimination, back substitution, and explicit zero-pivot checks. The production solution path does not call a library linear solver.
+![One-dimensional rod with heat generation and two boundary conditions](/images/projects/steady-conduction-1d/problem-setup.svg)
 
-The closed-form solution is
+What I wanted to know: where on the rod it's hottest, and which end the heat leaves from; and more importantly — whether the code I wrote can be trusted at all.
 
-$$
-\begin{aligned}
-T(x)&=T_{\text{left}}+C_1x-\frac{q'''x^2}{2k},\[0.5em]
-C_1&=\frac{q'''L+\dfrac{h_cq'''L^2}{2k}-h_c(T_{\text{left}}-T_\infty)}
-{k+h_cL}.
-\end{aligned}
-$$
+## First, work out a reference answer by hand
 
-I used this exact solution to check both the calculated temperatures and the assembly of the convective boundary equation.
-
-## My first convergence study measured nothing useful
-
-I originally planned to compare the numerical and closed-form solutions on successively finer grids and observe the error decrease. At $N=160$, however, the maximum error was already only $1.34\times10^{-11}$ K.
-
-That result did not mean the grid was exceptionally good. The exact temperature profile is quadratic, and central differences reproduce a quadratic exactly. At the half-control-volume boundary, the face-flux error also cancels the half-cell heat-generation term. Further refinement therefore reveals floating-point roundoff rather than the truncation-error order of the method.
-
-I did not treat the very small error as proof that the convergence study was complete. Instead, I changed the test problem.
-
-## I used a manufactured solution to verify second-order convergence
-
-I constructed a sinusoidal manufactured solution that satisfies the same fixed-temperature and convective boundary conditions. Unlike the quadratic solution, it cannot be represented exactly by the central-difference scheme, so grid refinement exposes the actual truncation error.
-
-For $N=20/40/80/160$, the maximum errors were
+Before writing code, work out a reference answer by hand first. The steady one-dimensional conduction equation is
 
 $$
-4.81\times10^{-2},
-1.20\times10^{-2},
-3.00\times10^{-3},
-7.51\times10^{-4}\ \text{K}.
+k\frac{d^2T}{dx^2}+q'''=0,
 $$
 
-A least-squares fit gave an observed order of 2.0002, consistent with the expected second-order behaviour of the central-difference discretisation.
+with the temperature given on the left and heat lost to the air on the right:
 
-![Manufactured-solution error versus grid spacing](/images/projects/steady-conduction-1d/convergence.svg)
+$$
+T(0)=T_{\text{left}},\qquad
+-k\frac{dT}{dx}\bigg|_{x=L}=h_c\left[T(L)-T_\infty\right].
+$$
 
-## I also checked energy conservation
+The equation is simple; integrate twice and you get the shape of the temperature distribution:
 
-The exact tip temperature is 360.446 K. The temperature reaches a maximum of 360.788 K at $x=0.425$ m.
+$$
+T(x)=T_{\text{left}}+C_1x-\frac{q'''x^2}{2k},
+$$
 
-The rod generates 10,000 W/m² per unit cross-sectional area. Of that total, only 1,511 W/m² leaves through the convective end. The remaining 8,489 W/m² conducts back to the fixed-temperature boundary at $x=0$.
+and the remaining constant $C_1$ is fixed by the right-end cooling boundary. Plugging my parameters in, the reference answer comes out: right-end temperature 360.446 K; maximum temperature 360.788 K, at $x\approx0.4244$ m. Later, when I reconcile the code, it's against these numbers and the whole curve.
 
-When I summed the energy balances of all discrete cells, the relative residual was $1.59\times10^{-12}$. The model therefore preserves the global energy balance as well as matching the pointwise temperature solution.
 
-## The four checks I retained
+## Cutting the rod into a grid
 
-| Check | Result | Requirement |
-|---|---:|---:|
-| Maximum error against the closed-form solution at $N=160$ | $1.34\times10^{-11}$ K | $\leq10^{-9}$ K |
-| Observed order for the manufactured solution | 2.0002 | 1.8–2.2 |
-| Relative energy-balance residual | $1.59\times10^{-12}$ | $\leq10^{-10}$ |
-| Difference between Thomas and NumPy dense solutions | $1.1\times10^{-16}$ | $\leq10^{-12}$ |
+The equation is continuous, but a computer only handles concrete numbers one at a time, so first cut the rod into a grid. Split the rod evenly into $N$ segments with spacing $h=L/N$. Interior nodes use central differences; each node deals only with its two neighbours, left and right:
 
-I compared my Thomas implementation with NumPy’s dense solver on 64 random tridiagonal systems. The maximum difference was $1.1\times10^{-16}$. The implementation also rejects a zero pivot explicitly rather than allowing NaNs to propagate through the calculation.
+$$
+\frac{k}{h^2}\left(T_{i-1}-2T_i+T_{i+1}\right)=-q'''_i.
+$$
 
-Each check targets a different failure mode. Comparison with the closed-form solution can reveal sign errors and mistakes in the boundary row. The manufactured solution tests whether the discretisation retains its expected second-order accuracy. The energy balance can expose a non-conservative scheme even when its temperatures appear reasonable. The independent dense solve checks my implementation of the tridiagonal algorithm.
+The left end is simple: the temperature is given, so just $T_0=T_{\text{left}}$. The right end is the real trap: the surface node stands at $x=L$, with only half a cell behind it. Its bookkeeping has three entries: heat conducted in from inside, heat generated by that half-cell itself, and heat carried away by the air:
 
-These checks are not interchangeable. My first convergence study failed precisely because I chose a solution that the discretisation could reproduce exactly. Only the sinusoidal manufactured solution allowed me to measure the numerical order.
+$$
+\frac{h}{2}q'''_N
+=h_c(T_N-T_\infty).
+$$
 
-## What the model still leaves out
+The middle term — the half-cell's own heat generation — is the easiest one to drop. Drop it, and the temperature curve still comes out smooth and pretty, but the energy books no longer balance. That's exactly the kind of looks-fine-but-isn't error I worried about at the start.
 
-The model is one-dimensional and steady, with constant material properties. It does not include temperature-dependent conductivity, contact resistance, or radiation from the end. It also cannot represent multidimensional heat spreading, fins with varying cross-sections, or transient heating.
+## Writing the solver myself
 
-The manufactured solution is a verification tool, not a physical operating condition. Extending the model to the omitted effects would require new equations, boundary treatments, and verification cases.
+All the node equations together form a tridiagonal matrix: apart from the middle three diagonals, everything is zero. This kind of matrix has a dedicated method, the Thomas algorithm: one elimination pass left to right, one back-substitution pass right to left, and done — the work grows only linearly with the number of nodes. I didn't call NumPy's ready-made solver; I wrote it myself. The full solver code is on GitHub: [src/steady_conduction_1d.py](https://github.com/gaoflow/steady-conduction-1d/blob/main/src/steady_conduction_1d.py). `assemble_system` builds the matrix, and `thomas_solve` does the Thomas solve.
 
-## Code and reproduction
+Solver written — now comes the real subject of this article: is it actually right? I verified it from four angles.
+## 1. Comparing against the hand-worked reference answer
 
-The source code is open source on GitHub: [gaoflow/steady-conduction-1d](https://github.com/gaoflow/steady-conduction-1d)
+After the code ran, I did grid refinement the textbook way: $N$ = 20, 40, 80, 160, watching how the error between the numerical solution and the reference answer falls. When the results came out I was quite happy at first: at $N=160$ the maximum error was only $1.34\times10^{-11}$ K, absurdly small. But the more I thought about it, the more wrong it felt — how could the error be this small?
+
+Going back and re-deriving the formulas, I understood: the exact solution of this problem is a quadratic polynomial, and the truncation error of central differencing is proportional to the fourth derivative of temperature. The fourth derivative of a quadratic is identically zero — in other words, central differencing is exact for this problem, with no truncation error at all. The $1.34\times10^{-11}$ K I measured wasn't discretisation error; it was just floating-point roundoff noise. So this check only half passed: the equation and the boundaries were assembled correctly, but the convergence order wasn't measured at all — that item failed.
+
+## 2. Does the error really fall at second order?
+
+To measure the order, I had to switch to a problem central differencing "can't get exactly right". I used the method of manufactured solutions (MMS): first prescribe a temperature curve with a sine bend,
+
+$$
+T_m(x)=T_{\text{left}}+C_1x+A\sin\left(\frac{\pi x}{L}\right),\qquad A=8\ \text{K},
+$$
+
+then substitute it back into the equation to back out the heat source needed to produce this curve:
+
+$$
+q'''(x)=kA\left(\frac{\pi}{L}\right)^2\sin\left(\frac{\pi x}{L}\right).
+$$
+
+The fourth derivative of a sine is not zero; this time the truncation error has nowhere to hide. Redoing the grid refinement with the same boundary conditions:
+
+| Cells $N$ | Grid spacing $h$ | Maximum node error |
+|---:|---:|---:|
+| 20 | 0.025 m | $4.81\times10^{-2}$ K |
+| 40 | 0.0125 m | $1.20\times10^{-2}$ K |
+| 80 | 0.00625 m | $3.00\times10^{-3}$ K |
+| 160 | 0.003125 m | $7.51\times10^{-4}$ K |
+
+![Manufactured-solution grid convergence](/images/projects/steady-conduction-1d/convergence.svg)
+
+Every time the grid doubles in fineness, the error shrinks to a quarter — very tidy. The fitted convergence order is 2.0002, which lands inside the pre-set 1.8–2.2 range, so this check holds up.
+
+## 3. Energy conservation
+
+With the order confirmed, I also had to verify that the heat generated inside the rod exactly equals what leaves through the left end plus what's lost from the right end. Per unit cross-sectional area, the whole rod generates 10,000 W/m²; of that, 8,489 W/m² conducts out through the left end and 1,511 W/m² is lost from the right. The relative residual of the balance was only $1.59\times10^{-12}$ — so I can say the model doesn't secretly leak heat or create heat at the boundaries.
+
+## 4. The solver's own arithmetic
+
+All three checks above rest on one premise: the assembled linear system gets solved correctly. And that premise is exactly what my hand-written Thomas algorithm is responsible for — and it had never been verified.
+
+With a fixed random seed I generated 64 tridiagonal systems of size $64\times64$ and handed each one to both my implementation and `numpy.linalg.solve`; the worst difference between the two sides was only $1.1\times10^{-16}$, machine-precision scale. Add the few small tests — a size mismatch must raise an error, a zero pivot must halt, and with no heat source the temperature must degenerate to a straight line — and this shows the solver itself is fine.
+
+At this point all four checks were in place: equation assembly, discretisation accuracy, boundary energy, and the solver. Then we can answer the original question.
+
+![Temperature distribution along the metal rod](/images/projects/steady-conduction-1d/temperature-profile.svg)
+
+The hottest point is not at either end, but at $x\approx0.42$ m, about 361 K (around 88 °C); the right end is actually slightly lower, about 360 K. These two numbers match the hand-worked reference answer (360.788 K and 360.446 K) exactly.
+
+I think the reason the peak isn't at an end point is simple: the right-side air doesn't carry heat away well, so the heat can't get out and has to "pile up" first near the right end. But where the heat goes is a bit counter-intuitive: of the heat generated in the rod, about 85% leaves through the left-end cooling block, and only about 15% escapes into the air on the right. In other words, this rod is mainly "pumped" cool by the cooling block on the left, not blown cool by the air on the right.
+
+## Summary
+
+Summing up what I ran into this time. I realised that a small error doesn't mean the method is right. When I first measured $10^{-11}$ I thought everything was fine, but that was just an illusion created by the problem being too special.
+
+Also, a big problem often needs to be split into several small checks that each mind one thing: the reference answer minds the assembly, the manufactured solution minds the convergence order, the energy books mind conservation, and the independent solver minds the implementation. Later, in my 2D transient heat-diffusion solver and when estimating the cooling of a motor water jacket and an inverter baseplate, I reused this same way of splitting; and the roughly 85%-to-15% heat split in this example also built a habit in me: compute the 1D case first, then decide whether a more complex model is needed. When I have time, I'll write up the cases from those other scenarios one by one too.
+
+Also, the model's boundaries should be stated clearly: it only handles 1D, steady, constant-property problems; it doesn't include contact resistance, radiation, or temperature-dependent properties; and the manufactured solution is only a verification tool, not a real operating condition. What it proves is this: under these assumptions, the equation, the discretisation, and the code are self-consistent.
+
+## Code
+
+The full solver code, tests, and plotting scripts for this project are open source: [gaoflow/steady-conduction-1d](https://github.com/gaoflow/steady-conduction-1d)
+
+Local commands:
 
 ```bash
 git clone https://github.com/gaoflow/steady-conduction-1d.git
@@ -114,9 +158,3 @@ cd steady-conduction-1d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
-
-## Practical applications: numerical foundation for cooling jacket and heatsink conduction
-
-When calculating steady temperature distributions across motor stator jackets and inverter heatsinks, conduction equations must be discretized with fixed-temperature or convective Robin boundaries.
-
-This 1D solver verified the half-control-volume boundary formulation, eliminating the half-cell offset distortion common in naive Robin discretizations, and delivered $\mathcal{O}(N)$ solution speed via the custom Thomas algorithm. Crucially, verifying second-order convergence (2.0002) via the Method of Manufactured Solutions (MMS) established a trusted discretization scheme for subsequent 2D and thermal network models.

@@ -1,12 +1,12 @@
 ---
-title: 'How I Checked Fluent with Exact Solutions, Mesh Studies and Experimental Data'
+title: 'Checking Fluent Results Against an Exact Solution, Mesh Studies and Experimental Data'
 year: 2026
 date: '2026-03-12'
 status: complete
 categories: [component-cfd, validation]
 tags: [CFD]
-summary: 'I first checked Fluent pipe flow against the exact Poiseuille solution, then studied mesh, domain and Re=0.1–20 effects around a cylinder; Cd stabilised at 2.7973 with 40,000 cells, but only Re=20 fell within 5% of the experimental data.'
-role: 'Simulation & report lead'
+summary: 'Check a Fluent pipe-flow computation against the exact Poiseuille solution, then run mesh, domain and Re=0.1–20 sweeps for flow past a cylinder and compare with experimental data.'
+role: 'Fluent simulation, data validation & report write-up'
 team: 'ESILV MMN1 group — Bing Gao, Nicolas Chang, Daphné Baray'
 duration: '7 weeks (TD1+TD4)'
 academic:
@@ -41,76 +41,101 @@ studySequence: 9
 heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
 ---
 
-## Why I started with pipe flow
+This is my lab record for the Computational Fluid Dynamics course in the spring 2026 semester.
 
-Both CFD tutorials addressed the same question: when should I trust a number produced by Fluent?
+## What the teacher asked for
 
-The first part used Poiseuille pipe flow, which has an exact solution, to check the boundary conditions, mass conservation, velocity, wall shear and pressure drop. The second part moved to flow around a cylinder, where there is no closed-form solution, and examined mesh effects, domain effects and differences from experimental data separately.
+The course task first handed us a pipe 10 m long and 0.4 m in diameter: fluid enters at a uniform 1 m/s and gradually develops into fully developed flow under wall friction. The teacher asked us to first compute the Reynolds number and the analytical entrance length, and judge whether the pipe is long enough; then check convergence, mass conservation, the velocity profile, wall shear and the pressure drop; and finally compare with the exact Poiseuille solution. The course diagram draws the process very directly: the boundary layers on the two walls grow thicker from the inlet, merge at the end of the entrance region, and afterwards the velocity profile keeps its parabolic shape. It is also a very good entry case for learning CFD.
 
-This was a three-person group assignment. I ran the Fluent simulations and wrote both reports, while the group reviewed the setups and cross-checked the result tables.
+<figure>
+  <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/course-pipe-entrance-region.png" alt="Course diagram of boundary-layer development and entrance length in a pipe" loading="lazy">
+  <figcaption>Pipe entrance region, from the course material</figcaption>
+</figure>
 
-## TD1: checking the complete workflow with Poiseuille flow
+The cylinder-flow task swaps the problem for an external flow with no closed-form solution: the outer boundary has to be far enough away, the cylinder edge and the whole fluid domain need a clearly defined mesh size, and the results have to be checked for convergence, mass conservation, the flow field and drag, then compared with the course's smooth-cylinder drag curve.
 
-The pipe was 10 m long with a radius of 0.2 m. The mean inlet velocity was 1 m/s, the density was 1 kg/m³ and the dynamic viscosity was 0.004 Pa·s, giving $Re=100$.
+<figure>
+  <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/course-cylinder-drag-reference.png" alt="Course reference curves of drag coefficient versus Reynolds number for a smooth cylinder and a sphere" loading="lazy">
+  <figcaption>The course's drag reference curve for a smooth cylinder</figcaption>
+</figure>
 
-The surviving run used 500 quadrilateral cells and 561 nodes.
+Next, I first used the pipe flow — which has an exact solution — to check the computation workflow, then switched to the cylinder and checked mesh, domain and experimental differences one by one. And along the way I kept asking myself: can I trust the numbers Fluent gives?
+
+## Calibrating the computation workflow with pipe flow
+
+The pipe is 10 m long with a radius of 0.2 m; the mean inlet velocity is 1 m/s, the density is 1 kg/m³ and the dynamic viscosity is 0.004 Pa·s, so $Re=100$. In Fluent I used 500 quadrilateral cells and 561 nodes. The comparison:
 
 | Check | Analytical value | Fluent result |
 |---|---:|---:|
 | Convergence | Residuals below $10^{-6}$ | Reached at iteration 53 |
-| Net mass imbalance | 0 | $-2.8\times10^{-10}$ kg/s |
+| Mass imbalance | 0 | $-2.8\times10^{-10}$ kg/s |
 | Maximum centreline velocity | 2.00 m/s | 1.98 m/s |
 | Wall shear stress | 0.08 Pa | 0.08 Pa |
 | Fully developed pressure drop | 8 Pa | 8.65 Pa |
 | Entrance length | 2.4 m | About 2.4 m |
 
-The centreline velocity was 1% below the exact value. The extra 0.65 Pa of pressure drop came from the entrance region, where the wall gradient was larger before the velocity profile became parabolic.
+First look at the velocity field, to check that the uniform inflow really develops step by step into the Poiseuille parabolic profile.
 
-I initially estimated the entrance length visually as about 2 m. In the final report, I replaced that judgement with a defined criterion: the point where the centreline velocity reached 99% of its final value. This gave an entrance length of about 2.4 m, consistent with the analytical relation.
+<div class="space-y-8">
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/pipe-velocity-development.png" alt="Contour of the in-pipe velocity developing from a uniform inlet toward a parabolic profile" loading="lazy">
+    <figcaption>Velocity in the pipe developing step by step from the uniform inlet</figcaption>
+  </figure>
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/pipe-velocity-profiles.png" alt="Axial velocity profiles near the pipe inlet and at a downstream station" loading="lazy">
+    <figcaption>Velocity profiles in the entrance region and the fully developed region</figcaption>
+  </figure>
+</div>
 
-That correction showed me why a written criterion is more reliable than deciding that a curve “looks close enough.”
+The centreline velocity is off by 1%. The extra 0.65 Pa of pressure drop comes from the entrance region: before the velocity profile grows into a parabola, the velocity gradient at the wall is larger, so the friction is naturally larger. Eyeballing the plot, the entrance length is about 2 m. The point where the centreline velocity reaches almost 99% of its final value gives about 2.4 m, so it agrees with the analytical relation.
 
-## TD4: keeping the cylinder model simple
+<div class="space-y-8">
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/pipe-centerline-velocity.png" alt="Centreline velocity gradually approaching its final value along the pipe axis" loading="lazy">
+    <figcaption>Centreline velocity along the pipe length</figcaption>
+  </figure>
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/pipe-pressure-drop.png" alt="Centreline static pressure falling along the pipe axis" loading="lazy">
+    <figcaption>Centreline static pressure along the pipe length</figcaption>
+  </figure>
+</div>
 
-The cylinder diameter was 1 m, and the external fluid domain was a circular region with diameter $D_2$. The fluid density was 1 kg/m³ and its dynamic viscosity was $10^{-3}$ Pa·s. I varied the inlet velocity to set the Reynolds number.
+## Checking the cylinder case, which has no exact solution
 
-The model was two-dimensional, steady, laminar and incompressible. I applied a uniform inlet velocity, zero gauge pressure at the outlet and a no-slip condition on the cylinder wall.
+The cylinder diameter is 1 m, and the external fluid domain is a circle of diameter $D_2$. The density is 1 kg/m³ and the dynamic viscosity is $10^{-3}$ Pa·s; I changed the Reynolds number by changing the inlet velocity. The model is two-dimensional, steady, laminar and incompressible. The inlet gets a uniform velocity, the outlet gets zero gauge pressure, and the cylinder wall is no-slip.
 
-I first searched for mesh and domain plateaus at $Re=10$. I then kept the case settings fixed while sweeping Reynolds number from 0.1 to 20.
+I first found the mesh and domain plateaus at $Re=10$, then fixed that setup and swept from $Re=0.1$ to 20.
 
-## The mesh plateau needed coarse points
+<figure>
+  <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/cylinder-domain-geometry.png" alt="Diameter parameters of the inner and outer circles in the cylinder external-flow domain" loading="lazy">
+  <figcaption>Parameterized geometry of the cylinder and the adjustable outer boundary</figcaption>
+</figure>
 
 | Cells | 50 | 200 | 450 | 800 | 12,800 | 28,800 | 40,000 |
 |---|--:|--:|--:|--:|--:|--:|--:|
 | $C_D$ | 3.1328 | 2.7982 | 2.7757 | 2.7800 | 2.7938 | 2.7953 | 2.7973 |
 
-From 12,800 cells onward, each further change in $C_D$ was below 0.1%. I retained the 40,000-cell result, $C_D=2.7973$.
+From 12,800 cells onward, the change in $C_D$ stays below 0.1%. In the end I kept 40,000 cells and $C_D=2.7973$.
 
 ![Mesh sensitivity at Re=10](/images/projects/fluent-cyl-vnv/mesh-sensitivity.svg)
 
-My first refinement, from 12,800 to 28,800 cells, changed the result by only 0.05%. However, two nearby fine-grid values were not enough to demonstrate that a plateau existed.
+One thing worth noting: refining from 12,800 to 28,800 changes the result by only 0.05%, and the two points sit very close. But two close fine-grid points cannot prove a plateau exists — they may just both happen to be short of it. So I swept in the coarse direction instead. The 50-cell mesh gives 3.1328, about 12% above the final value. It is exactly this coarse point that shows the result really does change with resolution — the direction and magnitude of the change are both visible — and that is what is truly convincing.
 
-The downward sweep supplied the missing evidence. The 50-cell mesh gave $C_D=3.1328$, about 12% above the final value. This coarse point showed that the result did depend on resolution before approaching the stable range, making the plateau more convincing.
-
-## The outer boundary also changed cylinder drag
-
-With the mesh fixed, I increased the outer-domain diameter from 100 to 200 m:
+With the mesh fixed, I increased the outer-domain diameter from 100 m to 200 m:
 
 | $D_2$ | 100 m | 120 m | 150 m | 180 m | 200 m |
 |---|--:|--:|--:|--:|--:|
 | $C_D$ | 2.7973 | 2.7889 | 2.7806 | 2.7751 | 2.7723 |
 
-The change from 100 to 200 m was below 1%, so I retained $D_2=100$ m.
+The change from 100 m to 200 m is below 1%, so I kept 100 m.
 
 ![Domain sensitivity on the fixed mesh](/images/projects/fluent-cyl-vnv/domain-sensitivity.svg)
 
-Smaller domains between 20 and 80 m raised $C_D$ to about 3.05, showing that the outer boundary constrained the flow. Those low-end cases also used coarser boundary divisions, however, so they only indicate the scale of the domain effect. They do not separate it completely from the mesh effect.
+Smaller 20–80 m domains push $C_D$ up to about 3.05, which shows the outer boundary really does squeeze the flow. But those low-end points also used coarser boundary divisions, so they can only show the magnitude of the domain effect; they cannot fully separate it from the mesh effect.
 
-## Reynolds-number sweep on a fixed case
+The sweep used the same mesh of about 20,200 nodes and $D_2=50$ m. As $Re$ went from 0.1 to 20, $C_D$ fell from 92.4 to 2.06.
 
-The sweep used one grid with about 20,200 nodes and $D_2=50$ m. As $Re$ increased from 0.1 to 20, $C_D$ fell from 92.4 to 2.06.
-
-| $Re$ | Inlet velocity (m/s) | Drag force (N) | $C_D$ |
+| $Re$ | Inlet velocity (m/s) | Drag (N) | $C_D$ |
 |---:|---:|---:|---:|
 | 0.1 | $10^{-4}$ | $4.62\times10^{-7}$ | 92.4 |
 | 0.5 | $5\times10^{-4}$ | $2.42\times10^{-6}$ | 19.37 |
@@ -119,53 +144,68 @@ The sweep used one grid with about 20,200 nodes and $D_2=50$ m. As $Re$ increase
 | 10 | $10^{-2}$ | $1.43\times10^{-4}$ | 2.85 |
 | 20 | $2\times10^{-2}$ | $4.11\times10^{-4}$ | 2.06 |
 
-When I compared these values with the experimental table supplied in the course handout, only $Re=20$ fell within the required 5% error band:
+The two animations below play the real Fluent outputs for $Re=0.1$, 0.5, 1, 5, 10 and 20 in turn.
 
+<div class="space-y-8">
+  <figure>
+    <video class="w-full rounded-xl shadow-sm" controls autoplay muted loop playsinline preload="metadata" aria-label="Sweep animation of the velocity field around the cylinder as the Reynolds number rises from 0.1 to 20">
+      <source src="/videos/projects/fluent-cyl-vnv/reynolds-velocity-sweep.mp4" type="video/mp4">
+      Your browser does not support HTML5 video.
+    </video>
+    <figcaption>Velocity-field sweep, Re=0.1–20</figcaption>
+  </figure>
+  <figure>
+    <video class="w-full rounded-xl shadow-sm" controls autoplay muted loop playsinline preload="metadata" aria-label="Sweep animation of the static-pressure field around the cylinder as the Reynolds number rises from 0.1 to 20">
+      <source src="/videos/projects/fluent-cyl-vnv/reynolds-pressure-sweep.mp4" type="video/mp4">
+      Your browser does not support HTML5 video.
+    </video>
+    <figcaption>Static-pressure-field sweep, Re=0.1–20</figcaption>
+  </figure>
+</div>
+
+The endpoint plots spread out the difference between the two ends. At $Re=0.1$, the viscous influence diffuses over a very large region, and there is only a smooth low-speed zone behind the cylinder; by $Re=20$, the wake is more concentrated, and the upstream stagnation high pressure and the downstream low pressure are clearer.
+
+<div class="space-y-8">
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/velocity-re0.1.png" alt="Fluent velocity-magnitude contour around the cylinder at Reynolds number 0.1" loading="lazy">
+    <figcaption>Velocity field at Re=0.1</figcaption>
+  </figure>
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/velocity-re20.png" alt="Fluent velocity-magnitude contour around the cylinder at Reynolds number 20" loading="lazy">
+    <figcaption>Velocity field at Re=20</figcaption>
+  </figure>
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/pressure-re0.1.png" alt="Fluent static-pressure contour around the cylinder at Reynolds number 0.1" loading="lazy">
+    <figcaption>Static-pressure field at Re=0.1</figcaption>
+  </figure>
+  <figure>
+    <img class="w-full" src="/images/projects/fluent-cyl-vnv/pressure-re20.png" alt="Fluent static-pressure contour around the cylinder at Reynolds number 20" loading="lazy">
+    <figcaption>Static-pressure field at Re=20</figcaption>
+  </figure>
+</div>
+
+## Comparing with 6 experimental points
+
+Compared against the experimental table in the course handout, only $Re=20$ of the six points falls inside the 5% error band:
 | $Re$ | 0.1 | 0.5 | 1 | 5 | 10 | 20 |
 |---|--:|--:|--:|--:|--:|--:|
 | Relative error | 81.2% | 51.1% | 48.9% | 32.4% | 17.5% | 3.83% |
 
-Five of the six points failed the course threshold. I did not hide that result by tuning the setup toward the experimental values.
+The other five points all failed :(
 
-## Why the difference was largest at low Reynolds numbers
+Why is the low-Reynolds-number end the worst? Analysing it afterwards, one layer of the reason is the setup: the sweep mesh is coarser than the 40,000-cell reference mesh at $Re=10$, and its domain is smaller. Those setup differences alone pushed the $Re=10$ $C_D$ from 2.7973 up to 2.85. Another possible reason comes from the model assumptions. At $Re\le1$, steady two-dimensional flow is a stronger assumption. In the $Re=0.1$ run, the continuity residual even stalled, and the velocity residuals only came down to $10^{-3}$, so the 92.4 number is the least trustworthy of the six results.
 
-The sweep grid was coarser than the 40,000-cell reference mesh used at $Re=10$, and its domain was smaller. Those setting changes alone increased the $Re=10$ result from $C_D=2.7973$ to 2.85.
+<figure>
+  <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/re-0.1-residuals.png" alt="Iteration history of the continuity and velocity residuals at Reynolds number 0.1" loading="lazy">
+  <figcaption>Residual history at Re=0.1</figcaption>
+</figure>
 
-At $Re\le1$, the steady two-dimensional model was also a stronger assumption. In the $Re=0.1$ case, the continuity residual stalled and the velocity residuals reached only $10^{-3}$. I therefore treat its $C_D=92.4$ result as the least reliable of the six points.
+The pipe-flow text record says a 1,000-cell mesh, while the only surviving console log comes from the 500-cell run. This article uses the data under the log's case conditions. Another mismatch comes from the cylinder surface pressure-coefficient $C_p$ curve: the exported figure labelled $Re=20$ is identical to the $Re=10$ file. So this article does not use that $C_p$ curve to support any $Re=20$ judgement. The $Re=20$ static-pressure contour and the force data table still match that case. So you can see: every number has to be tied to its specific case first. Filenames and captions are only clues; the log and the raw results decide which case the data belongs to.
 
-The experimental difference cannot be assigned to one cause. It contains discretisation, domain and model-form effects at the same time.
+## Summary
 
-## Correcting mismatches in the working records
+This assignment is where I started building my approach to CFD verification. I first did two relatively simple steady problems: check pipe flow with the exact Poiseuille solution, then check low-Reynolds-number cylinder flow with mesh, domain and external reference values. This stage settles one basic question first: what checks does a steady CFD result have to pass before it is worth trusting?
 
-The TD1 draft described a 1,000-cell grid, but the only surviving console log came from a 500-cell run. I used the data associated with that log rather than repeating a mesh description that I could no longer verify.
+A mesh plateau cannot be judged from two close fine-grid points either. I also had to sweep toward coarse meshes and see the result clearly leave the plateau; and the domain had to be changed on its own before I could tell whether the outer boundary was still affecting the drag. Of the 6 Reynolds-number cases, only $Re=20$ entered the 5% error band. This shows residual convergence is only the starting point — it does not mean the model, mesh and domain are accurate enough.
 
-The entrance-length record needed a different correction. The first visual estimate was about 2 m, but the final report defined the entrance length as the point where the centreline velocity reached 99% of its final value. That reproducible criterion gave about 2.4 m.
-
-There was also a figure-bookkeeping error in TD4. A pressure figure labelled $Re=20$ in the report actually reused the $Re=10$ export. The drag conclusion still comes from the force table, but that report figure cannot demonstrate the $Re=20$ pressure field.
-
-These problems taught me to treat run identity as part of validation. A filename, draft description or caption cannot replace the console log and the corresponding numerical results.
-
-## Results I retained
-
-| Check | Retained result |
-|---|---|
-| TD1 centreline velocity | 1% below the analytical value |
-| TD1 wall shear, entrance length and pressure-drop trend | Consistent with the analytical results |
-| $Re=10$ mesh plateau | Further changes below 0.1% in the fine-grid range, with $C_D=2.7973$ at 40,000 cells |
-| $Re=10$ domain plateau | Change below 1% for $D_2\ge100$ m |
-| $Re=20$ comparison with handout drag | 3.83% error, passing the 5% requirement |
-| $Re\le10$ comparison with handout drag | 17.5%–81.2% error, failing the requirement |
-
-## What this work does not establish
-
-The cylinder sweep only covers $Re\le20$. It cannot be extended to higher Reynolds numbers or unsteady vortex shedding. The two-dimensional model also omits possible three-dimensional wake structures.
-
-The uniform TD1 mesh was sufficient for the analytical checks performed here, but it was not an optimal near-wall resolution strategy. A better next step would be to add inflation layers near the wall.
-
-I regenerated the charts on this page from the report tables and surviving logs without rerunning Fluent. The experimental curve comes from the course handout table, so this page can only recheck the saved data; it does not add new simulation results.
-
-## What I learned
-
-Two close fine-grid results do not prove a plateau by themselves. Sweeping toward coarse meshes and seeing the result move clearly away from the stable range provided stronger evidence that the retained setting was sufficiently resolved.
-
-I also stopped using the circular claim that a mesh must be optimal because its result agrees with theory. The defensible conclusion is narrower: the current mesh was adequate for the checks I performed. Establishing that it was optimal would require a separate comparison of computational cost and error.
+The study here stops at two-dimensional steady laminar flow with $Re\le20$. After building this verification sequence, I pushed the same cylinder problem to higher Reynolds numbers in later assignments: first a steady-wake baseline at $Re=40$, then unsteady vortex shedding, lift and drag histories and the Strouhal number at $Re=150$. The progression is very clear: first judge whether a steady result is trustworthy, then study how the flow changes with time.
