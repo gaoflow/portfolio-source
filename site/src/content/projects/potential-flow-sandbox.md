@@ -11,8 +11,7 @@ duration: 'Independent build'
 featured: false
 order: 14
 studySequence: 2
-heroImage: /images/projects/potential-flow-sandbox/source/karman-vortex-street-lab.jpg
-cardImageFit: cover
+heroImage: /images/projects/potential-flow-sandbox/cylinder-lift-hero.svg
 github: 'https://github.com/gaoflow/potential-flow-sandbox'
 ---
 
@@ -24,7 +23,7 @@ It felt like a mathematical trick. How can a few invisible "points" add up to an
 
 Forget the complex numbers for a moment and picture water flowing around a round bridge pier. Far from the pier, the water moves roughly left to right. Right in front of the pier, it slows down and splits into two branches that pass above and below. If the two branches are perfectly symmetric, there is one point of zero velocity at the front and one at the back — the stagnation points. Now give the whole flow a slight clockwise rotation: the two sides no longer move at the same speed. One side gets faster and its pressure drops; the other side slows down and its pressure rises. The result is an upward net force.
 
-The header image is a real cylinder wake photographed in a laboratory: the fluid behind the cylinder sheds alternately and rolls up into two rows of counter-rotating vortices — a Kármán vortex street. This article starts with the simplest idealized version of that problem: take viscosity away, build the flow around a cylinder from four elementary flows, and check every step.
+The header image is that lecture example, computed with my own code: uniform flow plus a doublet gives the cylinder flow, and adding a clockwise point vortex makes the streamlines asymmetric — both stagnation points (orange dots) are pushed into the lower half of the cylinder, which is where the upward lift $L'$ comes from. The picture only looks plausible, though; whether it is actually computed correctly is what this article checks, item by item.
 
 ## The one question I wanted to answer
 
@@ -84,9 +83,7 @@ $$
 
 My numerical contour runs counter-clockwise, so recovering the "clockwise is positive" circulation from the line integral takes one more sign flip. I therefore checked three things at once: the vortex velocity on the right side of the cylinder should point downward; the closed integral should recover a positive $\Gamma$; and the pressure-integrated lift should point upward.
 
-The lift case uses $U=1$, $R=1$, $\rho=1.225$, and $\Gamma=2\pi$ throughout. From $\sin\theta=-\Gamma/(4\pi UR)$, the stagnation points should move from $0^\circ$ and $180^\circ$ without circulation to $-30^\circ$ and $-150^\circ$.
-
-![How positive circulation moves the stagnation points and produces upward lift](/images/projects/potential-flow-sandbox/circulation-lift.svg)
+The lift case uses $U=1$, $R=1$, $\rho=1.225$, and $\Gamma=2\pi$ throughout — the header image is the flow field for exactly these parameters. From $\sin\theta=-\Gamma/(4\pi UR)$, the stagnation points should move from $0^\circ$ and $180^\circ$ without circulation to $-30^\circ$ and $-150^\circ$.
 
 The two stagnation points the program found were $-150.0^\circ$ and $-30.0^\circ$, at most $8.9\times10^{-16}$ rad away from the theoretical angles.
 

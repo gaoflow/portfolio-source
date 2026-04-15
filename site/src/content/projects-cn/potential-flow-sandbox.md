@@ -11,8 +11,7 @@ duration: '独立构建'
 featured: false
 order: 14
 studySequence: 2
-heroImage: /images/projects/potential-flow-sandbox/source/karman-vortex-street-lab.jpg
-cardImageFit: cover
+heroImage: /images/projects/potential-flow-sandbox/cylinder-lift-hero.svg
 github: 'https://github.com/gaoflow/potential-flow-sandbox'
 ---
 
@@ -24,7 +23,7 @@ github: 'https://github.com/gaoflow/potential-flow-sandbox'
 
 先不管复数，想象水绕过一根圆桥墩。离桥墩很远，水大致从左往右流。到了桥墩正前方，水慢下来，再分成上下两路绕过去。如果上下两路完全对称，桥墩前后各有一个速度为零的点，也就是停滞点。如果再让整片水流带一点顺时针旋转，上下两侧的速度会变得不一样：一侧更快、压力更低，另一侧更慢、压力更高，于是出现向上的合力。
 
-头图是实验室里拍下的真实圆柱尾迹：圆柱后方的流体交替脱落，卷成两列旋转方向相反的漩涡——卡门涡街。本文先做它最简单的理想版本：把黏性拿掉，只用四种基本流动拼出绕圆柱的势流，再逐项核对。
+头图就是课上那个例子，是我用自己的代码算出来的：均匀流加偶极子拼出圆柱绕流，再加一个顺时针点涡后，流线上下不再对称，两个停滞点（橙点）都被压到圆柱下半部分，向上的升力 $L'$ 就是这么来的。不过这张图只是"看着合理"——它到底算得对不对，正是本文要逐项核对的事。
 
 ## 我只想回答一个问题
 
@@ -84,9 +83,7 @@ $$
 
 给出的向上升力。我的数值轮廓是逆时针走的，所以从线积分恢复“顺时针为正”的环量时，需要再翻一次符号。为此我同时检查三件事：点涡在圆柱右侧的速度应向下；闭合积分应恢复正 $\Gamma$；压力积分的升力应向上。
 
-升力算例统一使用 $U=1$、$R=1$、$\rho=1.225$ 和 $\Gamma=2\pi$。根据 $\sin\theta=-\Gamma/(4\pi UR)$，停滞点应从无环量时的 $0^\circ$、$180^\circ$ 移到 $-30^\circ$、$-150^\circ$。
-
-![正环量如何移动停滞点并产生向上升力](/images/projects/potential-flow-sandbox/circulation-lift.svg)
+升力算例统一使用 $U=1$、$R=1$、$\rho=1.225$ 和 $\Gamma=2\pi$——头图就是这组参数算出来的流场。根据 $\sin\theta=-\Gamma/(4\pi UR)$，停滞点应从无环量时的 $0^\circ$、$180^\circ$ 移到 $-30^\circ$、$-150^\circ$。
 
 程序找到的两个停滞点是 $-150.0^\circ$ 和 $-30.0^\circ$，和理论角度的差最大只有 $8.9\times10^{-16}$ rad。
 
