@@ -18,9 +18,9 @@ github: 'https://github.com/gaoflow/potential-flow-sandbox'
 
 ## Why this caught my interest
 
-In a fluid mechanics lecture, the professor wrote the complex potentials for a source, a doublet, and a point vortex on the blackboard, then said: stack these elementary flows together and you get the flow around a cylinder — you can even compute lift. It felt like a mathematical trick. How can a few invisible "points" add up to an entire flow field? And how does the sign in front of the vortex decide which way the lift points?
+In a fluid mechanics lecture, the professor used flow around a cylinder as the example: add a uniform flow and an elementary flow called a doublet, and a few lines of formulas on the blackboard produced the flow field around a cylinder; add a point vortex, and you could even compute lift.
 
-I wanted to walk through the process myself instead of just memorizing the final formulas. The panel method and vortex lattice method I planned to build later would rely on the same sources, doublets, vortices, and the Kutta–Joukowski relation. If a velocity direction or a circulation sign was wrong at this level, it would be much harder to find inside a larger model. So I first built a very small potential-flow sandbox: only 2D, inviscid, incompressible flow, with every step checkable against a closed-form answer.
+It felt like a mathematical trick. How can a few invisible "points" add up to an entire flow field? And how does the sign in front of the vortex decide which way the lift points? These questions stuck with me. After the lecture, I went through the theory again using the course material and what I found online, and wrote a very small "potential-flow sandbox" to check it item by item: only 2D, inviscid, incompressible flow, with every step checkable against a closed-form answer. It also laid the groundwork for the panel method and vortex lattice method I built later — those rely on the same sources, doublets, vortices, and the Kutta–Joukowski relation, and a wrong velocity direction or circulation sign at this level is much harder to find inside a larger model.
 
 Forget the complex numbers for a moment and picture water flowing around a round bridge pier. Far from the pier, the water moves roughly left to right. Right in front of the pier, it slows down and splits into two branches that pass above and below. If the two branches are perfectly symmetric, there is one point of zero velocity at the front and one at the back — the stagnation points. Now give the whole flow a slight clockwise rotation: the two sides no longer move at the same speed. One side gets faster and its pressure drops; the other side slows down and its pressure rises. The result is an upward net force.
 
@@ -88,11 +88,11 @@ The lift case uses $U=1$, $R=1$, $\rho=1.225$, and $\Gamma=2\pi$ throughout. Fro
 
 ![How positive circulation moves the stagnation points and produces upward lift](/images/projects/potential-flow-sandbox/circulation-lift.svg)
 
-The two stagnation points the program found were $-149.99999999999997^\circ$ and $-30.00000000000005^\circ$, at most $8.9\times10^{-16}$ rad away from the theoretical angles.
+The two stagnation points the program found were $-150.0^\circ$ and $-30.0^\circ$, at most $8.9\times10^{-16}$ rad away from the theoretical angles.
 
-I also ran a 4096-point contour integral on a circle at $r=2.5R$. Uniform flow and the doublet should each contribute zero circulation around the loop, so whatever remains can only come from the vortex. The integral returned 6.283185307179585 against an imposed circulation of 6.283185307179586 — an absolute error of $8.9\times10^{-16}$.
+I also ran a 4096-point contour integral on a circle at $r=2.5R$. Uniform flow and the doublet should each contribute zero circulation around the loop, so whatever remains can only come from the vortex. The integral recovered a circulation of 6.3 — the imposed value $2\pi$ also rounds to 6.3 at one decimal, and the two differ by only $8.9\times10^{-16}$.
 
-Finally, I integrated pressure over 8192 surface points. The computed lift per unit span was 7.696902001294994, identical to $\rho U\Gamma$ with 0.0 relative error, pointing upward. I kept the result only after all three routes agreed on the same sign.
+Finally, I integrated pressure over 8192 surface points. The computed lift per unit span was 7.7, identical to the $\rho U\Gamma$ value (0.0 relative error), pointing upward. I kept the result only after all three routes agreed on the same sign.
 
 ## Finally: is the RK4 really fourth-order?
 
@@ -126,7 +126,9 @@ The drag is zero to machine precision.
 
 "Zero drag" is not a prediction for a bridge pier or a real cylinder. The potential-flow model removes viscosity, and this zero-drag result is d'Alembert's paradox. There is no boundary layer, no separation, and no wake in the model — yet those are exactly where most of a real cylinder's drag comes from.
 
-A real flow sheds two alternating rows of vortices behind a cylinder — a Kármán vortex street. The same pattern shows up in the atmosphere: in November 2012, NASA's Terra satellite watched the wind sweep past Yakushima Island, Japan, and the cloud layer downstream rolled into a long train of alternating vortices. The island is a giant "cylinder" here, while the ideal potential-flow figure above is symmetric front to back and has no real wake at all.
+One confusion is worth clearing up here: cylinder flow and the Kármán vortex street are the same geometry but two different physics. What this article computes is the idealized version — no viscosity, a symmetric front-to-back flow field, zero drag. The real, viscous flow separates behind the cylinder and sheds a vortex street, which takes a Navier–Stokes CFD solver to compute; that is what I did in a separate project.
+
+This vortex street does not only show up in laboratories — the atmosphere produces it too. In November 2012, NASA's Terra satellite watched the wind sweep past Yakushima Island, Japan, and the cloud layer downstream rolled into a long train of alternating vortices. The island is a giant "cylinder" here, while the ideal potential-flow figure above is symmetric front to back and has no real wake at all.
 
 ![Satellite image of the Kármán vortex street downstream of Yakushima Island](/images/projects/potential-flow-sandbox/source/karman-vortex-street-yakushima-2012.jpg)
 
