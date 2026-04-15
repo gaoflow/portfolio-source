@@ -29,10 +29,7 @@ const alternatePath = hasAlternate ? (isChinese ? '/projects' : '/cn/projects') 
   alternatePath={alternatePath}
 >
   <section class="pt-4 pb-20">
-    <h1 class="section-label mb-2">{isChinese ? '项目目录' : 'Project catalogue'}</h1>
-    <p class="mb-10 max-w-2xl text-muted">
-      {isChinese ? '按时间从新到旧排列。' : 'Newest first.'}
-    </p>
+    <h1 class="section-label mb-10">{isChinese ? '项目目录' : 'Project catalogue'}</h1>
 
     {sortedProjects.length === 0 && isChinese ? (
       <p class="border border-edge bg-surface p-6 text-muted">中文项目文章尚未加入当前构建。</p>
