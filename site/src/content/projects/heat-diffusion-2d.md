@@ -27,10 +27,7 @@ That bothered me more than an immediate syntax error. A smooth colour plot can b
 
 ## What heat diffusion looks like outside a graph
 
-Heat diffusion is easy to miss because the material itself does not move. One everyday trace appears after snowfall. Paving slabs can show through the snow before the nearby ground does because heat stored below reaches the surface at different rates through different materials.
-
-![Snow melting at different rates above paving slabs and nearby ground](/images/projects/heat-diffusion-2d/snow-melting-over-paving-stones.jpg)
-*The outlines of the paving slabs become visible as the snow melts. This is a real example of heat moving through solids, not a validation image for my solver (photo by Martinvl, from Wikimedia Commons, CC BY-SA 4.0)*
+Heat diffusion is easy to miss because the material itself does not move. One everyday trace appears after snowfall. Paving slabs can show through the snow before the nearby ground does because heat stored below reaches the surface at different rates through different materials. The outlines of the buried slabs become visible as the snow melts — a real example of heat moving through solids.
 
 In practical engineering—such as a copper heat spreader underneath a CPU or an inverter baseplate on an electric vehicle—heat diffusion follows the exact same physical law: heat spreads spontaneously from high-temperature zones to low-temperature zones, flattening all thermal gradients.
 

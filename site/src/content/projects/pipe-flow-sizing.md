@@ -11,7 +11,7 @@ duration: 'Independent study'
 featured: false
 order: 13
 studySequence: 3
-heroImage: /images/projects/pipe-flow-sizing/reference/car-water-pump.jpg
+heroImage: /images/projects/pipe-flow-sizing/reference/split-case-centrifugal-pump.jpg
 cardImageFit: cover
 github: 'https://github.com/gaoflow/pipe-flow-sizing'
 ---
@@ -28,7 +28,7 @@ If I overestimated the flow here, the later thermal model could be numerically p
 
 I did not yet have measured pump, radiator or water-jacket data. This study therefore checks the calculation method with declared substitute inputs. The result of 26.22 L/min is not a measured vehicle flow rate.
 
-The header shows a real engine-driven coolant pump, the type used in FSAE combustion cars, not the team's own pump. Photo: Maly LOLek, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pompa_wody2.jpg).
+The header shows a real centrifugal pump — a large industrial one, but a car's coolant pump is the same kind of machine scaled down.
 
 ## The route the coolant must follow
 
@@ -49,7 +49,7 @@ A real radiator makes this restriction easier to picture. Coolant does not cross
 
 <figure>
   <img src="/images/projects/pipe-flow-sizing/reference/automobile-radiator.jpg" alt="Aluminium automotive radiator" loading="lazy" style="max-width: 529px; margin-inline: auto;">
-  <figcaption>Aluminium automotive radiator · Bill Wrigley · <a href="https://commons.wikimedia.org/wiki/File:Automobile_radiator.jpg">Wikimedia Commons</a> · public domain</figcaption>
+  <figcaption>Aluminium automotive radiator</figcaption>
 </figure>
 
 ## Turning every element into a pressure loss

@@ -11,7 +11,7 @@ duration: '独立研究'
 featured: false
 order: 15
 studySequence: 7
-heroImage: /images/projects/heat-diffusion-2d/snow-melting-over-paving-stones.jpg
+heroImage: /images/projects/heat-diffusion-2d/thermal-spreading-infrared.jpg
 cardImageFit: cover
 github: 'https://github.com/gaoflow/heat-diffusion-2d'
 ---
@@ -27,10 +27,6 @@ github: 'https://github.com/gaoflow/heat-diffusion-2d'
 ## 简化模型：一块单侧受冷的金属板
 
 把积雪问题简化后的模型是这样的：一块二维金属板，初始全场温度 $T=1$；在 $t=0$ 瞬间，左边界贴上恒温 $T=0$ 的冷源，其余三边全部绝热，板内热量只能从左侧这唯一的通道散失。
-
-![红外热成像下平板上的局部热点向四周扩散](/images/projects/heat-diffusion-2d/thermal-spreading-infrared.jpg)
-
-*红外热成像下的平板，局部热点的热量向四周扩散*
 
 我还做了无量纲化，这样的话结果可以等比缩放到任意真实工况。这个模型保留了积雪问题的核心物理——热量在固体内部随时间扩散、逐渐摊平温度起伏——但去掉了潜热、复杂几何和材料界面，并且有严格的傅里叶级数解析解，可以随时把数值解拉出来逐点对账。
 
