@@ -31,7 +31,7 @@ const copyByLocale = {
     role: profile.role,
     websiteName: `${profile.name} — Engineering Portfolio`,
     rssTitle: `${profile.name} — Engineering Notes`,
-    nav: ['Home', 'Projects', 'Notes'],
+    nav: ['Home', 'Projects'],
     cv: 'CV',
     alternate: 'Chinese',
     avatarAlt: 'Portrait of Bing Gao',
@@ -42,7 +42,7 @@ const copyByLocale = {
     role: 'Ingénieur en mécanique des fluides numérique et développeur',
     websiteName: `${profile.name} — Portfolio d’ingénierie`,
     rssTitle: `${profile.name} — Notes d’ingénierie`,
-    nav: ['Accueil', 'Projets', 'Notes'],
+    nav: ['Accueil', 'Projets'],
     cv: 'CV',
     alternate: 'Anglais',
     avatarAlt: 'Portrait de Bing Gao',
@@ -53,7 +53,7 @@ const copyByLocale = {
     role: '计算流体力学工程师与开发者',
     websiteName: `${profile.name}——工程作品集`,
     rssTitle: `${profile.name}——工程笔记`,
-    nav: ['首页', '项目', '笔记'],
+    nav: ['首页', '项目'],
     cv: '简历',
     alternate: '英文',
     avatarAlt: 'Bing Gao 的头像',
@@ -94,12 +94,10 @@ const structuredData = {
 };
 
 const projectsHref = isChinese ? '/cn/projects' : '/projects';
-const notesHref = isChinese ? '/cn/notes' : '/notes';
 const cvHref = locale === 'cn' ? '/cn/cv' : locale === 'fr' ? '/fr/cv' : '/cv';
 const nav = [
   { href: '/', label: copy.nav[0] },
   { href: projectsHref, label: copy.nav[1] },
-  { href: notesHref, label: copy.nav[2] },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
@@ -153,7 +151,7 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     <main class="page-enter mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
       <slot />
       <footer class="mt-20 flex flex-wrap justify-between gap-3 border-t border-edge-soft pt-6 text-xs text-stone">
-        <span class="flex items-center gap-3"><img src="/avatar_memoji_05_nobg.png" alt={copy.avatarAlt} width="32" height="32" class="h-8 w-8 shrink-0 object-contain" loading="lazy" decoding="async" /><span>{profile.name} · {copy.role}</span></span>
+        <span class="flex items-center gap-3"><img src="/avatar_memoji_05_nobg.png" alt={copy.avatarAlt} width="32" height="32" class="h-8 w-8 shrink-0 object-contain" loading="lazy" decoding="async" /><span>{profile.name}, {copy.role}</span></span>
         <span>{copy.credit} <a href="https://github.com/tw93/Kami" target="_blank" rel="noopener noreferrer" class="text-warm transition-colors hover:text-accent">Kami</a></span>
       </footer>
     </main>

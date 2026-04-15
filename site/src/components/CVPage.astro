@@ -77,7 +77,7 @@ const alternates = [
                 <h3>{item.role}</h3>
                 <p class="cv-organization">
                   {item.href ? <a href={item.href} target="_blank" rel="noopener noreferrer">{item.organization}</a> : item.organization}
-                  <span aria-hidden="true"> · </span>{item.place}
+                  <span aria-hidden="true">, </span>{item.place}
                 </p>
               </div>
               <p class="cv-period">{item.period}</p>
@@ -130,7 +130,7 @@ const alternates = [
             <header class="cv-entry-heading">
               <div>
                 <h3>{item.degree}</h3>
-                <p class="cv-organization">{item.institution} <span aria-hidden="true"> · </span>{item.place}</p>
+                <p class="cv-organization">{item.institution} <span aria-hidden="true">, </span>{item.place}</p>
               </div>
               <p class="cv-period">{item.period}</p>
             </header>
@@ -175,7 +175,7 @@ const alternates = [
           <header class="cv-entry-heading">
             <div>
               <h3>{content.community.role}</h3>
-              <p class="cv-organization"><a href={content.community.href} target="_blank" rel="noopener noreferrer">{content.community.organization}</a> <span aria-hidden="true"> · </span>{content.community.place}</p>
+              <p class="cv-organization"><a href={content.community.href} target="_blank" rel="noopener noreferrer">{content.community.organization}</a> <span aria-hidden="true">, </span>{content.community.place}</p>
             </div>
             <p class="cv-period">{content.community.period}</p>
           </header>

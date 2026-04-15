@@ -1,9 +1,0 @@
----
-import NotesIndex from '../../components/NotesIndex.astro';
-import { getCollection } from 'astro:content';
-
-const notes = await getCollection('notes');
-const hasChinese = (await getCollection('notesCn')).length > 0;
----
-
-<NotesIndex notes={notes} locale="en" hasAlternate={hasChinese} />

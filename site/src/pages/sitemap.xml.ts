@@ -7,11 +7,10 @@ const escapeXml = (value: string) => value.replace(/[<>&'\"]/g, (char) => ({
 
 export const GET: APIRoute = async ({ site }) => {
   if (!site) throw new Error('astro.config.mjs must define site');
-  const [projects, notes] = await Promise.all([getCollection('projects'), getCollection('notes')]);
+  const projects = await getCollection('projects');
   const entries = [
-    ...['/', '/projects/', '/notes/', '/cv/', '/fr/cv/', '/cn/cv/'].map((path) => ({ path })),
+    ...['/', '/projects/', '/cv/', '/fr/cv/', '/cn/cv/'].map((path) => ({ path })),
     ...projects.map((project) => ({ path: `/projects/${project.id}/`, modified: project.data.date })),
-    ...notes.map((note) => ({ path: `/notes/${note.id}/`, modified: note.data.published.toISOString().slice(0, 10) })),
   ];
   const body = entries.map(({ path, modified }) => [
     '  <url>',

@@ -71,7 +71,7 @@ const english: CvContent = {
   route: '/cv',
   pageTitle: 'Professional CV',
   description: 'Bing Gao — computational mechanics engineering student working across fluid simulation, thermal systems, numerical verification, and engineering software.',
-  eyebrow: 'Professional CV · 2026',
+  eyebrow: 'Professional CV, 2026',
   name: 'Bing Gao',
   portraitAlt: 'Bing Gao in the Faroe Islands',
   role: 'Computational Mechanics Engineering Student / Fluid Simulation, Thermal Systems & Engineering Software',
@@ -121,7 +121,7 @@ const english: CvContent = {
       role: '3D Modelling Intern',
       organization: 'Felisiak Engineering & Development',
       place: 'Paris, France',
-      period: 'Apr — Aug 2026 · 17 weeks',
+      period: 'Apr — Aug 2026, 17 weeks',
       bullets: [
         'Reconstructed the ESA Space Rider from public blueprints for a launch-campaign review application and delivered separate review and animation-ready assets for Unity and Blender.',
         'Built a scripted Blender audit, rollback, and export workflow and prepared the engineering report, defense poster, and browser-ready GLB.',
@@ -145,7 +145,7 @@ const english: CvContent = {
   projects: [
     {
       title: 'Formula Student Cooling System & OpenFOAM Surrogate',
-      context: 'Vinci Eco Drive · 2025–2026',
+      context: 'Vinci Eco Drive, 2025–2026',
       href: '/projects/fsae-cooling',
       bullets: [
         'Coupled vendor fan, radiator, and pump curves with an 80-cell one-dimensional finite-volume coolant model; the hydraulic operating point reached 10.03 L/min.',
@@ -156,7 +156,7 @@ const english: CvContent = {
     },
     {
       title: 'F1 External-Aerodynamics RANS Pilot',
-      context: 'Independent study · 2026',
+      context: 'Independent study, 2026',
       href: '/projects/f1-2026-aero',
       bullets: [
         'Built a 4.35-million-cell OpenFOAM 14 half-car RANS baseline and completed a 23-variant pilot campaign across geometry, boundary conditions, and modelling sensitivities.',
@@ -166,7 +166,7 @@ const english: CvContent = {
     },
     {
       title: 'FlowLab & FlowROM',
-      context: 'Independent study · 2026',
+      context: 'Independent study, 2026',
       href: '/projects/flowlab',
       bullets: [
         'Implemented a dependency-free D2Q9 BGK lattice-Boltzmann solver shared by Node.js and the browser; validated three grids at Re=100 against canonical lid-driven-cavity data.',
@@ -176,7 +176,7 @@ const english: CvContent = {
     },
     {
       title: 'Space Rider Digital Model',
-      context: 'Felisiak Engineering & Development · 2026',
+      context: 'Felisiak Engineering & Development, 2026',
       href: '/projects/space-rider',
       bullets: [
         'Reconstructed the ESA Space Rider from public blueprints during a 17-week internship; the internal verification record reports ±6 mm side-view and ±8.4 mm top-view agreement over a 4.88 m body.',
@@ -187,7 +187,7 @@ const english: CvContent = {
     },
     {
       title: 'XC48 Abaqus Tensile Twin',
-      context: 'Course project · 2026',
+      context: 'Course project, 2026',
       href: '/projects/xc48-abaqus-twin',
       bullets: [
         'Built a Python pipeline from raw force/displacement data to validated material inputs, Abaqus ODB post-processing, and report generation for an XC48 tensile study.',
@@ -196,7 +196,7 @@ const english: CvContent = {
     },
     {
       title: 'Airfoil & Ground-Effect Methods',
-      context: 'Independent studies · 2026',
+      context: 'Independent studies, 2026',
       href: '/projects/airfoil-methods',
       bullets: [
         'Implemented a cosine-spaced Hess–Smith panel method for NACA 0012 and compared linear lift against NASA TM-4074; the 160-to-240-panel lift change at 4° was 0.0307%.',
@@ -219,7 +219,7 @@ const english: CvContent = {
       degree: 'Bachelor of Computer Science',
       institution: 'Changchun University of Science and Technology',
       place: 'Changchun, China',
-      period: 'Sep 2012 — Jul 2016 · GPA 3.33/4.00',
+      period: 'Sep 2012 — Jul 2016, GPA 3.33/4.00',
       details: [
         'Patent: “Mouse with gamepad function” (CN203870574U, issued Oct 8, 2014).',
         'First Provincial Prize, China Undergraduate Mathematical Contest in Modeling (2014).',
@@ -254,7 +254,7 @@ const english: CvContent = {
   },
   closing: 'Detailed methods, figures, and evidence records are available in the',
   portfolioLabel: 'engineering portfolio',
-  closingMark: 'Bing Gao · Paris',
+  closingMark: 'Bing Gao, Paris',
 };
 
 const french: CvContent = {
@@ -262,7 +262,7 @@ const french: CvContent = {
   route: '/fr/cv',
   pageTitle: 'Curriculum vitæ',
   description: 'Bing Gao — élève-ingénieur en mécanique numérique, spécialisé en mécanique des fluides numérique, systèmes thermiques, vérification numérique et logiciels d’ingénierie.',
-  eyebrow: 'Curriculum vitæ · 2026',
+  eyebrow: 'Curriculum vitæ, 2026',
   name: 'Bing Gao',
   portraitAlt: 'Bing Gao aux Îles Féroé',
   role: 'Élève-ingénieur en mécanique numérique / Mécanique des fluides numérique, systèmes thermiques et logiciels d’ingénierie',
@@ -312,7 +312,7 @@ const french: CvContent = {
       role: 'Stagiaire en modélisation 3D',
       organization: 'Felisiak Ingénierie & Développement',
       place: 'Paris, France',
-      period: 'Avr. — août 2026 · 17 semaines',
+      period: 'Avr. — août 2026, 17 semaines',
       bullets: [
         'Reconstruit le Space Rider de l’ESA à partir de plans publics pour une application de revue de campagne de lancement et livré des ressources distinctes pour la revue et l’animation sous Unity et Blender.',
         'Développé un processus scripté d’audit, de retour arrière et d’export sous Blender, puis préparé le rapport d’ingénierie, le poster de soutenance et le GLB pour navigateur.',
@@ -336,7 +336,7 @@ const french: CvContent = {
   projects: [
     {
       title: 'Refroidissement Formula Student et modèle OpenFOAM',
-      context: 'Vinci Eco Drive · 2025–2026',
+      context: 'Vinci Eco Drive, 2025–2026',
       href: '/projects/fsae-cooling',
       bullets: [
         'Couplé les courbes constructeur du ventilateur, du radiateur et de la pompe à un modèle unidimensionnel du liquide de refroidissement sur 80 cellules ; point de fonctionnement hydraulique à 10,03 L/min.',
@@ -347,7 +347,7 @@ const french: CvContent = {
     },
     {
       title: 'Pilote RANS d’aérodynamique externe F1',
-      context: 'Étude indépendante · 2026',
+      context: 'Étude indépendante, 2026',
       href: '/projects/f1-2026-aero',
       bullets: [
         'Construit un cas de référence demi-voiture RANS de 4,35 millions de cellules sous OpenFOAM 14 et mené une campagne pilote de 23 variantes sur la géométrie, les conditions aux limites et la modélisation.',
@@ -357,7 +357,7 @@ const french: CvContent = {
     },
     {
       title: 'FlowLab et FlowROM',
-      context: 'Étude indépendante · 2026',
+      context: 'Étude indépendante, 2026',
       href: '/projects/flowlab',
       bullets: [
         'Implémenté un solveur de Boltzmann sur réseau D2Q9 BGK sans dépendance, partagé entre Node.js et le navigateur ; validé trois maillages à Re=100 sur la cavité entraînée de référence.',
@@ -367,7 +367,7 @@ const french: CvContent = {
     },
     {
       title: 'Modèle numérique Space Rider',
-      context: 'Felisiak Ingénierie & Développement · 2026',
+      context: 'Felisiak Ingénierie & Développement, 2026',
       href: '/projects/space-rider',
       bullets: [
         'Reconstruit le Space Rider de l’ESA à partir de plans publics pendant un stage de 17 semaines ; le dossier interne indique des écarts de ±6 mm en vue latérale et ±8,4 mm en vue de dessus sur un véhicule de 4,88 m.',
@@ -378,7 +378,7 @@ const french: CvContent = {
     },
     {
       title: 'Jumeau numérique de traction XC48 sous Abaqus',
-      context: 'Projet académique · 2026',
+      context: 'Projet académique, 2026',
       href: '/projects/xc48-abaqus-twin',
       bullets: [
         'Développé une chaîne Python des données brutes force/déplacement aux entrées matériau validées, au post-traitement ODB Abaqus et à la génération du rapport d’une étude de traction XC48.',
@@ -387,7 +387,7 @@ const french: CvContent = {
     },
     {
       title: 'Méthodes de profil et d’effet de sol',
-      context: 'Études indépendantes · 2026',
+      context: 'Études indépendantes, 2026',
       href: '/projects/airfoil-methods',
       bullets: [
         'Implémenté une méthode de panneaux Hess–Smith à espacement cosinus pour le NACA 0012 et comparé la portance linéaire à la NASA TM-4074 ; écart de 0,0307 % entre 160 et 240 panneaux à 4°.',
@@ -410,7 +410,7 @@ const french: CvContent = {
       degree: 'Licence en informatique',
       institution: 'Université des sciences et technologies de Changchun',
       place: 'Changchun, Chine',
-      period: 'Sept. 2012 — juil. 2016 · moyenne 3,33/4,00',
+      period: 'Sept. 2012 — juil. 2016, moyenne 3,33/4,00',
       details: [
         'Brevet : « Souris avec fonction de manette de jeu » (CN203870574U, délivré le 8 oct. 2014).',
         'Premier prix provincial, concours chinois de modélisation mathématique pour étudiants (2014).',
@@ -445,7 +445,7 @@ const french: CvContent = {
   },
   closing: 'Les méthodes détaillées, les figures et les dossiers de preuves sont disponibles dans le',
   portfolioLabel: 'portfolio d’ingénierie',
-  closingMark: 'Bing Gao · Paris',
+  closingMark: 'Bing Gao, Paris',
 };
 
 const chinese: CvContent = {
@@ -453,7 +453,7 @@ const chinese: CvContent = {
   route: '/cn/cv',
   pageTitle: '个人简历',
   description: 'Bing Gao——计算力学工程专业学生，研究方向涵盖流体数值模拟、热系统、数值验证与工程软件。',
-  eyebrow: '个人简历 · 2026',
+  eyebrow: '个人简历, 2026',
   name: 'Bing Gao',
   portraitAlt: 'Bing Gao 在法罗群岛',
   role: '计算力学工程专业学生 / 流体数值模拟、热系统与工程软件',
@@ -503,7 +503,7 @@ const chinese: CvContent = {
       role: '三维建模实习生',
       organization: 'Felisiak 工程与开发',
       place: '法国巴黎',
-      period: '2026 年 4 月至 8 月 · 17 周',
+      period: '2026 年 4 月至 8 月, 17 周',
       bullets: [
         '依据公开图纸重建欧洲空间局 Space Rider，为发射活动评审应用交付独立的评审资产，以及适用于 Unity 和 Blender 的动画资产。',
         '建立 Blender 脚本化审计、回滚与导出流程，并完成工程报告、答辩海报和浏览器版 GLB。',
@@ -527,7 +527,7 @@ const chinese: CvContent = {
   projects: [
     {
       title: '方程式学生赛车冷却系统与 OpenFOAM 替代模型',
-      context: 'Vinci Eco Drive · 2025—2026',
+      context: 'Vinci Eco Drive, 2025—2026',
       href: '/cn/projects/fsae-cooling',
       bullets: [
         '将风扇、散热器和水泵的供应商曲线与 80 单元一维有限体积冷却液模型耦合；液压工作点为 10.03 升/分。',
@@ -538,7 +538,7 @@ const chinese: CvContent = {
     },
     {
       title: 'F1 外部空气动力学 RANS 试验研究',
-      context: '独立研究 · 2026',
+      context: '独立研究, 2026',
       href: '/cn/projects/f1-2026-aero',
       bullets: [
         '建立 435 万单元的 OpenFOAM 14 半车 RANS 基准算例，并完成涵盖几何、边界条件和建模敏感性的 23 变体试验。',
@@ -548,7 +548,7 @@ const chinese: CvContent = {
     },
     {
       title: 'FlowLab 与 FlowROM',
-      context: '独立研究 · 2026',
+      context: '独立研究, 2026',
       href: '/cn/projects/flowlab',
       bullets: [
         '实现无依赖的 D2Q9 BGK 格子玻尔兹曼求解器，由 Node.js 与浏览器共用；在雷诺数 100 条件下，以经典顶盖驱动方腔数据验证三套网格。',
@@ -558,7 +558,7 @@ const chinese: CvContent = {
     },
     {
       title: 'Space Rider 数字模型',
-      context: 'Felisiak 工程与开发 · 2026',
+      context: 'Felisiak 工程与开发, 2026',
       href: '/cn/projects/space-rider',
       bullets: [
         '在 17 周实习期间依据公开图纸重建欧洲空间局 Space Rider；内部验证记录显示，4.88 米机身的侧视图误差为 ±6 毫米，俯视图误差为 ±8.4 毫米。',
@@ -569,7 +569,7 @@ const chinese: CvContent = {
     },
     {
       title: 'XC48 Abaqus 拉伸数字孪生',
-      context: '课程项目 · 2026',
+      context: '课程项目, 2026',
       href: '/cn/projects/xc48-abaqus-twin',
       bullets: [
         '建立 Python 流程，将原始力与位移数据转换为经过验证的材料输入，并完成 Abaqus ODB 后处理和 XC48 拉伸研究报告生成。',
@@ -578,7 +578,7 @@ const chinese: CvContent = {
     },
     {
       title: '翼型与地面效应方法',
-      context: '独立研究 · 2026',
+      context: '独立研究, 2026',
       href: '/cn/projects/airfoil-methods',
       bullets: [
         '为 NACA 0012 实现余弦间距 Hess–Smith 面板法，并与 NASA TM-4074 的线性升力结果比较；在迎角 4° 时，从 160 个面板加密到 240 个面板的升力变化为 0.0307%。',
@@ -601,7 +601,7 @@ const chinese: CvContent = {
       degree: '计算机科学学士',
       institution: '长春理工大学',
       place: '中国长春',
-      period: '2012 年 9 月至 2016 年 7 月 · 平均绩点 3.33/4.00',
+      period: '2012 年 9 月至 2016 年 7 月, 平均绩点 3.33/4.00',
       details: [
         '专利：“带游戏手柄功能的鼠标”（CN203870574U，2014 年 10 月 8 日授权）。',
         '中国大学生数学建模竞赛省级一等奖（2014）。',
@@ -636,7 +636,7 @@ const chinese: CvContent = {
   },
   closing: '详细方法、图表和证据记录请参阅',
   portfolioLabel: '工程作品集',
-  closingMark: 'Bing Gao · 法国巴黎',
+  closingMark: 'Bing Gao, 法国巴黎',
 };
 
 export const cvLocales: Record<CvLocale, CvContent> = {

@@ -7,9 +7,6 @@ import { getCollection } from 'astro:content';
 const projects = (await getCollection('projects')).sort(
   (a, b) => b.data.date.localeCompare(a.data.date) || (b.data.studySequence ?? 0) - (a.data.studySequence ?? 0) || a.data.order - b.data.order,
 );
-const notes = (await getCollection('notes')).sort(
-  (a, b) => b.data.published.valueOf() - a.data.published.valueOf() || a.data.order - b.data.order,
-);
 const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 ---
 
@@ -79,29 +76,4 @@ const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-
     </div>
   </section>
 
-  {/* 4. Engineering notes — writing feed */}
-  {notes.length > 0 && (
-    <section class="mt-20">
-      <div class="mb-5 flex items-baseline justify-between">
-        <h2 class="section-label"><span class="section-num mr-2">02</span>Engineering notes</h2>
-        <a href="/notes/" class="font-serif text-xs text-stone transition-colors hover:text-accent transition-colors hover:text-accent">All notes →</a>
-      </div>
-      <div class="border border-edge bg-surface">
-        {notes.map((n) => (
-          <a
-            href={`/notes/${n.id}`}
-            class="group grid grid-cols-[1fr] items-center gap-4 border-b border-edge-soft px-4 py-4 transition-shadow last:border-b-0 hover:shadow-[0_4px_24px_rgba(0,0,0,0.05)] sm:grid-cols-[1fr_auto]"
-          >
-            <span class="min-w-0">
-              <span class="block font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{n.data.title}</span>
-              <span class="mt-1 line-clamp-2 block text-base leading-relaxed text-muted">{n.data.summary}</span>
-            </span>
-            <span class="hidden font-serif text-xs text-stone whitespace-nowrap tabular-nums sm:block">
-              {n.data.published.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-            </span>
-          </a>
-        ))}
-      </div>
-    </section>
-  )}
 </Base>

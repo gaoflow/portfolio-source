@@ -16,10 +16,10 @@ export const profile = {
 
   // Headline capability rows, Balasko-style (mono, scan in 5 s)
   capabilities: [
-    { label: 'Simulation', value: 'Ansys Fluent · OpenFOAM' },
-    { label: 'CAD', value: 'Blender · SolidWorks' },
-    { label: 'Automation', value: 'Python · JavaScript · Bash' },
-    { label: 'Software', value: '9 yrs engineering leadership · C++ · Rust · TypeScript' },
+    { label: 'Simulation', value: 'Ansys Fluent, OpenFOAM' },
+    { label: 'CAD', value: 'Blender, SolidWorks' },
+    { label: 'Automation', value: 'Python, JavaScript, Bash' },
+    { label: 'Software', value: '9 yrs engineering leadership, C++, Rust, TypeScript' },
   ],
 
   // Representative case (homepage) — F1 full-car RANS campaign; every metric
@@ -53,7 +53,7 @@ export const profile = {
       label: 'Tooling',
       caption: 'Python and Bash pipelines drive meshing, solving, post-processing, and evidence packaging, so a reviewer can rebuild any figure from source.',
       metrics: [
-        { label: 'Pipeline', value: 'Python · Bash' },
+        { label: 'Pipeline', value: 'Python, Bash' },
         { label: 'Reproduction', value: 'single command' },
       ],
     },
@@ -67,7 +67,7 @@ export const profile = {
     { kind: 'education', org: 'CUST — Changchun Univ. of Science & Technology', title: 'BSc Computer Science', period: '2012 — 2016' },
   ],
 
-  // Languages: French DELF B2 · English full professional · Chinese native
+  // Languages: French DELF B2, English full professional, Chinese native
   references: [
     // { quote: '', name: '', title: '', href: '' },
   ] as { quote: string; name: string; title: string; href?: string }[],
