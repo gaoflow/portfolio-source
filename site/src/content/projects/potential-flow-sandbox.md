@@ -15,25 +15,27 @@ heroImage: /images/projects/potential-flow-sandbox/cylinder-lift-hero.svg
 github: 'https://github.com/gaoflow/potential-flow-sandbox'
 ---
 
-## Why this caught my interest
+## First hearing about cylinder flow
 
 In a fluid mechanics lecture, the professor used flow around a cylinder as the example: add a uniform flow and an elementary flow called a doublet, and a few lines of formulas on the blackboard produced the flow field around a cylinder; add a point vortex, and you could even compute lift.
 
-It felt like a mathematical trick. How can a few invisible "points" add up to an entire flow field? And how does the sign in front of the vortex decide which way the lift points? These questions stuck with me. After the lecture, I went through the theory again using the course material and what I found online, and wrote a very small "potential-flow sandbox" to check it item by item: only 2D, inviscid, incompressible flow, with every step checkable against a closed-form answer. It also laid the groundwork for the panel method and vortex lattice method I built later — those rely on the same sources, doublets, vortices, and the Kutta–Joukowski relation, and a wrong velocity direction or circulation sign at this level is much harder to find inside a larger model.
+It felt like magic. Why can a few invisible "points" add up to an entire flow field? And how does the sign in front of the vortex decide which way the lift points? After the lecture, I went through the theory again using the course material and what I found online, and wrote a very small "potential-flow sandbox" to check it item by item, working only with simple 2D, inviscid, incompressible flow. It also laid the groundwork for the panel method and vortex lattice method I built later — those rely on the same sources, doublets, vortices, and the Kutta–Joukowski relation, and a wrong velocity direction or circulation sign at this level is much harder to find inside a larger model.
 
-Forget the complex numbers for a moment and picture water flowing around a round bridge pier. Far from the pier, the water moves roughly left to right. Right in front of the pier, it slows down and splits into two branches that pass above and below. If the two branches are perfectly symmetric, there is one point of zero velocity at the front and one at the back — the stagnation points. Now give the whole flow a slight clockwise rotation: the two sides no longer move at the same speed. One side gets faster and its pressure drops; the other side slows down and its pressure rises. The result is an upward net force.
+Picture water flowing around a round bridge pier. Far from the pier, the water moves roughly left to right. Right in front of the pier, it slows down and splits into two branches that pass above and below. If the two branches are perfectly symmetric, there is one point of zero velocity at the front and one at the back — the stagnation points. Now give the whole flow a slight clockwise rotation: the two sides no longer move at the same speed. One side gets faster and its pressure drops; the other side slows down and its pressure rises. The result is an upward net force.
 
-The header image is that lecture example, computed with my own code: uniform flow plus a doublet gives the cylinder flow, and adding a clockwise point vortex makes the streamlines asymmetric — both stagnation points (orange dots) are pushed into the lower half of the cylinder, which is where the upward lift $L'$ comes from. The picture only looks plausible, though; whether it is actually computed correctly is what this article checks, item by item.
+I computed this process with code: uniform flow plus a doublet gives the cylinder flow, and after adding a clockwise point vortex, the streamlines are no longer symmetric between top and bottom; both stagnation points (orange dots) are pushed into the lower half of the cylinder, and that is where the upward lift $L'$ comes from:
+
+![Cylinder flow from uniform flow, a doublet, and a clockwise point vortex: asymmetric streamlines, both orange stagnation points in the lower half of the cylinder, arrow marking the upward lift](/images/projects/potential-flow-sandbox/cylinder-lift-hero.svg)
 
 ## The one question I wanted to answer
 
 After stacking the elementary flows into cylinder flow, can this code respect the cylinder boundary and get the pressure, stagnation points, circulation, lift, and streamlines right at the same time?
 
-## How four building blocks make a cylinder
+## Combining four elementary flows into a cylinder
 
-The potential-flow equation is linear, so simple flows can be added directly. I built four blocks first: uniform flow carries the whole fluid in one direction; a source pushes fluid outward from a point; a doublet can be understood as a source and a sink placed very close together; a point vortex makes the fluid rotate around a point. Here is what the streamlines of each block look like:
+The potential-flow equation is linear, so simple flows can be added directly. I implemented four elementary flows first: uniform flow carries the whole fluid in one direction; a source pushes fluid outward from a point; a doublet can be understood as a source and a sink placed very close together; a point vortex makes the fluid rotate around a point. Here is what their streamlines look like:
 
-![Streamline sketches of the four elementary flows: uniform flow, source, doublet, point vortex](/images/projects/potential-flow-sandbox/building-blocks.svg)
+![Streamline sketches of the four elementary flows: uniform flow, source, doublet, point vortex](/images/projects/potential-flow-sandbox/elementary-flows.svg)
 *Schematic streamlines of the four elementary flows, drawn directly from the complex potentials in this section; this is not an acceptance figure. The vortex arrows run clockwise, matching the positive-circulation convention used in the text.*
 
 Written as complex potentials $W(z)$ with $z=x+iy$, the velocity follows from
@@ -42,7 +44,7 @@ $$
 \frac{dW}{dz}=u-iv.
 $$
 
-The four blocks are:
+The four potentials are:
 
 $$
 \begin{aligned}
@@ -63,11 +65,11 @@ The figure below shows the case without circulation: fluid arrives from the left
 
 ![Streamlines of cylinder flow without circulation: fluid arrives from the left, passes around the cylinder, and the orange dots are the front and rear stagnation points](/images/projects/potential-flow-sandbox/streamlines-cylinder.svg)
 
-## Check the blocks first, then the cylinder boundary
+## Check the elementary flows first, then the cylinder boundary
 
 I started with a few hand-checkable locations for the four elementary flows. Uniform flow must have the same velocity everywhere. A source must point radially outward, with magnitude falling as $1/r$. A vortex must be tangential, also falling as $1/r$. The doublet velocity is checked directly against the derivative of its complex potential. That pins down the lowest-level formulas and directions first.
 
-Then I combined uniform flow and the doublet into the cylinder. On the cylinder surface, the normal velocity should be close to zero and the stream function should stay constant; at a distance of $1000R$, the velocity should return to the uniform free stream. Only when both the surface and the far field agree can I say the two blocks really did build a cylinder.
+Then I combined uniform flow and the doublet into the cylinder. On the cylinder surface, the normal velocity should be close to zero and the stream function should stay constant; at a distance of $1000R$, the velocity should return to the uniform free stream. Only when both the surface and the far field agree can I say the two elementary flows really did build a cylinder.
 
 With those two layers passing, I computed the pressure coefficient from the surface velocity. Without circulation, the analytical answer is $C_p=1-4\sin^2\theta$. Across 4097 measurement points on the cylinder surface, the largest difference between the program and this curve was $2.66\times10^{-15}$.
 
