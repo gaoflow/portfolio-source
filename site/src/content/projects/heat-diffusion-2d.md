@@ -1,155 +1,158 @@
 ---
-title: 'From Melting Snow on Paving Stones to a Heat Diffusion Solver'
+title: 'From Melting Snow to a 2D Heat Diffusion Solver'
 year: 2026
 date: '2026-02-07'
 status: complete
 categories: [validation]
 tags: [CFD]
-summary: 'One day I caught myself staring at the snow on the paving stones and noticed it melts in a curious, regular pattern, so I dug into why and wrote a 2-D FTCS heat diffusion solver.'
-role: 'Numerical methods & validation'
-duration: 'Independent study'
+summary: 'One day while watching snow on cobblestones, I noticed an interesting melting pattern. This sparked my curiosity and led me to build and verify a 2D FTCS heat diffusion solver.'
+role: 'Numerical Methods & Verification'
+duration: 'Independent Research'
 featured: false
 order: 15
 studySequence: 7
 heroImage: /images/projects/heat-diffusion-2d/thermal-spreading-infrared.jpg
+cardImageFit: cover
 github: 'https://github.com/gaoflow/heat-diffusion-2d'
 ---
 
-## It started with snow on paving stones
+## Observing Snow on Cobblestones
 
-Paris had a few heavy snowfalls this winter. One day, as I stood staring at the snow on the paving stones, I suddenly noticed a strange pattern in how it melts. The snow over the stones often melts before the snow on the surrounding soil, clearly tracing the outline of every slab. Back home I looked into why. Stone and soil conduct heat differently. The heat stored underground travels up through the slabs faster, so the surface temperature ends up uneven.
+During several heavy snowfalls in Paris, while spacing out and watching the snow on cobblestone pavements one day, I noticed a fascinating pattern: snow on top of paving stones often melted faster than on the surrounding soil, sometimes even tracing the exact outline of each brick. Looking into the reason, I found it stemmed from the thermal conductivity difference between stone and soil—subsurface ground heat conducts upward through masonry bricks faster, creating temperature gradients across the snow layer.
 
-![A street in Paris during snowfall](/images/projects/heat-diffusion-2d/paris-snow-video-frame.jpg)
+![Paris snowfall scene](/images/projects/heat-diffusion-2d/paris-snow-video-frame.jpg)
 
-I thought this mechanism was interesting, and it shows up in other engineering problems too, like the heat spreader under a chip or the cooling plate under a battery pack. A local heat source collects heat in one spot, and conduction through the solid slowly spreads it out. But real melting snow also involves latent heat, uneven snow thickness, and messy material interfaces. Too many variables, too complicated to start with. So I reduced it to a simpler problem to study first: a 2-D metal plate cooled on one side.
+I found this mechanism intriguing, and realized it also appears in various engineering scenarios: vapor chambers beneath semiconductor chips or cooling baseplates in battery packs, where local heat sources concentrate energy before solid-state conduction spreads it out. However, actual snow melting involves latent heat of fusion, uneven snowpack thickness, and complex material interfaces—too many coupled variables for an initial study. So I simplified it into a cleaner problem: a 2D metal plate cooled from one side.
 
-## The simplified model: a plate cooled on one side
+## Simplified Model: A Metal Plate Cooled on One Side
 
-Here is the simplified model. A 2-D metal plate starts at a uniform temperature $T=1$. At $t=0$, the left edge is pressed against a cold source held at $T=0$. The other three edges are fully insulated, so heat inside the plate can only escape through the left side, the one open channel.
+The simplified model of the snow problem is as follows: a 2D metal plate with an initial uniform temperature $T=1$. At $t=0$, a cold source at constant temperature $T=0$ is applied to the left boundary, while the remaining three edges are perfectly insulated. Internal heat can only escape through this single channel on the left.
 
-I also non-dimensionalized the problem, so the results can be scaled proportionally to any real working condition. The model keeps the core physics of the snow problem — heat diffusing through a solid over time, gradually flattening temperature differences — but drops latent heat, complex geometry, and material interfaces. And it has an exact Fourier series solution, so I can pull out the numerical solution at any moment and check it point by point.
+I also non-dimensionalized the formulation so the results can scale proportionally to any real-world operating condition. This model preserves the core physics of the snow problem—heat diffusing through a solid over time to smooth out temperature variations—while stripping away latent heat, complex geometry, and material interfaces. Crucially, it possesses an exact Fourier series analytical solution, allowing numerical results to be audited point by point at any time.
 
-## The solver crashed
+## Running into Solver Instability
 
-I wrote a 2-D explicit heat diffusion (FTCS) solver to watch how the temperature field inside a plate evolves step by step when one side is cooled. The program ran smoothly at first. To make the computation a bit faster, I casually increased the time step $\Delta t$ by a little. For the first few dozen steps, the temperature plot looked very smooth and natural, and the cooling process looked completely reasonable. But a few dozen steps later, the entire numerical matrix collapsed within a few steps and the screen filled with NaN.
+I wrote a 2D explicit Forward-Time Central-Space (FTCS) heat diffusion solver to observe how the internal temperature field evolves over time when the plate is cooled from one side. Initially, the program ran smoothly. To speed up computation, I casually bumped up the time step $\Delta t$ slightly. For the first few dozen steps, the temperature contour looked smooth and natural, and the cooling process appeared completely plausible. But just a few dozen steps later, the entire numerical matrix collapsed within a handful of iterations, flooding the screen with NaNs.
 
-One thing kept bothering me. Before diverging, it had produced dozens of seemingly normal, smooth steps. If a numerical algorithm does not fail immediately on its way to collapse, then in a more complex engineering problem, how do we know whether the plot in front of us is right, or already on its way to breaking? To work out why a transient solver suddenly loses control, how to block dangerous parameters before the computation starts, and how to measure temporal accuracy out of mixed errors, I started this investigation.
+This got me thinking: before blowing up, the solver produced dozens of seemingly normal, smooth illusions. If a numerical algorithm does not immediately flag an error before heading toward catastrophic divergence, how do we know in more complex engineering setups whether the contours we see are correct or secretly collapsing? To understand why a time-dependent solver can suddenly spin out of control, how to reject dangerous parameters before execution, and how to isolate temporal accuracy amidst mixed discretization errors, I began this investigation.
 
-## 1. Analysing the problem
+## 1. Problem Analysis
 
-I first went back to the 2-D heat diffusion equation and the discrete update formula itself:
+I first returned to the 2D heat diffusion equation and its discretization:
 
 $$
 \frac{\partial T}{\partial t} = \alpha \left( \frac{\partial^2 T}{\partial x^2} + \frac{\partial^2 T}{\partial y^2} \right)
 $$
 
-On a square grid ($\Delta x = \Delta y$), the forward-time centred-space (FTCS) algebraic update is:
+On a square grid ($\Delta x = \Delta y$), the algebraic update scheme for Forward-Time Central-Space (FTCS) is:
 
 $$
 T_{j,i}^{n+1} = T_{j,i}^{n} + r \left[ (T_{j,i+1}^{n} - 2T_{j,i}^{n} + T_{j,i-1}^{n}) + (T_{j+1,i}^{n} - 2T_{j,i}^{n} + T_{j-1,i}^{n}) \right]
 $$
 
-with the dimensionless diffusion number:
+where the dimensionless diffusion number $r$ is:
 
 $$
 r = \frac{\alpha \Delta t}{\Delta x^2}
 $$
 
-Why does a larger time step make the program blow up? A Von Neumann stability analysis decomposes the numerical error at any spatial wavelength into Fourier modes and gives the error amplification factor $g$ of a single step:
+Why did increasing the time step cause the program to blow up? Through Von Neumann stability analysis, decomposing spatial numerical error of arbitrary wavelength into Fourier modes yields the single-step amplification factor $g$:
 
 $$
 g = 1 - 4r \left[ \sin^2\left(\frac{k_x \Delta x}{2}\right) + \sin^2\left(\frac{k_y \Delta x}{2}\right) \right]
 $$
 
-To keep the computation from diverging, every spatial mode must satisfy $|g| \le 1$. The most dangerous mode, and the easiest one to excite, is the highest-frequency zigzag oscillation at grid scale (neighbouring cells alternating in sign, $\sin^2 = 1$). Substituting this limit case gives the worst-mode amplification factor:
+To ensure numerical stability, all spatial modes must satisfy $|g| \le 1$. The most dangerous and easily excited mode is the highest-frequency sawtooth oscillation at the grid scale (where adjacent nodes alternate phase, $\sin^2 = 1$). Substituting this limiting case yields the worst-mode amplification factor:
 
 $$
 g_{\text{worst}} = 1 - 8r
 $$
 
-Requiring $g_{\text{worst}} \ge -1$ gives the hard stability limit of the 2-D explicit FTCS scheme:
+Enforcing $g_{\text{worst}} \ge -1$ leads directly to the strict stability criterion for the 2D explicit FTCS scheme:
 
 $$
 r \le 0.25
 $$
 
-This explains the root cause of the crash. The $r \le 0.25$ limit is purely numerical. Once the time step is a little too large and $r$ becomes 0.26, high-frequency numerical noise gets multiplied at every step by an amplification factor whose absolute value is above 1 ($|g| = 1.08$).
+This explains the root cause of the collapse: $r \le 0.25$ is a strict numerical stability threshold. Once the time step is slightly oversized such that $r$ becomes 0.26, high-frequency numerical noise is multiplied at every step by an amplification factor greater than 1 in magnitude ($|g| = 1.08$).
 
-Why did the first few dozen steps look smooth? Because the initial floating-point rounding noise in a computer is extremely small (about $10^{-16}$). Even multiplied by 1.08 each step, by step 50 the noise has only grown to about $10^{-14}$, and the smooth main solution completely covers it. But with exponential growth, past step 100 the noise quickly inflates to the same order of magnitude as the main solution, and within the next few steps it overflows straight into NaN.
+Why did the first dozens of steps appear smooth? Because initial floating-point round-off noise is tiny ($\approx 10^{-16}$). Even when multiplied by 1.08 per step, at step 50 the noise is still only on the order of $10^{-14}$, completely masked by the smooth macro-solution. But under exponential growth, by step 100+ the noise rapidly scales to the magnitude of the main solution and overflows to NaN within the next few iterations.
 
-![How the worst-mode amplification factor varies with the diffusion number](/images/projects/heat-diffusion-2d/stability-limit.svg)
+![Worst-mode amplification factor vs. diffusion number](/images/projects/heat-diffusion-2d/stability-limit.svg)
 
-*The dashed line is the FTCS theoretical stability limit r=0.25; the validation run uses the safe r=0.20*
+*Dashed line marks theoretical FTCS stability limit r=0.25; production verification uses safe r=0.20.*
 
-## 2. Searching the problem
+## 2. Literature Review & Investigation
 
-After confirming the theoretical root cause, I searched the relevant literature and industrial practice, focusing on two key questions.
+Having identified the theoretical root cause, I researched literature and industry best practices focusing on two key questions:
 
-First, how do industrial-grade solvers handle the stability boundary? After reading classic computational heat transfer and CFD references, I found that many teaching scripts and basic tools, when given unsafe input, either run no check at all and let the program diverge, or just print one Warning line to the terminal and keep computing. In an automated engineering pipeline, this easily lets diverged garbage data flow into downstream modules. A reliable design must run a strict defensive check before any computation happens.
+First, how do production-grade solvers handle stability boundaries?
+Reviewing computational heat transfer and CFD literature revealed that many educational scripts either lack guardrails and let calculations diverge silently, or merely print a console warning and continue. In automated pipelines, this allows corrupt data to propagate downstream. Robust software must enforce defensive preconditions before computation begins.
 
-Second, how do you verify the first-order accuracy ($O(\Delta t)$) of the time integrator on its own? My first idea was to keep the spatial grid fixed, try different $\Delta t$, and difference the computed results against the Fourier analytical solution to measure the convergence order. But while reading the literature derivations of discretization truncation error, I found that the leading local truncation error of the FTCS scheme is:
+Second, how can the first-order temporal accuracy ($\mathcal{O}(\Delta t)$) be isolated and verified?
+I initially thought of varying $\Delta t$ on a fixed spatial mesh and taking differences against the Fourier analytical solution to measure convergence order. However, examining the truncation error derivation for FTCS revealed its leading local truncation error:
 
 $$
 \tau = \frac{\alpha \Delta x^2}{12}(6r - 1) \frac{\partial^4 T}{\partial x^4} + \mathcal{O}(\Delta t^2) + \mathcal{O}(\Delta x^4)
 $$
 
-The coefficient $(6r - 1)$ of the first term is tightly bound to the diffusion number $r = \alpha \Delta t / \Delta x^2$. When you change $\Delta t$ on a fixed grid, $r$ changes with it, and the weight of the spatial discretization error swings sharply as well. Compared directly against the pure mathematical analytical solution, the total error you compute is a stew of time error and space error mixed together. There is no way to measure a clean temporal convergence order from it.
+The coefficient $(6r - 1)$ of the leading term is directly tied to the diffusion number $r = \alpha \Delta t / \Delta x^2$. When changing $\Delta t$ on a fixed grid, $r$ changes as well, causing the spatial discretization error to fluctuate wildly. If compared directly against a pure mathematical analytical solution, the resulting total error mixes temporal and spatial components, obscuring the true temporal convergence order.
 
-The standard solution given in the literature is this. On the same spatial grid, first run a high-precision numerical benchmark with a very small time step, then difference each test case against that benchmark. The subtraction cancels the spatial error completely.
+The standard solution from literature is: run a high-precision benchmark on the exact same spatial grid with an ultra-small time step, and compare test cases against this benchmark to cancel out spatial errors completely.
 
-## 3. How I solved it
+## 3. Implementation & Solutions
 
-Based on the analysis and the search results, I made a few changes: block unstable input before the run, guarantee energy conservation in the code structure, and measure accuracy term by term using the analytical solution and a same-grid benchmark.
+Based on the analysis and findings, I implemented several enhancements: guard against unstable inputs before execution, enforce conservative energy balance structurally in code, and verify temporal convergence orders rigorously against analytical solutions and same-grid benchmarks.
 
-### Cases with an unsafe step size never start
+### Rejecting Unsafe Time Steps at Launch
 
-Since I knew the $r \le 0.25$ line, the cheapest fix is to make any run that crosses it impossible to start. After the solver receives the grid and the time step, it computes $r$ first. If $r > 0.25$ (say 0.26), it raises `StabilityError`, records the reason, and exits without taking a single step. A warning is easy to scroll past. By the time the plot suddenly turns into NaN a few hundred steps later, it is too late to go back and investigate.
+Knowing the $r \le 0.25$ threshold, the cleanest approach is preventing non-compliant computations from ever starting. Upon receiving the mesh and time step, the solver calculates $r$. If $r > 0.25$ (e.g., 0.26), it immediately raises `StabilityError`, records the reason, and terminates without advancing a single step. Warnings are easily overlooked; debugging after several hundred steps turn into NaNs is far too late.
 
-### Treating every cell as a small room with a heat ledger
+### Finite-Volume Flux Balancing for Energy Conservation
 
-I found another, sneakier problem. The curves can look perfectly fine while energy quietly leaks out through the boundaries. My approach is to treat each cell as a small room. How much its temperature changes depends only on how much heat crosses its four walls. Whatever flows out through one wall flows into the neighbouring room, so when I add up the ledger over the whole field, the heat fluxes through the internal walls cancel out in pairs. Code written this way can hardly leak heat. I measured it. With all four sides insulated, after 576 steps the total energy drift was 0.0.
+I discovered a subtler issue: simulations that look smooth can still secretly leak energy across boundaries. My solution treats each grid cell like a small room, tracking temperature changes purely through heat flux across its four walls. The heat exiting one wall is exactly what the neighboring cell absorbs, meaning all internal fluxes cancel out when summed across the domain. Code structured this way prevents artificial energy leaks. In practice: running 576 steps on a fully insulated domain yielded a total energy drift of exactly 0.0.
 
-### Verification
+### Verification & Validation
 
-Finally, how did I confirm the numbers are accurate? I wrote 13 unit tests in total.
+To confirm solver accuracy, I implemented a suite of 13 unit and verification tests.
 
-First, compare against the exact answer. On a $1 \times 0.2$ plate (grid $100 \times 20$), with the left side at $T=0$, the other three sides insulated, and an initial $T=1$, I used the safe $r = 0.20$ ($\Delta t = 2 \times 10^{-5}$ s) and advanced 2500 steps to $t = 0.05$ s, then compared point by point against the Fourier series analytical solution.
+First, benchmarking against the analytical standard. On a $1 \times 0.2$ plate ($100 \times 20$ grid), with left boundary $T=0$, remaining three edges insulated, initial $T=1$, and safe $r = 0.20$ ($\Delta t = 2 \times 10^{-5}\text{ s}$), I advanced 2,500 steps to $t = 0.05\text{ s}$ and compared results point by point with the Fourier series analytical solution.
 
-![Temperature profiles inside the plate at different times](/images/projects/heat-diffusion-2d/temperature-profiles.svg)
+![Temperature distribution profiles inside the plate at different time steps](/images/projects/heat-diffusion-2d/temperature-profiles.svg)
 
-*As time advances, the influence of the cold left boundary gradually spreads deeper into the plate*
+*As time advances, the cooling effect of the left boundary penetrates deeper into the plate.*
 
-![Overlay of the numerical solution and the Fourier analytical solution at the final time](/images/projects/heat-diffusion-2d/analytical-validation.svg)
+![Overlay comparison of numerical solution and Fourier analytical solution at final time](/images/projects/heat-diffusion-2d/analytical-validation.svg)
 
-*At t=0.05, the numerical values at the grid nodes closely overlap the Fourier analytical curve*
+*At t = 0.05 s, grid node numerical results match the Fourier analytical curve closely.*
 
-The maximum deviation was $1.384 \times 10^{-5}$, comfortably below the $5 \times 10^{-5}$ threshold I had set beforehand, and the transverse temperature difference across the 20 grid rows was strictly 0.
+The maximum absolute error was $1.384 \times 10^{-5}$, well below the predefined threshold of $5 \times 10^{-5}$. The transverse temperature difference across the 20 grid rows remained strictly 0.
 
-Then compare against "myself, run with a tiny step on the same grid". As analysed earlier, comparing directly with the analytical solution mixes spatial error and temporal error together. So on the same grid I first ran a high-precision benchmark at $r = 0.001$, then ran four cases at $r = 0.20, 0.10, 0.05, 0.025$, and subtracted the benchmark from each. The grid is the same, so the spatial error cancels; what remains is pure temporal error.
+Next, comparing against a high-resolution benchmark on the same mesh. As analyzed earlier, direct comparison with the analytical solution mixes spatial and temporal truncation errors. Therefore, I first computed a high-precision benchmark on the same grid using $r = 0.001$, then ran four test cases with $r = 0.20, 0.10, 0.05, 0.025$. Subtracting the benchmark cancelled spatial errors, leaving only pure temporal discretization error.
 
-![Convergence of the pure temporal error under time-step refinement](/images/projects/heat-diffusion-2d/temporal-refinement.svg)
+![Convergence of pure temporal error under time-step refinement](/images/projects/heat-diffusion-2d/temporal-refinement.svg)
 
-*The four time-step refinement tests fit to a measured temporal convergence order of 1.017*
+*Fitted observed temporal convergence order across four time-step refinements is 1.017.*
 
-Halving the step four times gave errors of $1.370 \times 10^{-4}$, $6.817 \times 10^{-5}$, $3.374 \times 10^{-5}$, and $1.653 \times 10^{-5}$, roughly halving each time. The fitted temporal order is 1.017, inside the theoretical band of 0.9–1.1.
+With each halving of the time step, the errors were $1.370 \times 10^{-4}$, $6.817 \times 10^{-5}$, $3.374 \times 10^{-5}$, and $1.653 \times 10^{-5}$—halving consistently each time. The fitted temporal convergence order was 1.017, falling squarely within the theoretical expected range of 0.9–1.1.
 
-| Verification item | Measured result | Acceptance criterion | Result |
+| Verification Item | Measured Result | Acceptance Criterion | Status |
 |---|---:|---:|:---:|
-| Maximum absolute error of the main transient vs the Fourier analytical solution | $L^\infty = 1.384 \times 10^{-5}$ | $\le 5 \times 10^{-5}$ | Pass |
-| Temporal convergence order on a fixed grid | 1.017 | 0.9 – 1.1 | Pass |
-| Discrete energy drift on a fully insulated grid | 0.0 | $\le 10^{-12}$ | Pass |
-| Attempting to run an unsafe step size ($r = 0.26$) | `StabilityError` raised and the reason logged | Must be firmly rejected | Pass |
-| Discrete difference across transverse temperature sections of the 2-D grid | 0.0 | $< 10^{-14}$ | Pass |
+| Max absolute error vs. Fourier analytical solution | $L^\infty = 1.384 \times 10^{-5}$ | $\le 5 \times 10^{-5}$ | Pass |
+| Temporal convergence order on fixed mesh | 1.017 | 0.9 – 1.1 | Pass |
+| Discrete energy drift on fully insulated mesh | 0.0 | $\le 10^{-12}$ | Pass |
+| Unsafe time step test ($r = 0.26$) | Raised `StabilityError` with diagnostic | Hard rejection required | Pass |
+| Transverse cross-section discrete temperature discrepancy | 0.0 | $< 10^{-14}$ | Pass |
 
-## Summary
+## Key Takeaways
 
-The question I studied was how long heat takes to work its way in when a surface is suddenly heated or cooled. It turned out to be genuinely useful later, when I was working on an FSAE electric race car. The IGBT modules in the motor inverter and the cold plate of the battery pack have to absorb a peak heat load of 6.0 kW within 10 seconds of hard acceleration. In that short a time, the heat has no chance to reach the outer heatsink at all, so a steady-state calculation is meaningless. Only a transient model like this one can show how much heat piles up locally. My shortcoming is just as direct. Stability demands $\Delta t \propto \Delta x^2$, so halving the cell size means 4 times as many steps, and a fine grid gets very slow. For a genuinely finer grid, the next step is to switch to an unconditionally stable implicit scheme, such as ADI or Crank-Nicolson.
+The core question studied here—how long it takes for sudden surface heating or cooling to penetrate inward—later proved directly applicable in Formula Student (FSAE) EV engineering: IGBT modules in motor inverters and battery thermal baseplates must withstand peak thermal fluxes of 6.0 kW during 10-second hard accelerations. Over such short durations, heat has no time to reach external radiators; steady-state calculations are useless, leaving transient models as the only way to evaluate local thermal accumulation. However, the limitation of this explicit scheme is clear: stability demands $\Delta t \propto \Delta x^2$. Halving the grid spacing quadruples the required time steps, making fine meshes computationally expensive. For finer meshes, the next step would be switching to unconditionally stable implicit schemes like ADI or Crank–Nicolson.
 
-Looking back, I started from an interesting pattern on the paving stones, reduced it to a metal plate cooled on one side, and wrote a solver. It crashed as soon as I casually enlarged the time step. Following that crash, I found the $r \le 0.25$ line and made unsafe runs impossible to start. I treated each cell as a small room with a heat ledger so energy cannot leak. And I settled the account two ways, against the analytical solution and against a high-precision benchmark on the same grid, to confirm the numbers are right. What a remarkable experience!
+Looking back, the journey went from observing snow melting patterns on cobblestones, simplifying it to a 2D plate cooled on one side, building a solver, to seeing it crash after casually increasing the time step. Following that collapse, I pinned down the $r \le 0.25$ stability boundary to block unsafe inputs at launch, adopted cell-by-cell flux accounting to guarantee energy conservation, and verified accuracy against analytical solutions and same-mesh benchmarks. It was a thoroughly rewarding learning experience.
 
-## Code
+## Code & Reproducibility
 
-All solver code, test cases, and analysis scripts for this project are open source: [gaoflow/heat-diffusion-2d](https://github.com/gaoflow/heat-diffusion-2d)
+All solver code, unit tests, and analysis scripts are open-sourced: [gaoflow/heat-diffusion-2d](https://github.com/gaoflow/heat-diffusion-2d)
 
 Local commands:
 

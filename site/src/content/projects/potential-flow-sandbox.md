@@ -1,13 +1,13 @@
 ---
-title: 'How I Built My First Potential-Flow Models from Complex Potentials'
+title: 'Building My First Potential Flow Model with Complex Potential'
 year: 2025
 date: '2025-11-08'
 status: complete
 categories: [component-cfd]
 tags: [CFD]
-summary: 'Exploring the problem of flow around a cylinder'
-role: 'Aerodynamics fundamentals'
-duration: 'Independent build'
+summary: 'Exploring the problem of flow past a circular cylinder'
+role: 'Aerodynamics Fundamentals'
+duration: 'Independent Project'
 featured: false
 order: 14
 studySequence: 2
@@ -15,32 +15,32 @@ heroImage: /images/projects/potential-flow-sandbox/cylinder-lift-hero.svg
 github: 'https://github.com/gaoflow/potential-flow-sandbox'
 ---
 
-## First hearing about cylinder flow
+## First Hearing About Flow Past a Cylinder
 
-In a fluid mechanics lecture, the professor used flow around a cylinder as the example: add a uniform flow and an elementary flow called a doublet, and a few lines of formulas on the blackboard produced the flow field around a cylinder; add a point vortex, and you could even compute lift.
+During a fluid mechanics lecture, our professor presented a classic example: flow past a circular cylinder. By superimposing uniform flow and an elementary flow called a "doublet," a few equations on the blackboard pieced together the entire flow field around a cylinder. Adding a point vortex on top could even yield aerodynamic lift.
 
-It felt like magic to me. Why can a few invisible "points" add up to an entire flow field? And how does the sign in front of the vortex decide which way the lift points? After the lecture, I went through the theory again using the course material and what I found online, and wrote a very small "potential-flow sandbox" to check it item by item, working only with simple 2D, inviscid, incompressible flow. It also laid the groundwork for the airfoil panel method and vortex lattice method I built later. Those rely on the same sources, doublets, vortices, and the Kutta–Joukowski relation, and a wrong velocity direction or circulation sign at this level is much harder to find inside a larger model.
+I found it fascinating at the time. How could a few invisible singularities construct an entire flow field? And how does the sign in front of the vortex dictate the resulting direction of lift? After class, combining course materials with online references, I re-derived the theory and implemented a compact "potential flow sandbox" to verify each component, focusing strictly on 2D, inviscid, incompressible flow. This also served as foundational grounding for subsequent panel methods and vortex lattice methods, which rely on the same machinery of sources, doublets, point vortices, and the Kutta–Joukowski theorem. If velocity directions or circulation signs are not properly verified at this foundational level, debugging them inside larger models becomes vastly more difficult.
 
-Picture water flowing around a round bridge pier. Far from the pier, the water moves roughly left to right. Right in front of the pier, it slows down and splits into two branches that pass above and below. If the two branches are perfectly symmetric, there is one point of zero velocity at the front and one at the back — the stagnation points. Now give the whole flow a slight clockwise rotation: the two sides no longer move at the same speed. One side gets faster and its pressure drops; the other side slows down and its pressure rises. The result is an upward net force.
+Consider water flowing around a circular bridge pier. Far upstream, the water moves uniformly from left to right. As it nears the front of the pier, it decelerates and bifurcates into upper and lower streams. If both branches are completely symmetric, points with zero velocity—stagnation points—appear at the leading and trailing edges of the pier. If clockwise rotation is introduced across the flow, the velocities on the upper and lower surfaces diverge: one side accelerates with lower pressure, while the other decelerates with higher pressure, producing a net upward force.
 
-I computed this process with code: uniform flow plus a doublet gives the cylinder flow, and after adding a clockwise point vortex, the streamlines are no longer symmetric between top and bottom; both stagnation points (orange dots) are pushed into the lower half of the cylinder, and that is where the upward lift $L'$ comes from:
+I computed this exact mechanism programmatically: uniform flow plus a doublet forms the flow past a cylinder; adding a clockwise point vortex breaks the top-bottom streamline symmetry, shifting both stagnation points (orange dots) toward the lower half of the cylinder, generating net upward lift $L'$:
 
-![Cylinder flow from uniform flow, a doublet, and a clockwise point vortex: asymmetric streamlines, both orange stagnation points in the lower half of the cylinder, arrow marking the upward lift](/images/projects/potential-flow-sandbox/cylinder-lift-hero.svg)
+![Flow past a cylinder formed by superimposing uniform flow, doublet, and clockwise point vortex: asymmetric streamlines, two orange stagnation points in the lower half, top arrow indicating lift direction](/images/projects/potential-flow-sandbox/cylinder-lift-hero.svg)
 
-## Combining four elementary flows into a cylinder
+## Composing Four Elementary Flows into a Cylinder
 
-The potential-flow equation is linear, so simple flows can be added directly. I implemented four elementary flows first: uniform flow carries the whole fluid in one direction; a source pushes fluid outward from a point; a doublet can be understood as a source and a sink placed very close together; a point vortex makes the fluid rotate around a point. Here is what their streamlines look like:
+Because the governing equation of potential flow is linear, elementary solutions can be directly superimposed. I first implemented four elementary flows: uniform flow carries the bulk fluid in a uniform direction; a source radiates fluid outward from a point; a doublet can be understood as a source-sink pair brought infinitesimally close; and a point vortex induces circular rotation around a point. Their respective streamlines are shown below:
 
-![Streamline sketches of the four elementary flows: uniform flow, source, doublet, point vortex](/images/projects/potential-flow-sandbox/elementary-flows.svg)
-*Schematic streamlines of the four elementary flows, drawn directly from the complex-potential formulas. The vortex arrows run clockwise.*
+![Streamline diagrams of four elementary flows: uniform flow, source, doublet, point vortex](/images/projects/potential-flow-sandbox/elementary-flows.svg)
+*Schematic representation of the four elementary flows plotted directly from complex potential formulas. The vortex arrow denotes clockwise rotation.*
 
-Written as complex potentials $W(z)$ with $z=x+iy$, the velocity follows from
+Expressed in terms of the complex potential $W(z)$, with $z = x + iy$, the velocity field is given by
 
 $$
-\frac{dW}{dz}=u-iv
+\frac{dW}{dz}=u-iv.
 $$
 
-The four potentials are:
+The four elementary complex potentials are:
 
 $$
 \begin{aligned}
@@ -51,69 +51,65 @@ W_{\text{vortex}} &= \frac{i\Gamma}{2\pi}\ln z.
 \end{aligned}
 $$
 
-Adding uniform flow and a doublet "pushes open" the streamline that used to pass through the center. The circle of radius $R$ becomes a streamline that the flow cannot cross. Adding a point vortex then gives cylinder flow with circulation:
+Superimposing uniform flow and a doublet "pushes open" the streamlines that would otherwise pass through the origin. The circle of radius $R$ becomes an impenetrable dividing streamline. Adding a point vortex yields flow past a cylinder with circulation:
 
 $$
 W(z)=U\left(z+\frac{R^2}{z}\right)+\frac{i\Gamma}{2\pi}\ln z.
 $$
 
-The figure below shows the case without circulation: fluid arrives from the left, passes around the cylinder, and the two orange dots are the front and rear stagnation points. This picture only shows what the flow looks like.
+The figure below illustrates the case without circulation: fluid approaches from the left and flows around the cylinder, with orange dots marking the front and rear stagnation points. This visualizes the basic flow morphology.
 
-![Streamlines of cylinder flow without circulation: fluid arrives from the left, passes around the cylinder, and the orange dots are the front and rear stagnation points](/images/projects/potential-flow-sandbox/streamlines-cylinder.svg)
+![Streamlines of flow past a cylinder without circulation: fluid entering from the left, flowing around the cylinder, orange dots indicating front and rear stagnation points](/images/projects/potential-flow-sandbox/streamlines-cylinder.svg)
 
-## Checking the elementary flows and the cylinder boundary
+## Verifying Elementary Flows and Cylinder Boundary Conditions
 
-I started with a few hand-checkable locations for the four elementary flows. Uniform flow must have the same velocity everywhere. A source must point radially outward, with magnitude falling as $1/r$. A vortex must be tangential, also falling as $1/r$. The doublet velocity is checked directly against the derivative of its complex potential. That pins down the lowest-level formulas and directions first.
+I first selected analytical checkpoints to verify the four elementary flows. Uniform flow velocity must be constant everywhere. The velocity of a source must be purely radial, decaying as $1/r$. The velocity of a point vortex must be purely tangential, also decaying as $1/r$. The velocity of a doublet was directly compared against the analytical derivative of its complex potential. This locked down the fundamental equations and coordinate conventions. Next, I combined uniform flow and the doublet into a cylinder. The normal velocity on the cylinder surface must approach zero, and the stream function must remain constant along the boundary; far away at $1000R$, the velocity should return to the freestream value. Matching both the body surface and far-field conditions confirmed that the two elementary flows faithfully formed a solid cylinder.
 
-Then I combined uniform flow and the doublet into the cylinder. On the cylinder surface, the normal velocity should be close to zero and the stream function should stay constant; at a distance of $1000R$, the velocity should return to the uniform free stream. Only when both the surface and the far field agree can I say the two elementary flows really did build a cylinder.
+With these two verification layers passed, I computed the pressure coefficient from the surface velocity. Without circulation, the analytical solution is $C_p = 1 - 4\sin^2\theta$. At sampling points on the cylinder surface, the maximum discrepancy between the numerical implementation and the analytical curve was $2.66\times 10^{-15}$. This difference is negligible, matching the analytical solution down to the machine precision of floating-point representation.
 
-With those two layers of checks passing, I computed the pressure coefficient from the surface velocity. Without circulation, the analytical answer is $C_p=1-4\sin^2\theta$. At the measurement points on the cylinder surface, the largest difference between the program and this curve was $2.66\times10^{-15}$. That difference is very small. The program and the analytical formula already agree down to the limit of the computer's floating-point representation.
+## Checking Circulation, Stagnation Points, and Lift Direction
 
-## Checking circulation, stagnation points, and lift direction
-
-Once the vortex is added, the thing most worth actively checking is the sign. Even if the sign in front of the vortex is flipped, the streamlines can still look perfectly smooth, but the rotation direction and the lift direction flip together.
-
-I use the aerodynamic convention: positive $\Gamma$ means clockwise circulation, corresponding to the upward lift given by
+Once the point vortex is introduced, sign conventions require active verification. Even if the sign of the vortex is flipped, the streamlines remain smooth, but the direction of rotation and the resulting lift vector will invert simultaneously. I adopted standard aerodynamic conventions: positive $\Gamma$ denotes clockwise circulation, corresponding to upward lift given by
 
 $$
-L'=\rho U\Gamma
+L'=\rho U\Gamma.
 $$
 
-My numerical contour runs counter-clockwise, so recovering the "clockwise is positive" circulation from the line integral takes one more sign flip. I therefore checked three things at once: the vortex velocity on the right side of the cylinder should point downward; the closed integral should recover a positive $\Gamma$; and the pressure-integrated lift should point upward. The lift case uses $U=1$, $R=1$, $\rho=1.225$, and $\Gamma=2\pi$ throughout. The header image is the flow field computed for these parameters. From $\sin\theta=-\Gamma/(4\pi UR)$, the stagnation points should move from $0^\circ$ and $180^\circ$ without circulation to $-30^\circ$ and $-150^\circ$. The two stagnation points the program found were $-150.0^\circ$ and $-30.0^\circ$, at most $8.9\times10^{-16}$ rad away from the theoretical angles. This error is still very small.
+Because my numerical integration contours proceed counterclockwise, converting contour integrals back to the "clockwise-positive" convention requires an explicit sign inversion. To ensure complete consistency, I verified three criteria simultaneously: the vortex-induced velocity on the right side of the cylinder must point downward; the closed line integral must recover positive $\Gamma$; and surface pressure integration must produce an upward lift force. The lift verification case used $U=1$, $R=1$, $\rho=1.225$, and $\Gamma=2\pi$—the exact parameters behind the hero figure. Based on $\sin\theta = -\Gamma/(4\pi UR)$, the stagnation points shift from $0^\circ$ and $180^\circ$ (zero circulation) to $-30^\circ$ and $-150^\circ$. The program located the two stagnation points at $-150.0^\circ$ and $-30.0^\circ$, deviating from analytical values by at most $8.9\times 10^{-16}$ rad.
 
-I also ran a contour integral on a closed circle at $r=2.5R$. Uniform flow and the doublet should each contribute zero circulation around the full loop, so whatever remains can only come from the vortex. The integral recovered a circulation of 6.3. The imposed value $2\pi$ also rounds to 6.3 at one decimal, and the two differ by only $8.9\times10^{-16}$. Finally, I integrated the pressure using the surface points. The computed lift per unit span was 7.7, exactly matching the theoretical $\rho U\Gamma$ value, pointing upward.
+I also performed contour integration along a closed circular path at $r=2.5R$. The net circulation contributions from uniform flow and the doublet along a full circle must vanish, leaving only the vortex contribution. The recovered circulation was 6.3—matching the input value $2\pi \approx 6.3$ rounded to one decimal place, with an actual residual of only $8.9\times 10^{-16}$. Finally, integrating surface pressure yielded a sectional lift of 7.7 per unit span, in exact agreement with the theoretical value of $\rho U\Gamma$, directed upward.
 
-## Finally checking whether the RK4 is really fourth-order
+## Verifying the Order of Accuracy for RK4
 
-A single smooth streamline only proves the plot looks nice; it does not prove the RK4 is written correctly. Even with a broken term, one trajectory at step size 0.01 can look very much like the right answer. The more reliable test is to halve the step size repeatedly and watch how the error falls.
+A smooth streamline plot only shows visual continuity; it does not prove the correctness of the Runge–Kutta 4th-order (RK4) integrator. Even with implementation flaws, a single trajectory integrated at a step size of 0.01 can easily appear plausible. A more rigorous method is to systematically halve the step size and observe the error convergence rate.
 
-The streamline starts at $(-3,1.2)$ and marches along the local velocity direction with fixed-step RK4. It should stay on the same analytical stream-function value the whole way. I halved the step from 0.08 down to 0.005, re-traced the entire streamline each time, and recorded the maximum stream-function drift. For a fourth-order method, halving the step should shrink the error to about $1/16$ of its previous value.
+Launching a streamline from $(-3, 1.2)$, the trajectory was tracked using fixed-step RK4 advancing along the unit velocity direction. The streamline should theoretically remain on an invariant analytical stream function value. Halving the step size successively from 0.08 down to 0.005, I recomputed the entire streamline at each step and recorded the maximum stream function drift. For a true fourth-order method, each step-size halving should reduce the error by approximately a factor of $1/16$.
 
-![Measured stream-function drift as the RK4 step size is halved](/images/projects/potential-flow-sandbox/rk4-convergence.svg)
+![Observed stream function drift under successive RK4 step-size halvings](/images/projects/potential-flow-sandbox/rk4-convergence.svg)
 
-At the acceptance step size of 0.01, the maximum drift was $2.56\times10^{-12}$; at 0.005, the drift shrank to $1/16.0$ of that, giving an observed convergence order of 4.003. The five dots in the figure all come from actual runs, and the dashed line is the fourth-order reference. So the result is still very good.
+At the baseline step size of 0.01 used for verification, the maximum drift was $2.56\times 10^{-12}$; reducing to 0.005 shrank the drift by a factor of $1/16.0$, yielding an observed convergence order of 4.003. The five markers in the figure represent actual numerical computations, while the dashed line indicates the theoretical fourth-order reference slope.
 
-The figure below shows only the case without circulation. The solid line is theory; the dots are values the program sampled from the velocity field.
+The figure below shows the zero-circulation case, where the solid line is analytical theory and the points represent sampled values evaluated from the numerical velocity field.
 
-![Theoretical surface pressure coefficient curve versus computed points](/images/projects/potential-flow-sandbox/cp-comparison.svg)
+![Theoretical curve versus computed points for surface pressure coefficient on a circular cylinder](/images/projects/potential-flow-sandbox/cp-comparison.svg)
 
-## The difference between ideal streamlines and a real wake
+## Differences Between Ideal Streamlines and Real Wakes
 
-The pressure-integrated drag is zero. But this is not a prediction for a bridge pier or a real cylinder: my potential-flow model removes viscosity, and this zero-drag result is d'Alembert's paradox. There is no boundary layer, no separation, and no wake in the model, and a real cylinder's drag comes mainly from exactly these phenomena.
+Integrating surface pressure yields exactly zero drag. However, this is not a prediction of real flow around a bridge pier or physical cylinder: potential flow assumes an inviscid fluid, and this zero-drag result is d'Alembert's paradox. The model omits boundary layers, flow separation, and wake dynamics—the primary sources of drag on a bluff body.
 
-One point that's easy to confuse is worth clearing up here: cylinder flow and the Kármán vortex street are the same geometry but two different physics. What this article computes is the idealized version — no viscosity, a front-to-back symmetric flow field, zero drag. The real, viscous flow separates behind the cylinder and sheds a vortex street, which takes a Navier–Stokes CFD solver to compute; that is what I did in a separate project.
+This clarifies a common point of confusion: potential flow past a cylinder and the Kármán vortex street share the same geometry but represent entirely different physics. The case simulated here is an idealized version—inviscid, symmetric fore-to-aft, with zero drag. Real viscous flow separates behind the cylinder and sheds an alternating vortex street, requiring Navier–Stokes CFD solvers (which I explored in a separate project).
 
-This vortex street doesn't only show up in laboratories; you can see it in the atmosphere too. In November 2012, NASA's Terra satellite watched the wind sweep past Yakushima Island, Japan, and the cloud layer downstream rolled into a long train of alternating vortices. The island is a giant "cylinder" here, while the ideal potential-flow figure above is symmetric front to back and has no real wake at all.
+Such vortex streets occur not only in wind tunnels but also on planetary scales in the atmosphere. In November 2012, NASA's Terra satellite captured wind blowing past Yakushima Island in Japan, with the downstream cloud deck curling into an extended trail of alternating vortices. The island acted as a giant "cylinder," whereas the idealized potential flow model remains fore-aft symmetric without a physical wake.
 
-![Satellite image of the Kármán vortex street downstream of Yakushima Island](/images/projects/potential-flow-sandbox/source/karman-vortex-street-yakushima-2012.jpg)
+![Satellite imagery showing a Kármán vortex street downstream of Yakushima Island](/images/projects/potential-flow-sandbox/source/karman-vortex-street-yakushima-2012.jpg)
 
-## A follow-up from later work
+## Subsequent Applications
 
-When I later built the Hess–Smith airfoil panel method and the ground-effect vortex lattice method, I again used the superposition of sources, doublets, and vortices and the Kutta–Joukowski lift. When I needed to check a lift direction, I came back to this article. I went back to this cylinder, which has closed-form answers, and checked the derivatives, the clockwise and counter-clockwise conventions, the stagnation points, and the RK4 order. Only then did I move on to the more complicated geometry normals, boundary matrices, and 3D meshes. With this article as a base, when sign problems come up later, I don't have to doubt the whole model from scratch. Troubleshooting goes much faster.
+When I later developed the Hess–Smith airfoil panel method and the vortex lattice method with ground effect, I relied heavily on the same foundations: superimposition of sources, doublets, and vortices alongside Kutta–Joukowski lift. Whenever I needed to verify lift directions, I returned to this article and re-checked the analytical cylinder case—re-verifying derivatives, clockwise/counterclockwise conventions, stagnation points, and RK4 accuracy. Confirming these fundamental elements first made debugging complex surface normals, boundary matrices, and 3D meshes much more straightforward.
 
 ## Code
 
-The project code is at [gaoflow/potential-flow-sandbox](https://github.com/gaoflow/potential-flow-sandbox)
+The source code is available at [gaoflow/potential-flow-sandbox](https://github.com/gaoflow/potential-flow-sandbox).
 
 ```bash
 python3 -m unittest discover -s tests -v
@@ -121,8 +117,8 @@ python3 scripts/analyse.py
 python3 scripts/publish_site.py
 ```
 
-## Further reading
+## Further Reading
 
-- [ERAU: Potential Flows](https://eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/potential-flows/) builds from elementary potential flows through superposition to cylinder flow, good for matching the formulas to flow pictures.
-- [Oregon State: Potential Flows](https://open.oregonstate.education/intermediate-fluid-mechanics/chapter/potential-flows/) explains the velocity potential, the stream function, and the elementary solutions in an open textbook.
-- [Wikipedia: Potential flow around a circular cylinder](https://en.wikipedia.org/wiki/Potential_flow_around_a_circular_cylinder) collects the velocity, pressure, and d'Alembert's paradox for cylinder potential flow, handy for checking the analytical relations used here.
+- [ERAU: Potential Flows](https://eaglepubs.erau.edu/introductiontoaerospaceflightvehicles/chapter/potential-flows/) covers basic potential flows, superposition, and cylinder flow, ideal for connecting equations with flow patterns.
+- [Oregon State: Potential Flows](https://open.oregonstate.education/intermediatefluidmechanics/chapter/potential-flows/) provides an open-textbook treatment of velocity potential, stream functions, and elementary solutions.
+- [Wikipedia: Potential flow around a circular cylinder](https://en.wikipedia.org/wiki/Potential_flow_around_a_circular_cylinder) summarizes velocity, pressure, and d'Alembert's paradox for cylinder flow, useful for verifying the analytical formulas used here.

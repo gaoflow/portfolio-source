@@ -1,13 +1,13 @@
 ---
-title: 'A Dimensionless-Number Toolkit That Catches Mistakes'
+title: 'A Dimensionless Numbers Tool That Catches Mistakes'
 year: 2025
 date: '2025-10-18'
 status: complete
 categories: [tooling]
 tags: [CFD]
-summary: 'I built a small toolkit that checks units, rejects unreasonable inputs, and keeps the validation on record.'
-role: 'Solo research project'
-duration: 'Independent build'
+summary: 'I built a small utility that enforces unit consistency, rejects unphysical inputs, and retains full validation records.'
+role: 'Personal Research Project'
+duration: 'Independent Development'
 featured: false
 order: 11
 studySequence: 1
@@ -15,59 +15,60 @@ heroImage: /images/projects/dimensionless-numbers/source/reynolds-observations-1
 github: 'https://github.com/gaoflow/dimensionless-numbers'
 ---
 
-## Starting from Reynolds' glass tube experiment
+## Starting from Reynolds' Glass Tube Experiment
 
-This was the first research project I gave myself when I started my program. It didn't begin with code, but with an experiment from more than 140 years ago.
+This was the first research project I assigned myself when starting my studies. The catalyst was not writing code, but an experiment conducted over 140 years ago.
 
-Soon after I started the fluid mechanics course, I learned that in 1883 Osborne Reynolds did a classic experiment. He ran water through a glass tube and injected a thin stream of dye into it. At low speed the dye stretched into a straight, thin line; open the valve wider, raise the speed, and the dye suddenly broke up and mixed with the surrounding water.
+When first learning fluid mechanics, I read about Osborne Reynolds' famous 1883 experiment. He passed water through a glass tube while injecting a thin filament of colored dye into the stream. At low velocities, the dye remained a straight, intact streamline. When he opened the valve to increase the flow velocity, the dye suddenly dispersed and mixed chaotically with the surrounding water.
 
-What interested me was his next judgement: whether the flow state changes abruptly doesn't depend on speed, diameter, or viscosity on its own, but on one ratio they form together. That ratio was later named after him:
+What struck me was his subsequent insight: whether the flow regime undergoes a transition does not depend on velocity, pipe diameter, or fluid viscosity in isolation, but on their combined dimensionless ratio. This ratio was later named in his honor:
 
 $$
 Re=\frac{\rho uL}{\mu}
 $$
 
-Same water, same tube. Just turn the speed up and the flow puts on a different face, and this ratio tells you roughly where the transition will happen. This idea was the first time I had seen several physical quantities put onto the same ruler before calculating.
+With the same water in the same tube, increasing only the velocity fundamentally changes the flow regime, and this dimensionless ratio predicts where that transition is likely to occur. It was my first exposure to the philosophy of normalizing disparate physical variables onto a common scale before performing computations.
 
-Now picture a small fan blowing at about 3 m/s across a card 15 cm wide. Plug in sea-level air density $\rho=1.225\ \mathrm{kg/m^3}$ and dynamic viscosity $\mu=1.81\times10^{-5}\ \mathrm{Pa\cdot s}$:
+Consider a practical scenario: a small desk fan blows air at roughly 3 m/s across a 15 cm wide index card. Substituting sea-level air density $\rho=1.225\ \mathrm{kg/m^3}$ and dynamic viscosity $\mu=1.81\times10^{-5}\ \mathrm{Pa\cdot s}$:
 
 $$
 Re=\frac{1.225\times3\times0.15}{1.81\times10^{-5}}
 \approx3.05\times10^4.
 $$
 
-The result has no unit; it is the ratio between "the inertia that keeps the fluid charging forward" and "viscosity's ability to smooth the flow out". The really useful part is that a fan, a racecar wing, and a whole car look nothing alike, yet they can all be compared inside the same ratio.
+The result is strictly dimensionless—the ratio of fluid momentum (inertia) to viscous diffusion (the fluid's ability to smooth out velocity gradients). Its utility lies in comparability: a fan, an aerodynamic wing, and an entire race car appear entirely different, yet can be evaluated on the same benchmark scale.
 
-![How Reynolds number varies with speed at three length scales](/images/projects/dimensionless-numbers/reynolds-sweep.svg)
+![Reynolds number variation with velocity across three length scales](/images/projects/dimensionless-numbers/reynolds-sweep.svg)
 
-*Speed and length together set the order of magnitude of the Reynolds number. The three curves use a 0.3 m wing chord, a 1 m sidepod, and a 5 m full car.*
+*Velocity and characteristic length together determine Reynolds number magnitude; curves represent 0.3 m wing chord, 1 m sidepod, and 5 m full vehicle*
 
-I drew a sketch. With the same sea-level air, a 0.3 m wing chord at 15 m/s gives $Re\approx3\times10^5$, and a 5 m full car at 60 m/s gives $Re\approx2\times10^7$, tens of times apart. When the Reynolds numbers are that far apart, the flows are not the same thing.
-## So I wrote my first small tool
+In sea-level air, a 0.3 m wing chord at 15 m/s yields $Re\approx3\times10^5$, while a 5 m vehicle at 60 m/s reaches $Re\approx2\times10^7$—differing by orders of magnitude. When Reynolds numbers differ significantly, the underlying flow physics are fundamentally distinct.
 
-So before tackling any new problem, you have to compute these numbers first, to work out which scale you're sitting at and which effects matter. Whether it's airflow over a racecar wing or cooling-water heat transfer, the first step is always this. So I just put the six most-used ones into a small Python tool:
+## Building My First Engineering Tool
 
-| Dimensionless number | What it helps me judge first |
+Before tackling any new fluid mechanics problem, calculating these dimensionless parameters is the necessary first step to understand the relevant scales and dominant physical effects. Whether analyzing external airflow over a wing or internal heat transfer in a cooling jacket, this evaluation must come first. I packaged the six most common dimensionless numbers into a dedicated Python utility:
+
+| Dimensionless Number | Initial Physical Question It Answers |
 |---|---|
-| Reynolds | whether inertia or viscosity has the upper hand |
-| Mach | whether compressibility needs to be considered |
-| Prandtl | whether momentum or heat diffuses faster |
-| Nusselt | how much convection beats pure conduction |
-| Grashof | how strong buoyancy is relative to viscosity |
-| Rayleigh | whether natural convection is worth considering |
+| Reynolds ($Re$) | Does inertia or viscosity dominate the flow? |
+| Mach ($M$) | Should fluid compressibility be accounted for? |
+| Prandtl ($Pr$) | Does momentum or thermal diffusion propagate faster? |
+| Nusselt ($Nu$) | How much does convective heat transfer exceed pure conduction? |
+| Grashof ($Gr$) | What is the relative strength of buoyancy forces versus viscous forces? |
+| Rayleigh ($Ra$) | Is natural convection significant in the system? |
 
-The formulas are all one line; the inputs are where things go wrong. Dynamic viscosity and kinematic viscosity, for example, both sit near $10^{-5}$ numerically. Put one in the other's slot and a normal calculator still hands you a very plausible-looking number. So I gave the tool two checks:
+While the formulas are straightforward single-line expressions, user input errors are common. For instance, dynamic viscosity and kinematic viscosity can have numerical values around $10^{-5}$ in different unit systems; a swapped variable in a basic calculator will still return a seemingly plausible number without warning. I built two defensive checks into the tool:
 
-- Unit check: every input must declare its unit. Put kinematic viscosity into the dynamic-viscosity slot and the program stops immediately and points out the problem.
-- Range check: density and viscosity must be positive, velocity can't be negative, and a property lookup outside its temperature range raises an error instead of extrapolating.
+- **Unit Verification**: Every input must declare explicit physical units; passing kinematic viscosity where dynamic viscosity is expected immediately halts execution with an explanatory error;
+- **Range & Boundary Checks**: Density and viscosity must be strictly positive, velocity cannot be negative, and thermodynamic property lookups raise errors outside defined temperature bounds rather than extrapolating.
 
-I also built 10 invalid calls, and all 10 were caught; one fully unit-tagged normal call went through. I treated the property data with the same care: I entered five temperature anchors from a textbook appendix (three for air at 300–400 K, two for water at 300–320 K), used linear interpolation between anchors, and refused to extrapolate outside them. The lookup results return the entered values exactly on all 20 fields.
+I implemented a test suite with 10 deliberate invalid calls—all 10 were successfully intercepted, while fully specified, valid calls passed without friction. Thermophysical property data was handled with equal rigor: five temperature anchor points from textbook reference tables were integrated (three for air across 300–400 K, two for water across 300–320 K) with linear interpolation between anchors and strict extrapolation rejection. Property lookups matched tabulated values across all 20 reference fields.
 
-While verifying the Rayleigh number, I almost made a mistake. The Rayleigh number has an identity, $Ra=Gr\cdot Pr$. If I let the program just multiply Grashof by Prandtl for the result, and then tested that "the two sides are equal", that test would pass forever, because it compares the thing against itself, and an error shared by both sides can never show up. So I compute the Rayleigh number separately from its expanded form, then reconcile it against $Gr\times Pr$. Over 500 fixed-seed random input sets, the two independent paths differed by at most $4.4\times10^{-16}$.
+During Rayleigh number validation, I caught a potential testing pitfall. The Rayleigh number satisfies the mathematical identity $Ra = Gr \cdot Pr$. If the solver simply computed $Gr \times Pr$ and a unit test checked that `Ra == Gr * Pr`, the test would pass trivially because the two sides share the exact same implementation, concealing internal calculation bugs. Instead, I computed $Ra$ independently from its fundamental constituent variables and reconciled it against the product $Gr \times Pr$. Across 500 fixed randomized test inputs, the maximum discrepancy between the two independent evaluation paths was only $4.4\times10^{-16}$.
 
 ## Code
 
-The source and tests are at [gaoflow/dimensionless-numbers](https://github.com/gaoflow/dimensionless-numbers):
+The source code and test suite are open-source at [gaoflow/dimensionless-numbers](https://github.com/gaoflow/dimensionless-numbers):
 
 ```bash
 git clone https://github.com/gaoflow/dimensionless-numbers.git
