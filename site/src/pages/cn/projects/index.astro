@@ -1,9 +1,0 @@
----
-import ProjectsIndex from '../../../components/ProjectsIndex.astro';
-import { getCollection } from 'astro:content';
-
-const projectsCn = await getCollection('projectsCn');
-const hasEnglish = (await getCollection('projects')).length > 0;
----
-
-<ProjectsIndex projects={projectsCn} locale="cn" hasAlternate={hasEnglish} />

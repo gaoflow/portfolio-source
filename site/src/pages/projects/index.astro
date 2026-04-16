@@ -3,7 +3,6 @@ import ProjectsIndex from '../../components/ProjectsIndex.astro';
 import { getCollection } from 'astro:content';
 
 const projects = await getCollection('projects');
-const hasChinese = (await getCollection('projectsCn')).length > 0;
 ---
 
-<ProjectsIndex projects={projects} locale="en" hasAlternate={hasChinese} />
+<ProjectsIndex projects={projects} locale="en" hasAlternate={false} />

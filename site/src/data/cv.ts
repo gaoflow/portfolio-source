@@ -84,7 +84,6 @@ const english: CvContent = {
   languageLinks: [
     { label: 'English', href: '/cv' },
     { label: 'French', href: '/fr/cv' },
-    { label: 'Chinese', href: '/cn/cv' },
   ],
   contact: {
     email: 'gaobing1230@gmail.com',
@@ -275,7 +274,6 @@ const french: CvContent = {
   languageLinks: [
     { label: 'Anglais', href: '/cv' },
     { label: 'Français', href: '/fr/cv' },
-    { label: 'Chinois', href: '/cn/cv' },
   ],
   contact: {
     email: 'gaobing1230@gmail.com',
@@ -528,7 +526,7 @@ const chinese: CvContent = {
     {
       title: '方程式学生赛车冷却系统与 OpenFOAM 替代模型',
       context: 'Vinci Eco Drive, 2025—2026',
-      href: '/cn/projects/fsae-cooling',
+      href: '/projects/fsae-cooling',
       bullets: [
         '将风扇、散热器和水泵的供应商曲线与 80 单元一维有限体积冷却液模型耦合；液压工作点为 10.03 升/分。',
         '在采购和整车详细流体模拟前确认被动 E3 架构违反逆变器温度边界，并记录否决决定及替代架构路径。',
@@ -539,7 +537,7 @@ const chinese: CvContent = {
     {
       title: 'F1 外部空气动力学 RANS 试验研究',
       context: '独立研究, 2026',
-      href: '/cn/projects/f1-2026-aero',
+      href: '/projects/f1-2026-aero',
       bullets: [
         '建立 435 万单元的 OpenFOAM 14 半车 RANS 基准算例，并完成涵盖几何、边界条件和建模敏感性的 23 变体试验。',
         '自动完成 CAD 变体准备、snappyHexMesh、稳态 RANS、有效性门槛、部件力提取和结果归档；保留九个有效敏感性算例，并保存两个发散的粗糙度算例。',
@@ -549,7 +547,7 @@ const chinese: CvContent = {
     {
       title: 'FlowLab 与 FlowROM',
       context: '独立研究, 2026',
-      href: '/cn/projects/flowlab',
+      href: '/projects/flowlab',
       bullets: [
         '实现无依赖的 D2Q9 BGK 格子玻尔兹曼求解器，由 Node.js 与浏览器共用；在雷诺数 100 条件下，以经典顶盖驱动方腔数据验证三套网格。',
         '生成 480 个速度场，其中 320 个用于训练，160 个覆盖四个完整留出周期，用于 POD/DMD 评估。',
@@ -559,7 +557,7 @@ const chinese: CvContent = {
     {
       title: 'Space Rider 数字模型',
       context: 'Felisiak 工程与开发, 2026',
-      href: '/cn/projects/space-rider',
+      href: '/projects/space-rider',
       bullets: [
         '在 17 周实习期间依据公开图纸重建欧洲空间局 Space Rider；内部验证记录显示，4.88 米机身的侧视图误差为 ±6 毫米，俯视图误差为 ±8.4 毫米。',
         '使用脚本化几何审计、受保护基准、回滚分支和参考视图检查，保留失败方案，并防止局部曲面修复改变已验收比例。',
@@ -570,7 +568,7 @@ const chinese: CvContent = {
     {
       title: 'XC48 Abaqus 拉伸数字孪生',
       context: '课程项目, 2026',
-      href: '/cn/projects/xc48-abaqus-twin',
+      href: '/projects/xc48-abaqus-twin',
       bullets: [
         '建立 Python 流程，将原始力与位移数据转换为经过验证的材料输入，并完成 Abaqus ODB 后处理和 XC48 拉伸研究报告生成。',
         'M2 网格与保留实验的决定系数为 0.9663，并验证断裂前动能与内能比不超过 5%；边界不包括独立完成整个团队 Abaqus 模型。',
@@ -579,7 +577,7 @@ const chinese: CvContent = {
     {
       title: '翼型与地面效应方法',
       context: '独立研究, 2026',
-      href: '/cn/projects/airfoil-methods',
+      href: '/projects/airfoil-methods',
       bullets: [
         '为 NACA 0012 实现余弦间距 Hess–Smith 面板法，并与 NASA TM-4074 的线性升力结果比较；在迎角 4° 时，从 160 个面板加密到 240 个面板的升力变化为 0.0307%。',
         '在 14 个离地高度与弦长比算例上建立马蹄涡与镜像涡求解器；当高度与弦长比为 50 时，自由空气升力误差为 0.0034%，从 64 个展向面板加密到 96 个时变化为 0.258%。',
