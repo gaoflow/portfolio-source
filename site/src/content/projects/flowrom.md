@@ -16,7 +16,7 @@ github: 'https://github.com/gaoflow/flowrom'
 ---
 ## A hand-written solver
 
-At the start, I wanted to watch how fluid moves, directly and interactively, in the browser and the terminal. Traditional commercial CFD software means drawing complex meshes and solving complex differential equations every time. It is slow, and it is hard to do real-time interaction on a web page with it. So I hand-wrote a lightweight fluid solver from scratch in JavaScript: [Hand-written fluid solver: putting Lattice Boltzmann in the browser (FlowLab)](/projects/flowlab). To make it fast enough, I did not solve the traditional Navier–Stokes equations. I chose the Lattice Boltzmann Method (LBM) instead. Once it was written, it ran smoothly at 60 FPS in the browser. I could drag a baffle with the mouse and watch the vortices in the cavity flow change in real time.
+At the start, I wanted to watch how fluid moves, directly and interactively, in the browser and in the terminal. With traditional commercial CFD software you are always drawing complex meshes and solving complex differential equations. It is slow, and real-time interaction on a web page is hard to do with it. So I hand-wrote a lightweight fluid solver from scratch in JavaScript — [Hand-written fluid solver: putting Lattice Boltzmann in the browser (FlowLab)](/projects/flowlab). To make it fast enough, I did not solve the traditional Navier–Stokes equations. I chose the Lattice Boltzmann Method (LBM). Once it was written, it ran smoothly at 60 FPS in the browser. I could drag a baffle with the mouse and watch the vortices in the cavity flow change in real time.
 
 ![FlowLab lid-driven cavity unsteady flow evolution and vortex animation](/images/projects/flowrom/flowlab-demo.gif)
 
@@ -24,25 +24,25 @@ But when I tried to use it to study unsteady flow with a periodic disturbance, I
 
 At the time I was thinking: this kind of periodic flow clearly has a strong inner pattern, so why can't I compress hundreds of frames of complex flow fields into a few core "skeleton images", like compressing a video? Could I even predict how the flow evolves next, without going back to the original fluid equations?
 
-To do this, I built this flow-field reduction and prediction toolkit: FlowROM.
+To do this, I built this flow-field reduction and prediction toolkit — FlowROM.
 
 ## Understanding Lattice Boltzmann (LBM)
 
 If traditional CFD treats water as one continuous piece of dough and solves calculus equations on it, the Lattice Boltzmann Method (LBM) imagines the fluid as countless microscopic marbles bouncing around on a regular lattice. I used the most classic model for 2D flow, D2Q9: the domain is divided into square cells, and the particles on each grid point can only move in 9 directions (stationary at the center, 4 directions up/down/left/right, and 4 diagonals).
 
-In each time step, the program actually does only two extremely simple things: collision and streaming. Specifically:
+In each time step, the program only does two extremely simple things, collision and streaming:
 
 1. Collision: particles that fly onto the same grid point hit each other and redistribute their velocities across the directions (moving toward equilibrium);
 2. Streaming: after the collision, each particle hops along its own direction to the next neighboring grid point.
 
-After these two steps, adding up the number of particles in all 9 directions on a grid point gives the macroscopic density there, and taking the momentum-weighted average across the directions directly gives the macroscopic flow velocity. It never needs to solve a global pressure equation, the algorithm is naturally suited to parallel computing, and it runs very fast. In FlowLab I ran a cavity flow with a sinusoidal velocity disturbance. After it settled into a stable periodic oscillation, I saved one frame every 10 steps, and exported 480 transient flow-field snapshots in total as the raw data for what came next.
+After these two steps, adding up the number of particles in all 9 directions on a grid point gives the macroscopic density there. Taking the momentum-weighted average across the directions gives the macroscopic flow velocity directly. It never needs to solve a global pressure equation, the algorithm is naturally suited to parallel computing, and it runs very fast. In FlowLab I ran a cavity flow with a sinusoidal velocity disturbance. After it settled into a stable periodic oscillation, I saved one frame every 10 steps, and exported 480 transient flow-field snapshots in total as the raw data for what came next.
 
 ## How FlowROM works
 
-FlowROM itself does not solve the fluid equations. It is a toolbox of algorithms for "slimming down" and "fortune-telling" flow-field data. I split it into 2 main parts:
+FlowROM itself does not solve the fluid equations. It is a toolbox of algorithms for "slimming down" and "fortune-telling" flow-field data. I split it into two main parts.
 
 ### 1. POD (Proper Orthogonal Decomposition)
-The idea behind POD is really just data dimensionality reduction. After subtracting the mean flow from the 480 frames, it uses singular value decomposition to break the messy flow fields into a few "orthogonal spatial feature maps" ranked by importance.
+The idea behind POD is just data dimensionality reduction. After subtracting the mean flow from the 480 frames, it uses singular value decomposition to break the messy flow fields into a few "orthogonal spatial feature maps" ranked by importance.
 
 - Originally each frame had thousands of velocity values, a huge amount of data;
 - After POD, we only need to keep the 8 most core flow-field skeleton images, plus the 8 coefficients for each frame;
@@ -56,7 +56,7 @@ POD can only compress and store flow fields that have already happened. On its o
 
 ## Splitting the training and test sets
 
-I used the first 320 frames (roughly the first 8 cycles) to train the model, and set aside the last 160 frames (4 full cycles) for later.
+I used the first 320 frames, roughly the first 8 cycles, to train the model. I set aside the last 160 frames, 4 full cycles, for later.
 
 ![POD modal energy spectrum](/images/projects/flowrom/pod-energy-spectrum.svg)
 
@@ -64,7 +64,7 @@ I used the first 320 frames (roughly the first 8 cycles) to train the model, and
 
 In a lot of data analysis, people like to randomly pick 20% of the data as the test set. But in periodic fluid flow, I think randomly sampling frames is serious "data cheating". Periodic motion loops over and over. If you sample randomly, a frame in the test set has already appeared among the frames before and after it in the training set. The model does not need to learn the real physics at all. It just needs to draw a line and interpolate between two neighboring frames to hand in a fake high score.
 
-So the last four full cycles have to be held out as one whole block. That forces the model to walk by itself from a known endpoint into the unknown future. Only then can you test whether it has truly learned how the flow evolves.
+So the last four full cycles have to be held out as one block. That forces the model to walk by itself from a known endpoint into the unknown future. Only then can you test whether it has truly learned how the flow evolves.
 
 ## A lesson from a failure
 
@@ -78,7 +78,7 @@ When I looked at the energy distribution, the 1st spatial mode alone accounted f
 | 8 modes | 0.09% | 0.12% |
 
 Later I thought about why keeping only 1 mode failed so badly.
-Periodic vortex motion is "going in circles" in space. To describe a full circular motion, you need at least one pair of mutually orthogonal directions (just like drawing a circle requires both the horizontal coordinate $\cos$ and the vertical coordinate $\sin$). With only one mode, the flow simply cannot rotate through its phases.
+Because periodic vortex motion is "going in circles" in space. To describe a full circular motion, you need at least one pair of mutually orthogonal directions (just like drawing a circle requires both the horizontal coordinate $\cos$ and the vertical coordinate $\sin$). With only one mode, the flow cannot rotate through its phases.
 
 The moment I added the 2nd mode, the test error dropped from 36% to 1.3%. This failure taught me once and for all: when reducing data you must never look only at the energy share on the training set. You have to combine it with the physical mechanism, and you have to speak from a test set the model has truly never seen.
 
@@ -93,15 +93,15 @@ When evaluating the accuracy of predicting 4 cycles ahead, I deliberately paid a
 
 ![DMD mode frequency spectrum and applied disturbance frequency](/images/projects/flowrom/dmd-spectrum.svg)
 
-In a cavity flow, most of the velocity in most regions actually comes from the steady mean flow. If you use the full velocity as the denominator, the base is large, so the computed error is only about one in a thousand, which looks very pretty.
+In a cavity flow, most of the velocity in most regions comes from the steady mean flow. If you use the full velocity as the denominator, the base is large, so the computed error is only about one in a thousand, which looks very pretty.
 
-But if what we want to grade is "whether the unsteady fluctuation prediction is accurate", we have to subtract the mean flow and look only at the deviation of the fluctuation. Then the error is 1.41%. Reporting only 0.10% would essentially use the steady mean flow to cover up the flaws of the time stepping. So both numbers matter.
+But if what we want to grade is "whether the unsteady fluctuation prediction is accurate", we have to subtract the mean flow and look only at the deviation of the fluctuation. Then the error is 1.41%. Reporting only 0.10% would in essence use the steady mean flow to cover up the flaws of the time stepping. So both numbers matter.
 
 ## Unit tests
 
-There is one more problem. FlowLab is both the data source and the standard to check against. If there is a bug in the reduction code, sometimes you simply cannot see it by only running FlowLab data through it.
+There is one more problem. FlowLab is both the data source and the standard to check against. If there is a bug in the reduction code, sometimes you cannot see it at all just by running FlowLab data through it.
 
-To close this "being your own referee" loophole, I deliberately added two purely mathematical independent unit tests to the program:
+To close this "being your own referee" loophole, I added two purely mathematical independent unit tests to the program:
 1. Build a pure rank-2 matrix with a known mathematical solution to test POD, which must reconstruct it with 100% accuracy;
 2. Build a pure sine wave to test DMD, which must extract the period and frequency exactly.
 
@@ -109,13 +109,13 @@ These two problems have standard answers. With this kind of isolated testing, if
 
 ## Other thoughts
 
-All the data in my project comes from a coarse $48\times48$ grid cavity. That is a low-speed flow with a single geometry, a single Reynolds number, and a single operating condition. It is not real external racecar aerodynamics, and it cannot be used directly as a surrogate model for a racecar wake. To actually apply this method to full-car racing CFD, I would also have to cover different ride heights, different speeds, and yaw angles, and build test sets by operating condition.
+All the data in my project comes from a coarse $48\times48$ grid cavity. That is a low-speed flow with a single geometry, a single Reynolds number, and a single operating condition. It is not real external racecar aerodynamics, and it cannot be used directly as a surrogate model for a racecar wake. To apply this method to full-car racing CFD for real, I would also have to cover different ride heights, different speeds, and yaw angles, and build test sets by operating condition.
 
-But I think the workflow built here — leakage-free splitting, POD spatial compression, DMD frequency capture, orthogonal mode matching, and dual-denominator error accounting — is a fully working, rigorous, and trustworthy data analysis process.
+But I think the workflow built here, the leakage-free splitting, POD spatial compression, DMD frequency capture, orthogonal mode matching, and dual-denominator error accounting, is a fully working, rigorous, and trustworthy data analysis process.
 
 ## Code and how to run
 
-This project is open source on GitHub: [gaoflow/flowrom](https://github.com/gaoflow/flowrom)
+This project is open source on GitHub, at [gaoflow/flowrom](https://github.com/gaoflow/flowrom).
 
 ```bash
 git clone https://github.com/gaoflow/flowrom.git

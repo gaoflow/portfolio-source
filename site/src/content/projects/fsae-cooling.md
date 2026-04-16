@@ -17,7 +17,7 @@ heroImage: '/images/projects/fsae-cooling/thermal-screen.svg'
 
 ## Where this started: on a 40 °C hot day, how do you get coolant down to 25 °C?
 
-This study started when I joined the Vinci EcoDrive team to take charge of powertrain cooling and ran into a really awkward practical problem: the motor and inverter supplier's hard limit was a coolant inlet temperature no higher than 25 °C.
+This study started when I joined the Vinci EcoDrive team to take charge of powertrain cooling and ran into an extremely thorny practical problem. The motor and inverter supplier's hard limit was a coolant inlet temperature no higher than 25 °C.
 
 But on a 40 °C midsummer track, if we only rely on the body sidepods passively catching air to blow through the radiators, how could the coolant ever settle below ambient temperature in steady state?
 
@@ -25,7 +25,7 @@ This was an architecture problem with a physical contradiction before any calcul
 
 ## E3: the flow was enough, but the temperature still could not work
 
-The E3 combination was: two Boyd 6310G3 heat exchangers, two SPAL brushless fans and one Pierburg CWA150 pump.
+The E3 combination was two Boyd 6310G3 heat exchangers, two SPAL brushless fans and one Pierburg CWA150 pump.
 
 I put four things into the same model:
 
@@ -34,9 +34,9 @@ I put four things into the same model:
 - interpolating within the range of the manufacturers' thermal-conductance data;
 - a one-dimensional finite-volume loop that computes advection, heat sources, heat rejection and storage together.
 
-The air-side operating point was 6.56 m³/min and 45.6 Pa per radiator; the total coolant flow was 10.03 L/min, and even the motor branch with the smallest flow still had 4.16 L/min. Judged on airflow and coolant flow alone, this combination passes.
+The air-side operating point was 6.56 m³/min and 45.6 Pa per radiator. The total coolant flow was 10.03 L/min, and even the motor branch with the smallest flow still had 4.16 L/min. Judged on airflow and coolant flow alone, this combination passes.
 
-The real problem was the temperature boundary. E3 assumes the air at the radiator inlet is 40 °C, while the AMK KW26 requires coolant at 25 °C at its inlet. Without active refrigeration, a radiator can only bring the coolant slowly towards ambient temperature; in steady state it can never take it below ambient.
+The real problem was the temperature boundary. E3 assumes the air at the radiator inlet is 40 °C, while the AMK KW26 requires coolant at 25 °C at its inlet. Without active refrigeration, a radiator can only bring the coolant slowly towards ambient temperature. In steady state it can never take it below ambient.
 
 In other words, before the solver even started, this passive architecture already contained a physical contradiction.
 
@@ -49,15 +49,15 @@ The model worked out how bad the failure was:
 - in the 10 s, 6.0 kW peak case, the maximum coolant temperature reached 68.18 °C;
 - with the unfavourable fan curve, the fan curve and the system-resistance curve did not even intersect.
 
-So I classified E3 as rejected. What I rejected is this passive architecture itself; it does not mean these pumps, fans and radiators can never be used in some other concept.
+So I classified E3 as rejected. What I rejected was this passive architecture itself. It does not mean these pumps, fans and radiators can never be used in some other concept.
 
 ## How I confirmed E3 was not a numerical false failure
 
 Before rejecting it, I first had to make sure the failure was a physics problem, not the model calculating wrong.
 
-In the baseline case, the 80-cell loop received 3,061.53 W and rejected 3,061.43 W; the remaining 0.105 W was changing the system's stored energy. The algebraic energy residual was only $3.2\times10^{-12}$ W.
+In the baseline case, the 80-cell loop received 3,061.53 W and rejected 3,061.43 W. The remaining 0.105 W was changing the system's stored energy. The algebraic energy residual was only $3.2\times10^{-12}$ W.
 
-During the peak phase, the input was 6,000 W, the radiators rejected 3,595.51 W, and the remaining 2,404.49 W went into storage. The temperature rise came entirely from the same energy equation; I did not add any artificial temperature ramp to the model.
+During the peak phase, the input was 6,000 W, the radiators rejected 3,595.51 W, and the remaining 2,404.49 W went into storage. The temperature rise came entirely from the same energy equation. I did not add any artificial temperature ramp to the model.
 
 ![Input, heat rejection, storage and algebraic residual in the E3 model](/images/projects/fsae-cooling/revision-12/e3_energy_residual.png)
 
@@ -71,18 +71,18 @@ I then varied the spatial grid and the time step separately:
 
 ![Spatial, temporal and independent steady-solution checks for E3](/images/projects/fsae-cooling/revision-12/e3_convergence.png)
 
-These results show the failure is not caused by the current discretisation scale. But they can only prove the model solves its own equations consistently; they cannot turn an unknown heat load into a measured input.
+These results show the failure is not caused by the current discretisation scale. But they can only prove the model solves its own equations consistently. They cannot turn an unknown heat load into a measured input.
 
 ## E7: I split the system into two temperature levels
 
-After E3 failed, I stopped expecting one passive loop to keep both the KW26 and the DD5 happy at the same time, and split the architecture instead:
+After E3 failed, I stopped expecting one passive loop to keep both the KW26 and the DD5 happy at the same time. I split the architecture:
 
 - an active low-temperature KW26 loop with a 25 °C inlet boundary;
 - a passive high-temperature loop for the two DD5s, allowing a 40–60 °C inlet;
 - a refrigerant loop that moves the KW26 heat and the compressor power to the high-temperature side;
 - separate condenser and DD5 air paths.
 
-E7 did not select a chiller; it first scanned an assumed range:
+E7 did not select a chiller. It first scanned an assumed range:
 
 | Parameter | Scanned range |
 |---|---:|
@@ -95,13 +95,13 @@ E7 did not select a chiller; it first scanned an assumed range:
 | DD5 inlet | 48.7–57.4 °C |
 | DD5 derating | 8.7%–17.4% |
 
-Every combination closes inside the stated equations. So E7 can only say one thing: the two-temperature architecture is numerically feasible within these assumptions. It has no data on the evaporator, condenser, control valves, receiver, auxiliary power or installed state, so it cannot be turned directly into a hardware concept.
+Every combination closes inside the stated equations. So E7 can only say one thing. The two-temperature architecture is numerically feasible within these assumptions. It has no data on the evaporator, condenser, control valves, receiver, auxiliary power or installed state, so it cannot be turned directly into a hardware concept.
 
 ## E8: I mapped the assumptions to public catalogue parts
 
 E8 built a steady-state reference for the three loops from public catalogue data. The main parts were a Masterflux SIERRA03-0982Y3 compressor, Danfoss B3-012 plate heat exchangers, a Bosch PCE hot-side pump, a Pierburg CWA150 pump, Boyd 6310G3 cores and SPAL fans.
 
-To be clear: these part numbers are only model inputs; they do not mean the team has selected or purchased them.
+To be clear, these part numbers are only model inputs. They do not mean the team has selected or purchased them.
 
 E8 checked two KW26 evaporator heat loads: 0.820 kW and 2.300 kW. On the DD5 side, I swept the heat entering the coolant from the two motors from 1.374 kW to 2.749 kW. The nominal model passed with the stated flow rates, temperatures, heat-exchanger UA values, compressor capacity, pump head and fan settings.
 
@@ -131,15 +131,15 @@ If you used all five "last passing points" together, you would be walking into a
 
 ![The five parameter-interaction domains in E8](/images/projects/fsae-cooling/revision-12/e8_interaction_domains.png)
 
-The result was direct: when one parameter gets worse, the minimum requirement on another goes up. The five single-variable boundaries are five different slices; they are not five independent allowances that can all be spent at once.
+The result was direct. When one parameter gets worse, the minimum requirement on another goes up. The five single-variable boundaries are five different slices. They are not five independent allowances that can all be spent at once.
 
-I also used twelve larger perturbations to confirm that failures appear in the expected direction. For example: the condenser fan passed at 70% and failed at 65%; the B3 available UA passed at 70% and failed at 65%; and raising the KW26-loop pressure loss from 1.20 bar to 1.30 bar failed.
+I also used twelve larger perturbations to confirm that failures appear in the expected direction. For example, the condenser fan passed at 70% and failed at 65%; the B3 available UA passed at 70% and failed at 65%; and raising the KW26-loop pressure loss from 1.20 bar to 1.30 bar failed.
 
 ## The surrogate duct: OpenFOAM only checked the method itself
 
 Once the system architecture had passed numerically, CFD became the right tool for the question "how does the air get through the fan, the shroud and the radiator core".
 
-I built an isolated three-dimensional surrogate duct: the fan used a full-face pressure jump, the core used an isotropic Darcy–Forchheimer porous zone, and four meshes kept the same geometry and the same set of boundary conditions.
+I built an isolated three-dimensional surrogate duct. The fan used a full-face pressure jump, the core used an isotropic Darcy–Forchheimer porous zone, and four meshes kept the same geometry and the same set of boundary conditions.
 
 | Mesh | Cells | Core flow (m³/s) | Core pressure loss (Pa) |
 |---|---:|---:|---:|
@@ -152,7 +152,7 @@ From the fine to the extra-fine mesh, the flow changed by 0.959% and the pressur
 
 ![Four-level mesh study of the fan and porous-core surrogate duct](/images/projects/fsae-cooling/openfoam-mesh-qualification.svg)
 
-This result only says: on this idealised surrogate duct, the fan-plus-porous-core method passed its mesh and conservation checks. The model has no real sidepod, measured incoming flow, core non-uniformity, hot-air recirculation or conjugate heat transfer, so it cannot represent the installed E8 duct performance.
+All this result says is that on this idealised surrogate duct, the fan-plus-porous-core method passed its mesh and conservation checks. The model has no real sidepod, measured incoming flow, core non-uniformity, hot-air recirculation or conjugate heat transfer, so it cannot represent the installed E8 duct performance.
 
 ## Why we still cannot buy now
 

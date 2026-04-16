@@ -28,15 +28,15 @@ cardImageFit: cover
 
 Our instructor, who works at the Spa-Francorchamps circuit, gave us a rich powertrain and driving-cycle dataset and asked us to systematically evaluate the energy consumption and emissions of different drive architectures. The data included:
 
-- Powertrain and vehicle parameters: four architectures — conventional internal combustion (ICE), full hybrid (HEV), plug-in hybrid (PHEV), and battery electric (BEV) — with the Peugeot 308 as the main reference car, and detailed curb weights, motor power, battery capacity, engine efficiency curves, and gear ratios.
+- Powertrain and vehicle parameters: four architectures, conventional internal combustion (ICE), full hybrid (HEV), plug-in hybrid (PHEV), and battery electric (BEV), with the Peugeot 308 as the main reference car, and detailed curb weights, motor power, battery capacity, engine efficiency curves, and gear ratios.
 - Track and test cycles: gradient, elevation, distance, and speed sequences for the real Spa-Francorchamps circuit in Belgium, split into a gentle, economical ECO mode and a highly dynamic, aggressive SPORT mode, plus the standard European test cycles (NEDC and WLTC base speed sequences).
 - Operating characteristics and control parameters: 0–100 km/h acceleration and braking characteristics, engine load-efficiency maps under different conditions, and PHEV initial state of charge (SOC) settings from 0% to 100%.
 
-With this data we could build a unified comparison baseline: holding the same speed trace and external road conditions, work backwards to the power required at the wheels, then push it level by level back to the engine's and the motor's energy consumption, and finally compare the powertrains side by side — with a focus on the PHEV's charge sensitivity and mass penalty.
+With this data we could build a unified analysis baseline. Holding the same speed trace and external road conditions, we worked backwards to the power required at the wheels, then pushed it level by level back to the engine's and the motor's energy consumption. Finally we compared the powertrains side by side, with a focus on the PHEV's charge sensitivity and mass penalty.
 
 ## Baseline setup and physical modelling
 
-For a fair comparison, every vehicle model must follow exactly the same trajectory and speed curve, removing consumption swings caused by driving style or route differences. We used a backward quasi-static physical model: given the speed $v$, acceleration $a$, distance travelled, and road gradient $\theta$ at each time step, solve backwards for the total tractive force $F$ needed at the wheels:
+For a fair comparison, every vehicle model must strictly follow the same trajectory and speed curve, removing consumption swings caused by driving style or route differences. We used a backward quasi-static physical model. Given the speed $v$, acceleration $a$, distance travelled, and road gradient $\theta$ at each time step, it solves backwards for the total tractive force $F$ needed at the wheels:
 
 $$
 F = ma + fmg + \frac{1}{2}\rho C_x S v^2 + mg\sin\theta.
@@ -60,7 +60,7 @@ For the reference-car comparison, the main Peugeot 308 input parameters were:
 | Electric motor power | — | 81 kW |
 | Battery / motor nominal efficiency | — | 0.95 / 0.90 |
 
-The two cars share exactly the same aerodynamic body, tyre spec, and gear ratios, which makes the influence of powertrain architecture, total mass, and control strategy stand out more clearly.
+The two cars share an identical aerodynamic body, tyre spec, and set of gear ratios, which makes the influence of powertrain architecture, total mass, and control strategy stand out more clearly.
 
 For the Spa circuit, the cornering speed limit is estimated from the tyre adhesion limit:
 
@@ -68,7 +68,7 @@ $$
 v = \sqrt{\mu g R}.
 $$
 
-where $\mu$ is the adhesion coefficient, $g$ is gravitational acceleration, and $R$ is the corner radius. ECO mode uses relatively gentle acceleration (0–100 km/h in 20 s), 0.4 g braking deceleration, and a 90 km/h top-speed cap; SPORT mode releases the engine's full power, raises braking intensity to about 0.6 g, and determines braking points through multiple rounds of iterative optimization.
+where $\mu$ is the adhesion coefficient, $g$ is gravitational acceleration, and $R$ is the corner radius. ECO mode uses relatively gentle acceleration (0–100 km/h in 20 s), 0.4 g braking deceleration, and a 90 km/h top-speed cap. SPORT mode releases the engine's full power, raises braking intensity to about 0.6 g, and determines braking points through multiple rounds of iterative optimization.
 
 ![Spa ECO speed and elevation curves](/images/projects/powertrain-cycle-simulation/spa-eco-profile.svg)
 
@@ -76,7 +76,7 @@ where $\mu$ is the adhesion coefficient, $g$ is gravitational acceleration, and 
 
 Before the global comparison, we first checked the exported simulation data for completeness. In the early data wrangling, locale differences in number formats truncated some exported values at the decimal point, and the point-by-point cumulative fuel differed from the summary total by a factor of two. We used physical constraints to remove every ambiguous, anomalous record and kept only fully self-consistent results:
 1. Fuel consumption and tailpipe CO₂ must strictly satisfy the 2392 g/l chemical-equivalent relation;
-2. Per-distance energy use and the total energy of a 7.0 km lap must match exactly;
+2. Per-distance energy use and the total energy of a 7.0 km lap must agree precisely;
 3. Instantaneous tractive force and the integrated wheel energy must close continuously in physical terms.
 
 ## Comparing the four architectures
@@ -95,13 +95,13 @@ Under the unified input baseline, the simulated results of the four architecture
 
 A few key observations from the comparison data:
 
-- The HEV's fuel-saving potential is limited: only 0.41 l/100km less than the pure petrol car on Spa SPORT, and only 0.16 l/100km on NEDC. The small buffer battery can shave peaks and fill valleys during acceleration and deceleration and recover some braking energy, but its capacity is limited, and the added weight of the hybrid system cancels a fair part of the savings.
+- The HEV's fuel-saving potential is limited: only 0.41 l/100km less than the pure petrol car on Spa SPORT, and only 0.16 l/100km on NEDC. The small buffer battery can shave peaks and fill valleys during acceleration and deceleration, and recover some braking energy. But its capacity is limited, and the added weight of the hybrid system cancels a fair part of the savings.
 - A fully charged PHEV performs very well: thanks to the high efficiency of electric drive and the stored charge, the PHEV cuts fuel use and tailpipe emissions by 86%–88% versus the ICE on Spa ECO and NEDC.
-- Aggressive driving pushes consumption up sharply across all architectures: on the aggressive Spa SPORT cycle, aerodynamic drag grows with the square of speed (and power with the cube), and frequent hard acceleration pushes ICE fuel use to 15.60 l/100km, while BEV electricity use climbs from 15.30 kWh/100km to 32.68 kWh/100km.
+- Aggressive driving pushes consumption up sharply across all architectures: on the aggressive Spa SPORT cycle, aerodynamic drag grows with the square of speed (and power with the cube). Frequent hard acceleration pushes ICE fuel use to 15.60 l/100km, and BEV electricity use climbs from 15.30 kWh/100km to 32.68 kWh/100km.
 
 ![BEV energy use on NEDC and Spa](/images/projects/powertrain-cycle-simulation/bev-cycle-energy.png)
 
-The fully charged PHEV's strong numbers led us to a further question: if the car sets off without a full charge, does the advantage survive?
+The fully charged PHEV's strong numbers led us to a further question. If the car sets off without enough charge, does the advantage survive?
 
 ## The nonlinear effect of initial SOC on PHEV efficiency
 
@@ -117,14 +117,14 @@ On the Spa ECO cycle we set 11 different initial SOC values (from 0% to 100% in 
 | 100% | 1.4 | 34.2 |
 
 The data shows a clear nonlinear step:
-1. Critical transition band: there is a key turning point between 20% and 40% initial SOC. Below 20%, the battery cannot provide enough pure-electric traction and the engine is forced to engage early and for long stretches; once the initial charge reaches 40% or more, the charge already covers most of the high-load conditions of this 7.0 km lap, and adding more starting charge improves the lap's fuel use by essentially nothing.
-2. Energy-management control logic: the simulation traces show that when starting at 0%–20% charge, the controller actively uses the engine to generate electricity and recovers energy during driving, bringing the terminal SOC back up to a protective band of 6%–22%; at high initial SOC, the system prefers to discharge to reduce fuel use.
+1. Critical transition band: there is a key turning point between 20% and 40% initial SOC. Below 20%, the battery cannot provide enough pure-electric traction, and the engine is forced to engage early and for long stretches. Once the initial charge reaches 40% or more, the charge already covers most of the high-load conditions of this 7.0 km lap, and adding more starting charge improves the lap's fuel use by essentially nothing.
+2. Energy-management control logic: the simulation traces show that when starting at 0%–20% charge, the controller actively uses the engine to generate electricity and recovers energy during driving, bringing the terminal SOC back up to a protective band of 6%–22%. At high initial SOC, the system prefers to discharge to reduce fuel use.
 
-This result leads directly to the next core question: when the battery is completely drained and the PHEV becomes a petrol car "carrying a heavy battery and motor", what happens?
+This result leads directly to the next core question. When the battery is completely drained and the PHEV becomes a petrol car "carrying a heavy battery and motor", what happens?
 
 ## The "deadweight penalty" after the battery runs out
 
-Comparing the PHEV's energy use with a depleted battery against a full-charge start, the result flips:
+Comparing the PHEV's energy use with a depleted battery against a full-charge start, the result reverses dramatically:
 
 | Test cycle | PHEV (full charge) | PHEV (depleted) | Reference: ICE (pure petrol) |
 |---|---|---|---|
@@ -142,13 +142,13 @@ The physical mechanism is clear:
 
 ![Spa elevation and battery SOC](/images/projects/powertrain-cycle-simulation/spa-topography-soc.png)
 
-In the plot of Spa's elevation against SOC, the PHEV's SOC briefly recovers in the downhill and repeated-braking sections, directly confirming that kinetic energy recovery exists; but this local recovery is far from enough to offset the mass penalty borne through the whole lap's climbing and acceleration.
+In the plot of Spa's elevation against SOC, the PHEV's SOC briefly recovers in the downhill and repeated-braking sections, which directly confirms that kinetic energy recovery exists. But this local recovery is far from enough to offset the mass penalty borne through the whole lap's climbing and acceleration.
 
 ## Model limitations and engineering boundaries
 
 When reading these conclusions, the applicable boundaries and assumptions of the backward quasi-static model must be stated:
 
-1. Idealized trajectory tracking: the model assumes the car always follows the target speed curve exactly, with no gearbox shift shock, clutch slip, tyre slip, or real-driver deviations.
+1. Idealized trajectory tracking: the model assumes the car always strictly follows the target speed curve, with no gearbox shift shock, clutch slip, tyre slip, or real-driver deviations.
 2. Missing auxiliary and thermal loads: the model does not count the energy of air conditioning, cabin heating, or low-voltage onboard electronics, nor the battery's internal-resistance change with temperature or engine cold-start heat losses.
 3. Simplified regenerative braking: brake energy recovery uses a simplified fixed efficiency and brake-force split, without the dynamic safety limits of ABS/ESP intervention.
 4. Parameter-calibration differences: the early exploratory parameters and the final defence data differ slightly in some mass definitions (such as the boundary between curb weight and unladen mass), so the absolute numbers are better suited to relative trend comparison between options than to strict production-car calibration data.
@@ -158,15 +158,15 @@ When reading these conclusions, the applicable boundaries and assumptions of the
 Placing the simulation results in the context of current European passenger-car regulations and real roads gives a deeper industry picture:
 
 - A generational gap between cycle standards: the NEDC cycle accelerates gently and cruises for long stretches, seriously underestimating consumption at high speed and under hard acceleration. [The European Commission has long pointed out that WLTP reflects modern driving behaviour more realistically](https://climate.ec.europa.eu/news-other-reads/news/car-and-van-manufacturers-meet-co2-emissions-targets-2016-2018-01-18_en), and since 2021 has based carbon-emission targets entirely on WLTP.
-- A "utility factor" correction for real PHEV emissions: [the EU's official real-world monitoring report](https://climate.ec.europa.eu/document/download/b644dafe-1385-4b56-98d9-21e7e9f3601b_en?filename) notes that because many owners haven't built a habit of regular daily charging, the average real-road emissions of European PHEVs in 2021 reached 139.5 g CO₂/km — about 3.5 times the laboratory WLTP certified value (39.5 g/km). This matches the "empty-battery mass penalty" we simulated. In response, the EU sharply lowered the PHEV Utility Factor in new regulations such as Euro 6e-bis, forcing a more realistic share of electric driving.
+- A "utility factor" correction for real PHEV emissions: [the EU's official real-world monitoring report](https://climate.ec.europa.eu/document/download/b644dafe-1385-4b56-98d9-21e7e9f3601b_en?filename) notes that because many owners haven't built a habit of regular daily charging, the average real-road emissions of European PHEVs in 2021 reached 139.5 g CO₂/km, about 3.5 times the laboratory WLTP certified value (39.5 g/km). This matches the "empty-battery mass penalty" we simulated. In response, the EU sharply lowered the PHEV Utility Factor in new regulations such as Euro 6e-bis, forcing a more realistic share of electric driving.
 - Spatial heterogeneity of grid carbon intensity: a BEV's lifecycle carbon advantage depends on how clean the grid is. According to [European Environment Agency (EEA) data](https://www.eea.europa.eu/en/analysis/indicators/greenhouse-gas-emission-intensity-of-1), the EU's average grid carbon intensity in 2024 was 183.4 g CO₂e/kWh, but the spread between countries is extreme (France, dominated by nuclear and clean hydro, is as low as about 36 g/kWh, while fossil-dependent Poland reaches 566 g/kWh). Assessing an electric car's environmental benefit has to account for the specific region and time of charging.
 
 ## Conclusions and future work
 
 From this multi-angle dissection of the powertrain simulation data, we drew clear engineering conclusions:
 
-1. No powertrain is absolutely better or worse — only matched to a scenario: battery-electric cars have a clear advantage in short trips with frequent acceleration and deceleration on a clean grid; a fully charged PHEV is an ideal low-carbon solution for short-to-medium trips, but only if it is charged often; the HEV offers a mild fuel saving with no change in refuelling habits, but the benefit narrows at high speed and heavy load.
-2. Beware the "weight cost" of electrified cars: once its battery is depleted, a PHEV actually uses more fuel than a conventional petrol car because of the hundreds of kilograms of electric-drive deadweight it carries.
+1. There is no absolutely better or worse powertrain, only ones matched to a scenario. Battery-electric cars have a clear advantage in short trips with frequent acceleration and deceleration on a clean grid. A fully charged PHEV is an ideal low-carbon solution for short-to-medium trips, but only if it is charged often. The HEV offers a mild fuel saving with no change in refuelling habits, but the benefit narrows at high speed and heavy load.
+2. Beware the "weight cost" of electrified cars: once its battery is depleted, a PHEV's real fuel use ends up higher than a conventional petrol car's, because of the hundreds of kilograms of electric-drive deadweight it carries.
 3. Data-consistency checking is the first line of defence in engineering simulation: any simulation analysis must first establish energy-conservation and chemical-equivalence checks, to avoid distorted technical conclusions caused by unit-conversion or export errors.
 
 Follow-up directions suggested by our instructor:

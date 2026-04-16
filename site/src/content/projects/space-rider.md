@@ -22,7 +22,7 @@ From April to August 2026, I interned for 17 weeks at Felisiak Ingénierie & Dé
 
 Space Rider was the first complete model task I was given, and the most important one. At the time, the company only had a polygonal shape with roughly correct proportions but not enough surface quality or detail (in the end I did not reuse it).
 
-Put simply, my actual job was to rebuild the Space Rider model in Blender using only public references. The required geometric accuracy was about 10 cm.
+In short, my actual job was to rebuild the Space Rider model in Blender using only public references. The required geometric accuracy was about 10 cm.
 
 <figure class="not-prose my-8">
   <img src="/images/projects/space-rider/reference/esa-official-render.jpg" alt="ESA official Space Rider concept image" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
@@ -73,25 +73,25 @@ ESA's three-view blueprint was the only authority for the shape. The user guide 
 
 ## v1
 
-v1 was mainly an attempt at building the whole thing, and the result was almost unacceptable. I spent only two days on the first version and built the entire vehicle, including the reentry module, service module, tanks, nozzle, solar wings, navigation lights, and decals.
+v1 was mainly an attempt at modelling, and the result was almost unacceptable. I spent only two days on the first version and built the entire vehicle, including the reentry module, service module, tanks, nozzle, solar wings, navigation lights, and decals.
 
 But just looking at the renders, there were a lot of problems: the nose was too sharp; the cargo-bay door bulged out of the curved surface; a wingtip light had ended up in the wrong place; and the model had a vertical tail fin that Space Rider does not have at all, plus thermal-tile details taken over from IXV.
 
 I changed the sharp nose to a blunt rounded dome, cleaned up the objects that had come loose from the body, and deleted the fin, flaps, door panels, and extra brackets.
 
-What I thought after the first version: a high level of completeness is not the same as a correct shape. The earlier you add detail, the more expensive the later proportion changes become.
+What I thought after the first version was that a high level of completeness is not the same as a correct shape. The earlier you add detail, the more expensive the later proportion changes become.
 
 ## v2
 
-In v2 I redid the standard shape: I rebuilt the reentry module from scratch. The early version used only 31 section rings; I later raised it to 91 rings with 32 vertices per ring, and only then did I get the wedge profile — high at the rear, falling monotonically toward the chisel-shaped nose.
+In v2 I redid the standard shape: I rebuilt the reentry module from scratch. The early version used only 31 section rings; I later raised it to 91 rings with 32 vertices per ring, and only then did I get the wedge profile, high at the rear and falling monotonically toward the chisel-shaped nose.
 
 This version also fixed three problems that had been dragging on:
 
-- I solved the right-side decals being mirrored the whole time. In the end I gave the left and right text objects their own independent orientations;
+- I solved the right-side decals that had been mirrored all along. In the end I gave the left and right text objects their own independent orientations;
 - the black-and-white TPS boundary used to be painted face by face with materials; I changed it to an analytic shader driven by position;
 - after comparing, I found the body was 11% too tall, so I compressed it as a whole and checked the dimensions against the blueprint again.
 
-When v2.720 was done, it roughly had the shape it should have. So it became the protected baseline — every later rollback went back to here.
+When v2.720 was done, it roughly had the shape it should have. So it became the protected baseline. Every later rollback went back to here.
 
 <figure class="not-prose my-8">
   <img src="/images/projects/space-rider/versions/v2-720-cinematic.jpg" alt="v2.720 protected-baseline full-vehicle render" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />
@@ -104,7 +104,7 @@ In v3 I tried using Claude Code to set up an automatic checking loop: pick a can
 
 But after more than 60 rounds, every round passed the checks while the model showed almost no visible progress. The local smoothness score kept going up, but there was no fixed global target telling it where to go.
 
-In the end this branch was abandoned completely and rolled back to v2. I think Claude Code is flawed by design here: if a loop only optimises local metrics and has no global target like the blueprint, it can keep working forever without ever getting closer to the finish. Giving AI coding a clear, verifiable goal is very important.
+This branch was finally abandoned as a whole and rolled back to v2. I think Claude Code is flawed by design here. If a loop only optimises local metrics and has no global target like the blueprint, it can keep working forever without ever getting closer to the finish. Giving AI coding a clear, verifiable goal is very important.
 
 ## v4
 
@@ -116,15 +116,15 @@ After this rollback, I gave the AI a rule: do not sacrifice already-accepted pro
 
 ## v5
 
-My principle for v5 changed to: check display problems first, then touch geometry. v5 carried on from v2.720, and this time the first rule was to lock the cameras onto the blueprint comparison views.
+My principle for v5 changed to checking display problems first and touching geometry only after. v5 carried on from v2.720, and this time the first rule was to lock the cameras onto the blueprint comparison views.
 
-In the process, two defects that looked serious turned out not to be geometry problems at all. The welded-looking ring at the nose tip was actually a shading seam; with Weighted Normals turned on, it disappeared without moving a single vertex. The dented band around the nose was there because 82% of the base faces had reversed winding; recalculating the normals once improved it a lot.
+In the process, two defects that looked serious turned out not to be geometry problems at all. The welded-looking ring at the nose tip turned out to be a shading seam; with Weighted Normals turned on, it disappeared without moving a single vertex. The dented band around the nose was there because 82% of the base faces had reversed winding; recalculating the normals once improved it a lot.
 
 From then on, before judging the geometry I first switched the material to clay and lit it with raking light. Dark materials easily make flat areas look like holes, and even lighting hides ripples. I banned Taubin relaxation, which had once pulled the convex nose inward into a lot of concave points. After that, the only safe tool I allowed was pushing dents outward along their normals.
 
-But later a new problem came up: I kept moving local vertices and slowly stacked a band of creases into the surface. So I changed my thinking: fit the whole nose in one pass, using B-spline sections plus a symmetric Fourier series — 91 coefficients in total, with an rms fit of 2.6 mm.
+But later a new problem came up: I kept moving local vertices and slowly stacked a band of creases into the surface. So I changed my thinking: fit the whole nose in one pass, using B-spline sections plus a symmetric Fourier series, specifically 91 coefficients in total, with an rms fit of 2.6 mm.
 
-But in the end the nose tip still had creases, because the end of the control cage was a pseudo-pole. That meant the topology itself was wrong, and moving vertices could not cure the problem. So I simply deleted all the last faces and rebuilt the tip as a clean pole fan. At that point the model reached zero dents for the first time. So: a topology problem cannot be solved by moving more vertices!
+But in the end the nose tip still had creases, because the end of the control cage was a pseudo-pole. That meant the topology itself was wrong, and moving vertices could not cure the problem. So I deleted all the last faces and rebuilt the tip as a clean pole fan. At that point the model reached zero dents for the first time. A topology problem cannot be solved by moving more vertices!
 
 <figure class="not-prose my-8">
   <img src="/images/projects/space-rider/versions/v5.015-wide.jpg" alt="v5.015 stage full-vehicle render" class="w-full rounded-xl object-cover shadow-sm" loading="lazy" />

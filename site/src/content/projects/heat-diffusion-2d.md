@@ -17,15 +17,15 @@ github: 'https://github.com/gaoflow/heat-diffusion-2d'
 
 ## It started with snow on paving stones
 
-Paris had a few heavy snowfalls this winter. One day, as I stood staring at the snow on the paving stones, I suddenly noticed a strange pattern in how it melts: the snow over the stones often melts before the snow on the surrounding soil, clearly tracing the outline of every slab. I went back and looked up the reason. Stone and soil conduct heat differently, so the heat stored underground travels up through the slabs faster, and the surface temperature ends up uneven.
+Paris had a few heavy snowfalls this winter. One day, as I stood staring at the snow on the paving stones, I suddenly noticed a strange pattern in how it melts. The snow over the stones often melts before the snow on the surrounding soil, clearly tracing the outline of every slab. Back home I looked into why. Stone and soil conduct heat differently. The heat stored underground travels up through the slabs faster, so the surface temperature ends up uneven.
 
 ![A street in Paris during snowfall](/images/projects/heat-diffusion-2d/paris-snow-video-frame.jpg)
 
-I found this mechanism interesting, and it shows up in other engineering situations too. A heat spreader under a chip or a cooling plate under a battery pack works the same way: a local heat source first concentrates heat in one spot, and conduction through the solid slowly flattens it out. But real melting snow also involves latent heat, uneven snow thickness, and messy material interfaces. Too many variables, too complicated to start with. So I reduced it to a simpler problem to study first: a 2-D metal plate cooled on one side.
+I thought this mechanism was interesting, and it shows up in other engineering problems too, like the heat spreader under a chip or the cooling plate under a battery pack. A local heat source collects heat in one spot, and conduction through the solid slowly spreads it out. But real melting snow also involves latent heat, uneven snow thickness, and messy material interfaces. Too many variables, too complicated to start with. So I reduced it to a simpler problem to study first: a 2-D metal plate cooled on one side.
 
 ## The simplified model: a plate cooled on one side
 
-The reduced model is this: a 2-D metal plate with a uniform initial temperature $T=1$. At $t=0$, the left edge is pressed against a cold source held at $T=0$. The other three edges are fully insulated, so heat inside the plate can only escape through the left side, the one open channel.
+Here is the simplified model. A 2-D metal plate starts at a uniform temperature $T=1$. At $t=0$, the left edge is pressed against a cold source held at $T=0$. The other three edges are fully insulated, so heat inside the plate can only escape through the left side, the one open channel.
 
 I also non-dimensionalized the problem, so the results can be scaled proportionally to any real working condition. The model keeps the core physics of the snow problem — heat diffusing through a solid over time, gradually flattening temperature differences — but drops latent heat, complex geometry, and material interfaces. And it has an exact Fourier series solution, so I can pull out the numerical solution at any moment and check it point by point.
 
@@ -33,7 +33,7 @@ I also non-dimensionalized the problem, so the results can be scaled proportiona
 
 I wrote a 2-D explicit heat diffusion (FTCS) solver to watch how the temperature field inside a plate evolves step by step when one side is cooled. The program ran smoothly at first. To make the computation a bit faster, I casually increased the time step $\Delta t$ by a little. For the first few dozen steps, the temperature plot looked very smooth and natural, and the cooling process looked completely reasonable. But a few dozen steps later, the entire numerical matrix collapsed within a few steps and the screen filled with NaN.
 
-What I kept thinking about was this: before diverging, it had produced dozens of seemingly normal, smooth steps. If a numerical algorithm does not fail immediately on its way to collapse, then in a more complex engineering problem, how do we know whether the plot in front of us is right, or already on its way to breaking? To work out why a transient solver suddenly loses control, how to block dangerous parameters before the computation starts, and how to measure temporal accuracy out of mixed errors, I started this investigation.
+One thing kept bothering me. Before diverging, it had produced dozens of seemingly normal, smooth steps. If a numerical algorithm does not fail immediately on its way to collapse, then in a more complex engineering problem, how do we know whether the plot in front of us is right, or already on its way to breaking? To work out why a transient solver suddenly loses control, how to block dangerous parameters before the computation starts, and how to measure temporal accuracy out of mixed errors, I started this investigation.
 
 ## 1. Analysing the problem
 
@@ -73,7 +73,7 @@ $$
 r \le 0.25
 $$
 
-This explains the root cause of the crash: $r \le 0.25$ is a purely numerical stability limit. Once the time step is a little too large and $r$ becomes 0.26, high-frequency numerical noise gets multiplied at every step by an amplification factor whose absolute value is above 1 ($|g| = 1.08$).
+This explains the root cause of the crash. The $r \le 0.25$ limit is purely numerical. Once the time step is a little too large and $r$ becomes 0.26, high-frequency numerical noise gets multiplied at every step by an amplification factor whose absolute value is above 1 ($|g| = 1.08$).
 
 Why did the first few dozen steps look smooth? Because the initial floating-point rounding noise in a computer is extremely small (about $10^{-16}$). Even multiplied by 1.08 each step, by step 50 the noise has only grown to about $10^{-14}$, and the smooth main solution completely covers it. But with exponential growth, past step 100 the noise quickly inflates to the same order of magnitude as the main solution, and within the next few steps it overflows straight into NaN.
 
@@ -93,21 +93,21 @@ $$
 \tau = \frac{\alpha \Delta x^2}{12}(6r - 1) \frac{\partial^4 T}{\partial x^4} + \mathcal{O}(\Delta t^2) + \mathcal{O}(\Delta x^4)
 $$
 
-The coefficient $(6r - 1)$ of the first term is tightly bound to the diffusion number $r = \alpha \Delta t / \Delta x^2$. When you change $\Delta t$ on a fixed grid, $r$ changes with it, and the weight of the spatial discretization error swings sharply as well. Compared directly against the pure mathematical analytical solution, the total error you compute is a stew of time error and space error mixed together — there is no way to measure a clean temporal convergence order from it.
+The coefficient $(6r - 1)$ of the first term is tightly bound to the diffusion number $r = \alpha \Delta t / \Delta x^2$. When you change $\Delta t$ on a fixed grid, $r$ changes with it, and the weight of the spatial discretization error swings sharply as well. Compared directly against the pure mathematical analytical solution, the total error you compute is a stew of time error and space error mixed together. There is no way to measure a clean temporal convergence order from it.
 
-The standard solution given in the literature: on the same spatial grid, first run a high-precision numerical benchmark with a very small time step, then difference each test case against that benchmark. The subtraction cancels the spatial error completely.
+The standard solution given in the literature is this. On the same spatial grid, first run a high-precision numerical benchmark with a very small time step, then difference each test case against that benchmark. The subtraction cancels the spatial error completely.
 
 ## 3. How I solved it
 
 Based on the analysis and the search results, I made a few changes: block unstable input before the run, guarantee energy conservation in the code structure, and measure accuracy term by term using the analytical solution and a same-grid benchmark.
 
-### Unsafe step sizes simply don't run
+### Cases with an unsafe step size never start
 
-Since I knew the $r \le 0.25$ line, the cheapest fix is to make any run that crosses it impossible to start. After the solver receives the grid and the time step, it computes $r$ first. If $r > 0.25$ (say 0.26), it raises `StabilityError`, records the reason, and exits without taking a single step. Warnings are easy to scroll past; by the time the plot suddenly turns into NaN a few hundred steps later, it is too late to go back and investigate.
+Since I knew the $r \le 0.25$ line, the cheapest fix is to make any run that crosses it impossible to start. After the solver receives the grid and the time step, it computes $r$ first. If $r > 0.25$ (say 0.26), it raises `StabilityError`, records the reason, and exits without taking a single step. A warning is easy to scroll past. By the time the plot suddenly turns into NaN a few hundred steps later, it is too late to go back and investigate.
 
 ### Treating every cell as a small room with a heat ledger
 
-I found another, sneakier problem: the curves can look perfectly fine while energy quietly leaks out through the boundaries. My approach is to treat each cell as a small room: how much its temperature changes depends only on how much heat crosses its four walls. Whatever flows out through one wall flows into the neighbouring room, so when I add up the ledger over the whole field, the heat fluxes through the internal walls cancel exactly in pairs. Code written this way can hardly leak heat. I measured it: with all four sides insulated, after 576 steps the total energy drift was 0.0.
+I found another, sneakier problem. The curves can look perfectly fine while energy quietly leaks out through the boundaries. My approach is to treat each cell as a small room. How much its temperature changes depends only on how much heat crosses its four walls. Whatever flows out through one wall flows into the neighbouring room, so when I add up the ledger over the whole field, the heat fluxes through the internal walls cancel out in pairs. Code written this way can hardly leak heat. I measured it. With all four sides insulated, after 576 steps the total energy drift was 0.0.
 
 ### Verification
 
@@ -131,7 +131,7 @@ Then compare against "myself, run with a tiny step on the same grid". As analyse
 
 *The four time-step refinement tests fit to a measured temporal convergence order of 1.017*
 
-Halving the step four times gave errors of $1.370 \times 10^{-4}$, $6.817 \times 10^{-5}$, $3.374 \times 10^{-5}$, and $1.653 \times 10^{-5}$ — roughly halving each time. The fitted temporal order is 1.017, inside the theoretical band of 0.9–1.1.
+Halving the step four times gave errors of $1.370 \times 10^{-4}$, $6.817 \times 10^{-5}$, $3.374 \times 10^{-5}$, and $1.653 \times 10^{-5}$, roughly halving each time. The fitted temporal order is 1.017, inside the theoretical band of 0.9–1.1.
 
 | Verification item | Measured result | Acceptance criterion | Result |
 |---|---:|---:|:---:|
@@ -143,9 +143,9 @@ Halving the step four times gave errors of $1.370 \times 10^{-4}$, $6.817 \times
 
 ## Summary
 
-The question I studied: when a surface is suddenly heated or cooled, how long does heat take to work its way in. It turned out to be genuinely useful later, when I was working on an FSAE electric race car: the IGBT modules in the motor inverter and the cold plate of the battery pack have to absorb a peak heat load of 6.0 kW within 10 seconds of hard acceleration. In that short a time, the heat has no chance to reach the outer heatsink at all, so a steady-state calculation is meaningless — only a transient model like this one can show how much heat piles up locally. My shortcoming is just as direct: stability demands $\Delta t \propto \Delta x^2$, so halving the cell size means 4 times as many steps, and a fine grid gets very slow. For a genuinely finer grid, the next step is to switch to an unconditionally stable implicit scheme, such as ADI or Crank-Nicolson.
+The question I studied was how long heat takes to work its way in when a surface is suddenly heated or cooled. It turned out to be genuinely useful later, when I was working on an FSAE electric race car. The IGBT modules in the motor inverter and the cold plate of the battery pack have to absorb a peak heat load of 6.0 kW within 10 seconds of hard acceleration. In that short a time, the heat has no chance to reach the outer heatsink at all, so a steady-state calculation is meaningless. Only a transient model like this one can show how much heat piles up locally. My shortcoming is just as direct. Stability demands $\Delta t \propto \Delta x^2$, so halving the cell size means 4 times as many steps, and a fine grid gets very slow. For a genuinely finer grid, the next step is to switch to an unconditionally stable implicit scheme, such as ADI or Crank-Nicolson.
 
-Looking back: I started from an interesting pattern on the paving stones, reduced it to a metal plate cooled on one side, and wrote a solver — which crashed as soon as I casually enlarged the time step. Following that crash, I found the $r \le 0.25$ line and made unsafe runs impossible to start; I treated each cell as a small room with a heat ledger so energy cannot leak; and I settled the account two ways, against the analytical solution and against a high-precision benchmark on the same grid, to confirm the numbers are right. What an experience!
+Looking back, I started from an interesting pattern on the paving stones, reduced it to a metal plate cooled on one side, and wrote a solver. It crashed as soon as I casually enlarged the time step. Following that crash, I found the $r \le 0.25$ line and made unsafe runs impossible to start. I treated each cell as a small room with a heat ledger so energy cannot leak. And I settled the account two ways, against the analytical solution and against a high-precision benchmark on the same grid, to confirm the numbers are right. What a remarkable experience!
 
 ## Code
 

@@ -52,14 +52,14 @@ The course task first handed us a pipe 10 m long and 0.4 m in diameter: fluid en
   <figcaption>Pipe entrance region, from the course material</figcaption>
 </figure>
 
-The cylinder-flow task swaps the problem for an external flow with no closed-form solution: the outer boundary has to be far enough away, the cylinder edge and the whole fluid domain need a clearly defined mesh size, and the results have to be checked for convergence, mass conservation, the flow field and drag, then compared with the course's smooth-cylinder drag curve.
+The cylinder-flow task swaps the problem for an external flow with no closed-form solution: the outer boundary has to be far enough away, the cylinder edge and the entire fluid domain need a clearly defined mesh size, and the results have to be checked for convergence, mass conservation, the flow field and drag, then compared with the course's smooth-cylinder drag curve.
 
 <figure>
   <img class="w-full" src="/images/projects/fluent-cyl-vnv/source/course-cylinder-drag-reference.png" alt="Course reference curves of drag coefficient versus Reynolds number for a smooth cylinder and a sphere" loading="lazy">
   <figcaption>The course's drag reference curve for a smooth cylinder</figcaption>
 </figure>
 
-Next, I first used the pipe flow — which has an exact solution — to check the computation workflow, then switched to the cylinder and checked mesh, domain and experimental differences one by one. And along the way I kept asking myself: can I trust the numbers Fluent gives?
+Next, I first used the pipe flow, which has an exact solution, to check the computation workflow. Then I switched to the cylinder and checked mesh, domain and experimental differences one by one. Along the way I kept asking myself: can I trust the numbers Fluent gives?
 
 ## Calibrating the computation workflow with pipe flow
 
@@ -119,7 +119,7 @@ From 12,800 cells onward, the change in $C_D$ stays below 0.1%. In the end I kep
 
 ![Mesh sensitivity at Re=10](/images/projects/fluent-cyl-vnv/mesh-sensitivity.svg)
 
-One thing worth noting: refining from 12,800 to 28,800 changes the result by only 0.05%, and the two points sit very close. But two close fine-grid points cannot prove a plateau exists — they may just both happen to be short of it. So I swept in the coarse direction instead. The 50-cell mesh gives 3.1328, about 12% above the final value. It is exactly this coarse point that shows the result really does change with resolution — the direction and magnitude of the change are both visible — and that is what is truly convincing.
+One thing is worth noting. Refining from 12,800 to 28,800 changes the result by only 0.05%, and the two points sit very close. But two close fine-grid points cannot prove a plateau exists. They may just both happen to be short of it. So I swept in the coarse direction. The 50-cell mesh gives 3.1328, about 12% above the final value. It is this coarse point that shows the result really does change with resolution; the direction and magnitude of the change are both visible. That is what is truly convincing.
 
 With the mesh fixed, I increased the outer-domain diameter from 100 m to 200 m:
 
@@ -206,6 +206,6 @@ The pipe-flow text record says a 1,000-cell mesh, while the only surviving conso
 
 This assignment is where I started building my approach to CFD verification. I first did two relatively simple steady problems: check pipe flow with the exact Poiseuille solution, then check low-Reynolds-number cylinder flow with mesh, domain and external reference values. This stage settles one basic question first: what checks does a steady CFD result have to pass before it is worth trusting?
 
-A mesh plateau cannot be judged from two close fine-grid points either. I also had to sweep toward coarse meshes and see the result clearly leave the plateau; and the domain had to be changed on its own before I could tell whether the outer boundary was still affecting the drag. Of the 6 Reynolds-number cases, only $Re=20$ entered the 5% error band. This shows residual convergence is only the starting point — it does not mean the model, mesh and domain are accurate enough.
+A mesh plateau cannot be judged from two close fine-grid points either. I also had to sweep toward coarse meshes and see the result clearly leave the plateau; and the domain had to be changed on its own before I could tell whether the outer boundary was still affecting the drag. Of the 6 Reynolds-number cases, only $Re=20$ entered the 5% error band. This shows residual convergence is only the starting point. It does not mean the model, mesh and domain are accurate enough.
 
 The study here stops at two-dimensional steady laminar flow with $Re\le20$. After building this verification sequence, I pushed the same cylinder problem to higher Reynolds numbers in later assignments: first a steady-wake baseline at $Re=40$, then unsteady vortex shedding, lift and drag histories and the Strouhal number at $Re=150$. The progression is very clear: first judge whether a steady result is trustworthy, then study how the flow changes with time.

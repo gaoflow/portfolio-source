@@ -102,7 +102,7 @@ We requested 200 field-output intervals in Abaqus, so we could see the whole cur
 
 A curve can only tell us how hard we pulled overall and how much it stretched; by itself it cannot say whether the fracture process is reasonable. So we looked at four kinds of results at the same time: stress `S` and equivalent plastic strain `PEEQ` to find stress concentration and plastic localisation; damage variable `SDEG` and element `STATUS` to track damage growth and element deletion; displacement and reaction force to rebuild the curve; and kinetic energy `ALLKE` with internal energy `ALLIE` for a basic inertia check.
 
-That also set how we judged things later. $R^2$ can summarise how close the whole curve is, but we would not look at one score alone — we also looked at the necking shape, where the stress concentrated, and the pace of element deletion.
+That also set how we judged things later. $R^2$ can summarise how close the whole curve is, but we would not look at one score alone. We also looked at the necking shape, where the stress concentrated, and the pace of element deletion.
 
 ## The mesh study
 
@@ -152,7 +152,7 @@ With the mesh settled, the remaining question was: which solver setting can push
 
 The archive kept both Static General and Dynamic Explicit solutions. After Static General enters the necking and damage stage, the negative stiffness from material softening makes the iterations hard to continue; its curve fit was $R^2=0.9595$. Dynamic Explicit does not rely on the same static iteration process and can keep computing through damage growth and element deletion; the reference run reached $R^2=0.9653$.
 
-The displacement and damage settings in these two archives are not identical, so they cannot be treated as a single-variable sensitivity test that changed only the solver. And 0.9653 is only the result of that Explicit reference run — not the same calculation as the final M2 combination's 0.9663. We kept Explicit mainly because it can keep going through the post-peak softening and deletion stages, not because one $R^2$ proves it is generally better than Static.
+The displacement and damage settings in these two archives are not identical, so they cannot be treated as a single-variable sensitivity test that changed only the solver. And 0.9653 is only the result of that Explicit reference run, not the same calculation as the final M2 combination's 0.9663. We kept Explicit mainly because it can keep going through the post-peak softening and deletion stages, not because one $R^2$ proves it is generally better than Static.
 
 <figure>
   <img src="/images/projects/xc48-abaqus-twin/static-vs-explicit-comparison.png" alt="Experimental true stress–strain curve compared with Static General and Dynamic Explicit numerical results" loading="lazy">
@@ -187,11 +187,11 @@ The loading method directly affects this check. The three amplitudes behaved lik
 
 So we kept Smooth Step in the final configuration. At this point, geometry, material, mesh, solver, and loading each had their own reason for being chosen, and only then could we go back to the full experimental curve.
 
-## How much of the final curve actually matched
+## How much of the final curve matched
 
 The final combination is M2 + Dynamic Explicit + Smooth Step, with $R^2=0.9663$ over the whole curve. Before the peak, the numerical curve follows the experiment's plastic hardening trend; the numerical true-stress peak is about 820 MPa versus the experimental 828.4 MPa, a difference of about 1%.
 
-Past the peak, the specimen starts necking, damage grows, element deletion follows, and the numerical curve comes down with them. A visible gap remains here: the tail of the numerical curve falls more slowly and stays on the high side. So $R^2=0.9663$ means the curve as a whole is close, not that every segment overlaps. The agreement around the peak is good; the post-peak softening and fracture tail are only a trend-level reconstruction.
+Past the peak, the specimen starts necking, damage grows, element deletion follows, and the numerical curve comes down with them. A visible gap remains here. The tail of the numerical curve falls more slowly and stays on the high side. So $R^2=0.9663$ means the curve as a whole is close, not that every segment overlaps. The agreement around the peak is good; the post-peak softening and fracture tail are only a trend-level reconstruction.
 
 <figure>
   <img src="/images/projects/xc48-abaqus-twin/final-numerical-experimental-validation.png" alt="Final M2 Dynamic Explicit Smooth Step numerical curve versus the experimental true stress–strain curve, R-squared 0.9663" loading="lazy">

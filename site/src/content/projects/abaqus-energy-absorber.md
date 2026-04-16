@@ -49,11 +49,11 @@ In a frontal collision, the front rail is bent and wrinkled first, then folds up
 - plot the force–displacement curve;
 - and finally try different shapes.
 
-The teacher did not fix the material, velocity, impactor mass, mesh, or how many variants to run — those were for us to decide. And the question we wanted to answer was just as direct: how do you make the rail keep folding, take in more kinetic energy, and still not produce too high a force at the first hit?
+The teacher did not fix the material, velocity, impactor mass, mesh, or how many variants to run. Those were for us to decide. And the question we wanted to answer was just as direct: how do you make the rail keep folding, take in more kinetic energy, and still not produce too high a force at the first hit?
 
 ## Getting the model onto one scale
 
-The rail given by the course is 1000 mm long. The baseline hat section is 100 mm wide, with a 59 mm inner span, a total height of 51.2 mm, and 20.5 mm flanges; the hat is 1.2 mm thick and the closing plate is 0.8 mm thick. The later changes — making both 1.0 mm, or thickening the corners — all vary from this baseline.
+The rail given by the course is 1000 mm long. The baseline hat section is 100 mm wide, with a 59 mm inner span, a total height of 51.2 mm, and 20.5 mm flanges; the hat is 1.2 mm thick and the closing plate is 0.8 mm thick. The later changes (making both 1.0 mm, or thickening the corners) all vary from this baseline.
 
 <figure>
   <img src="/images/projects/abaqus-energy-absorber/baseline-geometry-dimensions.png" alt="Baseline rail length, section dimensions and 1.2/0.8 mm wall thicknesses" loading="lazy">
@@ -81,7 +81,7 @@ $$
 W=\int F\,dx.
 $$
 
-So the $3.5\times10^6$ N·mm on the plot is actually 3.5 kJ, and must not be written as $3.5\times10^6$ J.
+So the $3.5\times10^6$ N·mm on the plot means 3.5 kJ, and must not be written as $3.5\times10^6$ J.
 
 With the dimensions and units sorted out, we started the first round of models and quickly ran into missing properties.
 
@@ -89,7 +89,7 @@ With the dimensions and units sorted out, we started the first round of models a
 
 ### The problem we found: 328 elements in the model tree had no properties
 
-When we got the model file, we found 328 elements had no material or section properties assigned. Abaqus stopped at the input check, so there was no usable impact run at all. This failure was basic, but useful: parts, a mesh, and a job in the model tree do not mean the solve actually started. So from then on, before every submission, we first checked whether section assignment had missed any elements.
+When we got the model file, we found 328 elements had no material or section properties assigned. Abaqus stopped at the input check, so there was no usable impact run at all. This failure was basic, but useful. Parts, a mesh, and a job in the model tree do not mean the solve really started. So from then on, before every submission, we first checked whether section assignment had missed any elements.
 
 ### Early baseline
 
@@ -117,7 +117,7 @@ The early baseline velocity was 13,888 mm/s, about 50 km/h.
 
 For the first 0.005 s the impactor had not yet pressed onto the rail, so the reaction force stayed near zero. After contact there was first a spike of about 100 kN; then the rail kept folding and the reaction force rose while oscillating, reaching 137.6 kN at about 0.0199 s. The impactor travelled about 270 mm in 0.02 s, and the displacement is almost a straight line, which means the velocity had not come down noticeably during that time.
 
-The raw force curve has a lot of high-frequency sawtooth. Explicit solving, contact, stress waves, and mass scaling all bring this kind of oscillation into the results. We kept the raw plot to see instantaneous peaks and used the smoothed plot to see the overall plateau — you cannot just pick the better-looking curve.
+The raw force curve has a lot of high-frequency sawtooth. Explicit solving, contact, stress waves, and mass scaling all bring this kind of oscillation into the results. We kept the raw plot to see instantaneous peaks and used the smoothed plot to see the overall plateau. You cannot just pick the better-looking curve.
 
 <figure>
   <img src="/images/projects/abaqus-energy-absorber/force-displacement-preliminary.png" alt="Smoothed early-baseline force–displacement curve" loading="lazy">
@@ -147,7 +147,7 @@ Steel first: the impactor moved about 500 mm within 0.04 s, and the reaction for
   <figcaption>Steel: energy</figcaption>
 </figure>
 
-Aluminium peaked lower, at about 115 kN. In the plots, the stress concentrates in the bending and folding regions — exactly where a thin-walled part absorbs energy through local buckling.
+Aluminium peaked lower, at about 115 kN. In the plots, the stress concentrates in the bending and folding regions, exactly where a thin-walled part absorbs energy through local buckling.
 
 <figure>
   <img src="/images/projects/abaqus-energy-absorber/aluminium-displacement-history.png" alt="V2 aluminium model impactor displacement over time" loading="lazy">
@@ -181,7 +181,7 @@ With steel and aluminium drawn on the same force–displacement plot, steel peak
   <figcaption>Steel / aluminium</figcaption>
 </figure>
 
-Some values read from the energy plots do not quite agree with the force–displacement integrals. In V2 we also used a fixed mass-scaling factor of 100, which added about 9900% mass; late in the aluminium model $ALLAE/ALLIE\approx15\%$ — artificial energy was already significant there. Magnesium's reaction plateau, about 70 kN, was only an exploratory result too. To compare materials seriously, you have to fix the geometry, mesh, velocity, and impactor, and remove mass scaling that strong.
+Some values read from the energy plots do not quite agree with the force–displacement integrals. In V2 we also used a fixed mass-scaling factor of 100, which added about 9900% mass; late in the aluminium model $ALLAE/ALLIE\approx15\%$, so artificial energy was already significant there. Magnesium's reaction plateau, about 70 kN, was only an exploratory result too. To compare materials seriously, you have to fix the geometry, mesh, velocity, and impactor, and remove mass scaling that strong.
 
 This set of results gave us a direction, but the numerical quality was not good enough. We planned to switch to a 500 kg rigid impactor and see whether the same material differences would show up again.
 
@@ -225,7 +225,7 @@ This time we ran a separate set of wall impacts: a 500 kg rigid impactor hitting
 | Al 6061 | 0.94 | 102 | 60.5% | 50.8 | 774 |
 | Ti-6Al-4V | 1.54 | 249 | 92.5% | 27.9 | 186 |
 
-Polypropylene developed contact instability and its force curve is not trustworthy, so it is not in the table. Al 6061 has the lowest peak force and the highest SEA, but it needs a 774 mm stroke — almost three times steel's. If the front of the car cannot fit that much crush space, no SEA solves the packaging problem. Titanium and steel have flatter plateaus but come with higher forces. So in this set of results, you cannot just pick the biggest number in one column.
+Polypropylene developed contact instability and its force curve is not trustworthy, so it is not in the table. Al 6061 has the lowest peak force and the highest SEA, but it needs a 774 mm stroke, almost three times steel's. If the front of the car cannot fit that much crush space, no SEA solves the packaging problem. Titanium and steel have flatter plateaus but come with higher forces. So in this set of results, you cannot just pick the biggest number in one column.
 
 Both material trials showed that looking only at peak force or SEA makes it easy to draw the wrong conclusion. We stopped ranking materials and reran a cleaner 30 km/h case.
 
@@ -241,7 +241,7 @@ V3 returned to the 30 km/h case. Both the hat rail and the closing plate were se
   <figcaption>V3 impact</figcaption>
 </figure>
 
-The results show the initial total energy was about 34.72 kJ and the final about 34.70 kJ, so the total barely drifted away. The final kinetic energy was still 22.65 kJ, so about 12.07 kJ of kinetic energy moved into other energy terms. But you cannot treat that 12.07 kJ as plastic energy absorption here. To find out where the energy actually went, you have to look through the ODB item by item: internal energy, artificial energy, contact energy, and the other components.
+The results show the initial total energy was about 34.72 kJ and the final about 34.70 kJ, so the total barely drifted away. The final kinetic energy was still 22.65 kJ, so about 12.07 kJ of kinetic energy moved into other energy terms. But you cannot treat that 12.07 kJ as plastic energy absorption here. To find out where the energy really went, you have to look through the ODB item by item: internal energy, artificial energy, contact energy, and the other components.
 
 V3 also left numerical problems behind. The solve went past 300,000 increments, and Abaqus advised us to rerun in double precision. It dropped V2's aggressive mass scaling, but we still had not done a mesh-convergence check, so we cannot assume every term is accurate enough just because the total energy is conserved. Once V3 could run to the end, our question moved from "can the model finish" to "where should the limited material go?"
 
@@ -260,7 +260,7 @@ $$
 t(s)=t_{min}+\left(t_{max}-t_{min}\right)\left(1-\frac{s}{H}\right)^{n_i}.
 $$
 
-$s$ is how far you have gone along the section, $H$ is the length of that wall segment, and $n_i$ decides whether the thickness falls fast or slowly. The point of this formulation is not to thicken the whole rail together, but — under the ideal condition of unchanged total mass — to move material to where it is needed more.
+$s$ is how far you have gone along the section, $H$ is the length of that wall segment, and $n_i$ decides whether the thickness falls fast or slowly. The point of this formulation is not to thicken the whole rail together, but to move material to where it is needed more, under the ideal condition of unchanged total mass.
 
 The FGT in the paper is a continuous-thickness design. What we did in Abaqus is a simplified version: 2 mm at the corners, 1 mm on the walls. We did not implement the continuous thickness function, and we did not run a parameter search under a fixed-mass constraint. So Model D is a stepped-thickness multi-cell section inspired by FGT.
 
@@ -280,7 +280,7 @@ We numbered the three section variants:
 
 - **Model A (Classic)**: the original structure given by the course. It consists of a hat channel and a flat closing plate, forming a single-cell section once joined. The hat is 1.2 mm thick and the plate is 0.8 mm thick.
 - **Model B (Uniform)**: keeps Model A's hat shape and single-cell structure, and only changes both the hat and the plate to 1.0 mm. This variant checks whether "uniform wall thickness" makes the crush more stable.
-- **Model D (FGT-inspired multi-cell section)**: no longer just one cell — dividers and stiffening ribs are added inside the section, splitting it into several small cells. Corners are 2 mm thick and flat walls 1 mm, aiming to concentrate material where bending happens.
+- **Model D (FGT-inspired multi-cell section)**: no longer just one cell, but with dividers and stiffening ribs added inside the section, splitting it into several small cells. Corners are 2 mm thick and flat walls 1 mm, aiming to concentrate material where bending happens.
 
 All the geometry comparisons in this set look at the results at 0.06 s. There is also a uniform 2 mm Model C, but it has no usable final results, so it is not in the comparison below.
 
@@ -332,7 +332,7 @@ Model A's internal energy reached 3.5 kJ, with a mean force of 11.6 kN and a pea
   <figcaption>B: displacement</figcaption>
 </figure>
 
-From A to B, mass dropped only 6.1%, but ALLIE fell 20%, SEA fell 15%, mean force fell 33.6%, CFE lost 12.5 percentage points, and stroke increased by 20% instead. This does not prove that a 1 mm thickness itself is necessarily bad. A more likely explanation is that once the wall thickness was redistributed, the fold initiation points moved with it.
+From A to B, mass dropped only 6.1%, but ALLIE fell 20%, SEA fell 15%, mean force fell 33.6%, CFE lost 12.5 percentage points, while stroke increased by 20%. This does not prove that a 1 mm thickness itself is necessarily bad. A more likely explanation is that once the wall thickness was redistributed, the fold initiation points moved with it.
 
 #### Model D: the corner-thickened multi-cell section
 
@@ -355,6 +355,6 @@ From A to D, mass became 4.67 times, ALLIE became 9.43 times, and SEA became 2.0
 
 ## Summary
 
-First, exploring a crash beam is a very practical project — I can imagine that designing a car at a car company means really thinking about crash-beam performance in exactly this way. This group assignment was the first time we put material, section, and numerical settings into the same crash problem. We learned how to judge results from force–displacement, kinetic energy, internal energy, and artificial energy, and we also saw that a model finishing its run does not make its numbers trustworthy. Missing properties, mass scaling, and precision problems are all very concrete takeaways from this course.
+First, exploring a crash beam is a very practical project. I can imagine that designing a car at a car company means really thinking about crash-beam performance this way. This group assignment was the first time we put material, section, and numerical settings into the same crash problem. We learned how to judge results from force–displacement, kinetic energy, internal energy, and artificial energy, and we also saw that a model finishing its run does not make its numbers trustworthy. Missing properties, mass scaling, and precision problems are all very concrete takeaways from this course.
 
 On design, we learned that light weight, high energy absorption, low peak force, and short stroke are hard to have at the same time. Aluminium is mass-efficient but needs a longer crush stroke; Model D absorbs more energy and has a flatter crush plateau, but its mass and forces go up a lot; and making all wall thicknesses the same does not necessarily give a better folding pattern. This assignment did not produce an answer that wins everywhere, but it taught us how to compare designs, and how to stay suspicious of a curve that looks beautiful.

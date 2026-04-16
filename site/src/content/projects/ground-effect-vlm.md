@@ -17,9 +17,9 @@ github: 'https://github.com/gaoflow/ground-effect-vlm'
 
 ## Ground effect in F1
 
-Whenever you watch F1, you always hear about "ground effect". The closer a wing gets to the ground, the stronger the downforce usually is. The questions I was curious about were: the ground is just a flat road, so why does it change the force on a wing above it? And once the wing gets too close, why do the results stop being trustworthy?
+Whenever you watch F1, you always hear about "ground effect". The closer a wing gets to the ground, the stronger the downforce usually is. The questions I was curious about were these. The ground is just a flat road, so why does it change the force on a wing above it? And once the wing gets too close, why do the results stop being trustworthy?
 
-On a real car, the floor, tyres, diffuser and gap leaks all affect the airflow at the same time. Putting the whole car straight into a model actually makes it harder to see what the ground itself does. So I used the method of image vortices to write a low-order vortex lattice method (VLM) tool, and started by studying one simple rectangular wing.
+On a real car, the floor, tyres, diffuser and gap leaks all affect the airflow at the same time. Putting the whole car straight into a model makes it harder to see what the ground itself does. So I used the method of image vortices to write a low-order vortex lattice method (VLM) tool, and started by studying one simple rectangular wing.
 
 The 2022 to 2025 F1 cars [used shaped Venturi floor tunnels to strengthen ground effect](https://www.formula1.com/en/latest/article/10-things-you-need-to-know-about-the-all-new-2022-f1-car.4OLg8DrXyzHzdoGrbqp6ye):
 
@@ -37,19 +37,19 @@ The 2026 regulations [switch to a flatter floor and a larger diffuser](https://w
 
 ## Simplifying the problem to one rectangular wing
 
-Take the simplest possible model: a thin rectangular wing meeting the airflow at a fixed angle. At the start it is far above the ground; then it comes down bit by bit, with everything else unchanged. I wanted to watch three things: 1 how the loading changes along the span, 2 how much the total lift grows, 3 how much induced drag you pay for the same lift.
+Take the simplest possible model. A thin rectangular wing meets the airflow at a fixed angle. At the start it is far above the ground; then it comes down bit by bit, with everything else unchanged. I wanted to watch three things: 1 how the loading changes along the span, 2 how much the total lift grows, 3 how much induced drag you pay for the same lift.
 
-I did not import CAD, and I did not model the floor of any particular F1 generation — all of that was too complex. I used the simplest geometry for a first exploration. In the code, my wing has no thickness, no sweep and no twist. The chord is $c=1$, the span is $b=4c$, and the angle of attack is fixed at $4^\circ$. This simplification lets me change only the height above the ground, without bringing in tyres, diffuser and body interference. Flip the wing over and the force direction becomes what F1 calls downforce; I care more about how the ground changes the loading, so whether the force points up or down does not affect the near-ground mechanism discussed here.
+I did not import CAD, and I did not model the floor of any particular F1 generation. All of that was too complex. I used the simplest geometry for a first exploration. In the code, my wing has no thickness, no sweep and no twist. The chord is $c=1$, the span is $b=4c$, and the angle of attack is fixed at $4^\circ$. This simplification lets me change only the height above the ground, without bringing in tyres, diffuser and body interference. Flip the wing over and the force direction becomes what F1 calls downforce. I care more about how the ground changes the loading, so whether the force points up or down does not affect the near-ground mechanism discussed here.
 
 Because the model is so simple, I treat it as trend-watching only. It has no viscosity and no flow separation, so it cannot predict at which ride height a real car would stall.
 
 ## What is a vortex, and how does it form?
 
-Put simply, a vortex is a blob of air spinning around some centre. Air can flow backwards while it spins. Smoke, cloud and water vapour can make the rotation visible, but the smoke itself is not the vortex; it just moves with the air.
+In simple terms, a vortex is a blob of air spinning around some centre. Air can flow backwards while it spins. Smoke, cloud and water vapour can make the rotation visible, but the smoke itself is not the vortex; it just moves with the air.
 
 When a wing makes lift, the pressure is lower on the upper surface and higher on the lower surface. Near the tip, the high-pressure air below spills around the tip towards the low-pressure region above. After the air leaves the wing it keeps rolling up, and in the end forms two trailing vortices, one on each side, spinning in opposite directions. [NASA's explanation of downwash](https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/downwash-effects-on-lift/) and the [FAA's wake-turbulence note](https://www.faa.gov/air_traffic/publications/atpubs/aim_html/chap7_section_4.html) describe this process.
 
-To make the formation process easier to see, I asked AI, and it returned a very easy-to-follow animation that I thought worked really well, so I put it here too. The animation first draws how the pressure difference drives the flow around the tip, then how that flow rolls up into a trailing vortex.
+To make the formation process more intuitive, I asked AI, and it returned a very easy-to-follow animation. I thought it worked very well, so I put it here too. The animation first draws how the pressure difference drives the flow around the tip, then how that flow rolls up into a trailing vortex.
 
 <iframe class="article-demo" src="/labs/ground-effect-vortex/" title="Wingtip vortex formation animation" loading="lazy"></iframe>
 
@@ -67,7 +67,7 @@ The matrix $A$ records the influence between the vortices, and $\Gamma$ is the s
 
 ## How image vortices represent the ground
 
-The ground makes only one basic demand on the airflow: **air cannot go through it. In velocity terms, the vertical velocity on the ground must be zero.**
+The ground makes only one basic demand on the airflow. **Air cannot go through it. In velocity terms, the vertical velocity on the ground must be zero.**
 
 My approach is to place a set of image vortices below the ground. Each image vortex mirrors the position of the real vortex above and has the opposite circulation direction. The vertical velocity the real vortex creates on the ground is cancelled by the image vortex. This satisfies the no-penetration condition without meshing the ground.
 
@@ -102,7 +102,7 @@ The left plot shows how much the lift at fixed angle of attack grows relative to
 
 The free-air baseline is $C_L=0.2615$ and $C_{D_i}=0.00549$. Once the wing comes down to $h/c=0.5$, $C_L$ grows by 32.4% to 0.3461. The absolute induced drag grows by only 1.7%, to 0.00559. At the same time, $C_{D_i}/C_L^2$ falls by 41.9%.
 
-Simply put, the third number drops a lot mainly because the denominator $C_L^2$ got bigger; it does not mean the absolute drag went down. So I can conclude that for the same amount of lift, the induced-drag cost is lower. But the claim that "as soon as a wing gets close to the ground, its absolute drag drops" is not supported.
+The third number drops a lot mainly because the denominator $C_L^2$ got bigger. It does not mean the absolute drag went down. So I can conclude that for the same amount of lift, the induced-drag cost is lower. But the claim that "as soon as a wing gets close to the ground, its absolute drag drops" is not supported.
 
 ## Deviations in the data
 
@@ -137,7 +137,7 @@ So I set $h/c=0.25$ as the lower bound of the sweep. It is where I chose to stop
 
 ## Summary
 
-The model I built assumes steady, incompressible, inviscid and zero-thickness flow. It has no road boundary layer, no body blockage, no pressure recovery and no flow separation. I only treat it as a low-cost tool for checking direction, magnitude and the numerical pipeline. For the real situation, a real car, the study has to be far more complex than mine — it would also need finite thickness, chordwise loading, a moving-ground boundary layer, ride-height and pitch variation, tyres, leakage, a diffuser, grid sensitivity and flow separation, among other things.
+The model I built assumes steady, incompressible, inviscid and zero-thickness flow. It has no road boundary layer, no body blockage, no pressure recovery and no flow separation. I only treat it as a low-cost tool for checking direction, magnitude and the numerical pipeline. For the real situation and a real car, the study has to be far more complex than mine. It would also need finite thickness, chordwise loading, a moving-ground boundary layer, ride-height and pitch variation, tyres, leakage, a diffuser, grid sensitivity and flow separation, among other things.
 
 ## Code and running it
 

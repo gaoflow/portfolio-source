@@ -18,11 +18,11 @@ github: 'https://github.com/gaoflow/steady-conduction-1d'
 
 ## "It runs" doesn't mean "it's right"
 
-I used to do software engineering and later moved into mechanical and thermal engineering. When I first switched, the hardest thing to adjust to was this: in software, if the code runs and the tests are all green, that basically means it's written correctly; but in numerical computing, code can run perfectly smoothly, throw no errors, draw very smooth curves — and still be wrong. For example, half a cell of heat left out at a boundary, or one sign flipped in an equation.
+I used to do software engineering and later moved into mechanical and thermal engineering. When I first switched, the hardest thing to adjust to was this: in software, if the code runs and the tests are all green, that basically means it's written correctly; but in numerical computing, code can run perfectly smoothly, throw no errors, draw very smooth curves, and still be wrong. For example, half a cell of heat left out at a boundary, or one sign flipped in an equation.
 
 To figure out "how to prove a numerical program computes correctly", I picked the smallest problem I could still work out by hand all the way: a metal rod that heats itself. It was the first partial differential equation solver I wrote.
 
-This article records exactly that: how I verified a hand-written finite-difference model, step by step, until I could trust it.
+This article records just that: how I verified a hand-written finite-difference model, step by step, until I could trust it.
 
 ## Starting from a metal rod that heats itself
 
@@ -39,7 +39,7 @@ I simplified the model to uniform heat generation throughout the rod, with heat 
 
 ![One-dimensional rod with heat generation and two boundary conditions](/images/projects/steady-conduction-1d/problem-setup.svg)
 
-What I wanted to know: where on the rod it's hottest, and which end the heat leaves from; and more importantly — whether the code I wrote can be trusted at all.
+What I wanted to know: where on the rod it's hottest, and which end the heat leaves from; and more importantly, whether the code I wrote can be trusted at all.
 
 ## First, work out a reference answer by hand
 
@@ -80,18 +80,18 @@ $$
 =h_c(T_N-T_\infty).
 $$
 
-The middle term — the half-cell's own heat generation — is the easiest one to drop. Drop it, and the temperature curve still comes out smooth and pretty, but the energy books no longer balance. That's exactly the kind of looks-fine-but-isn't error I worried about at the start.
+The middle term, the half-cell's own heat generation, is the easiest one to drop. Drop it, and the temperature curve still comes out smooth and pretty, but the energy books no longer balance. That's exactly the kind of looks-fine-but-isn't error I worried about at the start.
 
 ## Writing the solver myself
 
-All the node equations together form a tridiagonal matrix: apart from the middle three diagonals, everything is zero. This kind of matrix has a dedicated method, the Thomas algorithm: one elimination pass left to right, one back-substitution pass right to left, and done — the work grows only linearly with the number of nodes. I didn't call NumPy's ready-made solver; I wrote it myself. The full solver code is on GitHub: [src/steady_conduction_1d.py](https://github.com/gaoflow/steady-conduction-1d/blob/main/src/steady_conduction_1d.py). `assemble_system` builds the matrix, and `thomas_solve` does the Thomas solve.
+All the node equations together form a tridiagonal matrix: apart from the middle three diagonals, everything is zero. This kind of matrix has a dedicated method, the Thomas algorithm: one elimination pass left to right, one back-substitution pass right to left, and done. The work grows only linearly with the number of nodes. I didn't call NumPy's ready-made solver; I wrote it myself. The full solver code is on GitHub: [src/steady_conduction_1d.py](https://github.com/gaoflow/steady-conduction-1d/blob/main/src/steady_conduction_1d.py). `assemble_system` builds the matrix, and `thomas_solve` does the Thomas solve.
 
-Solver written — now comes the real subject of this article: is it actually right? I verified it from four angles.
+Solver written. Now comes the real subject of this article: is it right? I verified it from four angles.
 ## 1. Comparing against the hand-worked reference answer
 
-After the code ran, I did grid refinement the textbook way: $N$ = 20, 40, 80, 160, watching how the error between the numerical solution and the reference answer falls. When the results came out I was quite happy at first: at $N=160$ the maximum error was only $1.34\times10^{-11}$ K, absurdly small. But the more I thought about it, the more wrong it felt — how could the error be this small?
+After the code ran, I did grid refinement the textbook way: $N$ = 20, 40, 80, 160, watching how the error between the numerical solution and the reference answer falls. When the results came out I was quite happy at first: at $N=160$ the maximum error was only $1.34\times10^{-11}$ K, absurdly small. But the more I thought about it, the more wrong it felt. How could the error be this small?
 
-Going back and re-deriving the formulas, I understood: the exact solution of this problem is a quadratic polynomial, and the truncation error of central differencing is proportional to the fourth derivative of temperature. The fourth derivative of a quadratic is identically zero — in other words, central differencing is exact for this problem, with no truncation error at all. The $1.34\times10^{-11}$ K I measured wasn't discretisation error; it was just floating-point roundoff noise. So this check only half passed: the equation and the boundaries were assembled correctly, but the convergence order wasn't measured at all — that item failed.
+Going back and re-deriving the formulas, I understood: the exact solution of this problem is a quadratic polynomial, and the truncation error of central differencing is proportional to the fourth derivative of temperature. The fourth derivative of a quadratic is identically zero. In other words, central differencing is exact for this problem, with no truncation error at all. The $1.34\times10^{-11}$ K I measured wasn't discretisation error; it was just floating-point roundoff noise. So this check only half passed: the equation and the boundaries were assembled correctly, but the convergence order wasn't measured at all. That item failed.
 
 ## 2. Does the error really fall at second order?
 
@@ -118,23 +118,23 @@ The fourth derivative of a sine is not zero; this time the truncation error has 
 
 ![Manufactured-solution grid convergence](/images/projects/steady-conduction-1d/convergence.svg)
 
-Every time the grid doubles in fineness, the error shrinks to a quarter — very tidy. The fitted convergence order is 2.0002, which lands inside the pre-set 1.8–2.2 range, so this check holds up.
+Every time the grid doubles in fineness, the error shrinks to a quarter. Very tidy. The fitted convergence order is 2.0002, which lands inside the pre-set 1.8–2.2 range, so this check holds up.
 
 ## 3. Energy conservation
 
-With the order confirmed, I also had to verify that the heat generated inside the rod exactly equals what leaves through the left end plus what's lost from the right end. Per unit cross-sectional area, the whole rod generates 10,000 W/m²; of that, 8,489 W/m² conducts out through the left end and 1,511 W/m² is lost from the right. The relative residual of the balance was only $1.59\times10^{-12}$ — so I can say the model doesn't secretly leak heat or create heat at the boundaries.
+With the order confirmed, I also had to verify that the heat generated inside the rod exactly equals what leaves through the left end plus what's lost from the right end. Per unit cross-sectional area, the whole rod generates 10,000 W/m²; of that, 8,489 W/m² conducts out through the left end and 1,511 W/m² is lost from the right. The relative residual of the balance was only $1.59\times10^{-12}$, so I can say the model doesn't secretly leak heat or create heat at the boundaries.
 
 ## 4. The solver's own arithmetic
 
-All three checks above rest on one premise: the assembled linear system gets solved correctly. And that premise is exactly what my hand-written Thomas algorithm is responsible for — and it had never been verified.
+All three checks above rest on one premise: the assembled linear system gets solved correctly. And that premise is exactly what my hand-written Thomas algorithm is responsible for, and it had never been verified.
 
-With a fixed random seed I generated 64 tridiagonal systems of size $64\times64$ and handed each one to both my implementation and `numpy.linalg.solve`; the worst difference between the two sides was only $1.1\times10^{-16}$, machine-precision scale. Add the few small tests — a size mismatch must raise an error, a zero pivot must halt, and with no heat source the temperature must degenerate to a straight line — and this shows the solver itself is fine.
+With a fixed random seed I generated 64 tridiagonal systems of size $64\times64$ and handed each one to both my implementation and `numpy.linalg.solve`; the worst difference between the two sides was only $1.1\times10^{-16}$, machine-precision scale. Add the few small tests: a size mismatch must raise an error, a zero pivot must halt, and with no heat source the temperature must degenerate to a straight line. Together these show the solver itself is fine.
 
 At this point all four checks were in place: equation assembly, discretisation accuracy, boundary energy, and the solver. Then we can answer the original question.
 
 ![Temperature distribution along the metal rod](/images/projects/steady-conduction-1d/temperature-profile.svg)
 
-The hottest point is not at either end, but at $x\approx0.42$ m, about 361 K (around 88 °C); the right end is actually slightly lower, about 360 K. These two numbers match the hand-worked reference answer (360.788 K and 360.446 K) exactly.
+The hottest point is not at either end, but at $x\approx0.42$ m, about 361 K (around 88 °C); the right end is slightly lower, about 360 K. These two numbers match the hand-worked reference answer (360.788 K and 360.446 K) exactly.
 
 I think the reason the peak isn't at an end point is simple: the right-side air doesn't carry heat away well, so the heat can't get out and has to "pile up" first near the right end. But where the heat goes is a bit counter-intuitive: of the heat generated in the rod, about 85% leaves through the left-end cooling block, and only about 15% escapes into the air on the right. In other words, this rod is mainly "pumped" cool by the cooling block on the left, not blown cool by the air on the right.
 

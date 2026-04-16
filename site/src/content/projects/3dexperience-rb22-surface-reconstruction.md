@@ -28,9 +28,9 @@ After visiting an F1 race in person and seeing the 1:1 model of the F1 2026 car 
 
 My project references Ted L's article [I Built an F1 Car — The 2026 Regulations](https://www.linkedin.com/pulse/i-built-f1-car-2026-regulations-ted-l-dqfnc/). It is a very in-depth article, and I learned a lot from it. The original article records, from a full-car perspective, how the author did geometry creation, regulation trade-offs, and CFD analysis against the 2026 rules.
 
-I roughly followed the approach of that article. My plan is to first split the car into clear parts, model each part one by one, and finally run CFD analysis to check the gap between my model and the real car.
+I roughly followed that article's approach. I planned to first split the car into clear parts and model each part one by one, then run CFD analysis at the end to check the gap between my model and the real car.
 
-First, I took the sidepod as my first target. In a blank project, I built points, surfaces, section curves, support surfaces, and structural surfaces from scratch, and then used the same method to finish the rear wing.
+I took the sidepod as the first target. In a blank project, I built points, surfaces, section curves, support surfaces, and structural surfaces from scratch. Then I used the same method to finish the rear wing.
 
 ## How I built the modeling skeleton from scratch
 
@@ -51,7 +51,7 @@ In GSD, I classified the feature tree by modeling purpose instead of putting eve
 | Trimming and joining | Split, Trim, Boundary, and Join |
 | Final results | The sidepod and rear wing surfaces kept after checks |
 
-With this structure, every surface can be traced back to its own sections and boundaries. When I modify a local region, I only need to go back to the corresponding points or splines, instead of recreating the whole part. I also gave each part and construction object a proper name, so they are easy to find and search later.
+With this structure, every surface can be traced back to its own sections and boundaries. When I modify a local region, I only need to go back to the corresponding points or splines, not recreate the whole part. I also gave each part and construction object a proper name, so they are easy to find and search later.
 
 ## The basic GSD modeling sequence
 
@@ -68,7 +68,7 @@ Datum planes
 → Symmetry
 ```
 
-For flat end faces and closed outlines, my approach is to build the surface with Fill. For freeform surfaces, my approach is to use sets of section splines as the main body. Between sections, if the change is gentle, I connect them with Multi-Sections Surface. But when I hit a sudden curvature change or a rapidly shrinking outline, I split the region into adjacent smaller surfaces and combine them with Join. For regions with holes, my approach is to build the outer support surface first, then project the inner loop onto the support surface and Split it.
+For flat end faces and closed outlines, I build the surface with Fill. For freeform surfaces, sets of section splines form the main body. Between sections, if the change is gentle, I connect them with Multi-Sections Surface. But when I hit a sudden curvature change or a rapidly shrinking outline, I split the region into adjacent smaller surfaces and combine them with Join. For regions with holes, I build the outer support surface first, then project the inner loop onto the support surface and Split it.
 
 I only completed the surfaces and the Join for the right half, and did the symmetry afterwards. This gives me left-side geometry identical to the right, avoids editing both sides at the same time, and keeps the plane of symmetry always controlled by the same centre datum.
 
@@ -83,7 +83,7 @@ After finishing the main sections, I used Multi-Sections Surface to build the co
 - The shoulder and tail change relatively gently, so they can be lofted directly from continuous sections.
 - The undercut region and the local turns change quickly, so they need extra local sections.
 
-For flat closing regions and local turns, I used the following approaches:
+For flat closing regions and local turns, I used these approaches:
 
 - End faces and local flat regions use a closed spline with Fill.
 - Narrow closed regions are patched segment by segment along their boundaries.
@@ -153,6 +153,6 @@ But first, I will start experimenting with the individual parts. The current ide
 
 For the front wing, floor, suspension, and wheels that come later, I will use consistent inlet conditions, ground and tyre settings, and unified post-processing metrics. A unified setup lets the differences between geometries come mainly from the parts themselves, and avoids the influence of changing the computational domain or boundary conditions. Each part will be checked in its own independent environment for mesh, pressure distribution, surface flow, separation regions, and the main vortex structures.
 
-In the end, I plan to do a full-car level study, analyzing the interactions between upstream and downstream parts. I know there are many difficulties in this, and a single part's results cannot directly stand in for full-car conclusions. Computing part by part helps understand what each region does, but in the end I still need to put all the surfaces into the full-car model and study, from the whole-car perspective, the coupling between the front-wing wake, the tyre wake, the floor, the sidepod, and the rear wing.
+In the end, I plan to do a full-car level study, analyzing the interactions between upstream and downstream parts. I know there are many difficulties in this, and a single part's results cannot directly stand in for full-car conclusions. Computing part by part helps understand what each region does. But I still need to put all the surfaces into the full-car model and study, from the whole-car perspective, the coupling between the front-wing wake, the tyre wake, the floor, the sidepod, and the rear wing.
 
 To be continued. Progress will be updated in this article.

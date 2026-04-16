@@ -17,11 +17,11 @@ github: 'https://github.com/gaoflow/airfoil-methods'
 
 ## Why a minimal check before the real CFD is necessary
 
-A full CFD workflow for aerodynamic analysis is usually long: pick the airfoil section, build the fluid-domain geometry in CAD, mesh the volume, set the boundary conditions and turbulence model, and finally submit a RANS run to the solver. One run takes a few hours at best; with a full 3D vehicle flow or a fine mesh, you often wait days before you see a converged flow field and force coefficients. For a fairly ordinary computer like mine, it is even worse.
+A full CFD workflow for aerodynamic analysis is usually long: pick the airfoil section, build the fluid-domain geometry in CAD, mesh the volume, set the boundary conditions and turbulence model, and finally submit a RANS run to the solver. One run takes a few hours at best. With a full 3D vehicle flow or a fine mesh, you often wait days before you see a converged flow field and force coefficients. For a fairly ordinary computer like mine, it is even worse.
 
-The long wait itself is a normal engineering cost. The really frustrating part is waiting for days and then finding out the very first input was wrong. I have been through most of these: the sign convention of the coordinate system flipped, the sign of the angle of attack flipped so the downforce I wanted came out as lift, the chord scaling wrong, or geometry drawn with a sharp kink in curvature that gave terrible mesh quality or made the solve diverge outright. Lessons from these low-level mistakes are painful: all the compute and waiting afterwards goes straight to waste.
+The long wait itself is a normal engineering cost. The really frustrating part is waiting for days and then finding out the very first input was wrong. I have been through these: the sign convention of the coordinate system flipped, the sign of the angle of attack flipped so the downforce I wanted came out as lift, the chord scaling wrong, or geometry drawn with a sharp kink in curvature that gave terrible mesh quality or made the solve diverge outright. The lesson from these low-level mistakes is painful. All the compute and waiting afterwards goes straight to waste.
 
-So my idea at the time was very clear: before I officially start an expensive, time-consuming CFD run, can I first use a low-cost method that returns in milliseconds as a preventive check against stupid things happening? It does not need to be accurate to many decimal places, but it has to tell me three things instantly: 1. is the sign of the lift direction right; 2. is the magnitude of lift and aerodynamic load normal; 3. roughly where the surface suction peak sits, and whether the geometry has been glued on upside down.
+So my idea at the time was very clear. Before officially starting an expensive, time-consuming CFD run, could I first run a low-cost method that returns in milliseconds, as a preventive check against stupid mistakes? It does not need to be accurate to many decimal places. But it has to tell me three things instantly: 1. is the sign of the lift direction right; 2. is the magnitude of lift and aerodynamic load normal; 3. roughly where the surface suction peak sits, and whether the geometry has been glued on upside down.
 
 This note lays out how I designed this low-cost pre-check, and it comes with a Python demo.
 
@@ -30,11 +30,11 @@ This note lays out how I designed this low-cost pre-check, and it comes with a P
 To keep the pre-check light enough, I implemented the two most classical inviscid potential-flow methods in aerodynamics in the demo:
 
 1. Thin-airfoil theory: flatten the airfoil into a zero-thickness camber line and estimate lift instantly with one minimal formula $C_l = 2\pi\alpha$;
-2. Hess–Smith panel method: cut the real airfoil contour into short straight panels and place sources and a vortex sheet on the surface, estimating not only lift but also the pressure coefficient $C_p$ distributed along the whole surface.
+2. Hess–Smith panel method: cut the real airfoil contour into short straight panels and place sources and a vortex sheet on the surface. It estimates not only lift but also the pressure coefficient $C_p$ distributed along the whole surface.
 
 ![The NACA 0012 airfoil surface discretized into small panel segments in the little demo, with the freestream angle of attack](/images/projects/airfoil-methods/geometry-and-panels.svg)
 
-The figure shows the panel method's geometric discretization directly: the smooth continuous airfoil is cut into end-to-end line segments, with cosine clustering for local refinement near the leading and trailing edges where curvature changes sharply. After writing this little demo, I had to pin down: is it actually reliable? How far can I trust its output? When does it fail completely? For that, I brought in the wind-tunnel measurements of the classic symmetric airfoil (NACA 0012) from the NASA TM-4074 report as the yardstick for this little tool.
+The figure shows the panel method's geometric discretization directly. The smooth continuous airfoil is cut into end-to-end line segments, with cosine clustering for local refinement near the leading and trailing edges where curvature changes sharply. After writing this little demo, I had to pin down three questions. Is it reliable? How far can I trust its output? When does it fail completely? For that, I brought in the wind-tunnel measurements of the classic symmetric airfoil (NACA 0012) from the NASA TM-4074 report as the yardstick for this little tool.
 
 ## A first test at 4.18° angle of attack
 
@@ -52,7 +52,7 @@ $$
 L=\frac{1}{2}\rho V^2 S C_l.
 $$
 
-With this dimensionless number, the minimal formula, the numerical model and the wind-tunnel test can be compared on the same basis. This example has a very interesting twist: thin-airfoil theory — one line of formula that ignores airfoil thickness completely — has an error of only 2.6%, while the panel method with 160 small panels and the full 12% real thickness reaches 12.8%! Why does the seemingly finer panel method do worse on total lift? And why bother writing the panel method at all? After seeing enough counterintuitive situations in CFD you stop being surprised... but my analysis of the reason is: thin-airfoil theory can only give a single lift number, while the panel method gives the pressure distribution everywhere on the surface.
+With this dimensionless number, the minimal formula, the numerical model and the wind-tunnel test can be compared on the same basis. This example has a very interesting twist. Thin-airfoil theory, one line of formula that ignores airfoil thickness completely, has an error of only 2.6%. The panel method, with 160 small panels and the full 12% real thickness kept, reaches 12.8%! Why does the seemingly finer panel method do worse on total lift? And why bother writing the panel method at all? After seeing enough counterintuitive situations in CFD, you stop being surprised. My analysis of the reason is this: thin-airfoil theory can only give a single lift number, while the panel method gives the pressure distribution everywhere on the surface.
 
 ## Hunting down wind-tunnel reference data
 
@@ -62,19 +62,19 @@ To find reliable ground truth for the demo, I read the test report [NASA TM-4074
 
 *Exterior of the NASA Langley Low-Turbulence Pressure Tunnel (NASA photo L-71-6093)*
 
-This large pressurized tunnel allows pressure and Reynolds number to be adjusted independently without changing the Mach number, providing a very clean, low-turbulence aerodynamic test environment.
+This large pressurized tunnel allows pressure and Reynolds number to be adjusted independently without changing the Mach number. It provides a very clean, low-turbulence aerodynamic test environment.
 
 ![Schematic from NASA TM-4074 of the NACA 0012 model mounted between the tunnel sidewalls](/images/projects/airfoil-methods/source/nasa-tm4074-airfoil-mount.png)
 
 *NASA TM-4074 figure 1: the airfoil model spans between rotatable disks on the two tunnel sidewalls*
 
-The test model in the report spanned the whole test section, with a chord of 23.66 inches and 81 pressure taps packed over the surface. Lift and pitching moment were obtained by integrating the surface pressures from these taps, while drag was measured with a wake-survey rake downstream.
+The test model in the report spanned the whole test section, with a chord of 23.66 inches and 81 pressure taps packed over the surface. Lift and pitching moment were obtained by integrating the surface pressures from these taps. Drag was measured with a wake-survey rake downstream.
 
 ![NASA Langley NACA 0012 wind-tunnel model with surface pressure taps and pressure tubing bundles](/images/projects/airfoil-methods/source/nasa-naca0012-pressure-tap-model.webp)
 
 *The physical NACA 0012 model with pressure taps and tubing (from NASA NTRS 19880005556)*
 
-The photo above shows the pressure-tapped airfoil model in the tunnel directly: the tiny holes near mid-span are the pressure taps, and bundles of thin metal tubes carry the local air pressure to the sensors. The zero-angle repeatability recorded in the NASA report is: drag coefficient $C_d$ differences within 0.0002, and normal-force coefficient within 0.004. From it I extracted the free-transition set at $M=0.15$, $Re=5.97\times10^6$ — 16 angle-of-attack points covering $-4.05^\circ \sim 17.35^\circ$ — as the benchmark.
+The photo above shows the pressure-tapped airfoil model in the tunnel directly. The tiny holes near mid-span are the pressure taps, and bundles of thin metal tubes carry the local air pressure to the sensors. The zero-angle repeatability recorded in the NASA report is: drag coefficient $C_d$ differences within 0.0002, and normal-force coefficient within 0.004. From it I extracted the free-transition set at $M=0.15$, $Re=5.97\times10^6$, 16 angle-of-attack points covering $-4.05^\circ \sim 17.35^\circ$, as the benchmark.
 
 ## Thin-airfoil theory
 
@@ -86,11 +86,11 @@ $$
 
 where the angle of attack $\alpha$ must be in radians. Converted to degrees, the theoretical lift slope is about 0.1097 per degree. At $4.18^\circ$ (about 0.07295 radians), the incompressible result is 0.4584. With the Prandtl–Glauert subsonic compressibility correction $1/\sqrt{1-M^2} \approx 1.0114$ at $M=0.15$, the final estimate is 0.4636.
 
-This method abstracts the airfoil completely into a thickness-less mean line. It has no idea how thick the airfoil is, and it cannot compute where the surface suction is strong, what the drag is, or when stall will happen. But its value lies in absolute speed and simplicity: with no waiting at all, it confirms the lift direction and the rough magnitude.
+This method abstracts the airfoil completely into a thickness-less mean line. It has no idea how thick the airfoil is. It cannot compute where the surface suction is strong, what the drag is, or when stall will happen. But its value lies in absolute speed and simplicity. With no waiting at all, it confirms the lift direction and the rough magnitude.
 
 ## The Hess–Smith panel method (a.k.a. recovering the surface pressure distribution)
 
-If I want more than total lift — where the surface suction peak sits, whether the upper and lower geometry has been flipped — the model has to keep the real geometric contour. That is what the Hess–Smith panel method does. I divided the airfoil surface into 160 small panel segments:
+If I want more than total lift, like where the surface suction peak sits or whether the upper and lower geometry has been flipped, the model has to keep the real geometric contour. That is what the Hess–Smith panel method does. I divided the airfoil surface into 160 small panel segments:
 
 1. Non-penetration boundary condition: at each panel midpoint, force the velocity normal to the wall to zero (the flow cannot pass through the solid wall), which builds the source influence matrix;
 2. Circulation and the Kutta condition: all panels share one continuous vortex-sheet strength, and the flow is forced to leave the trailing edge smoothly from the upper and lower surfaces, producing physical circulation and lift;
@@ -107,7 +107,7 @@ The more negative $C_p$ is, the faster the local flow and the stronger the stati
 
 *Upper- and lower-surface pressure coefficient distribution at 4.18° angle of attack*
 
-By aerodynamic convention, the $C_p$ vertical axis is plotted inverted (negative values on top, representing suction). The plot shows it clearly: at positive angle of attack, a strong suction peak appears at the upper-surface leading edge, while the lower surface carries positive pressure. This is the panel method's irreplaceable core value: it is more work to write than a one-line formula, but it draws the physical shape of the flow field directly.
+By aerodynamic convention, the $C_p$ vertical axis is plotted inverted (negative values on top, representing suction). The plot shows it clearly. At positive angle of attack, a strong suction peak appears at the upper-surface leading edge, while the lower surface carries positive pressure. This is the panel method's irreplaceable core value. It is more work to write than a one-line formula, but it draws the physical shape of the flow field directly.
 
 ## Checking panel convergence
 
@@ -121,7 +121,7 @@ Before taking the computed results to NASA, I first had to rule out the possibil
 
 *With more panels, the 4° lift coefficient converges quickly*
 
-At $4^\circ$ angle of attack, 40, 80, 160 and 240 panels give $C_l$ of 0.48646, 0.48727, 0.48773 and 0.48788. Going from 160 to 240 panels changes the lift by only 0.0307%. This proves the solver is already well converged in panels: any later deviation from the wind-tunnel measurements is not because there are too few panels, but is decided by the model's own physical assumptions.
+At $4^\circ$ angle of attack, 40, 80, 160 and 240 panels give $C_l$ of 0.48646, 0.48727, 0.48773 and 0.48788. Going from 160 to 240 panels changes the lift by only 0.0307%. This proves the solver is already well converged in panels. Any later deviation from the wind-tunnel measurements is not because there are too few panels. It is decided by the model's own physical assumptions.
 
 ## Other things I picked up along the way
 
@@ -141,16 +141,16 @@ Over the normal linear range $-4.1^\circ \leq \alpha \leq 10.2^\circ$, the fitte
 
 *NASA measured lift vs the two inviscid models*
 
-I kept wondering why the panel method, which accounts for thickness, overestimates the lift instead. The answer ChatGPT gave me is a good line of thinking, so I put it here directly:
+I kept wondering why the panel method, which accounts for thickness, overestimates the lift. The answer ChatGPT gave me is a good line of thinking, so I put it here directly:
 - The panel method's physics: inviscid potential flow assumes the fluid has no viscosity at all; a thick airfoil accelerates the flow locally over the upper surface more than a thin plate, and under the ideal Kutta condition it generates larger circulation;
 - The real world's physics: in real air, a viscous boundary layer clings to the airfoil surface, thickening especially near the trailing edge, so the actual effective trailing edge is blunted (viscous shedding reduces the actual circulation somewhat);
-- Thin-airfoil theory's "coincidence": thin-airfoil theory ignores the extra acceleration from thickness, and the two errors happen to cancel each other partly in the integrated lift, so the single-point lift looks more accurate instead.
+- Thin-airfoil theory's "coincidence": thin-airfoil theory ignores the extra acceleration from thickness, and the two errors happen to cancel each other partly in the integrated lift, so the single-point lift ends up looking more accurate.
 
-But this does not mean the panel method is obsolete. The panel method provides the surface pressure distribution map, and when fool-proofing a design, one look at the pressure peak confirms the angle-of-attack sign and the suction-zone distribution — something thin-airfoil theory absolutely cannot do.
+But this does not mean the panel method is obsolete. The panel method provides the surface pressure distribution map. When fool-proofing a design, one look at the pressure peak confirms the angle-of-attack sign and the suction-zone distribution. Thin-airfoil theory absolutely cannot do that.
 
 ### 2. The model must fail at high angle of attack / stall and separation
 
-Push the angle of attack up to $17.35^\circ$ and the NASA measured lift coefficient is 1.660, with the curve already showing a clear bending and flattening trend; the panel method, meanwhile, keeps climbing along its straight line to 2.085 (full-range RMSE worsens to 0.225). This is the essential limitation of inviscid potential flow: it has no viscous dissipation term from the Navier-Stokes equations inside it, so it cannot capture the flow separation and stall after the boundary layer runs out of energy. A little tool like this must never be used to evaluate high-angle-of-attack limit conditions.
+Push the angle of attack up to $17.35^\circ$. The NASA measured lift coefficient is 1.660, and the curve already shows a clear bending and flattening trend. The panel method keeps climbing along its straight line to 2.085, and the full-range RMSE worsens to 0.225. This is the essential limitation of inviscid potential flow: it has no viscous dissipation term from the Navier-Stokes equations inside it, so it cannot capture the flow separation and stall after the boundary layer runs out of energy. A little tool like this must never be used to evaluate high-angle-of-attack limit conditions.
 
 ### 3. The computed drag is almost zero / d'Alembert's paradox
 
@@ -164,9 +164,9 @@ In the wind tunnel, NASA used the downstream wake rake to measure the momentum l
 
 ![NASA measured real drag vs the panel method's near-zero pressure drag](/images/projects/airfoil-methods/drag-blind-spot.svg)
 
-*The panel method's near-zero pressure drag vs the NASA measured drag — a sharp contrast*
+*The sharp contrast between the panel method's near-zero pressure drag and the NASA measured drag*
 
-The panel method's integrated pressure drag stays below 0.0008 the whole time. This is exactly d'Alembert's paradox from classical fluid mechanics: in inviscid, steady, ideal potential flow, the net drag on a closed two-dimensional body is always zero. The tiny number the panel method computes is merely truncation error from numerical integration.
+The panel method's integrated pressure drag stays below 0.0008 throughout. This is precisely d'Alembert's paradox from classical fluid mechanics: in inviscid, steady, ideal potential flow, the net drag on a closed two-dimensional body is always zero. The tiny number the panel method computes is merely truncation error from numerical integration.
 
 ## Code
 
