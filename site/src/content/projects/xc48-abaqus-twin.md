@@ -23,7 +23,8 @@ heroVideo:
   src: '/videos/projects/xc48-abaqus-twin/m2-von-mises-fracture.mp4'
   poster: '/images/projects/xc48-abaqus-twin/m2-von-mises-fracture-poster.webp'
   caption: 'M2 Von Mises stress and fracture evolution under Smooth Step loading.'
-heroImage: /images/projects/xc48-abaqus-twin/stress-strain.svg
+heroImage: /images/projects/xc48-abaqus-twin/xc48-fracture-hero-cn.webp
+cardImageFit: cover
 ---
 
 This is a tensile-test record we completed in the Materials and Behavior course in the spring 2026 semester.

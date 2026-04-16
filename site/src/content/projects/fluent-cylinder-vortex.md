@@ -29,7 +29,7 @@ academic:
 featured: true
 order: 17
 studySequence: 12
-heroImage: /images/projects/fluent-cylinder-vortex/force-history.svg
+heroImage: /images/projects/fluent-cylinder-vortex/source/developed-vorticity.png
 ---
 
 This is my lab record for the Computational Fluid Dynamics course in the spring 2026 semester.

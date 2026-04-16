@@ -11,7 +11,7 @@ duration: 'Independent study'
 featured: false
 order: 6
 studySequence: 13
-heroImage: /images/projects/ground-effect-vlm/ground-sweep.svg
+heroImage: /images/projects/ground-effect-vlm/reference/faa-wake-vortex-generation.svg
 github: 'https://github.com/gaoflow/ground-effect-vlm'
 ---
 

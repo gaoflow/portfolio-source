@@ -35,7 +35,7 @@ academic:
 featured: false
 order: 18
 studySequence: 10
-heroImage: /images/projects/abaqus-energy-absorber/force-displacement-preliminary.png
+heroImage: /images/projects/abaqus-energy-absorber/assignment-front-rail.jpeg
 ---
 
 This is my lab record from the Computational Solid Mechanics course in the spring 2026 semester.

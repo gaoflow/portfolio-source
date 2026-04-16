@@ -38,7 +38,7 @@ academic:
 featured: true
 order: 16
 studySequence: 9
-heroImage: /images/projects/fluent-cyl-vnv/cd-vs-re.svg
+heroImage: /images/projects/fluent-cyl-vnv/velocity-re20.png
 ---
 
 This is my lab record for the Computational Fluid Dynamics course in the spring 2026 semester.
