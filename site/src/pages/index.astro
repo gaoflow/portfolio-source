@@ -1,79 +1,77 @@
 ---
 import Base from '../layouts/Base.astro';
-import CasePipeline from '../components/CasePipeline.astro';
-import { profile } from '../data/profile';
 import { getCollection } from 'astro:content';
 
 const projects = (await getCollection('projects')).sort(
   (a, b) => b.data.date.localeCompare(a.data.date) || (b.data.studySequence ?? 0) - (a.data.studySequence ?? 0) || a.data.order - b.data.order,
 );
-const fmt = (iso: string) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 ---
 
-<Base title="Home">
-  {/* 1. Hero — one pitch line + capability strip */}
-  <section class="max-w-3xl">
-    <h1 class="text-4xl font-medium leading-[1.1] tracking-tight text-ink sm:text-5xl">
-      External-aerodynamics CFD{' '}
-      <span class="text-muted">with auditable numbers.</span>
-    </h1>
-    <p class="mt-6 text-xl leading-relaxed text-muted">
-      {profile.pitch}
-    </p>
-    <dl class="mt-10 space-y-3 border-l border-edge pl-4">
-      {profile.capabilities.map((c) => (
+<Base>
+  <div class="mx-auto max-w-3xl">
+    <section aria-labelledby="about-heading">
+      <div class="flex items-center gap-5 sm:gap-7">
+        <img
+          src="/avatar_faroe2.jpg"
+          alt="Bing Gao"
+          width="800"
+          height="800"
+          loading="eager"
+          decoding="async"
+          class="h-24 w-24 shrink-0 rounded-full object-cover sm:h-32 sm:w-32"
+        />
         <div>
-          <dt class="font-serif text-xs font-medium uppercase tracking-[0.1em] text-stone">{c.label}</dt>
-          <dd class="text-base text-ink/85">{c.value}</dd>
+          <p class="font-serif text-xs uppercase tracking-[0.12em] text-stone">About me</p>
+          <h1 id="about-heading" class="mt-2 text-4xl font-medium tracking-tight text-ink sm:text-5xl">Bing Gao</h1>
         </div>
-      ))}
-    </dl>
-  </section>
+      </div>
 
-  {/* 2. Representative case — one honest verification chain */}
-  <section class="mt-16 max-w-4xl">
-    <CasePipeline steps={profile.caseSteps} />
-  </section>
+      <div class="about-copy mt-10 space-y-6 text-lg leading-relaxed text-warm">
+        <p>
+          Hi! 👋 I'm Bing Gao, a Master's student in Modelling & Computational Mechanics at École supérieure d’ingénieurs Léonard de Vinci (<a href="https://www.esilv.fr/" target="_blank" rel="noopener noreferrer">ESILV</a>). I am also an aerodynamics team member for our school's Formula Student racing team, Vinci Eco Drive. My responsibilities primarily cover aerodynamic and aero-kit design, cooling-system design, thermal-fluid modelling, numerical validation, and the development of custom simulation tools.
+        </p>
 
-  {/* 3. Projects — the full catalogue, oldest first */}
-  <section class="mt-20">
-    <div class="mb-5 flex items-baseline justify-between">
-      <h2 class="section-label"><span class="section-num mr-2">01</span>Projects</h2>
-      <span class="font-serif text-xs text-stone tabular-nums">{projects.length}</span>
-    </div>
-    <div class="grid gap-5 sm:grid-cols-2">
-      {projects.map((p, i) => (
-        <a
-          href={`/projects/${p.id}`}
-          class="project-card group"
-        >
-          {p.data.heroImage ? (
-            <img
-              src={p.data.heroImage}
-              alt={p.data.title}
-              loading="lazy"
-              decoding="async"
-              class:list={[
-                'project-card-media',
-                p.data.cardImageFit === 'cover' && 'project-card-media--cover',
-              ]}
-            />
-          ) : (
-            <span class="project-card-media project-card-placeholder">
-              <span class="tag">{p.data.tags[0]}</span>
-            </span>
-          )}
-          <span class="block p-5">
-            <span class="flex items-baseline justify-between gap-3">
-              <span class="section-num">{String(i + 1).padStart(2, '0')}</span>
-              <span class="font-serif text-xs text-stone tabular-nums">{fmt(p.data.date)}</span>
-            </span>
-            <span class="mt-2 block font-medium text-lg leading-snug text-ink transition-colors group-hover:text-accent">{p.data.title}</span>
-            <span class="mt-2 line-clamp-3 block text-sm leading-relaxed text-muted">{p.data.summary}</span>
-          </span>
-        </a>
-      ))}
-    </div>
-  </section>
+        <p>
+          Before moving into engineering, I spent nearly 8 years in mobile software development and team management. As a core developer of Lao You, which means "Old Friend" in Chinese (<a href="https://apps.apple.com/us/app/%E8%80%81%E6%9F%9A/id1157853494" target="_blank" rel="noopener noreferrer">iOS</a> / <a href="https://sj.qq.com/appdetail/com.laoyouzhibo.app" target="_blank" rel="noopener noreferrer">Android</a>), I built the live-streaming application from scratch, contributed more than 70% of its core code, and helped scale it from zero to more than 2 million users. That work gave me hands-on experience with audio and video codecs, live-room architecture, complex business logic, cross-platform integration with React Native and Flutter, hot fixing, application security, code obfuscation, and CI/CD automation.
+        </p>
 
+        <p>
+          From 2015 to 2023, I was also a core organizer for Google Developer Group Beijing. I organized more than five technical events each year, with 200 to 1,000 attendees per event. I invited developers and technical experts from teams at Google and major technology companies in Beijing, and helped organize knowledge sharing around mobile development, front-end engineering, Google Cloud, TensorFlow, and emerging AI technologies.
+        </p>
+
+        <p>
+          I also contribute to open-source projects on GitHub, mainly around scientific computing, numerical solvers, serialization, and data-processing tools. Every library I contribute to is one I use in my own work, and every pull request starts from a problem I have encountered. I use tools such as Codex and Claude Code to find and solve issues more efficiently, while keeping regression tests in place for every merged change.
+        </p>
+      </div>
+    </section>
+
+    <section id="projects" class="mt-20 scroll-mt-24" aria-labelledby="projects-heading">
+      <h2 id="projects-heading" class="text-3xl font-medium tracking-tight text-ink">Projects</h2>
+      <ul class="mt-7 border-t border-edge">
+        {projects.map((project) => (
+          <li class="border-b border-edge-soft">
+            <a
+              href={`/projects/${project.id}`}
+              class="block py-4 text-lg text-ink transition-colors hover:text-accent sm:py-5"
+            >
+              {project.data.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
 </Base>
+
+<style>
+  .about-copy a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+    text-underline-offset: 0.2em;
+  }
+
+  .about-copy a:hover {
+    text-decoration-color: var(--color-accent);
+  }
+</style>

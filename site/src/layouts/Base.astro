@@ -31,33 +31,18 @@ const copyByLocale = {
     role: profile.role,
     websiteName: `${profile.name} — Engineering Portfolio`,
     rssTitle: `${profile.name} — Engineering Notes`,
-    nav: ['Home', 'Projects'],
-    cv: 'CV',
-    alternate: 'Chinese',
-    avatarAlt: 'Portrait of Bing Gao',
-    credit: 'Interface design based on',
   },
   fr: {
     htmlLang: 'fr',
     role: 'Ingénieur en mécanique des fluides numérique et développeur',
     websiteName: `${profile.name} — Portfolio d’ingénierie`,
     rssTitle: `${profile.name} — Notes d’ingénierie`,
-    nav: ['Accueil', 'Projets'],
-    cv: 'CV',
-    alternate: 'Anglais',
-    avatarAlt: 'Portrait de Bing Gao',
-    credit: 'Interface conçue d’après',
   },
   cn: {
     htmlLang: 'zh-CN',
     role: '计算流体力学工程师与开发者',
     websiteName: `${profile.name}——工程作品集`,
     rssTitle: `${profile.name}——工程笔记`,
-    nav: ['首页', '项目'],
-    cv: '简历',
-    alternate: '英文',
-    avatarAlt: 'Bing Gao 的头像',
-    credit: '界面设计参考',
   },
 } as const;
 const copy = copyByLocale[locale];
@@ -92,14 +77,6 @@ const structuredData = {
     },
   ],
 };
-
-const projectsHref = '/projects';
-const cvHref = locale === 'cn' ? '/cn/cv' : locale === 'fr' ? '/fr/cv' : '/cv';
-const nav = [
-  { href: '/', label: copy.nav[0] },
-  { href: projectsHref, label: copy.nav[1] },
-];
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 
 <!doctype html>
@@ -129,30 +106,15 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
   </head>
   <body class="min-h-screen">
     <div class="sticky top-0 z-40 border-b border-edge bg-bg/90 backdrop-blur">
-      <div class="mx-auto flex h-14 max-w-6xl items-center gap-5 px-6 text-sm lg:px-8">
+      <div class="mx-auto flex h-14 max-w-6xl items-center px-6 text-sm lg:px-8">
         <a href="/" class="font-medium text-ink">{profile.name}</a>
-        <span class="hidden text-muted sm:inline">{copy.role}</span>
-        <nav class="ml-auto flex items-center gap-4 sm:gap-5">
-          {nav.map((n) => (
-            <a href={n.href} class:list={['transition-colors', path === n.href ? 'text-accent' : 'text-stone hover:text-accent']}>
-              {n.label}
-            </a>
-          ))}
-          {alternatePath && (
-            <a href={alternatePath} class="font-serif text-xs text-stone transition-colors hover:text-accent">
-              {copy.alternate}
-            </a>
-          )}
-          <a href={cvHref} class="btn btn-secondary">{copy.cv}</a>
-        </nav>
       </div>
     </div>
 
     <main class="page-enter mx-auto max-w-6xl px-6 py-12 lg:px-8 lg:py-16">
       <slot />
-      <footer class="mt-20 flex flex-wrap justify-between gap-3 border-t border-edge-soft pt-6 text-xs text-stone">
-        <span class="flex items-center gap-3"><img src="/avatar_memoji_05_nobg.png" alt={copy.avatarAlt} width="32" height="32" class="h-8 w-8 shrink-0 object-contain" loading="lazy" decoding="async" /><span>{profile.name}, {copy.role}</span></span>
-        <span>{copy.credit} <a href="https://github.com/tw93/Kami" target="_blank" rel="noopener noreferrer" class="text-warm transition-colors hover:text-accent">Kami</a></span>
+      <footer class="mt-20 border-t border-edge-soft pt-6 text-xs text-stone">
+        Copyright © 2026 Bing Gao. All rights reserved.
       </footer>
     </main>
   </body>

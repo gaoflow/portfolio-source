@@ -16,7 +16,7 @@ const { project, locale, hasAlternate } = Astro.props;
 const isChinese = locale === 'cn';
 const d = project.data;
 const { Content } = await render(project);
-const basePath = isChinese ? '/cn/projects' : '/projects';
+const basePath = '/#projects';
 const alternatePath = hasAlternate
   ? `${isChinese ? '/projects' : '/cn/projects'}/${project.id}`
   : undefined;
