@@ -18,7 +18,7 @@ def visible_text(html: str) -> str:
 contracts = {
     "cv/index.html": {
         "lang": "en",
-        "required": ("Experience", "Selected work", "Education", "Core skills", "Community"),
+        "required": ("Experience", "Education", "Core skills", "Community"),
         "forbidden": (
             "Aujourd’hui", "Diplôme", "Expérience", "Travaux sélectionnés", "Formation",
             "Compétences", "Communauté", "Télécharger", "Imprimer", "Étude de cas",
@@ -28,7 +28,7 @@ contracts = {
     },
     "fr/cv/index.html": {
         "lang": "fr",
-        "required": ("Expérience", "Travaux sélectionnés", "Formation", "Compétences clés", "Communauté"),
+        "required": ("Expérience", "Formation", "Compétences clés", "Communauté"),
         "forbidden": (
             "Download PDF", "Print", "Experience", "Selected work", "Education",
             "Core skills", "Community", "Case study", "Present", "Independent study",
@@ -37,7 +37,7 @@ contracts = {
     },
     "cn/cv/index.html": {
         "lang": "zh-CN",
-        "required": ("工作经历", "代表项目", "教育经历", "核心技能", "技术社区"),
+        "required": ("工作经历", "教育经历", "核心技能", "技术社区"),
         "forbidden": (
             "Download PDF", "Print", "Experience", "Selected work", "Education",
             "Core skills", "Community", "Case study", "Present", "Independent study",

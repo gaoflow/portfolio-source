@@ -25,24 +25,16 @@ export interface CvContent {
   facts: { value: string; label: string }[];
   sections: {
     experience: { number: string; title: string; subtitle: string };
-    projects: { number: string; title: string; subtitle: string };
     education: { number: string; title: string; subtitle: string };
     skills: { number: string; title: string; subtitle: string };
     community: { number: string; title: string; subtitle: string };
   };
-  caseStudyLabel: string;
   experience: {
     role: string;
     organization: string;
     href?: string;
     place: string;
     period: string;
-    bullets: string[];
-  }[];
-  projects: {
-    title: string;
-    context: string;
-    href: string;
     bullets: string[];
   }[];
   education: {
@@ -99,12 +91,10 @@ const english: CvContent = {
   ],
   sections: {
     experience: { number: '01', title: 'Experience', subtitle: 'Engineering and product delivery' },
-    projects: { number: '02', title: 'Selected work', subtitle: 'Methods, evidence, and stated limits' },
-    education: { number: '03', title: 'Education', subtitle: 'Mechanics, computation, and software' },
-    skills: { number: '04', title: 'Core skills', subtitle: 'Tools and working languages' },
-    community: { number: '05', title: 'Community', subtitle: 'Developer education at scale' },
+    education: { number: '02', title: 'Education', subtitle: 'Mechanics, computation, and software' },
+    skills: { number: '03', title: 'Core skills', subtitle: 'Tools and working languages' },
+    community: { number: '04', title: 'Community', subtitle: 'Developer education at scale' },
   },
-  caseStudyLabel: 'Case study',
   experience: [
     {
       role: 'Aerodynamics Engineer',
@@ -139,69 +129,6 @@ const english: CvContent = {
         'Designed a Ruby-based delivery pipeline that automated testing, packaging, and distribution across Android and iOS.',
         'Implemented code and resource obfuscation plus certificate pinning to increase resistance to reverse engineering and traffic interception.',
         'Integrated React Native and built a hotfix mechanism for controlled runtime updates.',
-      ],
-    },
-  ],
-  projects: [
-    {
-      title: 'Formula Student Cooling System & OpenFOAM Surrogate',
-      context: 'Vinci Eco Drive, 2025–2026',
-      href: '/projects/fsae-cooling',
-      bullets: [
-        'Coupled vendor fan, radiator, and pump curves with an 80-cell one-dimensional finite-volume coolant model; the hydraulic operating point reached 10.03 L/min.',
-        'Identified that the passive E3 architecture violated the inverter temperature boundary before procurement and detailed vehicle simulation, documenting a rejection decision and replacement architecture paths.',
-        'Qualified a fan-jump and porous-core OpenFOAM surrogate on four meshes from 7,440 to 3,481,920 cells; fine-to-extra-fine changes were 0.950% in flow and 0.0145% in pressure loss.',
-        'Limit: numerical screening and surrogate-method qualification, not installed-vehicle airflow, heat transfer, hardware, or track validation.',
-      ],
-    },
-    {
-      title: 'F1 External-Aerodynamics RANS Pilot',
-      context: 'Independent study, 2026',
-      href: '/projects/f1-2026-aero',
-      bullets: [
-        'Built a 4.35-million-cell OpenFOAM 14 half-car RANS baseline and completed a 23-variant pilot campaign across geometry, boundary conditions, and modelling sensitivities.',
-        'Automated CAD variant staging, snappyHexMesh, steady RANS, validity gates, component-force extraction, and result archiving; retained nine valid sensitivity cases and preserved two diverged roughness runs.',
-        'Kept material mesh sensitivity visible and excluded absolute aerodynamic performance, yaw, wind-tunnel, and physical-correlation claims.',
-      ],
-    },
-    {
-      title: 'FlowLab & FlowROM',
-      context: 'Independent study, 2026',
-      href: '/projects/flowlab',
-      bullets: [
-        'Implemented a dependency-free D2Q9 BGK lattice-Boltzmann solver shared by Node.js and the browser; validated three grids at Re=100 against canonical lid-driven-cavity data.',
-        'Generated 480 velocity fields, using 320 snapshots for training and 160 snapshots across four complete holdout cycles for POD/DMD evaluation.',
-        'Achieved 0.123% rank-8 POD holdout error with 48.8× compression and 0.100% DMD full-state holdout error; the stated limit is controlled two-dimensional internal flow.',
-      ],
-    },
-    {
-      title: 'Space Rider Digital Model',
-      context: 'Felisiak Engineering & Development, 2026',
-      href: '/projects/space-rider',
-      bullets: [
-        'Reconstructed the ESA Space Rider from public blueprints during a 17-week internship; the internal verification record reports ±6 mm side-view and ±8.4 mm top-view agreement over a 4.88 m body.',
-        'Used scripted geometry audits, protected reference states, rollback branches, and reference-view checks to retain failed approaches and prevent local surface fixes from changing accepted proportions.',
-        'Delivered separate review and animation-ready assets and reduced the browser GLB from 11.6 MB to 639 KB while preserving the declared release structure.',
-        'Limit: reference-led work for Felisiak using public ESA material, not ESA employment, manufacturer CAD, or flight-article validation.',
-      ],
-    },
-    {
-      title: 'XC48 Abaqus Tensile Twin',
-      context: 'Course project, 2026',
-      href: '/projects/xc48-abaqus-twin',
-      bullets: [
-        'Built a Python pipeline from raw force/displacement data to validated material inputs, Abaqus ODB post-processing, and report generation for an XC48 tensile study.',
-        'Matched the retained experiment with R²=0.9663 on the M2 mesh and verified a 5% pre-fracture kinetic/internal energy bound; the stated limit excludes sole authorship of the full team Abaqus model.',
-      ],
-    },
-    {
-      title: 'Airfoil & Ground-Effect Methods',
-      context: 'Independent studies, 2026',
-      href: '/projects/airfoil-methods',
-      bullets: [
-        'Implemented a cosine-spaced Hess–Smith panel method for NACA 0012 and compared linear lift against NASA TM-4074; the 160-to-240-panel lift change at 4° was 0.0307%.',
-        'Built a horseshoe/image-vortex ground-effect solver over 14 h/c cases; recovered free-air lift within 0.0034% at h/c=50 and changed 0.258% from 64 to 96 span panels.',
-        'Limit: linear, inviscid, steady methods, without viscous drag, separation, stall, tyres, bodywork, or race-car performance claims.',
       ],
     },
   ],
@@ -290,12 +217,10 @@ const french: CvContent = {
   ],
   sections: {
     experience: { number: '01', title: 'Expérience', subtitle: 'Ingénierie et livraison de produits' },
-    projects: { number: '02', title: 'Travaux sélectionnés', subtitle: 'Méthodes, preuves et limites déclarées' },
-    education: { number: '03', title: 'Formation', subtitle: 'Mécanique, calcul et logiciel' },
-    skills: { number: '04', title: 'Compétences clés', subtitle: 'Outils et langues de travail' },
-    community: { number: '05', title: 'Communauté', subtitle: 'Transmission technique à grande échelle' },
+    education: { number: '02', title: 'Formation', subtitle: 'Mécanique, calcul et logiciel' },
+    skills: { number: '03', title: 'Compétences clés', subtitle: 'Outils et langues de travail' },
+    community: { number: '04', title: 'Communauté', subtitle: 'Transmission technique à grande échelle' },
   },
-  caseStudyLabel: 'Étude de cas',
   experience: [
     {
       role: 'Ingénieur aérodynamique',
@@ -330,69 +255,6 @@ const french: CvContent = {
         'Conçu une chaîne de livraison en Ruby automatisant les tests, la création des paquets et la distribution sur Android et iOS.',
         'Mis en place l’obscurcissement du code et des ressources ainsi que l’épinglage de certificat pour renforcer la résistance à l’ingénierie inverse et à l’interception du trafic.',
         'Intégré React Native et construit un mécanisme de correctifs à chaud pour des mises à jour contrôlées à l’exécution.',
-      ],
-    },
-  ],
-  projects: [
-    {
-      title: 'Refroidissement Formula Student et modèle OpenFOAM',
-      context: 'Vinci Eco Drive, 2025–2026',
-      href: '/projects/fsae-cooling',
-      bullets: [
-        'Couplé les courbes constructeur du ventilateur, du radiateur et de la pompe à un modèle unidimensionnel du liquide de refroidissement sur 80 cellules ; point de fonctionnement hydraulique à 10,03 L/min.',
-        'Identifié avant l’achat et avant toute simulation détaillée du véhicule que l’architecture passive E3 violait la limite de température de l’onduleur ; documenté une décision de rejet et des pistes d’architecture de remplacement.',
-        'Qualifié une méthode OpenFOAM couplant saut de pression au ventilateur et cœur poreux sur quatre maillages de 7 440 à 3 481 920 cellules ; écarts fin–extra-fin de 0,950 % sur le débit et 0,0145 % sur la perte de charge.',
-        'Limite : évaluation numérique et qualification de méthode, sans validation du véhicule, du matériel, du transfert thermique installé ni validation en piste.',
-      ],
-    },
-    {
-      title: 'Pilote RANS d’aérodynamique externe F1',
-      context: 'Étude indépendante, 2026',
-      href: '/projects/f1-2026-aero',
-      bullets: [
-        'Construit un cas de référence demi-voiture RANS de 4,35 millions de cellules sous OpenFOAM 14 et mené une campagne pilote de 23 variantes sur la géométrie, les conditions aux limites et la modélisation.',
-        'Automatisé la préparation des variantes CAO, snappyHexMesh, le calcul RANS stationnaire, les critères de validité, les efforts par composant et l’archivage ; retenu neuf cas valides et conservé deux divergences de rugosité.',
-        'Conservé l’incertitude de maillage dans les résultats et exclu toute affirmation de performance absolue, de lacet, de soufflerie ou de corrélation physique.',
-      ],
-    },
-    {
-      title: 'FlowLab et FlowROM',
-      context: 'Étude indépendante, 2026',
-      href: '/projects/flowlab',
-      bullets: [
-        'Implémenté un solveur de Boltzmann sur réseau D2Q9 BGK sans dépendance, partagé entre Node.js et le navigateur ; validé trois maillages à Re=100 sur la cavité entraînée de référence.',
-        'Généré 480 champs de vitesse : 320 instantanés d’entraînement et 160 instantanés couvrant quatre cycles complets réservés à l’évaluation POD/DMD.',
-        'Obtenu 0,123 % d’erreur POD de rang 8 avec une compression de 48,8× et 0,100 % d’erreur DMD sur l’état complet ; la limite déclarée est un écoulement interne bidimensionnel contrôlé.',
-      ],
-    },
-    {
-      title: 'Modèle numérique Space Rider',
-      context: 'Felisiak Ingénierie & Développement, 2026',
-      href: '/projects/space-rider',
-      bullets: [
-        'Reconstruit le Space Rider de l’ESA à partir de plans publics pendant un stage de 17 semaines ; le dossier interne indique des écarts de ±6 mm en vue latérale et ±8,4 mm en vue de dessus sur un véhicule de 4,88 m.',
-        'Utilisé des audits géométriques scriptés, des références protégées, des branches de retour arrière et des vues de référence afin de conserver les essais échoués et de protéger les proportions acceptées.',
-        'Livré des ressources distinctes pour la revue et l’animation et réduit le GLB pour navigateur de 11,6 Mo à 639 Ko tout en préservant la structure de livraison déclarée.',
-        'Limite : travail de reconstruction pour Felisiak à partir de sources publiques de l’ESA, sans emploi par l’ESA, CAO constructeur ni validation d’un article de vol.',
-      ],
-    },
-    {
-      title: 'Jumeau numérique de traction XC48 sous Abaqus',
-      context: 'Projet académique, 2026',
-      href: '/projects/xc48-abaqus-twin',
-      bullets: [
-        'Développé une chaîne Python des données brutes force/déplacement aux entrées matériau validées, au post-traitement ODB Abaqus et à la génération du rapport d’une étude de traction XC48.',
-        'Obtenu R²=0,9663 sur le maillage M2 et vérifié une limite de 5 % pour le rapport énergie cinétique/interne avant rupture ; la limite déclarée n’attribue pas l’ensemble du modèle Abaqus d’équipe à une seule personne.',
-      ],
-    },
-    {
-      title: 'Méthodes de profil et d’effet de sol',
-      context: 'Études indépendantes, 2026',
-      href: '/projects/airfoil-methods',
-      bullets: [
-        'Implémenté une méthode de panneaux Hess–Smith à espacement cosinus pour le NACA 0012 et comparé la portance linéaire à la NASA TM-4074 ; écart de 0,0307 % entre 160 et 240 panneaux à 4°.',
-        'Construit un solveur à vortex en fer à cheval et vortex images sur 14 cas h/c ; portance en air libre retrouvée à 0,0034 % près à h/c=50 et écart de 0,258 % entre 64 et 96 panneaux d’envergure.',
-        'Limite : méthodes linéaires, non visqueuses et stationnaires, sans traînée visqueuse, séparation, décrochage, pneus, carrosserie ni performance de voiture de course.',
       ],
     },
   ],
@@ -481,12 +343,10 @@ const chinese: CvContent = {
   ],
   sections: {
     experience: { number: '01', title: '工作经历', subtitle: '工程实践与产品交付' },
-    projects: { number: '02', title: '代表项目', subtitle: '方法、证据与适用边界' },
-    education: { number: '03', title: '教育经历', subtitle: '力学、计算与软件' },
-    skills: { number: '04', title: '核心技能', subtitle: '工具与工作语言' },
-    community: { number: '05', title: '技术社区', subtitle: '面向开发者的知识传播' },
+    education: { number: '02', title: '教育经历', subtitle: '力学、计算与软件' },
+    skills: { number: '03', title: '核心技能', subtitle: '工具与工作语言' },
+    community: { number: '04', title: '技术社区', subtitle: '面向开发者的知识传播' },
   },
-  caseStudyLabel: '查看项目',
   experience: [
     {
       role: '空气动力学工程师',
@@ -521,69 +381,6 @@ const chinese: CvContent = {
         '设计基于 Ruby 的交付流水线，自动完成 Android 与 iOS 的测试、打包和分发。',
         '实施代码与资源混淆及证书固定，提高对逆向工程和流量拦截的抵抗能力。',
         '集成 React Native，并建立受控运行时更新的热修复机制。',
-      ],
-    },
-  ],
-  projects: [
-    {
-      title: '方程式学生赛车冷却系统与 OpenFOAM 替代模型',
-      context: 'Vinci Eco Drive, 2025—2026',
-      href: '/projects/fsae-cooling',
-      bullets: [
-        '将风扇、散热器和水泵的供应商曲线与 80 单元一维有限体积冷却液模型耦合；液压工作点为 10.03 升/分。',
-        '在采购和整车详细流体模拟前确认被动 E3 架构违反逆变器温度边界，并记录否决决定及替代架构路径。',
-        '在 7,440 至 3,481,920 个单元的四套网格上验证风扇压升与多孔芯体 OpenFOAM 替代模型；细网格至超细网格的流量变化为 0.950%，压降变化为 0.0145%。',
-        '边界：仅支持数值筛查和替代方法验证，不代表已安装整车气流、换热、硬件或赛道验证。',
-      ],
-    },
-    {
-      title: 'F1 外部空气动力学 RANS 试验研究',
-      context: '独立研究, 2026',
-      href: '/projects/f1-2026-aero',
-      bullets: [
-        '建立 435 万单元的 OpenFOAM 14 半车 RANS 基准算例，并完成涵盖几何、边界条件和建模敏感性的 23 变体试验。',
-        '自动完成 CAD 变体准备、snappyHexMesh、稳态 RANS、有效性门槛、部件力提取和结果归档；保留九个有效敏感性算例，并保存两个发散的粗糙度算例。',
-        '公开保留网格敏感性，不作绝对气动性能、偏航、风洞或物理相关性结论。',
-      ],
-    },
-    {
-      title: 'FlowLab 与 FlowROM',
-      context: '独立研究, 2026',
-      href: '/projects/flowlab',
-      bullets: [
-        '实现无依赖的 D2Q9 BGK 格子玻尔兹曼求解器，由 Node.js 与浏览器共用；在雷诺数 100 条件下，以经典顶盖驱动方腔数据验证三套网格。',
-        '生成 480 个速度场，其中 320 个用于训练，160 个覆盖四个完整留出周期，用于 POD/DMD 评估。',
-        '八阶 POD 留出误差为 0.123%，压缩率为 48.8 倍；DMD 全状态留出误差为 0.100%。适用边界为受控二维内流。',
-      ],
-    },
-    {
-      title: 'Space Rider 数字模型',
-      context: 'Felisiak 工程与开发, 2026',
-      href: '/projects/space-rider',
-      bullets: [
-        '在 17 周实习期间依据公开图纸重建欧洲空间局 Space Rider；内部验证记录显示，4.88 米机身的侧视图误差为 ±6 毫米，俯视图误差为 ±8.4 毫米。',
-        '使用脚本化几何审计、受保护基准、回滚分支和参考视图检查，保留失败方案，并防止局部曲面修复改变已验收比例。',
-        '分别交付评审资产与动画资产，并在保持发布结构的前提下，将浏览器 GLB 从 11.6 兆字节压缩到 639 千字节。',
-        '边界：这是 Felisiak 基于欧洲空间局公开资料开展的参考重建，不代表受雇于欧洲空间局，不使用制造商 CAD，也不构成飞行器验证。',
-      ],
-    },
-    {
-      title: 'XC48 Abaqus 拉伸数字孪生',
-      context: '课程项目, 2026',
-      href: '/projects/xc48-abaqus-twin',
-      bullets: [
-        '建立 Python 流程，将原始力与位移数据转换为经过验证的材料输入，并完成 Abaqus ODB 后处理和 XC48 拉伸研究报告生成。',
-        'M2 网格与保留实验的决定系数为 0.9663，并验证断裂前动能与内能比不超过 5%；边界不包括独立完成整个团队 Abaqus 模型。',
-      ],
-    },
-    {
-      title: '翼型与地面效应方法',
-      context: '独立研究, 2026',
-      href: '/projects/airfoil-methods',
-      bullets: [
-        '为 NACA 0012 实现余弦间距 Hess–Smith 面板法，并与 NASA TM-4074 的线性升力结果比较；在迎角 4° 时，从 160 个面板加密到 240 个面板的升力变化为 0.0307%。',
-        '在 14 个离地高度与弦长比算例上建立马蹄涡与镜像涡求解器；当高度与弦长比为 50 时，自由空气升力误差为 0.0034%，从 64 个展向面板加密到 96 个时变化为 0.258%。',
-        '边界：线性、无黏、稳态方法，不包含黏性阻力、分离、失速、轮胎、车身或赛车性能结论。',
       ],
     },
   ],

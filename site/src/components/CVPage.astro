@@ -90,31 +90,6 @@ const alternates = [
       </div>
     </section>
 
-    <section class="cv-section" id="projects">
-      <header class="cv-section-heading">
-        <span class="cv-section-number">{content.sections.projects.number}</span>
-        <div>
-          <h2>{content.sections.projects.title}</h2>
-          <p>{content.sections.projects.subtitle}</p>
-        </div>
-      </header>
-      <div class="cv-section-body">
-        {content.projects.map((project) => (
-          <article class="cv-entry cv-project">
-            <header class="cv-entry-heading">
-              <div>
-                <h3><a href={project.href}>{project.title}</a></h3>
-                <p class="cv-organization">{project.context}</p>
-              </div>
-              <a class="cv-case-link print-hidden" href={project.href}>{content.caseStudyLabel} <span aria-hidden="true">→</span></a>
-            </header>
-            <ul>
-              {project.bullets.map((bullet) => <li>{bullet}</li>)}
-            </ul>
-          </article>
-        ))}
-      </div>
-    </section>
 
     <section class="cv-section" id="education">
       <header class="cv-section-heading">
@@ -473,8 +448,7 @@ const alternates = [
     color: var(--color-muted);
   }
 
-  .cv-period,
-  .cv-case-link {
+  .cv-period {
     margin: 0;
     font-family: var(--font-mono);
     font-size: 0.8rem;
@@ -483,9 +457,6 @@ const alternates = [
     color: var(--color-stone);
   }
 
-  .cv-case-link {
-    color: var(--color-accent);
-  }
 
   .cv-entry ul {
     margin: 1.25rem 0 0;
@@ -508,15 +479,6 @@ const alternates = [
     color: var(--color-accent);
   }
 
-  .cv-project h3 a {
-    color: var(--color-ink);
-  }
-
-  @media (hover: hover) {
-    .cv-project h3 a:hover {
-      color: var(--color-accent);
-    }
-  }
 
   .cv-skill-list {
     margin: 0;
@@ -670,8 +632,7 @@ const alternates = [
       gap: 0.65rem;
     }
 
-    .cv-period,
-    .cv-case-link {
+    .cv-period {
       white-space: normal;
     }
 
