@@ -9,7 +9,7 @@ export const GET: APIRoute = async ({ site }) => {
   if (!site) throw new Error('astro.config.mjs must define site');
   const projects = await getCollection('projects');
   const entries = [
-    ...['/', '/projects/', '/cv/', '/fr/cv/'].map((path) => ({ path })),
+    ...['/', '/projects/', '/cv/', '/fr/cv/', '/cn/cv/'].map((path) => ({ path })),
     ...projects.map((project) => ({ path: `/projects/${project.id}/`, modified: project.data.date })),
   ];
   const body = entries.map(({ path, modified }) => [

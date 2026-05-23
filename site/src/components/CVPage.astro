@@ -10,6 +10,7 @@ const { content } = Astro.props;
 const alternates = [
   { hreflang: 'en', path: '/cv' },
   { hreflang: 'fr', path: '/fr/cv' },
+  { hreflang: 'zh-CN', path: '/cn/cv' },
 ];
 ---
 
@@ -186,7 +187,7 @@ const alternates = [
     </section>
 
     <div class="cv-closing">
-      <p>{content.closing} <a href={content.locale === 'cn' ? '/cn/projects' : '/projects'}>{content.portfolioLabel}</a>{content.locale === 'cn' ? '。' : '.'}</p>
+      <p>{content.closing} <a href="/projects">{content.portfolioLabel}</a>{content.locale === 'cn' ? '。' : '.'}</p>
       <p class="cv-closing-mark">{content.closingMark}</p>
     </div>
   </article>

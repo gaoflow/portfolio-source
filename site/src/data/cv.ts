@@ -84,6 +84,7 @@ const english: CvContent = {
   languageLinks: [
     { label: 'English', href: '/cv' },
     { label: 'French', href: '/fr/cv' },
+    { label: 'Chinese', href: '/cn/cv' },
   ],
   contact: {
     email: 'gaobing1230@gmail.com',
@@ -274,6 +275,7 @@ const french: CvContent = {
   languageLinks: [
     { label: 'Anglais', href: '/cv' },
     { label: 'Français', href: '/fr/cv' },
+    { label: 'Chinois', href: '/cn/cv' },
   ],
   contact: {
     email: 'gaobing1230@gmail.com',
