@@ -9,7 +9,7 @@ const projects = (await getCollection('projects')).sort(
 ---
 
 <Base>
-  <div class="mx-auto max-w-5xl">
+  <div class="mx-auto max-w-7xl">
     <section aria-labelledby="about-heading">
       <div class="flex items-center gap-5 sm:gap-7">
         <img
@@ -63,16 +63,15 @@ const projects = (await getCollection('projects')).sort(
             <a
               href="/cv-en.pdf"
               target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex h-9 items-center justify-center rounded-full border border-edge px-3 text-xs font-medium text-ink transition-opacity hover:opacity-60"
+              class="inline-flex h-9 items-center justify-center rounded-full border border-accent bg-accent px-3 text-sm font-semibold text-white transition-opacity hover:opacity-75"
             >
-              Resume
+              Download CV
             </a>
           </nav>
         </div>
       </div>
 
-      <div class="about-copy mt-7 max-w-4xl space-y-6 text-lg leading-8 text-warm">
+      <div class="about-copy mt-6 space-y-4 text-lg leading-8 text-warm">
         <p>
           Hi! 👋 I'm Bing Gao, a Master's student in Modelling & Computational Mechanics at École supérieure d’ingénieurs Léonard de Vinci (<a href="https://www.esilv.fr/" target="_blank" rel="noopener noreferrer">ESILV</a>). I am also an aerodynamics team member for our school's Formula Student racing team, Vinci Eco Drive. My responsibilities primarily cover aerodynamic and aero-kit design, cooling-system design, thermal-fluid modelling, numerical validation, and the development of custom simulation tools.
         </p>
@@ -92,7 +91,7 @@ const projects = (await getCollection('projects')).sort(
     </section>
   </div>
 
-  <section id="projects" class="mt-14 scroll-mt-24" aria-labelledby="projects-heading">
+  <section id="projects" class="mt-6 scroll-mt-24" aria-labelledby="projects-heading">
     <h2 id="projects-heading" class="text-3xl font-medium tracking-tight text-ink">Projects</h2>
     <div class="mt-7 grid gap-5 sm:grid-cols-2">
       {projects.map((project) => (
