@@ -22,7 +22,7 @@ const projects = (await getCollection('projects')).sort(
           class="h-20 w-20 shrink-0 rounded-full object-cover sm:h-24 sm:w-24"
         />
         <div>
-          <p class="font-serif text-xs uppercase tracking-[0.12em] text-stone">About me</p>
+          <p class="font-serif text-xs uppercase tracking-[0.12em] text-stone">About Me</p>
           <h1 id="about-heading" class="mt-1 text-4xl font-medium tracking-tight text-ink sm:text-5xl">Bing Gao</h1>
           <nav class="mt-4 flex items-center gap-2" aria-label="Profile links">
             <a
@@ -50,23 +50,29 @@ const projects = (await getCollection('projects')).sort(
               </svg>
             </a>
             <a
-              href="/cv-en.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open CV PDF"
-              title="CV"
+              href={`mailto:${profile.email}`}
+              aria-label="Email"
+              title="Email"
               class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-edge text-ink transition-opacity hover:opacity-60"
             >
               <svg aria-hidden="true" viewBox="0 0 24 24" class="h-5 w-5 fill-none stroke-current" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6.75 2.75h7l3.5 3.5v15H6.75z"/>
-                <path d="M13.75 2.75v3.5h3.5M9.5 11h5M9.5 15h5"/>
+                <rect x="3" y="5" width="18" height="14" rx="2"/>
+                <path d="m4 7 8 6 8-6"/>
               </svg>
+            </a>
+            <a
+              href="/cv-en.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex h-9 items-center justify-center rounded-full border border-edge px-3 text-xs font-medium text-ink transition-opacity hover:opacity-60"
+            >
+              Resume
             </a>
           </nav>
         </div>
       </div>
 
-      <div class="about-copy mt-6 grid gap-x-10 gap-y-4 text-base leading-6 text-warm md:grid-cols-2">
+      <div class="about-copy mt-7 max-w-4xl space-y-6 text-lg leading-8 text-warm">
         <p>
           Hi! 👋 I'm Bing Gao, a Master's student in Modelling & Computational Mechanics at École supérieure d’ingénieurs Léonard de Vinci (<a href="https://www.esilv.fr/" target="_blank" rel="noopener noreferrer">ESILV</a>). I am also an aerodynamics team member for our school's Formula Student racing team, Vinci Eco Drive. My responsibilities primarily cover aerodynamic and aero-kit design, cooling-system design, thermal-fluid modelling, numerical validation, and the development of custom simulation tools.
         </p>
