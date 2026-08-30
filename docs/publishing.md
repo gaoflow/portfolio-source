@@ -1,15 +1,17 @@
 # Publishing strategy
 
-This repository keeps two kinds of work separate:
+This repository separates public site history from private working material:
 
-- `main`: the public GitHub branch. It contains only the deployable portfolio surface.
+- `main`: the public GitHub branch. It keeps the full publishable history for site content, UI changes, and deployment configuration.
 - `work`: the private working branch. It may contain research, design notes, experiments, private source material, and other work that is not meant for public GitHub.
 
 ## What belongs on `main`
 
-Only publish what the public site and repository should expose:
+Publish source files and history that are safe for the public repository:
 
-- `site/` — the deployable Astro site and its public content.
+- `site/` — the Astro site, public assets, English content, and Chinese source documents.
+- `site/src/content/projects/` — English documents loaded by Astro and deployed as pages.
+- `site/src/content/projects-cn/` — public Chinese source documents retained in Git, but not loaded by Astro and not deployed as routes.
 - `README.md` — public project overview.
 - `LICENSE` — public license.
 - `.github/` — public CI or workflow configuration required for the public repository.
@@ -27,19 +29,19 @@ Keep local or private material on `work` only:
 
 ## Daily workflow
 
-1. Do normal work and commits on `work`.
-2. When content is ready to publish, create a public commit on `main` containing only the approved public files.
-3. Push only `main` to GitHub.
-4. Do not commit daily private work directly on `main`.
+1. Commit publishable article edits, UI changes, and deployment configuration as separate commits on `main`.
+2. Keep Chinese source documents under `site/src/content/projects-cn/`; do not add that directory to Astro collections or page routes.
+3. Use `work` for private research, experiments, and internal tooling.
+4. Push `main` without squashing or rewriting its shared history.
 
 ## Rules
 
 - Do not push `work` to the public GitHub repository.
-- Do not include private tooling, private notes, or non-public source content in `main`.
-- Do not rewrite history on `main` once it is shared unless there is a clear release reason.
-- Every public update should be reviewed as a deployment decision, not as a routine work commit.
+- Do not include private tooling, private notes, or non-public research sources in `main`.
+- Chinese source documents are public repository content, not deployed website routes.
+- Do not squash or rewrite shared `main` history; article, UI, and deployment commits remain individually visible.
 
 ## Current branch layout
 
-- `main` — public, pushed to `origin/main`.
-- `work` — private working history, kept locally.
+- `main` — public site source, public Chinese documents, and publishable development history; pushed to `origin/main`.
+- `work` — private research and working material; kept locally.

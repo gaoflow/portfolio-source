@@ -31,18 +31,21 @@ npm run preview
 
 ## Content
 
-Project articles live in:
+English project articles deployed by Astro:
 
 ```text
 site/src/content/projects/
 ```
 
+Chinese source documents tracked publicly but not loaded or deployed:
+
+```text
+site/src/content/projects-cn/
+```
+
 ## Verification
 
 ```bash
-python3 scripts/verify_numerical_projects.py --portfolio-only
 cd site
 npm run build
-python3 scripts/check_static_links.py dist
-python3 scripts/check_cv_locales.py dist
 ```
