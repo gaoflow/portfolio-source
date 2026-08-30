@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Direction B — Monolith</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500&family=Space+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root { --gray: #999; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; color: #fff; font-family: 'Space Mono', monospace; }
+  .caps { font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 1.4px; font-size: 13px; }
+  .display { font-family: 'Unbounded', sans-serif; font-weight: 400; line-height: 1.06; text-transform: uppercase; }
+
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 28px 48px; position: fixed; top: 0; left: 0; right: 0; }
+  nav a { color: #fff; text-decoration: none; }
+  nav a:hover { opacity: .75; }
+  .wordmark { font-size: 15px; letter-spacing: 4px; }
+
+  /* monumental hero */
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 48px; }
+  .hero h1 { font-size: clamp(64px, 12.5vw, 176px); }
+  .hero h1 .l2 { display: block; color: transparent; -webkit-text-stroke: 1px #fff; }
+  .hero .row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 40px; flex-wrap: wrap; gap: 24px; }
+  .hero .caps { color: var(--gray); }
+  .pill { display: inline-block; border: 1px solid #fff; border-radius: 9999px; padding: 13px 26px; color: #fff; text-decoration: none; transition: background .25s ease, color .25s ease; }
+  .pill:hover { background: #fff; color: #000; }
+
+  /* telemetry strip */
+  .tele { border-top: 1px solid var(--gray); border-bottom: 1px solid var(--gray); display: grid; grid-template-columns: repeat(4, 1fr); }
+  .tele > div { padding: 28px 48px; border-right: 1px solid #222; }
+  .tele .v { font-family: 'Unbounded'; font-size: 30px; margin-top: 8px; }
+  .tele .caps { color: var(--gray); font-size: 11px; }
+
+  /* project chapters — no cards, film chapters */
+  .chapter { padding: 96px 48px; border-bottom: 1px solid #1a1a1a; display: grid; grid-template-columns: 160px 1fr; gap: 48px; align-items: start; }
+  .chapter .no { font-family: 'Unbounded'; font-size: 60px; line-height: 1; color: transparent; -webkit-text-stroke: 1px var(--gray); }
+  .chapter h2 { font-family: 'Unbounded'; font-size: clamp(32px, 4.4vw, 60px); line-height: 1.06; text-transform: uppercase; margin-bottom: 24px; }
+  .chapter .meta { color: var(--gray); margin-bottom: 24px; }
+  .chapter p { font-size: 14px; line-height: 1.7; color: #ccc; max-width: 52ch; font-family: 'Space Mono'; }
+  .chapter .media { grid-column: 2; margin-top: 40px; aspect-ratio: 21/9; background:
+      radial-gradient(ellipse 80% 120% at 30% 100%, #0e2a3a 0%, transparent 60%),
+      radial-gradient(ellipse 60% 100% at 75% 20%, #301010 0%, transparent 55%), #050505; }
+
+  footer { padding: 96px 48px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 32px; }
+  footer .big { font-family: 'Unbounded'; font-size: clamp(28px, 3.4vw, 48px); text-transform: uppercase; line-height: 1.1; }
+
+  @media (max-width: 860px) {
+    nav, .hero, .tele > div, .chapter, footer { padding-left: 24px; padding-right: 24px; }
+    .tele { grid-template-columns: 1fr 1fr; }
+    .chapter { grid-template-columns: 1fr; }
+    .chapter .media { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="caps">
+  <a href="#">Menu</a>
+  <a href="#" class="wordmark">BING&nbsp;GAO</a>
+  <a href="#">Contact</a>
+</nav>
+
+<header class="hero">
+  <h1 class="display">Computed<span class="l2">Airflow</span></h1>
+  <div class="row">
+    <span class="caps">CFD Engineer &amp; Developer · ESILV Formula Student · Paris</span>
+    <a class="pill caps" href="#work">Selected work</a>
+  </div>
+</header>
+
+<section class="tele">
+  <div><div class="caps">Δ Downforce</div><div class="v">+18.2%</div></div>
+  <div><div class="caps">Full-car mesh</div><div class="v">36M</div></div>
+  <div><div class="caps">CFD ↔ Track</div><div class="v">±4%</div></div>
+  <div><div class="caps">Batch params</div><div class="v">30+</div></div>
+</section>
+
+<div id="work">
+  <section class="chapter">
+    <div class="no">01</div>
+    <div>
+      <h2 class="display">FSAE Full-Car Aero Package</h2>
+      <div class="meta caps">OpenFOAM · Steady RANS · k-ω SST · 2025</div>
+      <p>Twelve documented iterations from baseline to race-ready package. Per-assembly force breakdown, closing the loop with on-track constant-speed runs.</p>
+    </div>
+    <div class="media"></div>
+  </section>
+  <section class="chapter">
+    <div class="no">02</div>
+    <div>
+      <h2 class="display">CFD Batch Automation Wrapper</h2>
+      <div class="meta caps">Python · OpenFOAM · JSON-driven · 2024</div>
+      <p>One config file, thirty parameters: mesh, solve, post-process. Attack, sideslip and airspeed sweeps run unattended overnight.</p>
+    </div>
+    <div class="media"></div>
+  </section>
+  <section class="chapter">
+    <div class="no">03</div>
+    <div>
+      <h2 class="display">Front Wing Sensitivity Study</h2>
+      <div class="meta caps">STAR-CCM+ · DOE · Ride-height sweep · 2024</div>
+      <p>Mapping downforce sensitivity across the ride-height envelope — the plot the design review actually decided on.</p>
+    </div>
+    <div class="media"></div>
+  </section>
+</div>
+
+<footer>
+  <div class="big display">Open to CFD roles —<br>let's talk flow.</div>
+  <a class="pill caps" href="mailto:gaobing1230@gmail.com">gaobing1230@gmail.com</a>
+</footer>
+
+</body>
+</html>

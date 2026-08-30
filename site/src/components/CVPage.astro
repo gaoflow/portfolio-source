@@ -1,0 +1,811 @@
+---
+import Base from '../layouts/Base.astro';
+import type { CvContent } from '../data/cv';
+
+interface Props {
+  content: CvContent;
+}
+
+const { content } = Astro.props;
+const alternates = [
+  { hreflang: 'en', path: '/cv' },
+  { hreflang: 'fr', path: '/fr/cv' },
+  { hreflang: 'zh-CN', path: '/cn/cv' },
+];
+---
+
+<Base title={content.pageTitle} description={content.description} locale={content.locale} alternates={alternates}>
+  <article class="cv-document">
+    <header class="cv-hero">
+      <div class="cv-eyebrow">
+        <div class="cv-eyebrow-copy">
+          <p>{content.eyebrow}</p>
+          <nav class="cv-language-nav print-hidden" aria-label={content.languageNavigationLabel}>
+            {content.languageLinks.map((link) => (
+              <a href={link.href} aria-current={link.href === content.route ? 'page' : undefined}>{link.label}</a>
+            ))}
+          </nav>
+        </div>
+        <div class="cv-actions print-hidden">
+          <a class="cv-action cv-action-primary" href={content.downloadUrl}>{content.downloadLabel}</a>
+          <a class="cv-action cv-action-ghost" href={`mailto:${content.contact.email}`}>{content.contactLabel}</a>
+        </div>
+      </div>
+
+      <div class="cv-identity">
+        <div class="cv-identity-copy">
+          <h1>{content.name}</h1>
+          <p class="cv-role">{content.role}</p>
+
+          <nav class="cv-contact" aria-label={content.contactNavigationLabel}>
+            <a href={`mailto:${content.contact.email}`}>{content.contact.email}</a>
+            <span>{content.contact.location}</span>
+            <a href="https://www.linkedin.com/in/bing-gao/" target="_blank" rel="noopener noreferrer">{content.contact.linkedinLabel}</a>
+            <a href="https://github.com/gaoflow" target="_blank" rel="noopener noreferrer">{content.contact.githubLabel}</a>
+          </nav>
+        </div>
+        <figure class="cv-portrait">
+          <img src="/avatar_faroe2.jpg" alt={content.portraitAlt} width="800" height="800" loading="eager" decoding="async" />
+        </figure>
+      </div>
+
+      <p class="cv-summary">{content.summary}</p>
+
+      <dl class="cv-facts">
+        {content.facts.map((fact) => (
+          <div>
+            <dt>{fact.value}</dt>
+            <dd>{fact.label}</dd>
+          </div>
+        ))}
+      </dl>
+    </header>
+
+    <section class="cv-section" id="experience">
+      <header class="cv-section-heading">
+        <span class="cv-section-number">{content.sections.experience.number}</span>
+        <div>
+          <h2>{content.sections.experience.title}</h2>
+          <p>{content.sections.experience.subtitle}</p>
+        </div>
+      </header>
+      <div class="cv-section-body">
+        {content.experience.map((item) => (
+          <article class="cv-entry">
+            <header class="cv-entry-heading">
+              <div>
+                <h3>{item.role}</h3>
+                <p class="cv-organization">
+                  {item.href ? <a href={item.href} target="_blank" rel="noopener noreferrer">{item.organization}</a> : item.organization}
+                  <span aria-hidden="true">, </span>{item.place}
+                </p>
+              </div>
+              <p class="cv-period">{item.period}</p>
+            </header>
+            <ul>
+              {item.bullets.map((bullet) => <li>{bullet}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </section>
+
+
+    <section class="cv-section" id="education">
+      <header class="cv-section-heading">
+        <span class="cv-section-number">{content.sections.education.number}</span>
+        <div>
+          <h2>{content.sections.education.title}</h2>
+          <p>{content.sections.education.subtitle}</p>
+        </div>
+      </header>
+      <div class="cv-section-body">
+        {content.education.map((item) => (
+          <article class="cv-entry cv-education">
+            <header class="cv-entry-heading">
+              <div>
+                <h3>{item.degree}</h3>
+                <p class="cv-organization">{item.institution} <span aria-hidden="true">, </span>{item.place}</p>
+              </div>
+              <p class="cv-period">{item.period}</p>
+            </header>
+            {item.details.length > 0 && (
+              <ul>
+                {item.details.map((detail) => <li>{detail}</li>)}
+              </ul>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="cv-section" id="skills">
+      <header class="cv-section-heading">
+        <span class="cv-section-number">{content.sections.skills.number}</span>
+        <div>
+          <h2>{content.sections.skills.title}</h2>
+          <p>{content.sections.skills.subtitle}</p>
+        </div>
+      </header>
+      <dl class="cv-section-body cv-skill-list">
+        {content.skills.map((skill) => (
+          <div class="cv-skill-row">
+            <dt>{skill.label}</dt>
+            <dd>{skill.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section class="cv-section" id="community">
+      <header class="cv-section-heading">
+        <span class="cv-section-number">{content.sections.community.number}</span>
+        <div>
+          <h2>{content.sections.community.title}</h2>
+          <p>{content.sections.community.subtitle}</p>
+        </div>
+      </header>
+      <div class="cv-section-body">
+        <article class="cv-entry cv-community">
+          <header class="cv-entry-heading">
+            <div>
+              <h3>{content.community.role}</h3>
+              <p class="cv-organization"><a href={content.community.href} target="_blank" rel="noopener noreferrer">{content.community.organization}</a> <span aria-hidden="true">, </span>{content.community.place}</p>
+            </div>
+            <p class="cv-period">{content.community.period}</p>
+          </header>
+          <ul>
+            {content.community.bullets.map((bullet) => <li>{bullet}</li>)}
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <div class="cv-closing">
+      <p>{content.closing} <a href="/projects">{content.portfolioLabel}</a>{content.locale === 'cn' ? '。' : '.'}</p>
+      <p class="cv-closing-mark">{content.closingMark}</p>
+    </div>
+  </article>
+
+</Base>
+
+<style>
+  .cv-document {
+    max-width: 64rem;
+    margin-inline: auto;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .cv-hero {
+    padding: 3rem 0 5rem;
+  }
+
+  .cv-eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 4rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--color-stone);
+  }
+
+  .cv-eyebrow-copy {
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+  }
+
+  .cv-language-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    letter-spacing: 0.03em;
+    text-transform: none;
+  }
+
+  .cv-language-nav a {
+    color: var(--color-stone);
+    text-decoration: none;
+  }
+
+  .cv-language-nav a[aria-current='page'] {
+    color: var(--color-accent);
+  }
+
+  .cv-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .cv-action {
+    min-height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--color-accent);
+    border-radius: 999px;
+    font-family: var(--font-serif);
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+  }
+
+  .cv-action-primary {
+    color: var(--color-bg);
+    background: var(--color-accent);
+  }
+
+  .cv-action-ghost {
+    color: var(--color-accent);
+    background: transparent;
+  }
+
+  @media (hover: hover) {
+    .cv-action:hover {
+      transform: translateY(-1px);
+    }
+
+    .cv-action-primary:hover {
+      background: var(--color-accent-light);
+    }
+
+    .cv-action-ghost:hover {
+      background: var(--color-tint);
+    }
+  }
+
+  .cv-identity {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(9.5rem, 16vw, 12rem);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: end;
+  }
+
+  .cv-identity-copy {
+    min-width: 0;
+  }
+
+  .cv-portrait {
+    width: 100%;
+    margin: 0;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border: 1px solid var(--color-edge);
+    background: var(--color-surface);
+  }
+
+  .cv-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+  }
+
+  .cv-hero h1 {
+    margin: 0;
+    font-size: clamp(4.2rem, 9.5vw, 7.8rem);
+    font-weight: 500;
+    letter-spacing: -0.055em;
+    line-height: 0.86;
+  }
+
+  .cv-role {
+    max-width: 50rem;
+    margin-top: 2rem;
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    line-height: 1.35;
+    color: var(--color-warm);
+    text-wrap: balance;
+  }
+
+  .cv-role span {
+    color: var(--color-accent);
+  }
+
+  .cv-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1.1rem;
+    margin-top: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-stone);
+  }
+
+  .cv-contact a,
+  .cv-entry a,
+  .cv-closing a {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .cv-contact a:hover,
+    .cv-entry a:hover,
+    .cv-closing a:hover {
+      color: var(--color-accent-light);
+    }
+  }
+
+  .cv-summary {
+    max-width: 51rem;
+    margin-top: 3.75rem;
+    font-size: clamp(1.3rem, 2.3vw, 1.65rem);
+    line-height: 1.55;
+    color: var(--color-muted);
+    text-wrap: pretty;
+  }
+
+  .cv-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 4rem;
+    border-top: 1px solid var(--color-edge);
+    border-bottom: 1px solid var(--color-edge);
+  }
+
+  .cv-facts > div {
+    min-width: 0;
+    padding: 1.5rem 1.5rem 1.6rem 0;
+  }
+
+  .cv-facts > div + div {
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--color-edge-soft);
+  }
+
+  .cv-facts dt {
+    font-size: clamp(1.7rem, 3vw, 2.35rem);
+    font-weight: 500;
+    line-height: 1;
+    color: var(--color-ink);
+  }
+
+  .cv-facts dd {
+    max-width: 13rem;
+    margin-top: 0.65rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--color-stone);
+  }
+
+  .cv-section {
+    display: grid;
+    grid-template-columns: 10.5rem minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    padding: 4.5rem 0;
+    border-top: 1px solid var(--color-edge);
+  }
+
+  .cv-section-heading {
+    align-self: start;
+  }
+
+  .cv-section-number {
+    display: block;
+    margin-bottom: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--color-accent);
+  }
+
+  .cv-section-heading h2 {
+    margin: 0;
+    font-size: 1.55rem;
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+
+  .cv-section-heading p {
+    margin-top: 0.65rem;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--color-stone);
+  }
+
+  .cv-section-body {
+    min-width: 0;
+  }
+
+  .cv-entry + .cv-entry {
+    margin-top: 2.75rem;
+    padding-top: 2.75rem;
+    border-top: 1px solid var(--color-edge-soft);
+  }
+
+  .cv-entry-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .cv-entry h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+
+  .cv-organization {
+    margin-top: 0.35rem;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: var(--color-muted);
+  }
+
+  .cv-period {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.45;
+    white-space: nowrap;
+    color: var(--color-stone);
+  }
+
+
+  .cv-entry ul {
+    margin: 1.25rem 0 0;
+    padding-left: 1.15rem;
+    list-style-type: disc;
+  }
+
+  .cv-entry li {
+    padding-left: 0.35rem;
+    font-size: 1.05rem;
+    line-height: 1.62;
+    color: var(--color-warm);
+  }
+
+  .cv-entry li + li {
+    margin-top: 0.55rem;
+  }
+
+  .cv-entry li::marker {
+    color: var(--color-accent);
+  }
+
+
+  .cv-skill-list {
+    margin: 0;
+  }
+
+  .cv-skill-row {
+    display: grid;
+    grid-template-columns: 12rem minmax(0, 1fr);
+    gap: 1.5rem;
+    padding: 1.25rem 0;
+    border-top: 1px solid var(--color-edge-soft);
+  }
+
+  .cv-skill-row:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .cv-skill-row dt {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--color-ink);
+  }
+
+  .cv-skill-row dd {
+    font-size: 1.02rem;
+    line-height: 1.6;
+    color: var(--color-warm);
+  }
+
+  .cv-closing {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2.5rem 0 1rem;
+    border-top: 1px solid var(--color-edge);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+
+  .cv-closing-mark {
+    flex: none;
+    font-style: italic;
+  }
+
+  @media (max-width: 760px) {
+    .cv-hero {
+      padding: 1.5rem 0 3.5rem;
+    }
+
+    .cv-eyebrow {
+      align-items: flex-start;
+      margin-bottom: 3rem;
+    }
+
+    .cv-section {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding: 3.5rem 0;
+    }
+
+    .cv-section-heading {
+      display: grid;
+      grid-template-columns: 2.5rem minmax(0, 1fr);
+      gap: 0.75rem;
+    }
+
+    .cv-section-number {
+      margin: 0.25rem 0 0;
+    }
+
+    .cv-skill-row {
+      grid-template-columns: 10rem minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .cv-eyebrow {
+      display: block;
+    }
+
+    .cv-eyebrow-copy {
+      display: block;
+    }
+
+    .cv-language-nav {
+      margin-top: 0.75rem;
+    }
+
+    .cv-actions {
+      margin-top: 1.25rem;
+    }
+
+    .cv-action {
+      min-width: 0;
+    }
+
+    .cv-identity {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+
+    .cv-portrait {
+      grid-row: 1;
+      width: 8rem;
+      aspect-ratio: 1;
+    }
+
+    .cv-hero h1 {
+      font-size: clamp(3.35rem, 20vw, 4.6rem);
+    }
+
+    .cv-role {
+      margin-top: 1.5rem;
+      font-size: 1.2rem;
+    }
+
+    .cv-contact {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .cv-summary {
+      margin-top: 2.75rem;
+      font-size: 1.25rem;
+    }
+
+    .cv-facts {
+      grid-template-columns: 1fr;
+      margin-top: 3rem;
+    }
+
+    .cv-facts > div,
+    .cv-facts > div + div {
+      padding: 1.1rem 0;
+      border-left: 0;
+    }
+
+    .cv-facts > div + div {
+      border-top: 1px solid var(--color-edge-soft);
+    }
+
+    .cv-facts dd {
+      max-width: none;
+    }
+
+    .cv-entry-heading {
+      grid-template-columns: 1fr;
+      gap: 0.65rem;
+    }
+
+    .cv-period {
+      white-space: normal;
+    }
+
+    .cv-entry + .cv-entry {
+      margin-top: 2.25rem;
+      padding-top: 2.25rem;
+    }
+
+    .cv-skill-row {
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+      padding: 1.1rem 0;
+    }
+
+    .cv-closing {
+      display: block;
+    }
+
+    .cv-closing-mark {
+      margin-top: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cv-action {
+      transition: none;
+    }
+  }
+
+  @media print {
+    @page {
+      size: A4;
+      margin: 12mm 14mm;
+    }
+
+    :global(body) {
+      background: #fff !important;
+      color: #141413 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    :global(body > div.sticky),
+    :global(main > footer),
+    .print-hidden {
+      display: none !important;
+    }
+
+    :global(main.page-enter) {
+      max-width: none !important;
+      padding: 0 !important;
+      animation: none !important;
+    }
+
+    .cv-document {
+      max-width: none;
+    }
+
+    .cv-hero {
+      padding: 0 0 8mm;
+    }
+
+    .cv-eyebrow {
+      margin-bottom: 8mm;
+    }
+
+    .cv-identity {
+      grid-template-columns: minmax(0, 1fr) 31mm;
+      gap: 8mm;
+    }
+
+    .cv-portrait {
+      width: 31mm;
+    }
+
+    .cv-hero h1 {
+      font-size: 46pt;
+    }
+
+    .cv-role {
+      margin-top: 5mm;
+      font-size: 14.5pt;
+    }
+
+    .cv-contact {
+      margin-top: 5mm;
+      font-size: 8.5pt;
+    }
+
+    .cv-summary {
+      margin-top: 8mm;
+      font-size: 11.5pt;
+    }
+
+    .cv-facts {
+      margin-top: 8mm;
+    }
+
+    .cv-facts > div {
+      padding-block: 4mm;
+    }
+
+    .cv-facts dt {
+      font-size: 17pt;
+    }
+
+    .cv-facts dd {
+      font-size: 8.5pt;
+    }
+
+    .cv-section {
+      grid-template-columns: 30mm minmax(0, 1fr);
+      gap: 7mm;
+      padding: 8mm 0;
+    }
+
+    .cv-section-heading {
+      display: block;
+    }
+
+    .cv-section-heading h2 {
+      font-size: 13.5pt;
+    }
+
+    .cv-section-heading p,
+    .cv-section-number,
+    .cv-period {
+      font-size: 7.75pt;
+    }
+
+    .cv-entry + .cv-entry {
+      margin-top: 5mm;
+      padding-top: 5mm;
+    }
+
+    .cv-entry,
+    .cv-skill-row {
+      break-inside: avoid;
+    }
+
+    .cv-entry h3 {
+      font-size: 11pt;
+    }
+
+    .cv-organization {
+      font-size: 8.25pt;
+    }
+
+    .cv-entry ul {
+      margin-top: 3mm;
+    }
+
+    .cv-entry li,
+    .cv-skill-row dt,
+    .cv-skill-row dd {
+      font-size: 9.25pt;
+      line-height: 1.45;
+    }
+
+    .cv-skill-row {
+      grid-template-columns: 34mm minmax(0, 1fr);
+      gap: 5mm;
+      padding: 3mm 0;
+    }
+
+    .cv-closing {
+      padding-top: 5mm;
+      font-size: 8.5pt;
+    }
+
+    a {
+      color: inherit !important;
+      text-decoration: none !important;
+    }
+  }
+</style>

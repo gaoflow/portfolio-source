@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Airfoil Methods technical report</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="/documents/airfoil-methods-report.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Airfoil Methods technical report</h1>
+</header>
+<h1
+id="airfoil-methods-where-low-order-models-earn-and-lose-trust">Airfoil
+Methods: where low-order models earn and lose trust</h1>
+<h2 id="objective">Objective</h2>
+<p>A method hierarchy should expose capability boundaries, not imply
+that more machinery always gives a better answer. This study implements
+analytical and panel methods for the NACA 0012 and compares them with
+one internally consistent public wind-tunnel series. It asks four
+concrete questions:</p>
+<ol type="1">
+<li>Does the implementation reproduce symmetry and the expected linear
+lift scale?</li>
+<li>Does geometry-resolved potential flow converge with panel
+refinement?</li>
+<li>How closely do the models match measured lift in the attached-flow
+range?</li>
+<li>Which requested outputs are structurally outside an inviscid model’s
+scope?</li>
+</ol>
+<h2 id="public-reference">Public reference</h2>
+<p>The measurements come from Table I of NASA TM-4074, <em>Effects of
+Independent Variation of Mach and Reynolds Numbers on the Low-Speed
+Aerodynamic Characteristics of the NACA 0012 Airfoil Section</em>, by
+Charles L. Ladson (1988) [1]. The selected series uses free transition,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>=</mo><mn>0.15</mn></mrow><annotation encoding="application/x-tex">M=0.15</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>e</mi><mo>=</mo><mn>5.97</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup></mrow><annotation encoding="application/x-tex">Re=5.97\times10^6</annotation></semantics></math>.
+NASA Langley’s pressure tunnel provided lift and pitching moment from
+integrated surface pressures and drag from a wake survey. The report
+states repeatability of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>d</mi></msub><annotation encoding="application/x-tex">C_d</annotation></semantics></math>
+within 0.0002, normal-force coefficient within 0.004, and moment
+coefficient within 0.0002 for repeated zero-angle points.</p>
+<p>Sixteen tabulated points from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><msup><mn>4.05</mn><mo>∘</mo></msup></mrow><annotation encoding="application/x-tex">-4.05^\circ</annotation></semantics></math>
+through
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>17.35</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">17.35^\circ</annotation></semantics></math>
+are transcribed into the repository. No plotted curve was digitised and
+no values from a different Reynolds number or transition condition were
+merged.</p>
+<h2 id="level-1-thin-airfoil-theory">Level 1: thin-airfoil theory</h2>
+<p>For a symmetric airfoil,</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>l</mi></msub><mo>=</mo><mn>2</mn><mi>π</mi><mi>α</mi><mo>,</mo></mrow><annotation encoding="application/x-tex">C_l=2\pi\alpha,</annotation></semantics></math></p>
+<p>with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+in radians. At
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>=</mo><mn>0.15</mn></mrow><annotation encoding="application/x-tex">M=0.15</annotation></semantics></math>,
+the Prandtl–Glauert factor
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><msqrt><mrow><mn>1</mn><mo>−</mo><msup><mi>M</mi><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">1/\sqrt{1-M^2}</annotation></semantics></math>
+is applied. This level has almost no geometric resolution beyond camber
+and zero-lift angle. It predicts a linear slope but no stall, viscous
+drag, or detailed surface loading.</p>
+<h2 id="level-2-geometry-resolved-panel-method">Level 2:
+geometry-resolved panel method</h2>
+<p>The NACA four-digit equation generates a closed 12%-thick profile
+with cosine-spaced surface points. The Hess–Smith formulation assigns
+one constant source strength to every panel and one global vortex-sheet
+strength. Collocation enforces zero normal velocity; the sum of upper
+and lower trailing-edge tangential velocities enforces the Kutta
+condition.</p>
+<p>Influence integrals use 12-point Gauss–Legendre quadrature.
+Analytical half-jump terms handle each panel’s self influence. Surface
+velocity gives</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>p</mi></msub><mo>=</mo><mn>1</mn><mo>−</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>V</mi><mi>t</mi></msub><mi>/</mi><msub><mi>V</mi><mi>∞</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo>,</mo></mrow><annotation encoding="application/x-tex">C_p=1-\left(V_t/V_\infty\right)^2,</annotation></semantics></math></p>
+<p>followed by the same Prandtl–Glauert scaling. Integrating pressure
+over the surface gives lift, pressure drag, and quarter-chord
+moment.</p>
+<p>This level adds inspectable
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>C</mi><mi>p</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">C_p(x)</annotation></semantics></math>
+and geometry sensitivity. It still solves inviscid, irrotational flow
+outside the prescribed vortex sheet.</p>
+<h2 id="verification-before-data-comparison">Verification before data
+comparison</h2>
+<p>Five behavioral tests guard the implementation:</p>
+<ul>
+<li>the NACA 0012 polygon closes, is symmetric, and is within 0.2
+percentage points of 12% thickness;</li>
+<li>zero angle gives zero lift to numerical precision;</li>
+<li>zero-angle pressure drag remains below 0.001;</li>
+<li>the small-angle lift slope is within 15% of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>π</mi></mrow><annotation encoding="application/x-tex">2\pi</annotation></semantics></math>
+per radian;</li>
+<li>doubling from 80 to 160 panels changes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>l</mi></msub><annotation encoding="application/x-tex">C_l</annotation></semantics></math>
+at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>4</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">4^\circ</annotation></semantics></math>
+by less than 1%.</li>
+</ul>
+<p>The production refinement sequence uses 40, 80, 160, and 240 panels.
+The 160-to-240 change at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>4</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">4^\circ</annotation></semantics></math>
+is 0.0307%, so the subsequent comparison uses 160 panels.</p>
+<h2 id="measurement-comparison">Measurement comparison</h2>
+<p>A least-squares fit from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><msup><mn>4.1</mn><mo>∘</mo></msup></mrow><annotation encoding="application/x-tex">-4.1^\circ</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>10.2</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">10.2^\circ</annotation></semantics></math>
+gives:</p>
+<table>
+<thead>
+<tr>
+<th>Quantity</th>
+<th style="text-align: right;">NASA TM-4074</th>
+<th style="text-align: right;">Thin airfoil + P–G</th>
+<th style="text-align: right;">Hess–Smith + P–G</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lift slope, per degree</td>
+<td style="text-align: right;">0.10684</td>
+<td style="text-align: right;">0.11092</td>
+<td style="text-align: right;">0.12162</td>
+</tr>
+<tr>
+<td>Slope error</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">3.81%</td>
+<td style="text-align: right;">13.83%</td>
+</tr>
+<tr>
+<td>Linear-range
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>l</mi></msub><annotation encoding="application/x-tex">C_l</annotation></semantics></math>
+RMSE</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">0.0226</td>
+<td style="text-align: right;">0.0824</td>
+</tr>
+</tbody>
+</table>
+<p>The analytical line is closer to measured integral lift than the
+panel model. That is not a reason to discard the panel method:
+thickness-resolving potential flow supplies a surface pressure
+distribution, but its inviscid assumptions increase the lift slope
+relative to the experiment. The result is a warning against ranking
+methods on complexity alone.</p>
+<p>Across the full tabulated range, panel-model lift RMSE rises to
+0.225. NASA’s measured
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>l</mi></msub><annotation encoding="application/x-tex">C_l</annotation></semantics></math>
+reaches 1.660 at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>17.35</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">17.35^\circ</annotation></semantics></math>;
+the inviscid solution continues its nearly linear rise and returns
+2.085. Separation and stall are absent from the governing model.</p>
+<h2 id="drag-is-a-declared-blind-spot">Drag is a declared blind
+spot</h2>
+<p>NASA drag rises from roughly 0.0065 near zero lift to 0.0275 at
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>17.35</mn><mo>∘</mo></msup><annotation encoding="application/x-tex">17.35^\circ</annotation></semantics></math>.
+The panel result remains near zero apart from discretisation error. This
+is d’Alembert’s paradox in the delivered evidence, not agreement.</p>
+<p>Reporting the near-zero curve beside the wake-survey data prevents a
+common presentation failure: treating an unavailable viscous output as a
+weakly accurate one. Drag prediction requires at least a
+boundary-layer/transition model or a viscous CFD method, and stall
+requires separation physics beyond this hierarchy.</p>
+<h2 id="acceptance-and-limits">Acceptance and limits</h2>
+<p>The executable study exits nonzero unless:</p>
+<ul>
+<li>geometry thickness is within 0.002 of 0.12;</li>
+<li>linear-range panel
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>l</mi></msub><annotation encoding="application/x-tex">C_l</annotation></semantics></math>
+RMSE is below 0.1;</li>
+<li>panel lift slope is within 15% of the measured slope;</li>
+<li>the 160-to-240-panel
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>l</mi></msub><annotation encoding="application/x-tex">C_l</annotation></semantics></math>
+change is below 1%;</li>
+<li>near-zero inviscid pressure drag and greater-than-0.02 measured drag
+coexist, proving that the blind spot remains explicit.</li>
+</ul>
+<p>The comparison is one airfoil, one Mach number, one Reynolds number,
+and one transition condition. It does not validate other geometries,
+laminar bubbles, roughness, or post-stall flow. Its purpose is to
+demonstrate model selection, implementation checks, measurement
+provenance, and honest failure boundaries.</p>
+<h2 id="reference">Reference</h2>
+<ol type="1">
+<li>Ladson, C. L. (1988). <em>Effects of Independent Variation of Mach
+and Reynolds Numbers on the Low-Speed Aerodynamic Characteristics of the
+NACA 0012 Airfoil Section</em>. NASA TM-4074.
+https://ntrs.nasa.gov/citations/19880019495</li>
+</ol>
+</body>
+</html>

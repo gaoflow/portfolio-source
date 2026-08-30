@@ -1,0 +1,314 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Kami palette — warm parchment canvas, single ink-blue accent, warm grays only.
+     Tokens from github.com/tw93/Kami references/design.md */
+  --color-bg: #f5f4ed;        /* parchment — page canvas, never pure white */
+  --color-surface: #faf9f5;   /* ivory — lifted cards */
+  --color-sand: #e8e6dc;      /* warm sand — interactive surfaces */
+  --color-edge: #e8e6dc;      /* primary hairline */
+  --color-edge-soft: #e5e3d8; /* row separators */
+  --color-ink: #141413;       /* near-black, warm olive undertone */
+  --color-warm: #3d3d3a;      /* secondary text */
+  --color-muted: #504e49;     /* olive — descriptions */
+  --color-stone: #6b6a64;     /* tertiary — dates, metadata */
+  --color-accent: #1b365d;    /* ink blue — the only chromatic color */
+  --color-accent-light: #2d5a8a;
+  --color-tag: #e4ecf5;       /* solid tag swatch (ink blue on parchment) */
+  --color-tint: #eef2f7;      /* lightest ink-blue fill */
+  --color-ok: #8b4513;        /* warm brown — active/caution (Kami breaking accent) */
+  --color-ok-bg: #f0e0d8;     /* warm peach */
+  --color-best: #6b6a64;      /* stone — no second chromatic color */
+
+  --font-serif: "Source Serif 4", Charter, Georgia, "Times New Roman", serif;
+  --font-sans: "Source Serif 4", Charter, Georgia, "Times New Roman", serif; /* Kami EN: serif for everything */
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+
+
+@font-face { font-family: KaTeX_AMS; font-style: normal; font-weight: 400; src: url("/fonts/KaTeX_AMS-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Caligraphic; font-style: normal; font-weight: 700; src: url("/fonts/KaTeX_Caligraphic-Bold.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Caligraphic; font-style: normal; font-weight: 400; src: url("/fonts/KaTeX_Caligraphic-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Fraktur; font-style: normal; font-weight: 700; src: url("/fonts/KaTeX_Fraktur-Bold.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Fraktur; font-style: normal; font-weight: 400; src: url("/fonts/KaTeX_Fraktur-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Main; font-style: normal; font-weight: 700; src: url("/fonts/KaTeX_Main-Bold.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Main; font-style: italic; font-weight: 700; src: url("/fonts/KaTeX_Main-BoldItalic.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Main; font-style: italic; font-weight: 400; src: url("/fonts/KaTeX_Main-Italic.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Main; font-style: normal; font-weight: 400; src: url("/fonts/KaTeX_Main-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Math; font-style: italic; font-weight: 700; src: url("/fonts/KaTeX_Math-BoldItalic.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Math; font-style: italic; font-weight: 400; src: url("/fonts/KaTeX_Math-Italic.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Script; font-style: normal; font-weight: 400; src: url("/fonts/KaTeX_Script-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Size; font-style: normal; font-weight: 400; src: url("/fonts/KaTeX_Size1-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Size; font-style: normal; font-weight: 400; src: url("/fonts/KaTeX_Size2-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Size; font-style: normal; font-weight: 400; src: url("/fonts/KaTeX_Size3-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Size; font-style: normal; font-weight: 400; src: url("/fonts/KaTeX_Size4-Regular.woff2") format("woff2"); font-display: swap; }
+@font-face { font-family: KaTeX_Typewriter; font-style: normal; font-weight: 400; src: url("/fonts/KaTeX_Typewriter-Regular.woff2") format("woff2"); font-display: swap; }
+
+body {
+  @apply bg-bg text-ink font-sans antialiased;
+  line-height: 1.55;
+}
+
+/* Article media (both hero and body): full natural aspect ratio, zero cropping, clean rounded corners */
+article img,
+article video {
+  border-radius: 0.75rem;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Project catalogue cards share one global treatment across index surfaces. */
+.project-card {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--color-edge);
+  border-radius: 0.75rem;
+  background: var(--color-surface);
+  transition: box-shadow 0.2s ease;
+}
+.project-card:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+}
+.project-card-media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  border-bottom: 1px solid var(--color-edge);
+  background: #fff;
+  object-fit: contain;
+}
+.project-card-media--cover {
+  object-fit: cover;
+}
+.project-card-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-tint);
+}
+
+::selection {
+  background: #d7e1ee; /* ink blue at ~12% over parchment, solid */
+}
+
+/* Section label — Kami eyebrow: serif 12px / 500 / +1.2px / stone / caps */
+.section-label {
+  @apply font-serif text-xs font-medium tracking-[0.1em] uppercase;
+  color: var(--color-stone);
+}
+
+/* Section number — Kami .section-num: serif 500, ink blue */
+.section-num {
+  @apply font-serif text-sm font-medium;
+  color: var(--color-accent);
+  letter-spacing: 0.4px;
+}
+
+/* Solid tag swatch — Kami forbids rgba tag fills */
+.tag {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  color: var(--color-accent);
+  background: var(--color-tag);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+/* Buttons — Kami .btn */
+.btn {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: box-shadow 0.2s;
+}
+.btn-secondary {
+  background: var(--color-sand);
+  color: var(--color-warm);
+  box-shadow: 0 0 0 1px var(--color-edge);
+}
+.btn-secondary:hover {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* Page entrance — Kami fadeIn, the only global animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: fadeIn 0.4s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-enter { animation: none; }
+}
+
+/* Figures: every article image takes its own row, full width, hairline frame */
+.prose :where(img):not(:where(.not-prose img)) {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-inline: auto;
+  border: 1px solid var(--color-edge);
+  background: #fff;
+}
+.prose :where(figure) {
+  margin-block: 2rem;
+}
+.prose :where(figcaption) {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-olive, var(--color-muted));
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+/* Tables: caption-style display text centred across header and body cells.
+   CSS text-align wins over the `align` attribute markdown emits. */
+.prose :where(table) {
+  margin-inline: auto;
+}
+.prose :where(th, td) {
+  text-align: center;
+}
+.prose :where(.article-demo) {
+  display: block;
+  width: 100%;
+  height: clamp(230px, 64vw, 470px);
+  margin-block: 2rem;
+  border: 1px solid var(--color-edge);
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+/* KaTeX on parchment: inherit serif body size, no display overflow */
+/* KaTeX defaults to 1.21em — oversized against Source Serif; pull inline
+   math to near-body scale so spacing and line-height stay harmonious */
+.katex {
+  font-size: 1.06em;
+}
+.katex-display {
+  overflow-x: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25rem;
+}
+/* long display math scrolls horizontally instead of wrapping mid-bracket */
+.katex-display > .katex {
+  white-space: nowrap;
+}
+
+/* Lists — Kami ul.dash: brand-coloured markers */
+.prose :where(ul > li)::marker {
+  color: var(--color-accent);
+}
+.prose :where(ol > li)::marker {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+/* Blockquote — Kami .quote: 2px brand rule, olive, never italic */
+.prose :where(blockquote) {
+  border-left: 2px solid var(--color-accent);
+  padding: 4px 0 4px 14px;
+  color: var(--color-muted);
+  font-style: normal;
+  quotes: none;
+}
+.prose :where(blockquote p)::before,
+.prose :where(blockquote p)::after {
+  content: none;
+}
+
+/* Tables — Kami decision table: serif body, uppercase stone heads, soft rules */
+.prose :where(table) {
+  font-family: var(--font-serif);
+  font-size: 0.95em;
+  font-variant-numeric: tabular-nums;
+}
+.prose :where(thead th) {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--color-stone);
+  border-bottom: 1px solid var(--color-edge);
+}
+.prose :where(tbody td) {
+  border-bottom: 1px solid var(--color-edge-soft);
+}
+.prose :where(th[align="right"], td[align="right"]) {
+  text-align: right;
+}
+.prose :where(tbody tr:last-child td) {
+  border-bottom: none;
+}
+
+/* Inline code — Kami .prose code: ivory swatch, hairline, radius 4px */
+.prose :where(code):not(pre code) {
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--color-warm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-edge-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-weight: 400;
+}
+.prose :where(code):not(pre code)::before,
+.prose :where(code):not(pre code)::after {
+  content: none;
+}
+
+/* Code blocks — Kami .code: ivory card, hairline, radius 6px; keep Shiki
+   github-light token colours, override only the canvas */
+.prose :where(pre), .astro-code {
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-edge);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.prose :where(pre code), .astro-code code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Links — Kami .prose a: brand, medium, underline on hover */
+.prose :where(a):not(:where(.not-prose a)) {
+  color: var(--color-accent);
+  font-weight: 500;
+  text-decoration: none;
+}
+.prose :where(a):hover:not(:where(.not-prose a)) {
+  text-decoration: underline;
+}
+
+/* Strong locked to W05 — no synthetic bold */
+.prose :where(strong) {
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+/* Prose robustness on narrow viewports: tables scroll */
+.prose table {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  overflow-x: auto;
+}

@@ -1,0 +1,121 @@
+---
+import 'katex/dist/katex.min.css';
+import '../styles/global.css'; /* after KaTeX: our @font-face overrides win */
+import '@fontsource/source-serif-4/400.css';
+import '@fontsource/source-serif-4/500.css';
+import '@fontsource/source-serif-4/600.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+import { profile } from '../data/profile';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  locale?: 'en' | 'fr' | 'cn';
+  alternatePath?: string;
+  alternates?: { hreflang: string; path: string }[];
+}
+const {
+  title,
+  description = profile.tagline,
+  image = '/og-card.png',
+  locale = 'en',
+  alternatePath,
+  alternates,
+} = Astro.props;
+const isChinese = locale === 'cn';
+const copyByLocale = {
+  en: {
+    htmlLang: 'en',
+    role: profile.role,
+    websiteName: `${profile.name} — Engineering Portfolio`,
+    rssTitle: `${profile.name} — Engineering Notes`,
+  },
+  fr: {
+    htmlLang: 'fr',
+    role: 'Ingénieur en mécanique des fluides numérique et développeur',
+    websiteName: `${profile.name} — Portfolio d’ingénierie`,
+    rssTitle: `${profile.name} — Notes d’ingénierie`,
+  },
+  cn: {
+    htmlLang: 'zh-CN',
+    role: '计算流体力学工程师与开发者',
+    websiteName: `${profile.name}——工程作品集`,
+    rssTitle: `${profile.name}——工程笔记`,
+  },
+} as const;
+const copy = copyByLocale[locale];
+const htmlLang = copy.htmlLang;
+const alternateLinks = alternates?.map((alternate) => ({
+  hreflang: alternate.hreflang,
+  href: new URL(alternate.path, Astro.site ?? Astro.url).toString(),
+})) ?? [
+  { hreflang: htmlLang, href: Astro.url.toString() },
+  ...(alternatePath
+    ? [{ hreflang: isChinese ? 'en' : 'zh-CN', href: new URL(alternatePath, Astro.site ?? Astro.url).toString() }]
+    : []),
+];
+const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — ${copy.role}`;
+const socialImage = new URL(image, Astro.site ?? Astro.url).toString();
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      name: profile.name,
+      jobTitle: copy.role,
+      url: Astro.site?.toString(),
+      sameAs: [profile.github, profile.linkedin],
+    },
+    {
+      '@type': 'WebSite',
+      name: copy.websiteName,
+      url: Astro.site?.toString(),
+      description,
+      author: { '@type': 'Person', name: profile.name },
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={Astro.url} />
+    {alternateLinks.map((alternate) => <link rel="alternate" hreflang={alternate.hreflang} href={alternate.href} />)}
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="preload" href="/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="apple-touch-icon" href="/avatar_memoji_05_nobg.png" />
+    <link rel="alternate" type="application/rss+xml" title={copy.rssTitle} href="/rss.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:image" content={socialImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)}></script>
+    <title>{pageTitle}</title>
+  </head>
+  <body class="min-h-screen">
+    <div class="sticky top-0 z-40 border-b border-edge bg-bg/90 backdrop-blur">
+      <div class="mx-auto flex h-14 max-w-7xl items-center px-6 text-sm lg:px-8">
+        <a href="/" class="font-medium text-ink">{profile.name}</a>
+      </div>
+    </div>
+
+    <main class="page-enter mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+      <slot />
+      <footer class="mt-20 border-t border-edge-soft pt-6 text-center text-xs text-stone">
+        Copyright © 2026 Bing Gao. All rights reserved.
+      </footer>
+    </main>
+  </body>
+</html>

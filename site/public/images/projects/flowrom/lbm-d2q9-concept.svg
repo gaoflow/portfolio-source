@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 380" width="100%" height="100%" style="background:#ffffff; font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0f766e" />
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#c2410c" />
+    </marker>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- Panel A: D2Q9 Lattice Vectors -->
+  <g transform="translate(30, 20)">
+    <rect width="390" height="340" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="25" y="38" font-size="15" font-weight="700" fill="#0f172a">A. D2Q9 离散速度模型</text>
+    <text x="25" y="58" font-size="12" fill="#64748b">每个网格节点具有 9 个离散运动方向</text>
+
+    <!-- Grid Background -->
+    <g transform="translate(195, 195)">
+      <!-- Surrounding Nodes -->
+      <line x1="-90" y1="-90" x2="90" y2="-90" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1"/>
+      <line x1="-90" y1="0" x2="90" y2="0" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1"/>
+      <line x1="-90" y1="90" x2="90" y2="90" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1"/>
+      <line x1="-90" y1="-90" x2="-90" y2="90" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1"/>
+      <line x1="0" y1="-90" x2="0" y2="90" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1"/>
+      <line x1="90" y1="-90" x2="90" y2="90" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1"/>
+
+      <!-- Cardinal Vectors (Length 75) -->
+      <line x1="0" y1="0" x2="72" y2="0" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <line x1="0" y1="0" x2="0" y2="-72" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <line x1="0" y1="0" x2="-72" y2="0" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow)"/>
+      <line x1="0" y1="0" x2="0" y2="72" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+      <!-- Diagonal Vectors (Length 70) -->
+      <line x1="0" y1="0" x2="62" y2="-62" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="0" y1="0" x2="-62" y2="-62" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="0" y1="0" x2="-62" y2="62" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow)"/>
+      <line x1="0" y1="0" x2="62" y2="62" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <!-- Surrounding Node dots -->
+      <circle cx="-90" cy="-90" r="4" fill="#94a3b8"/>
+      <circle cx="0" cy="-90" r="4" fill="#94a3b8"/>
+      <circle cx="90" cy="-90" r="4" fill="#94a3b8"/>
+      <circle cx="-90" cy="0" r="4" fill="#94a3b8"/>
+      <circle cx="90" cy="0" r="4" fill="#94a3b8"/>
+      <circle cx="-90" cy="90" r="4" fill="#94a3b8"/>
+      <circle cx="0" cy="90" r="4" fill="#94a3b8"/>
+      <circle cx="90" cy="90" r="4" fill="#94a3b8"/>
+
+      <!-- Center Node -->
+      <circle cx="0" cy="0" r="8" fill="#0f766e" stroke="#ffffff" stroke-width="2"/>
+
+      <!-- Vector Labels -->
+      <text x="82" y="4" font-size="12" font-weight="700" fill="#0f766e">e₁</text>
+      <text x="70" y="-70" font-size="12" font-weight="700" fill="#0f766e">e₅</text>
+      <text x="-4" y="-80" font-size="12" font-weight="700" fill="#0f766e">e₂</text>
+      <text x="-80" y="-70" font-size="12" font-weight="700" fill="#0f766e">e₆</text>
+      <text x="-92" y="4" font-size="12" font-weight="700" fill="#0f766e">e₃</text>
+      <text x="-80" y="76" font-size="12" font-weight="700" fill="#0f766e">e₇</text>
+      <text x="-4" y="90" font-size="12" font-weight="700" fill="#0f766e">e₄</text>
+      <text x="70" y="76" font-size="12" font-weight="700" fill="#0f766e">e₈</text>
+      <text x="12" y="16" font-size="11" font-weight="700" fill="#0f766e">e₀ (静止)</text>
+    </g>
+    <text x="25" y="322" font-size="11" fill="#64748b">权重: w₀=4/9, 正向 w₁₋₄=1/9, 对角 w₅₋₈=1/36</text>
+  </g>
+
+  <!-- Panel B: Collision and Streaming -->
+  <g transform="translate(450, 20)">
+    <rect width="420" height="340" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="25" y="38" font-size="15" font-weight="700" fill="#0f172a">B. 核心演化两步法</text>
+    <text x="25" y="58" font-size="12" fill="#64748b">每个时间步：在格点上碰撞，再跳跃到相邻格点</text>
+
+    <!-- Step 1: Collision Box -->
+    <g transform="translate(25, 75)">
+      <rect width="370" height="105" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+      <circle cx="24" cy="24" r="12" fill="#0f766e"/>
+      <text x="20" y="29" font-size="13" font-weight="700" fill="#ffffff">1</text>
+      <text x="46" y="29" font-size="14" font-weight="700" fill="#0f172a">碰撞阶段 (Collision)</text>
+      <text x="25" y="58" font-size="12" fill="#334155">到达格点的粒子相互碰撞，向局部平衡态松弛：</text>
+      <rect x="25" y="68" width="320" height="26" rx="4" fill="#f1f5f9"/>
+      <text x="35" y="86" font-size="12" font-family="monospace" fill="#0f766e">fᵢ* = fᵢ - (1 / τ) · (fᵢ - fᵢᵉᑫ)</text>
+    </g>
+
+    <!-- Transition Arrow -->
+    <path d="M 210 188 L 210 200" stroke="#c2410c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+
+    <!-- Step 2: Streaming Box -->
+    <g transform="translate(25, 205)">
+      <rect width="370" height="110" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+      <circle cx="24" cy="24" r="12" fill="#c2410c"/>
+      <text x="20" y="29" font-size="13" font-weight="700" fill="#ffffff">2</text>
+      <text x="46" y="29" font-size="14" font-weight="700" fill="#0f172a">迁移阶段 (Streaming)</text>
+      <text x="25" y="56" font-size="12" fill="#334155">碰撞后的粒子沿各自离散速度跳向相邻节点：</text>
+      <rect x="25" y="66" width="320" height="26" rx="4" fill="#fef2f2"/>
+      <text x="35" y="84" font-size="12" font-family="monospace" fill="#c2410c">fᵢ(x + eᵢ·Δt, t + Δt) = fᵢ*(x, t)</text>
+    </g>
+  </g>
+</svg>

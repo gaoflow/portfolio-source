@@ -1,0 +1,92 @@
+---
+import Base from '../layouts/Base.astro';
+import ModelViewer from './ModelViewer.astro';
+import { render, type CollectionEntry } from 'astro:content';
+
+type Locale = 'en' | 'cn';
+type ProjectEntry = CollectionEntry<'projects'> | CollectionEntry<'projectsCn'>;
+
+interface Props {
+  project: ProjectEntry;
+  locale: Locale;
+  hasAlternate: boolean;
+}
+
+const { project, locale, hasAlternate } = Astro.props;
+const isChinese = locale === 'cn';
+const d = project.data;
+const { Content } = await render(project);
+const basePath = '/#projects';
+const alternatePath = hasAlternate
+  ? `${isChinese ? '/projects' : '/cn/projects'}/${project.id}`
+  : undefined;
+---
+
+<Base title={d.title} description={d.summary} image={`/og/projects/${project.id}.png`} locale={locale} alternatePath={alternatePath}>
+  <article class="mx-auto max-w-3xl px-6 pt-16 pb-24">
+    <header class="space-y-5 mb-10">
+      <a href={basePath} class="font-mono text-xs text-muted hover:text-accent">{isChinese ? '← 返回项目列表' : '← Projects'}</a>
+      <h1 class="text-3xl md:text-5xl font-medium leading-tight tracking-tight">{d.title}</h1>
+      <p class="text-xl text-warm leading-relaxed">{d.summary}</p>
+      {d.nda && (
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="tag">{isChinese ? '符合 NDA 的公开版本' : 'NDA-safe write-up'}</span>
+        </div>
+      )}
+    </header>
+
+    {d.heroVideo && (
+      <figure class="mb-10">
+        <video
+          autoplay
+          loop
+          muted
+          playsinline
+          controls
+          preload="metadata"
+          poster={d.heroVideo.poster}
+          aria-label={d.title}
+          class="block w-full h-auto rounded-xl shadow-sm"
+        >
+          <source src={d.heroVideo.src} type="video/mp4" />
+          {isChinese ? '你的浏览器不支持 HTML5 视频。' : 'Your browser does not support HTML5 video.'}
+        </video>
+        <figcaption class="mt-2 font-mono text-xs leading-relaxed text-stone">{d.heroVideo.caption}</figcaption>
+      </figure>
+    )}
+
+    {d.academic?.note && (
+      <p class="mb-10 border-l-2 border-accent pl-5 text-lg leading-relaxed text-muted">{d.academic.note}</p>
+    )}
+    {d.academic && d.academic.media.length > 0 && (
+      <div class="mb-10 space-y-10">
+        {d.academic.media.map((media) => (
+          <figure>
+            <img src={media.src} alt={media.alt} class="w-full rounded-xl shadow-sm bg-white" loading="lazy" />
+            <figcaption class="mt-2 font-mono text-xs leading-relaxed text-stone">{media.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
+    )}
+
+    {!d.heroVideo && d.model3d && (
+      <ModelViewer
+        src={d.model3d}
+        alt={d.title}
+        poster={d.heroImage}
+        caption={isChinese ? '在线预览 3D' : 'Interactive 3D — drag to rotate and scroll to zoom.'}
+      />
+    )}
+    {!d.heroVideo && d.heroImage && !d.model3d && (
+      <img src={d.heroImage} alt={d.title} class="w-full rounded-xl shadow-sm mb-10" loading="lazy" />
+    )}
+
+    <div class="prose prose-neutral prose-lg max-w-none
+      prose-headings:font-medium prose-headings:tracking-tight
+      prose-h2:mt-12 prose-h2:text-3xl
+      prose-p:leading-[1.6] prose-li:leading-[1.6]
+      prose-strong:text-ink">
+      <Content />
+    </div>
+  </article>
+</Base>
