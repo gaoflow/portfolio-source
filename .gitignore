@@ -18,3 +18,9 @@ site/.private/
 .agent-workbench/
 
 /196479.MP4
+
+# Local agent tooling
+.agents/
+.claude/
+.agent-workbench/
+skills-lock.json
