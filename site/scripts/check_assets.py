@@ -34,10 +34,12 @@ ALLOWLIST = {
     'projects/space-rider/final-vehicle.png',
     # Abaqus viewport capture — the software's viewport is dark by design
     'projects/xc48-abaqus-twin/m2-necking-deformed.png',
-    # CC BY laboratory photograph — preserve the source image without retouching
+    # Laboratory and flow-visualisation photographs — preserve source appearance
     'projects/steady-conduction-1d/reference/metal-rod-conduction-experiment.jpg',
-    # CC BY-SA flow-visualization photograph — preserve the source image unmodified
-    'projects/potential-flow-sandbox/reference/real-cylinder-wake-low-re.jpg',
+    'projects/steady-conduction-1d/reference/heating-element.jpg',
+    'projects/steady-conduction-1d/reference/metal-bar-induction-heating.jpg',
+    'projects/steady-conduction-1d/reference/quartz-heating-element.jpg',
+    'projects/potential-flow-sandbox/source/karman-vortex-street-yakushima-2012.jpg',
     # Event photographs — preserve the original night/stage lighting
     'projects/3dexperience-rb22/f1-photos/IMG_4739.jpg',
     'projects/3dexperience-rb22/f1-photos/IMG_4753.jpg',
@@ -61,7 +63,9 @@ ALLOWLIST = {
     'projects/fluent-cylinder-vortex/source/steady-velocity-magnitude.png',
     'projects/fluent-cylinder-vortex/source/transverse-velocity-patch.png',
     # Reference photographs selected as project-card covers
-    'projects/pipe-flow-sizing/reference/car-water-pump.jpg',
+    'projects/heat-diffusion-2d/paris-snow-video-frame.jpg',
+    'projects/heat-diffusion-2d/thermal-spreading-infrared.jpg',
+    'projects/pipe-flow-sizing/reference/split-case-centrifugal-pump.jpg',
     'projects/powertrain-cycle-simulation/spa-francorchamps-aerial.jpg',
     # Official/reference spacecraft imagery and Blender renders
     'projects/space-rider/reference/esa-earth-render.jpg',

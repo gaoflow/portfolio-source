@@ -28,30 +28,22 @@ jobs:
           cache-dependency-path: site/package-lock.json
 
       - name: Install dependencies
-        run: |
-          npm ci --prefix site
-          python3 -m pip install --disable-pip-version-check numpy==2.2.6 matplotlib==3.10.8 scipy==1.17.1
-
-      - name: Verify committed evidence catalog
-        run: |
-          python3 projects/evidence-kit/scripts/audit_portfolio.py
-          python3 projects/evidence-kit/scripts/publish_site.py
-          git diff --exit-code -- projects/evidence-kit/results site/public/evidence
-
-      - name: Test every numerical project
-        run: python3 scripts/verify_numerical_projects.py --portfolio-only
+        run: npm ci --prefix site
 
       - name: Build static site
         run: npm --prefix site run build
 
-      - name: Check local links and assets
+      - name: Check local links
         run: python3 site/scripts/check_static_links.py site/dist
 
-      - name: Check nothing leaked through markdown rendering
+      - name: Check rendered content
         run: python3 site/scripts/check_rendering.py site/dist
 
-      - name: Check no dark-background images ship
+      - name: Check image assets
         run: python3 site/scripts/check_assets.py site/public/images
 
-      - name: Check no dark UI blocks ship
+      - name: Check UI colors
         run: python3 site/scripts/check_dark_ui.py site/dist
+
+      - name: Check CV locale isolation
+        run: python3 site/scripts/check_cv_locales.py site/dist

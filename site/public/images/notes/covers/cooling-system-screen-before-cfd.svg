@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360"><rect width="640" height="360" fill="#faf9f5"/>
-<rect x="80" y="120" width="150" height="120" fill="#e8e6dc" stroke="#504e49" stroke-width="1.5"/>
-<rect x="410" y="120" width="150" height="120" fill="#e8e6dc" stroke="#504e49" stroke-width="1.5"/>
-<rect x="290" y="90" width="60" height="180" fill="#f0e0d8" stroke="#8b4513" stroke-width="2.5"/>
-<line x1="300" y1="100" x2="340" y2="260" stroke="#8b4513" stroke-width="2.5"/>
-<line x1="340" y1="100" x2="300" y2="260" stroke="#8b4513" stroke-width="2.5"/>
-<text x="298" y="72" font-family="ui-monospace, Menlo, monospace" font-size="12" letter-spacing="2" fill="#8b4513">NO-GO</text><text x="28" y="330" font-family="ui-monospace, Menlo, monospace" font-size="13" letter-spacing="3" fill="#504e49">FSAE COOLING SCREEN</text></svg>
