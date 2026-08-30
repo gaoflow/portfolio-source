@@ -10,6 +10,9 @@
     "build": "astro build",
     "check:seo": "python3 scripts/check_seo.py dist",
     "verify:seo": "npm run build && npm run check:seo",
+    "submit:indexnow": "python3 scripts/submit_indexnow.py dist/sitemap.xml c68a268aff5d62140ef3185062c68b9d",
+    "deploy:production": "npm run verify:seo && npx --yes wrangler@4.125.0 pages deploy dist --project-name vinzzy --branch main && npm run submit:indexnow",
+    "deploy:www-redirect": "npx --yes wrangler@4.125.0 deploy --config wrangler.www-redirect.jsonc",
     "preview": "astro preview",
     "serve:dist": "serve dist -l 4321 --no-clipboard",
     "astro": "astro"

@@ -12,6 +12,7 @@ from urllib.parse import urlsplit
 from xml.etree import ElementTree
 
 ORIGIN = "https://vinzzy.com"
+INDEXNOW_KEY = "c68a268aff5d62140ef3185062c68b9d"
 FORBIDDEN_HOSTS = ("localhost", "127.0.0.1", "192.168.")
 
 
@@ -210,6 +211,12 @@ def main() -> int:
             failures.append("llms.txt project count does not match rendered Article pages")
         if any(host in llms for host in FORBIDDEN_HOSTS):
             failures.append("llms.txt contains a local host reference")
+    indexnow_key_path = root / f"{INDEXNOW_KEY}.txt"
+    if not indexnow_key_path.exists():
+        failures.append(f"missing {indexnow_key_path.name}")
+    elif indexnow_key_path.read_text(encoding="utf-8").strip() != INDEXNOW_KEY:
+        failures.append(f"{indexnow_key_path.name} does not contain the configured key")
+
 
     if failures:
         print("SEO check failed:")

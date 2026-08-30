@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "portfolio-www-redirect",
+  "main": "workers/www-redirect.ts",
+  "compatibility_date": "2026-08-30",
+  "routes": [
+    {
+      "pattern": "www.vinzzy.com/*",
+      "zone_name": "vinzzy.com"
+    }
+  ]
+}
