@@ -1,11 +1,11 @@
 ---
-title: 'Estimating Cooling Loop Flow Rate Without Physical Hardware'
+title: 'How to Estimate Cooling Loop Flow Rate Without Physical Hardware'
 year: 2025
 date: '2025-11-29'
 status: complete
 categories: [tooling]
 tags: [CFD]
-summary: 'A water pump rated at 40 L/min will not deliver 40 L/min once connected to hoses, radiators, and water jackets. By modeling the segment-by-segment resistance, I determined the actual operating point of 26.22 L/min at 51.34 kPa, verifying friction factors, line losses, and curve intersections.'
+summary: 'A cooling pump datasheet may state 40 L/min, but that does not mean it will deliver 40 L/min once connected to hoses, a radiator, and engine water jackets. By modeling these head losses segment by segment, I determined the actual operating point at 26.22 L/min and 51.34 kPa, while verifying friction factors, line pressure drops, and curve intersections.'
 role: 'Hydraulics & Numerical Methods'
 duration: 'Independent Research'
 featured: false
@@ -16,120 +16,126 @@ cardImageFit: cover
 github: 'https://github.com/gaoflow/pipe-flow-sizing'
 ---
 
-## The Datasheet's 40 L/min Is Not the Operating Reality
+## 40 L/min on the Datasheet $\neq$ Real-World Flow Rate
 
-This project was carried out in the third month of my first year of master's studies in mechanical engineering. Our team was discussing the cooling system for our FSAE race car. A water pump datasheet stated "maximum flow rate: 40 L/min," and I needed to verify what flow rate would actually be achieved in practice.
+This project was completed during my third month as a first-year M.S. student in Mechanical Engineering. The team was designing the cooling system for an FSAE race car. The water pump datasheet specified a "maximum flow rate of 40 L/min," and I was tasked with evaluating what that 40 L/min actually translates to in practice.
 
-That rating comes with a major caveat: near-zero discharge resistance (free delivery). Once installed in a real vehicle, coolant must pass through hoses, elbows, radiators, and narrow engine cooling jackets. It behaves much like a garden hose: short and straight, it fills a bucket quickly; lengthen it, bend it around corners, or constrict a section, and the flow drops significantly even though the water source remains unchanged.
+This maximum flow rating assumes ideal conditions: essentially zero backpressure at the outlet. Once installed in the vehicle, the coolant must pass through hoses, elbows, a radiator, and narrow engine channels. It behaves much like a garden hose: when short and straight, it fills a bucket quickly; extend it, introduce bends, or pinch a section, and the flow rate drops significantly despite using the same water source.
 
-If the flow rate is overestimated at this stage, subsequent thermal calculations—no matter how many decimal places are kept—will be evaluating the wrong operating condition. Therefore, I needed to solve this core question:
+If the flow rate is overestimated at this stage, any subsequent thermal calculations—no matter how many decimal places are retained—will be based on an incorrect operating condition. Thus, I set out to solve this core question:
 
-> Given a pump curve and a series circuit, at what flow rate does the pump pressure head exactly match the total pressure losses across the loop?
+> Given a pump performance curve and a series cooling loop, at what flow rate does the pressure head delivered by the pump exactly balance the total system pressure loss?
 
-## Cooling Circuit Topology
+## The Fluid Circuit
 
-To calculate flow rate, I decomposed the circuit into four series components: suction hose, radiator core, engine water jacket, and return hose. Connected end-to-end, coolant flows sequentially through each section before returning to the pump.
+To evaluate the flow rate, I discretized the loop into four sequential segments: the suction hose, the radiator core, the engine water jacket, and the return hose. They are connected in series, meaning fluid flows through each segment sequentially before returning to the pump.
 
-A series circuit has a key property: the flow rate is identical through every component. I only needed to calculate the pressure drop across each of the four sections and sum them up to determine the total pressure head required by the system at any given flow rate.
+A series circuit simplifies the analysis: the volumetric flow rate is identical across all segments. By calculating the pressure loss within each individual segment and summing them up, the total system head loss for a given flow rate can be obtained.
 
-| Component | Length | Inner Diameter | $K$ |
+| Component | Length ($L$) | Inner Diameter ($D$) | Minor Loss Coefficient ($K$) |
 |---|---:|---:|---:|
-| Suction hose | 0.40 m | 16 mm | 1.5 |
-| Radiator core | 0.15 m | 16 mm | 8.0 |
-| Engine water jacket | 0.50 m | 14 mm | 4.0 |
-| Return hose | 0.60 m | 16 mm | 2.0 |
+| Suction Hose | 0.40 m | 16 mm | 1.5 |
+| Radiator Core | 0.15 m | 16 mm | 8.0 |
+| Engine Water Jacket | 0.50 m | 14 mm | 4.0 |
+| Return Hose | 0.60 m | 16 mm | 2.0 |
 
-The radiator introduces substantial resistance because coolant does not simply pass through a large open cavity; instead, it is distributed into dozens of narrow micro-channels.
+The radiator introduces substantial flow resistance because coolant does not pass through a wide open cavity; instead, it is split into numerous narrow micro-channels.
 
 <figure>
-  <img src="/images/projects/pipe-flow-sizing/reference/automobile-radiator.jpg" alt="Automobile aluminum radiator" loading="lazy" style="max-width: 529px; margin-inline: auto;">
-  <figcaption>Automobile aluminum radiator.</figcaption>
+  <img src="/images/projects/pipe-flow-sizing/reference/automobile-radiator.jpg" alt="Automotive Aluminum Radiator" loading="lazy" style="max-width: 529px; margin-inline: auto;">
+  <figcaption>Automotive aluminum radiator</figcaption>
 </figure>
 
-## Converting Each Component into Pressure Drop
+## Converting Components to Pressure Drops
 
-I calculated the pressure drop for each component using the standard Darcy–Weisbach formulation:
+I applied the Darcy–Weisbach formulation to compute the pressure drop across each individual component:
 
 $$
 \Delta p=\left(f\frac{L}{D}+K\right)\frac{\rho V^2}{2}.
 $$
 
-This equation decomposes into two parts: $fL/D$ accounts for major friction loss along the pipe walls, while $K$ accounts for minor losses from elbows, inlets, contractions, and internal passage geometry. The final dynamic pressure term $\rho V^2/2$ depends on flow velocity—as speed increases, pressure drop rises quadratically. Length, diameter, density, and velocity can all be substituted directly. The main challenge lies in evaluating the Darcy friction factor $f$, so before solving the entire loop, I verified $f$ independently.
+This equation can be divided into two main components: $fL/D$ accounts for the major friction losses along the pipe walls, while $K$ accounts for minor losses introduced by bends, inlets, and internal geometry changes. The dynamic pressure term, $\rho V^2/2$, scales with flow velocity; higher velocities lead to quadratically higher pressure drops. While length, diameter, density, and velocity can be directly substituted, determining the Darcy friction factor ($f$) requires careful treatment. Rather than immediately solving the entire loop, I verified the calculation of $f$ independently first.
 
-## Calculating the Friction Factor
+## Friction Factor ($f$) Calculations
 
-In laminar flow, $f$ is calculated directly:
+For laminar flow regime, $f$ is solved explicitly:
 
 $$
 f=\frac{64}{Re}.
 $$
 
-The Reynolds number acts as a gauge for flow regime: at lower values, viscosity dominates; as it increases, the flow transitions into turbulence, and pipe wall roughness begins to dictate friction. I sampled 200 points between $Re=100$ and $2300$, and the solver output matched $64/Re$ with a difference of exactly 0.0.
+Here, the Reynolds number ($Re$) serves as a metric for the flow regime: at lower values, viscous forces dominate; at higher values, the flow transitions to turbulence, where pipe wall roughness begins to dictate friction losses. I sampled 200 points across $Re = 100$ to $2300$, and the solver's numerical output matched $64/Re$ with zero residual error ($0.0$).
 
-Turbulent flow is more complex. In the Colebrook equation, $f$ appears implicitly on both sides, requiring iterative numerical solution. I first used the [Haaland approximation](https://doi.org/10.1115/1.3240948) to provide a close initial guess, then refined it using Newton–Raphson iteration. If convergence is not reached within 50 iterations, the solver raises an error rather than returning an unverified value. After computation, I substituted each $f$ back into the Colebrook equation. Across 150 combinations of Reynolds number and relative roughness up to $Re=10^8$, the maximum residual was $3.55\times10^{-15}$. Mathematically, the solved $f$ is fully verified.
+Turbulent flow is more complex. In the implicit Colebrook equation, $f$ appears on both sides of the equation, requiring iterative solution techniques. I used the [Haaland approximation](https://doi.org/10.1115/1.3240948) to generate an accurate initial guess, followed by Newton-Raphson iterations to refine the root. If convergence is not reached within 50 iterations, the program raises an exception rather than returning an invalid result. After solving, each evaluated $f$ was substituted back into the original Colebrook equation. Across 150 combinations of Reynolds numbers (up to $Re = 10^8$) and relative roughness values, the maximum residual was $3.55\times10^{-15}$, confirming the mathematical validity of the solver.
 
-![Friction factors for laminar, smooth pipe, and rough pipe regimes](/images/projects/pipe-flow-sizing/moody.svg)
+![Friction Factors for Laminar, Smooth, and Rough Pipe Flows](/images/projects/pipe-flow-sizing/moody.svg)
 
-## Validity Range and Domain Checks
+## Domain Validation & Boundary Checks
 
-I implemented the explicit [Swamee–Jain equation](https://doi.org/10.1061/JYCEAJ.0004542) as a secondary validation baseline. It claims an accuracy of $\pm3\%$, but only within the following domain:
+As a secondary validation path, I implemented the explicit [Swamee–Jain equation](https://doi.org/10.1061/JYCEAJ.0004542). While it claims an accuracy within $\pm3\%$, this guarantee is strictly bounded by the following domain:
 
 $$
 5\times10^3\le Re\le10^8,\qquad
 10^{-6}\le\varepsilon/D\le10^{-2}.
 $$
 
-During my initial cross-comparison, I set the test domain too broadly. At very low roughness with $Re$ near $4\times10^3$, the discrepancy between the two formulations exceeded 3%. I initially suspected an error in the Colebrook solver, but soon realized these test points lay outside Swamee–Jain's stated validity envelope. Restricting the 3% acceptance check to the equation's declared domain brought the maximum discrepancy down to 2.83%. This discrepancy did not require modifying the Colebrook solver, but rather correcting the validation domain. It served as a reminder that empirical reference formulas have strict boundaries and cannot serve as arbiters outside their intended scope.
+During initial testing, I evaluated points outside these specified boundaries. Near low relative roughness and $Re \approx 4\times10^3$, discrepancies between the Colebrook solver and Swamee–Jain exceeded 3%. Initially suspecting a bug in my Colebrook solver, further inspection revealed that these evaluation points fell outside the valid domain of the Swamee–Jain approximation. Once the validation test range was constrained strictly to the published validity domain, the maximum relative discrepancy dropped to 2.83%. This discrepancy did not require modifying the Colebrook solver, but rather adjusting the test envelope. It served as a good reminder: analytical reference formulas have operational boundaries and cannot serve as universal ground truth outside their specified domains.
 
-Having passed both verification checks, the friction factor calculation was integrated back into the four-segment pipe network.
+With the friction factor solver fully validated across both tests, the four pipe segments could be integrated back into the complete circuit model.
 
-## Determining the Operating Flow Rate
+## Determining the Operating Point
 
-I began with a trial flow rate, evaluated the pressure drop across the four segments in sequence, and summed them up:
+Starting with an initial trial flow rate, I calculated the pressure drop across all four segments and summed them to obtain the total system resistance:
 
 $$
 \Delta p_{sys}(Q)=\sum_i \Delta p_i(Q).
 $$
 
-Repeating this calculation across a range of flow rates generates the system resistance curve. As flow rate increases, system head loss rises, causing this curve to slope upward. The pump supplies head according to its own characteristic curve. The pump referenced earlier is engine-driven via a pulley, where the impeller imparts kinetic and pressure energy to the coolant. However, a pump cannot deliver a fixed flow rate irrespective of circuit resistance. This project models the pump using a representative parabolic characteristic:
+Repeating this calculation across a range of flow rates yields the system curve. Because flow resistance increases with velocity, the system curve slopes upward. Conversely, the pump supplies energy to the fluid, represented by a pump performance curve. In the physical vehicle, the pump impeller is driven by the engine crank via a belt and pulley. However, a pump cannot deliver a constant flow rate regardless of backpressure. In this model, a surrogate quadratic curve was used to approximate the pump characteristics:
 
 $$
 \Delta p_{pump}=90\ \text{kPa}-cQ^2.
 $$
 
-It provides 90 kPa at zero flow (shutoff head), decaying to zero pressure at 40 L/min (free delivery). The actual flow rate delivered in the system corresponds to the intersection of the pump curve and system curve:
+This curve yields a shut-off head of 90 kPa at zero flow and drops to zero head at 40 L/min (free delivery). The actual operating flow rate corresponds to the intersection of the pump curve and the system curve:
 
 $$
 \Delta p_{pump}(Q)-\Delta p_{sys}(Q)=0.
 $$
 
-The solver first uses Newton–Raphson iteration to locate the root. If an iteration step jumps outside the bounding interval, it falls back to bisection for guaranteed convergence.
+The solver uses the Newton-Raphson method to locate this intersection point. If an iterative step projects outside the valid domain, the algorithm falls back to a bisection method to guarantee convergence.
 
-![Pump curve and system resistance curve](/images/projects/pipe-flow-sizing/pump-operating-point.svg)
+![Pump Curve and System Curve Intersection](/images/projects/pipe-flow-sizing/pump-operating-point.svg)
 
-The two curves intersect at 26.22 L/min and 51.34 kPa. In other words, under these representative parameters, the 40 L/min free flow rate drops by approximately one-third once connected to the circuit.
+The two curves intersect at **26.22 L/min** and **51.34 kPa**. Under these simplified system parameters, connecting the 40 L/min free-delivery pump into the circuit results in an approximate 34% reduction in actual delivered flow.
 
-While numerical solvers can return many decimal places, high precision does not guarantee physical correctness. I performed a fine sweep across 4,096 uniformly spaced points between 0 and 40 L/min, bracketing the sign change between the two curves. This brute-force scan bounded the intersection between 26.2173 and 26.2271 L/min, cleanly containing the Newton–Raphson result. At this operating point, pump head and system loss differ by at most $2.18\times10^{-11}\text{ Pa}$. I also verified several fundamental physical invariants: system pressure drop must increase monotonically with flow rate; adding an extra 10 kPa of static head must decrease operating flow rate; and total loop pressure drop must equal the sum of the four segment losses. With the operating point validated, the analysis turned to the practical question: which component causes the greatest restriction?
+High floating-point precision in numerical solvers does not automatically guarantee physical accuracy. To double-check the result, I performed a brute-force sweep over 4,096 uniformly spaced points between 0 and 40 L/min to locate the zero-crossing interval. This coarse scan bracketed the intersection between 26.2173 and 26.2271 L/min, closely matching the Newton-Raphson result. At this solved operating point, the residual difference between pump pressure and system head loss was less than $2.18\times10^{-11}$ Pa. Additional physical sanity checks were confirmed: system pressure drop monotonically increases with flow rate; introducing an additional 10 kPa of static head reduces the operating flow rate; and total loop pressure drop strictly equals the sum of the four individual segment losses. With the intersection point verified, the investigation turned to identifying the primary sources of pressure loss.
 
-## Breakdown of the 51.34 kPa Pressure Loss
+## Pressure Loss Breakdown (51.34 kPa)
 
-![Pressure loss breakdown across the four circuit components](/images/projects/pipe-flow-sizing/pressure-loss-breakdown.svg)
+![Pressure Loss Breakdown across Four Loop Components](/images/projects/pipe-flow-sizing/pressure-loss-breakdown.svg)
 
-At the operating point, the suction hose loses 4.89 kPa, the radiator core loses 19.37 kPa, the engine water jacket loses 20.33 kPa, and the return hose loses 6.75 kPa. Summing these four gives exactly 51.34 kPa. The radiator core and engine jacket together account for 39.70 kPa, or roughly 77% of total system pressure drop. Looking across the entire circuit, minor loss terms ($K$) account for 43.19 kPa (84.1%), while major pipe friction accounts for 8.14 kPa (15.9%).
+At the operating point, the pressure loss breakdown across components is as follows:
+* Suction Hose: 4.89 kPa
+* Radiator Core: 19.37 kPa
+* Engine Water Jacket: 20.33 kPa
+* Return Hose: 6.75 kPa
 
-Therefore, under these design assumptions, reducing the restriction in the core and water jacket is far more effective than trimming a few centimeters off the hoses. However, this conclusion strictly applies to the current geometry and $K$-factor assumptions; actual proportions may shift with empirical rig measurements.
+Combined, the radiator core and engine water jacket account for 39.70 kPa, or approximately **77%** of the total loop pressure drop. Looking at loss mechanisms across the entire circuit, minor losses ($K$-factors) contribute 43.19 kPa (**84.1%**), whereas major friction losses ($fL/D$) account for only 8.14 kPa (**15.9%**).
 
-## Summary
+Consequently, under this baseline configuration, reducing restriction in the radiator core and engine passages offers a significantly higher return on flow rate optimization than trimming hose lengths. Note that this insight holds specifically for the assumed geometry and loss coefficients; actual proportions may shift with empirical component data.
 
-In summary, 40 L/min is merely the pump's free delivery flow rate under zero external resistance. Once connected to a real circuit, the operating point settles at 26.22 L/min and 51.34 kPa—a reduction of about one-third. Furthermore, exploring where the pressure head is consumed revealed that roughly 77% of the 51.34 kPa is lost in the radiator core and engine water jacket; any effort to improve flow rate must target these components first.
+## Key Takeaways
 
-Whenever evaluating a nominal flow rating, one must ask what pressure head that rating corresponds to, and how much pressure the actual circuit requires. Flow rate is only meaningful when the pump curve and system resistance are evaluated together. The initial discrepancy during the Swamee–Jain comparison also serves as a reminder: when results diverge, both the numerical solver and the reference equation's domain of validity must be checked simultaneously.
+In summary, a rated value of 40 L/min represents only the free-delivery capacity of the pump under near-zero backpressure. When integrated into a real circuit, the actual operating point drops to **26.22 L/min at 51.34 kPa**—a loss of over one-third of the rated flow. Furthermore, the loss breakdown revealed that ~77% of the total head loss originates within the radiator core and engine water passages, highlighting these areas as primary targets for flow optimization.
 
-Of course, 26.22 L/min is not necessarily the final vehicle design flow rate. Several simplifications remain: the pump curve is an idealized parabola, and the $K$-factors are textbook estimates rather than test-bench measurements. The model assumes steady, incompressible, single-phase flow without cavitation, aeration, or NPSH checks, and is limited to a single series loop. Next steps would incorporate empirical pump and component loss curves, followed by parallel branches and thermal network modeling for comprehensive sizing.
+When evaluating a nominal flow specification, it is essential to determine the corresponding head loss and compare it against the system resistance curve. Flow rate is meaningful only when evaluated at the operating point where the pump curve intersects the system curve. Additionally, the Swamee–Jain discrepancy highlighted an important engineering lesson: when numerical results diverge, both the numerical solver implementation and the validity limits of empirical reference formulas must be audited.
 
-## Code & Reproducibility
+Naturally, 26.22 L/min is not necessarily the final target flow rate for the actual vehicle. Several simplifications were made in this study: the pump curve was modeled as a surrogate quadratic equation, minor loss coefficients ($K$) were sourced from engineering handbooks rather than bench test measurements, and the fluid model assumed steady-state, incompressible, single-phase flow (omitting cavitation risk, air entrainment, NPSH checks, and parallel branching). Next steps involve incorporating empirical pump performance curves, measured component pressure drop data, parallel flow loops, and integrated thermal network models for further verification.
 
-Complete source code and tests are available on GitHub: [gaoflow/pipe-flow-sizing](https://github.com/gaoflow/pipe-flow-sizing)
+## Code
+
+The complete source code and test suite are available at [gaoflow/pipe-flow-sizing](https://github.com/gaoflow/pipe-flow-sizing):
 
 ```bash
 git clone https://github.com/gaoflow/pipe-flow-sizing.git
@@ -138,4 +144,4 @@ python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py
 ```
 
-References: Formulation sources include Haaland friction approximation, Swamee–Jain cross-check, and the [original Colebrook paper](https://doi.org/10.1680/ijoti.1939.13150).
+*References: Governing formulas include the Haaland friction factor approximation, Swamee–Jain cross-validation explicit relation, and the original [Colebrook paper](https://doi.org/10.1680/ijoti.1939.13150).*
