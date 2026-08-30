@@ -1,0 +1,21 @@
+---
+import ProjectDetail from '../../../components/ProjectDetail.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const [projects, projectsCn] = await Promise.all([
+    getCollection('projects'),
+    getCollection('projectsCn'),
+  ]);
+  const englishIds = new Set(projects.map((project) => project.id));
+
+  return projectsCn.map((project) => ({
+    params: { slug: project.id },
+    props: { project, hasAlternate: englishIds.has(project.id) },
+  }));
+}
+
+const { project, hasAlternate } = Astro.props;
+---
+
+<ProjectDetail project={project} locale="cn" hasAlternate={hasAlternate} />
