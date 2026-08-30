@@ -11,7 +11,7 @@ duration: 'Independent Research'
 featured: false
 order: 13
 studySequence: 3
-heroImage: /images/projects/pipe-flow-sizing/reference/split-case-centrifugal-pump.jpg
+heroImage: /images/projects/pipe-flow-sizing/reference/car-water-pump.jpg
 cardImageFit: cover
 github: 'https://github.com/gaoflow/pipe-flow-sizing'
 ---
