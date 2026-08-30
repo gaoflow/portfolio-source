@@ -2,6 +2,7 @@
 title: 'Modeling a 2026 F1 Car from Scratch with GSD in 3DExperience'
 year: 2026
 date: '2026-08-24'
+updated: '2026-08-24'
 status: active
 categories: [design]
 tags: [Design, CAD, GSD, Surface Modeling]

@@ -2,6 +2,7 @@
 title: 'FlowLab: Rebuilding a Lattice Boltzmann Method Solver'
 year: 2026
 date: '2026-05-16'
+updated: '2026-05-16'
 status: complete
 categories: [tooling, validation]
 tags: [CFD]

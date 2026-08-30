@@ -2,6 +2,7 @@
 title: 'Flow Field Reduced-Order Modeling: Compressing 480 Snapshots into Dominant Modes'
 year: 2026
 date: '2026-05-30'
+updated: '2026-05-30'
 status: complete
 categories: [validation, tooling]
 tags: [CFD]

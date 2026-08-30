@@ -10,7 +10,7 @@ const { content } = Astro.props;
 const alternates = [{ hreflang: 'en', path: '/cv' }];
 ---
 
-<Base title={content.pageTitle} description={content.description} locale={content.locale} alternates={alternates}>
+<Base title={content.pageTitle} description={content.description} locale={content.locale} alternates={alternates} pageType="profile">
   <article class="cv-document">
     <header class="cv-hero">
       <div class="cv-eyebrow">

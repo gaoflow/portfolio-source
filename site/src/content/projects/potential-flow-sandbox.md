@@ -2,6 +2,7 @@
 title: 'Building My First Potential Flow Model with Complex Potential'
 year: 2025
 date: '2025-11-08'
+updated: '2026-04-16'
 status: complete
 categories: [component-cfd]
 tags: [CFD]

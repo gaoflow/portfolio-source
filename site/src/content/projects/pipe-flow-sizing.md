@@ -2,6 +2,7 @@
 title: 'How to Estimate Cooling Loop Flow Rate Without Physical Hardware'
 year: 2025
 date: '2025-11-29'
+updated: '2026-08-30'
 status: complete
 categories: [tooling]
 tags: [CFD]

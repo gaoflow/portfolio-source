@@ -2,6 +2,7 @@
 title: 'From Melting Snow to a 2D Heat Diffusion Solver'
 year: 2026
 date: '2026-02-07'
+updated: '2026-04-16'
 status: complete
 categories: [validation]
 tags: [CFD]

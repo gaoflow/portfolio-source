@@ -2,6 +2,7 @@
 title: 'Crashworthiness Analysis of an Automotive Front Rail in Abaqus'
 year: 2026
 date: '2026-03-28'
+updated: '2026-04-16'
 status: complete
 categories: [design, validation]
 tags: [FEA]

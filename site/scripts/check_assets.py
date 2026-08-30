@@ -65,7 +65,7 @@ ALLOWLIST = {
     # Reference photographs selected as project-card covers
     'projects/heat-diffusion-2d/paris-snow-video-frame.jpg',
     'projects/heat-diffusion-2d/thermal-spreading-infrared.jpg',
-    'projects/pipe-flow-sizing/reference/split-case-centrifugal-pump.jpg',
+    'projects/pipe-flow-sizing/reference/car-water-pump.jpg',
     'projects/powertrain-cycle-simulation/spa-francorchamps-aerial.jpg',
     # PaddockCV uses a deliberate black editorial cover
     'projects/paddockcv/og.png',

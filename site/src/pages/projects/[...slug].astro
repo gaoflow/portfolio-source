@@ -5,13 +5,29 @@ import { getCollection } from 'astro:content';
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
 
-  return projects.map((project) => ({
-    params: { slug: project.id },
-    props: { project },
-  }));
+  return projects.map((project) => {
+    const relatedProjects = projects
+      .filter((candidate) => candidate.id !== project.id)
+      .map((candidate) => ({
+        project: candidate,
+        sharedCategories: candidate.data.categories.filter((category) => project.data.categories.includes(category)).length,
+      }))
+      .filter(({ sharedCategories }) => sharedCategories > 0)
+      .sort((a, b) =>
+        b.sharedCategories - a.sharedCategories
+        || b.project.data.updated.localeCompare(a.project.data.updated)
+        || a.project.data.order - b.project.data.order)
+      .slice(0, 3)
+      .map(({ project: relatedProject }) => relatedProject);
+
+    return {
+      params: { slug: project.id },
+      props: { project, relatedProjects },
+    };
+  });
 }
 
-const { project } = Astro.props;
+const { project, relatedProjects } = Astro.props;
 ---
 
-<ProjectDetail project={project} />
+<ProjectDetail project={project} relatedProjects={relatedProjects} />

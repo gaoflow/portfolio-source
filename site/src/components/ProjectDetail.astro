@@ -2,24 +2,40 @@
 import Base from '../layouts/Base.astro';
 import ModelViewer from './ModelViewer.astro';
 import { render, type CollectionEntry } from 'astro:content';
+import { topicBySlug } from '../data/topics';
 
 
 interface Props {
   project: CollectionEntry<'projects'>;
+  relatedProjects: CollectionEntry<'projects'>[];
 }
 
-const { project } = Astro.props;
+const { project, relatedProjects } = Astro.props;
 const d = project.data;
 const { Content } = await render(project);
 const basePath = '/#projects';
+const projectTopics = d.categories.map((slug) => ({ slug, ...topicBySlug[slug] }));
 ---
 
-<Base title={d.title} description={d.summary} image={`/og/projects/${project.id}.png`}>
+<Base
+  title={d.title}
+  description={d.summary}
+  image={`/og/projects/${project.id}.png`}
+  pageType="article"
+  publishedTime={d.date}
+  modifiedTime={d.updated}
+  keywords={[...d.categories, ...d.tags]}
+>
   <article class="mx-auto max-w-3xl px-6 pt-16 pb-24">
     <header class="space-y-5 mb-10">
       <a href={basePath} class="font-mono text-xs text-muted hover:text-accent">← Projects</a>
       <h1 class="text-3xl md:text-5xl font-medium leading-tight tracking-tight">{d.title}</h1>
       <p class="text-xl text-warm leading-relaxed">{d.summary}</p>
+      <nav class="flex flex-wrap gap-2" aria-label="Project topics">
+        {projectTopics.map((topic) => (
+          <a href={`/topics/${topic.slug}/`} class="tag hover:text-accent">{topic.title}</a>
+        ))}
+      </nav>
       {d.nda && (
         <div class="flex flex-wrap items-center gap-2">
           <span class="tag">NDA-safe write-up</span>
@@ -80,5 +96,21 @@ const basePath = '/#projects';
       prose-strong:text-ink">
       <Content />
     </div>
+    {relatedProjects.length > 0 && (
+      <aside class="mt-16 border-t border-edge-soft pt-8" aria-labelledby="related-projects-heading">
+        <h2 id="related-projects-heading" class="text-2xl font-medium tracking-tight text-ink">Related projects</h2>
+        <div class="mt-5 grid gap-4 sm:grid-cols-3">
+          {relatedProjects.map((relatedProject) => (
+            <a
+              href={`/projects/${relatedProject.id}/`}
+              class="rounded-xl border border-edge p-4 transition-colors hover:border-accent"
+            >
+              <h3 class="font-medium leading-snug text-ink">{relatedProject.data.title}</h3>
+              <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-muted">{relatedProject.data.summary}</p>
+            </a>
+          ))}
+        </div>
+      </aside>
+    )}
   </article>
 </Base>

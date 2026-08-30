@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
+import { topics } from '../data/topics';
 
 const escapeXml = (value: string) => value.replace(/[<>&'\"]/g, (char) => ({
   '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;',
@@ -9,8 +10,9 @@ export const GET: APIRoute = async ({ site }) => {
   if (!site) throw new Error('astro.config.mjs must define site');
   const projects = await getCollection('projects');
   const entries = [
-    ...['/', '/cv/'].map((path) => ({ path })),
-    ...projects.map((project) => ({ path: `/projects/${project.id}/`, modified: project.data.date })),
+    ...['/', '/cv/', '/labs/flowlab/', '/labs/ground-effect-vortex/'].map((path) => ({ path })),
+    ...topics.map((topic) => ({ path: `/topics/${topic.slug}/` })),
+    ...projects.map((project) => ({ path: `/projects/${project.id}/`, modified: project.data.updated })),
   ];
   const body = entries.map(({ path, modified }) => [
     '  <url>',

@@ -2,6 +2,7 @@
 title: 'Cutting CFD Turnaround with Upfront Sanity Checks'
 year: 2026
 date: '2026-02-28'
+updated: '2026-04-16'
 status: complete
 categories: [validation, tooling]
 tags: [CFD]

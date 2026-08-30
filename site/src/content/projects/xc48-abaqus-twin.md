@@ -2,6 +2,7 @@
 title: 'Digital Twin in Action: Reconstructing a Tensile Test in Abaqus'
 year: 2026
 date: '2026-04-04'
+updated: '2026-04-16'
 status: complete
 categories: [validation, design]
 tags: [FEA]

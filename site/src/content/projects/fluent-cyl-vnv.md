@@ -2,6 +2,7 @@
 title: 'Comparative Analysis of Fluent Results Against Exact Solutions, Meshes, and Experimental Data'
 year: 2026
 date: '2026-03-12'
+updated: '2026-04-16'
 status: complete
 categories: [component-cfd, validation]
 tags: [CFD]

@@ -2,6 +2,7 @@
 title: 'How to Validate a Finite Difference Model'
 year: 2026
 date: '2026-01-17'
+updated: '2026-04-16'
 status: complete
 categories: [validation]
 tags: [Heat Transfer, Finite Difference, Numerical Validation]

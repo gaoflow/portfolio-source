@@ -2,6 +2,7 @@
 title: 'Investigating Ground Effect with Image Vortices'
 year: 2026
 date: '2026-04-25'
+updated: '2026-04-25'
 status: complete
 categories: [validation, tooling]
 tags: [CFD]

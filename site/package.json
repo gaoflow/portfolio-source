@@ -8,6 +8,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "check:seo": "python3 scripts/check_seo.py dist",
+    "verify:seo": "npm run build && npm run check:seo",
     "preview": "astro preview",
     "serve:dist": "serve dist -l 4321 --no-clipboard",
     "astro": "astro"

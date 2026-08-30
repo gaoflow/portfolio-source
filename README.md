@@ -47,5 +47,5 @@ site/src/content/projects-cn/
 
 ```bash
 cd site
-npm run build
+npm run verify:seo
 ```

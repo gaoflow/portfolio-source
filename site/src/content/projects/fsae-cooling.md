@@ -2,6 +2,7 @@
 title: 'Building an FSAE Cooling System from Scratch'
 year: 2026
 date: '2026-08-22'
+updated: '2026-08-22'
 status: complete
 categories: [fsae, validation]
 tags: [thermal-management]

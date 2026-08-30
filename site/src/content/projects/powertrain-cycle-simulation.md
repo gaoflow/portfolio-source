@@ -2,6 +2,7 @@
 title: 'Drive Cycle Simulation and Energy Consumption Comparison of Four Powertrain Architectures'
 year: 2025
 date: '2025-12-06'
+updated: '2026-04-16'
 status: complete
 categories: [tooling, validation]
 tags: [powertrain-simulation]

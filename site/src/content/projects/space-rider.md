@@ -2,6 +2,7 @@
 title: 'Reconstructing a 3D Spacecraft Model in Blender from ESA Blueprints'
 year: 2026
 date: '2026-06-15'
+updated: '2026-06-15'
 status: complete
 categories: [design]
 tags: [design]
