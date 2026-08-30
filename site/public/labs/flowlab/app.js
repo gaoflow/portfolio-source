@@ -54,9 +54,9 @@ function createSolver() {
 function updateLegend() {
   const showingVorticity = displaySelect.value === 'vorticity';
   visual.dataset.field = showingVorticity ? 'vorticity' : 'speed';
-  legendLow.textContent = showingVorticity ? '顺时针旋转' : '低速';
-  legendCentre.textContent = showingVorticity ? '零旋度' : '速度大小';
-  legendHigh.textContent = showingVorticity ? '逆时针旋转' : '高速';
+  legendLow.textContent = showingVorticity ? 'Clockwise rotation' : 'Low speed';
+  legendCentre.textContent = showingVorticity ? 'Zero vorticity' : 'Velocity magnitude';
+  legendHigh.textContent = showingVorticity ? 'Counter-clockwise rotation' : 'High speed';
 }
 
 // Kami warm paper fluid color ramp
@@ -214,7 +214,7 @@ function animate(timestamp) {
     frameCount = 0;
     lastTimestamp = timestamp;
   }
-  metrics.textContent = `Re ${solver.reynolds} · 粘性系数 ${(solver.viscosity * 1000).toFixed(2)} · ${solver.iteration.toLocaleString()} 迭代 · ${framesPerSecond} FPS`;
+  metrics.textContent = `Re ${solver.reynolds} · viscosity ${(solver.viscosity * 1000).toFixed(2)} · ${solver.iteration.toLocaleString()} iterations · ${framesPerSecond} FPS`;
   requestAnimationFrame(animate);
 }
 
@@ -324,7 +324,7 @@ displaySelect.addEventListener('change', () => {
 });
 toggleButton.addEventListener('click', () => {
   running = !running;
-  toggleButton.textContent = running ? '暂停 Pause' : '继续 Resume';
+  toggleButton.textContent = running ? 'Pause' : 'Resume';
 });
 resetButton.addEventListener('click', createSolver);
 

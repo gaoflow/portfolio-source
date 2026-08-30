@@ -12,8 +12,7 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
-  locale?: 'en' | 'fr' | 'cn';
-  alternatePath?: string;
+  locale?: 'en';
   alternates?: { hreflang: string; path: string }[];
 }
 const {
@@ -21,10 +20,8 @@ const {
   description = profile.tagline,
   image = '/og-card.png',
   locale = 'en',
-  alternatePath,
   alternates,
 } = Astro.props;
-const isChinese = locale === 'cn';
 const copyByLocale = {
   en: {
     htmlLang: 'en',
@@ -32,30 +29,13 @@ const copyByLocale = {
     websiteName: `${profile.name} — Engineering Portfolio`,
     rssTitle: `${profile.name} — Engineering Notes`,
   },
-  fr: {
-    htmlLang: 'fr',
-    role: 'Ingénieur en mécanique des fluides numérique et développeur',
-    websiteName: `${profile.name} — Portfolio d’ingénierie`,
-    rssTitle: `${profile.name} — Notes d’ingénierie`,
-  },
-  cn: {
-    htmlLang: 'zh-CN',
-    role: '计算流体力学工程师与开发者',
-    websiteName: `${profile.name}——工程作品集`,
-    rssTitle: `${profile.name}——工程笔记`,
-  },
 } as const;
 const copy = copyByLocale[locale];
 const htmlLang = copy.htmlLang;
 const alternateLinks = alternates?.map((alternate) => ({
   hreflang: alternate.hreflang,
   href: new URL(alternate.path, Astro.site ?? Astro.url).toString(),
-})) ?? [
-  { hreflang: htmlLang, href: Astro.url.toString() },
-  ...(alternatePath
-    ? [{ hreflang: isChinese ? 'en' : 'zh-CN', href: new URL(alternatePath, Astro.site ?? Astro.url).toString() }]
-    : []),
-];
+})) ?? [{ hreflang: htmlLang, href: Astro.url.toString() }];
 const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — ${copy.role}`;
 const socialImage = new URL(image, Astro.site ?? Astro.url).toString();
 const structuredData = {

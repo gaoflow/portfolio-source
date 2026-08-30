@@ -3,7 +3,7 @@
 This repository keeps two kinds of work separate:
 
 - `main`: the public GitHub branch. It contains only the deployable portfolio surface.
-- `work`: the private working branch. It may contain research, design notes, experiments, Chinese source articles, AI tooling, and other material that is not meant for public GitHub.
+- `work`: the private working branch. It may contain research, design notes, experiments, private source material, and other work that is not meant for public GitHub.
 
 ## What belongs on `main`
 
@@ -22,8 +22,7 @@ Keep local or private material on `work` only:
 - `docs/` — working notes, strategy, and internal process documents.
 - `research/` — reference analysis and investigations.
 - `projects/` — numerical projects and evidence sources not needed by the public site.
-- Chinese source articles under `site/src/content/projects-cn/`.
-- AI agent tooling, skills, prompts, and experiment records.
+- Private automation tooling, prompts, and experiment records.
 - Local PM2, debug, cache, and machine-specific configuration.
 
 ## Daily workflow
@@ -36,7 +35,7 @@ Keep local or private material on `work` only:
 ## Rules
 
 - Do not push `work` to the public GitHub repository.
-- Do not include AI tooling, agent skills, private notes, or Chinese source content in `main`.
+- Do not include private tooling, private notes, or non-public source content in `main`.
 - Do not rewrite history on `main` once it is shared unless there is a clear release reason.
 - Every public update should be reviewed as a deployment decision, not as a routine work commit.
 

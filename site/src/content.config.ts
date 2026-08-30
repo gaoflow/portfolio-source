@@ -44,9 +44,4 @@ const projects = defineCollection({
   schema: projectSchema,
 });
 
-const projectsCn = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/projects-cn' }),
-  schema: projectSchema,
-});
-
-export const collections = { projects, projectsCn };
+export const collections = { projects };

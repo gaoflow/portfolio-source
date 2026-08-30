@@ -26,26 +26,6 @@ contracts = {
             "Développement", "Défense",
         ),
     },
-    "fr/cv/index.html": {
-        "lang": "fr",
-        "required": ("Expérience", "Formation", "Compétences clés", "Communauté"),
-        "forbidden": (
-            "Download PDF", "Print", "Experience", "Selected work", "Education",
-            "Core skills", "Community", "Case study", "Present", "Independent study",
-            "Course project", "Limit:", "Professional CV", "Code portfolio",
-        ),
-    },
-    "cn/cv/index.html": {
-        "lang": "zh-CN",
-        "required": ("工作经历", "教育经历", "核心技能", "技术社区"),
-        "forbidden": (
-            "Download PDF", "Print", "Experience", "Selected work", "Education",
-            "Core skills", "Community", "Case study", "Present", "Independent study",
-            "Course project", "Limit:", "Professional CV", "Code portfolio",
-            "Aujourd’hui", "Diplôme", "Expérience", "Formation", "Compétences",
-            "Communauté", "Télécharger", "Imprimer", "Étude de cas",
-        ),
-    },
 }
 
 failures = []

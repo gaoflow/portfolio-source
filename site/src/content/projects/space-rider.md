@@ -100,7 +100,7 @@ Once v2.720 was complete, the vehicle possessed its intended form. It became our
 
 ## Version 3 (v3)
 
-Starting with v3, I attempted to set up an automated inspection loop using Claude Code: selecting target regions, modifying a minimal number of vertices per cycle, saving and reloading, and evaluating changes in topology, materials, and vertex positions.
+Starting with v3, I set up an automated inspection loop: selecting target regions, modifying a minimal number of vertices per cycle, saving and reloading, and evaluating changes in topology, materials, and vertex positions.
 
 However, after running more than 60 iterations—each passing automated checks—the model showed virtually no discernible improvement. Local smoothness scores kept rising, but without a fixed global objective guiding the convergence path.
 
@@ -108,7 +108,7 @@ This branch was ultimately abandoned and rolled back to v2. The bottleneck in th
 
 ## Version 4 (v4)
 
-In v4, I used Claude Code once more, applying radial reconstruction to eliminate pinch wrinkles at the nose apex. While the wrinkles disappeared, the nose became artificially shortened, the ventral curvature flattened, and the black TPS boundary contracted.
+In v4, I tried radial reconstruction to eliminate pinch wrinkles at the nose apex. While the wrinkles disappeared, the nose became artificially shortened, the ventral curvature flattened, and the black TPS boundary contracted.
 
 Side-by-side comparison between v4 and v2.720 showed that the new version was inferior overall, prompting another complete branch rollback.
 

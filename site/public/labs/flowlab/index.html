@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FlowLab — 实时流体仿真实验室</title>
+  <title>FlowLab — Real-Time Fluid Simulation Lab</title>
   <link rel="icon" href="/favicon.ico" sizes="any" />
   <link rel="apple-touch-icon" href="/avatar_memoji_05_nobg.png" />
   <style>
@@ -210,7 +210,7 @@
       <div>
         <a href="/projects/flowlab" class="nav-back">← Back</a>
         <h1>FlowLab Demo</h1>
-        <p>本 Demo 使用我自己写的 LBM 求解器，演示顶盖驱动方腔。方腔四周封闭，只有顶部壁面持续向右移动；顶盖把动量传给下面的流体，最后在腔体里形成顺时针主涡。鼠标或手指拖动会给局部流场一个短暂扰动，之后可以继续观察主涡怎样重新组织。</p>
+        <p>This demo uses my LBM solver to simulate a lid-driven cavity. The cavity is closed on all sides, while the top wall moves continuously to the right. It transfers momentum to the fluid below and forms a clockwise primary vortex. Drag with a mouse or finger to disturb the local flow, then watch the main vortex reorganize.</p>
       </div>
     </header>
     <section class="panel">
@@ -218,25 +218,25 @@
         <canvas id="field" width="384" height="256" aria-label="Interactive fluid flow field"></canvas>
         <div class="legend" aria-hidden="true"></div>
         <div class="legend-labels">
-          <span id="legend-low">低速</span>
-          <span id="legend-centre">速度大小</span>
-          <span id="legend-high">高速</span>
+          <span id="legend-low">Low speed</span>
+          <span id="legend-centre">Velocity magnitude</span>
+          <span id="legend-high">High speed</span>
         </div>
       </div>
       <div class="controls">
         <div class="field-controls">
-          <label>雷诺数 Reynolds
+          <label>Reynolds number
             <select id="reynolds"><option>100</option><option selected>400</option><option>1000</option></select>
           </label>
-          <label>显示物理量 Field
-            <select id="display"><option value="speed">流速幅值 Speed</option><option value="vorticity">旋度场 Vorticity</option></select>
+          <label>Displayed field
+            <select id="display"><option value="speed">Speed</option><option value="vorticity">Vorticity</option></select>
           </label>
         </div>
         <div class="actions">
-          <button id="toggle" type="button">暂停 Pause</button>
-          <button id="reset" type="button">重置流场 Reset</button>
+          <button id="toggle" type="button">Pause</button>
+          <button id="reset" type="button">Reset flow</button>
         </div>
-        <output id="metrics">初始化中...</output>
+        <output id="metrics">Initializing...</output>
       </div>
     </section>
   </main>

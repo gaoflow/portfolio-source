@@ -106,7 +106,7 @@ In short, the large reduction in the third metric is primarily driven by the lar
 
 ## Verification and Discrepancy Checks
 
-After identifying the trends, I verified whether the image vortices truly enforced the ground boundary condition, checked whether the solution recovered free-stream values far from the ground, and inspected theoretical magnitudes, panel refinement, and spanwise symmetry. I used ChatGPT to help compare deviations:
+After identifying the trends, I verified whether the image vortices truly enforced the ground boundary condition, checked whether the solution recovered free-stream values far from the ground, and inspected theoretical magnitudes, panel refinement, and spanwise symmetry. I then compared the deviations:
 
 | Check | Result | Criterion |
 |---|---:|---:|

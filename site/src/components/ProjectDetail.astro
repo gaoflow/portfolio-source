@@ -3,34 +3,26 @@ import Base from '../layouts/Base.astro';
 import ModelViewer from './ModelViewer.astro';
 import { render, type CollectionEntry } from 'astro:content';
 
-type Locale = 'en' | 'cn';
-type ProjectEntry = CollectionEntry<'projects'> | CollectionEntry<'projectsCn'>;
 
 interface Props {
-  project: ProjectEntry;
-  locale: Locale;
-  hasAlternate: boolean;
+  project: CollectionEntry<'projects'>;
 }
 
-const { project, locale, hasAlternate } = Astro.props;
-const isChinese = locale === 'cn';
+const { project } = Astro.props;
 const d = project.data;
 const { Content } = await render(project);
 const basePath = '/#projects';
-const alternatePath = hasAlternate
-  ? `${isChinese ? '/projects' : '/cn/projects'}/${project.id}`
-  : undefined;
 ---
 
-<Base title={d.title} description={d.summary} image={`/og/projects/${project.id}.png`} locale={locale} alternatePath={alternatePath}>
+<Base title={d.title} description={d.summary} image={`/og/projects/${project.id}.png`}>
   <article class="mx-auto max-w-3xl px-6 pt-16 pb-24">
     <header class="space-y-5 mb-10">
-      <a href={basePath} class="font-mono text-xs text-muted hover:text-accent">{isChinese ? '← 返回项目列表' : '← Projects'}</a>
+      <a href={basePath} class="font-mono text-xs text-muted hover:text-accent">← Projects</a>
       <h1 class="text-3xl md:text-5xl font-medium leading-tight tracking-tight">{d.title}</h1>
       <p class="text-xl text-warm leading-relaxed">{d.summary}</p>
       {d.nda && (
         <div class="flex flex-wrap items-center gap-2">
-          <span class="tag">{isChinese ? '符合 NDA 的公开版本' : 'NDA-safe write-up'}</span>
+          <span class="tag">NDA-safe write-up</span>
         </div>
       )}
     </header>
@@ -49,7 +41,7 @@ const alternatePath = hasAlternate
           class="block w-full h-auto rounded-xl shadow-sm"
         >
           <source src={d.heroVideo.src} type="video/mp4" />
-          {isChinese ? '你的浏览器不支持 HTML5 视频。' : 'Your browser does not support HTML5 video.'}
+          Your browser does not support HTML5 video.
         </video>
         <figcaption class="mt-2 font-mono text-xs leading-relaxed text-stone">{d.heroVideo.caption}</figcaption>
       </figure>
@@ -74,7 +66,7 @@ const alternatePath = hasAlternate
         src={d.model3d}
         alt={d.title}
         poster={d.heroImage}
-        caption={isChinese ? '在线预览 3D' : 'Interactive 3D — drag to rotate and scroll to zoom.'}
+        caption="Interactive 3D — drag to rotate and scroll to zoom."
       />
     )}
     {!d.heroVideo && d.heroImage && !d.model3d && (
