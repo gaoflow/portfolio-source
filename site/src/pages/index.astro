@@ -6,6 +6,13 @@ import { getCollection } from 'astro:content';
 const projects = (await getCollection('projects')).sort(
   (a, b) => b.data.date.localeCompare(a.data.date) || (b.data.studySequence ?? 0) - (a.data.studySequence ?? 0) || a.data.order - b.data.order,
 );
+
+const paddockCV = {
+  href: 'https://paddockcv.com/',
+  title: 'Paddock CV',
+  summary: 'A sourced career-path atlas of trackside engineering staff across F1, F2, WEC / Le Mans, Formula E, and F1 Academy.',
+  image: '/images/projects/paddockcv/og.png',
+};
 ---
 
 <Base>
@@ -81,7 +88,7 @@ const projects = (await getCollection('projects')).sort(
         </p>
 
         <p>
-          From 2015 to 2023, I was also a core organizer for Google Developer Group Beijing. I organized more than five technical events each year, with 200 to 1,000 attendees per event. I invited developers and technical experts from teams at Google and major technology companies in Beijing, and helped organize knowledge sharing around mobile development, front-end engineering, Google Cloud, TensorFlow, and emerging AI technologies.
+          From 2015 to 2023, I was also a core organizer for Google Developer Group Beijing. I organized more than five technical events each year, with 200 to 1,000 attendees per event. I invited developers and technical experts from teams at Google and major technology companies in Beijing, and helped organize knowledge sharing around mobile development, front-end engineering, Google Cloud, TensorFlow, and emerging technologies.
         </p>
 
         <p>
@@ -94,6 +101,29 @@ const projects = (await getCollection('projects')).sort(
   <section id="projects" class="mt-6 scroll-mt-24" aria-labelledby="projects-heading">
     <h2 id="projects-heading" class="text-3xl font-medium tracking-tight text-ink">Projects</h2>
     <div class="mt-7 grid gap-5 sm:grid-cols-2">
+      <a
+        href={paddockCV.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="project-card group"
+      >
+        <img
+          src={paddockCV.image}
+          alt="Paddock CV career-path atlas"
+          loading="lazy"
+          decoding="async"
+          class="project-card-media project-card-media--cover"
+        />
+        <span class="block p-5">
+          <span class="flex items-baseline justify-between gap-3 text-lg font-medium leading-snug text-ink transition-colors group-hover:text-accent">
+            <span>{paddockCV.title}</span>
+            <span aria-hidden="true">↗</span>
+          </span>
+          <span class="mt-2 line-clamp-3 block text-sm leading-relaxed text-muted">
+            {paddockCV.summary}
+          </span>
+        </span>
+      </a>
       {projects.map((project) => (
         <a href={`/projects/${project.id}`} class="project-card group">
           {project.data.heroImage ? (

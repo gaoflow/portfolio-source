@@ -63,6 +63,8 @@ ALLOWLIST = {
     # Reference photographs selected as project-card covers
     'projects/pipe-flow-sizing/reference/car-water-pump.jpg',
     'projects/powertrain-cycle-simulation/spa-francorchamps-aerial.jpg',
+    # PaddockCV uses a deliberate black editorial cover
+    'projects/paddockcv/og.png',
     # Official/reference spacecraft imagery and Blender renders
     'projects/space-rider/reference/esa-earth-render.jpg',
     'projects/space-rider/reference/esa-official-render.jpg',
