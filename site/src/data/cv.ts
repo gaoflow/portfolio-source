@@ -77,7 +77,7 @@ const english: CvContent = {
     { label: 'English', href: '/cv' },
   ],
   contact: {
-    email: 'gaobing1230@gmail.com',
+    email: 'binggao1230@gmail.com',
     location: 'Paris, France',
     linkedinLabel: 'LinkedIn',
     githubLabel: 'Code portfolio',
