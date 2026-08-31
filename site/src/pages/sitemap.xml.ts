@@ -10,7 +10,7 @@ export const GET: APIRoute = async ({ site }) => {
   if (!site) throw new Error('astro.config.mjs must define site');
   const projects = await getCollection('projects');
   const entries = [
-    ...['/', '/cv/', '/projects/', '/labs/flowlab/', '/labs/ground-effect-vortex/'].map((path) => ({ path })),
+    ...['/', '/cv/', '/labs/flowlab/', '/labs/ground-effect-vortex/'].map((path) => ({ path })),
     ...topics.map((topic) => ({ path: `/topics/${topic.slug}/` })),
     ...projects.map((project) => ({ path: `/projects/${project.id}/`, modified: project.data.updated })),
   ];

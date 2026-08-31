@@ -1,6 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 import { topics, type Topic } from '../../data/topics';
 
@@ -26,11 +25,7 @@ const projects = (await getCollection('projects'))
     <nav aria-label="Breadcrumb" class="font-mono text-xs text-muted">
       <a href="/" class="hover:text-accent">Home</a>
       <span aria-hidden="true"> / </span>
-      <a href="/projects/" class="hover:text-accent">Projects</a>
-      <span aria-hidden="true"> / </span>
       <span>Topics</span>
-      <span aria-hidden="true"> / </span>
-      <span aria-current="page">{topic.title}</span>
     </nav>
 
     <header class="mt-6 max-w-3xl">
@@ -39,7 +34,32 @@ const projects = (await getCollection('projects'))
     </header>
 
     <div class="mt-10 grid gap-5 sm:grid-cols-2">
-      {projects.map((project) => <ProjectCard project={project} />)}
+      {projects.map((project) => (
+        <a href={`/projects/${project.id}/`} class="project-card group">
+          {project.data.heroImage ? (
+            <img
+              src={project.data.heroImage}
+              alt={project.data.title}
+              loading="lazy"
+              decoding="async"
+              class:list={[
+                'project-card-media',
+                project.data.cardImageFit === 'cover' && 'project-card-media--cover',
+              ]}
+            />
+          ) : (
+            <span class="project-card-media project-card-placeholder"></span>
+          )}
+          <span class="block p-5">
+            <span class="block text-lg font-medium leading-snug text-ink transition-colors group-hover:text-accent">
+              {project.data.title}
+            </span>
+            <span class="mt-2 line-clamp-3 block text-sm leading-relaxed text-muted">
+              {project.data.summary}
+            </span>
+          </span>
+        </a>
+      ))}
     </div>
   </article>
 </Base>

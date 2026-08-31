@@ -31,7 +31,6 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     `- [About Bing Gao](${url('/')}): CFD engineer and developer studying Modelling & Computational Mechanics at ESILV.`,
     `- [Curriculum vitae](${url('/cv/')}): Education, engineering experience, projects, and technical skills.`,
-    `- [Engineering projects](${url('/projects/')}): Browse all case studies by topic and engineering method.`,
     '',
     '## Topics',
     '',

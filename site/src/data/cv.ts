@@ -60,7 +60,7 @@ export interface CvContent {
 
 const english: CvContent = {
   locale: 'en',
-  route: '/cv/',
+  route: '/cv',
   pageTitle: 'Professional CV',
   description: 'Bing Gao — computational mechanics engineering student working across fluid simulation, thermal systems, numerical verification, and engineering software.',
   eyebrow: 'Professional CV, 2026',

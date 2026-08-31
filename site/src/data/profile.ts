@@ -3,7 +3,6 @@ export const profile = {
   name: 'Bing Gao',
   role: 'CFD Engineer & Developer',
   tagline: 'External aerodynamics, CFD methodology & simulation tooling',
-  location: 'Paris, France',
   email: 'binggao1230@gmail.com',
   linkedin: 'https://www.linkedin.com/in/binggao1230/',
   github: 'https://github.com/binggao1230',

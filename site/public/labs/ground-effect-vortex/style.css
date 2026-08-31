@@ -38,16 +38,6 @@ main {
   white-space: nowrap;
 }
 
-.project-link {
-  display: inline-block;
-  margin-bottom: 4px;
-  color: var(--blue);
-  font: 500 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
-  text-decoration: none;
-}
-
-.project-link:hover { text-decoration: underline; }
-
 .controls { display: flex; gap: 6px; }
 
 .controls button {
