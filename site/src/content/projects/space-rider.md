@@ -9,7 +9,7 @@ tags: [design]
 summary: 'During my 17-week internship in 2026, I reconstructed a 3D model of the Space Rider spacecraft in Blender based on publicly available European Space Agency blueprints and technical documentation.'
 role: '3D Modeling Intern'
 duration: '17 weeks'
-featured: false
+featured: true
 order: 8
 studySequence: 16
 model3d: /models/space-rider-v5.050.glb

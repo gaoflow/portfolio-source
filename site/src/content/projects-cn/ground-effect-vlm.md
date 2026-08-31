@@ -5,7 +5,7 @@ date: '2026-04-25'
 status: complete
 categories: [validation, tooling]
 tags: [CFD]
-summary: '我实现了带镜像涡的低阶涡格法，用 14 个不同车高研究地面距离如何改变矩形翼的展向载荷、升力放大和诱导阻力。'
+summary: '我写了一个地面效应 VLM 工具'
 role: '空气动力学与数值方法'
 duration: '独立研究'
 featured: false

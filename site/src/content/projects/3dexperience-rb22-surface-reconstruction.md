@@ -9,7 +9,7 @@ tags: [Design, CAD, GSD, Surface Modeling]
 summary: 'Using Generative Shape Design in 3DExperience, I successfully modeled the sidepods and rear wing of a 2026 F1 car by creating points, cross-sections, splines, lofts, and trimmed surfaces, with plans to build the complete 2026 F1 car model in future steps.'
 role: 'Independent CAD Surface Modeling'
 duration: 'Sidepods and rear wing complete; full car surface modeling in progress'
-featured: false
+featured: true
 order: 0
 studySequence: 19
 heroImage: /images/projects/3dexperience-rb22/sidepod/sidepod_r1_iso.jpg

@@ -6,7 +6,7 @@ updated: '2026-04-25'
 status: complete
 categories: [validation, tooling]
 tags: [CFD]
-summary: 'I implemented a low-order Vortex Lattice Method with image vortices to isolate how ground proximity changes spanwise loading, lift amplification, and induced drag for a rectangular wing across 14 ride heights.'
+summary: 'I built a ground-effect Vortex Lattice Method (VLM) tool.'
 role: 'Aerodynamics & Numerical Methods'
 duration: 'Independent Research'
 featured: false

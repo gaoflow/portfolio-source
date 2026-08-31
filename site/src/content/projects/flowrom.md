@@ -9,7 +9,7 @@ tags: [CFD]
 summary: 'During unsteady CFD simulations, transient snapshot storage quickly overwhelms disk capacity. I investigated whether hundreds of complex flow snapshots could be compressed into 8 core spatial modes—similar to video compression—and used to forecast future flow dynamics without solving the governing equations.'
 role: 'Numerical Methods & Software Engineering'
 duration: 'Independent Research'
-featured: true
+featured: false
 order: 4
 studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg

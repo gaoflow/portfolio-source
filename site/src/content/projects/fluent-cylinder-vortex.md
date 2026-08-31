@@ -18,7 +18,7 @@ academic:
     - 'Run a transient case at Re=150 and trigger symmetry breaking via a controlled velocity perturbation.'
     - 'Record lift and drag histories and identify the Kármán vortex street.'
     - 'Compare force results against provided experimental benchmarks and discuss discrepancies.'
-featured: false
+featured: true
 order: 17
 studySequence: 12
 heroImage: /images/projects/fluent-cylinder-vortex/source/developed-vorticity.png

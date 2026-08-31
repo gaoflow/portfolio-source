@@ -17,7 +17,7 @@ academic:
     - '在 Re=10 时确认圆柱网格无关性。'
     - '确认远场计算域无关性。'
     - '将雷诺数从 0.1 扫描至 20，并在课程规定的 5% 门槛下与给定实验表中的阻力进行比较。'
-featured: false
+featured: true
 order: 16
 studySequence: 9
 heroImage: /images/projects/fluent-cyl-vnv/velocity-re20.png

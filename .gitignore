@@ -4,6 +4,7 @@
 # Local agent and research caches
 .agent-workbench/
 .firecrawl/
+.wrangler/
 
 # Private source material and working data
 196479.MP4

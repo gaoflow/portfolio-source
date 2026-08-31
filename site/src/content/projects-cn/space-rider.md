@@ -8,7 +8,7 @@ tags: [设计]
 summary: '在我 2026 年为期 17 周的实习中，我依据 European Space Agency 公开的蓝图和资料信息重建了 Space Rider 卫星 3D 模型。'
 role: '3D 建模实习生'
 duration: '17 周'
-featured: false
+featured: true
 order: 8
 studySequence: 16
 model3d: /models/space-rider-v5.050.glb

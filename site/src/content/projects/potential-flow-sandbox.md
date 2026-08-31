@@ -6,7 +6,7 @@ updated: '2026-04-16'
 status: complete
 categories: [component-cfd]
 tags: [CFD]
-summary: 'I implemented 2D inviscid flow past a circular cylinder by superimposing uniform flow, a doublet, and a point vortex, then verified pressure, circulation, lift direction, stagnation points, and RK4 streamline convergence against analytical solutions.'
+summary: 'Exploring the problem of flow past a circular cylinder'
 role: 'Aerodynamics Fundamentals'
 duration: 'Independent Project'
 featured: false

@@ -8,7 +8,7 @@ tags: [CFD]
 summary: '为了学习如何编写 CFD 求解器，我用 JavaScript 复现了一个简单的 LBM 求解器，并写了一个 Re=100 顶盖驱动方腔 Demo'
 role: '数值方法与软件工程'
 duration: '独立研究'
-featured: true
+featured: false
 order: 5
 studySequence: 14
 heroImage: /images/projects/flowlab/cavity-vorticity.svg

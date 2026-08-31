@@ -10,7 +10,7 @@ summary: 'I first used a thermo-fluid model to reject the passive E3 architectur
 role: 'Thermal Systems & Numerical Modeling'
 team: 'Vinci Eco Drive — ESILV FSAE'
 duration: 'E3 / E7 / E8 numerical baselines across three generations'
-featured: true
+featured: false
 order: 2
 studySequence: 5
 heroImage: '/images/projects/fsae-cooling/thermal-screen.svg'

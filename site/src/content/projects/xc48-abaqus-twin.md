@@ -6,7 +6,7 @@ updated: '2026-04-16'
 status: complete
 categories: [validation, design]
 tags: [FEA]
-summary: 'I reconstructed an XC48 steel tensile test in Abaqus, calibrated a 3D damage model against measured stress–strain data, and compared mesh, solver, loading, and element-deletion choices against the physical fracture response.'
+summary: 'Coursework record: from physical tensile testing to Abaqus analysis'
 duration: '8 weeks'
 academic:
   institution: 'ESILV'

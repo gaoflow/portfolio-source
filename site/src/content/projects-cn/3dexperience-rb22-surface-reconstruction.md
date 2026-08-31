@@ -8,7 +8,7 @@ tags: [设计, CAD, GSD, 曲面建模]
 summary: '我在 3DExperience 的 Generative Shape Design 中，通过建立点、截面、样条、放样以及裁剪曲面，成功完成了 F1 2026 侧箱和后翼的还原，并打算后续绘制出 F1 2026 赛车的整车。'
 role: '独立 CAD 曲面建模'
 duration: '侧箱与后翼完成，整车曲面建模进行中'
-featured: false
+featured: true
 order: 0
 studySequence: 19
 heroImage: /images/projects/3dexperience-rb22/sidepod/sidepod_r1_iso.jpg

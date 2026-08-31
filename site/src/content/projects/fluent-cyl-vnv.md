@@ -18,7 +18,7 @@ academic:
     - 'Confirm cylinder mesh independence at Re=10.'
     - 'Confirm far-field computational domain independence.'
     - 'Sweep Reynolds numbers from 0.1 to 20 and compare drag against the provided experimental reference table under the course-mandated 5% threshold.'
-featured: false
+featured: true
 order: 16
 studySequence: 9
 heroImage: /images/projects/fluent-cyl-vnv/velocity-re20.png
