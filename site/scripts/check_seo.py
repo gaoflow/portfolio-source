@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from xml.etree import ElementTree
 
-ORIGIN = "https://vinzzy.com"
+ORIGIN = "https://binggao.dev"
 INDEXNOW_KEY = "c68a268aff5d62140ef3185062c68b9d"
 FORBIDDEN_HOSTS = ("localhost", "127.0.0.1", "192.168.")
 

@@ -7,7 +7,7 @@ import rehypeFigureCaptions from './src/plugins/rehype-figure-captions.mjs';
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.SITE_URL ?? 'https://vinzzy.com',
+  site: process.env.SITE_URL ?? 'https://binggao.dev',
   vite: {
     plugins: [tailwindcss()],
   },
