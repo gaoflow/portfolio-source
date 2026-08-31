@@ -5,7 +5,7 @@ date: '2025-11-08'
 status: complete
 categories: [component-cfd]
 tags: [CFD]
-summary: '探索圆柱绕流的问题'
+summary: '我用均匀流、偶极子和点涡叠加实现二维无黏圆柱绕流，并用解析解验证压力、环量、升力方向、驻点和 RK4 流线收敛。'
 role: '空气动力学基础'
 duration: '独立构建'
 featured: false

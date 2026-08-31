@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import Counter
 from html.parser import HTMLParser
 from pathlib import Path
@@ -90,6 +91,16 @@ def static_target(root: Path, url: str) -> Path:
     return candidate
 
 
+def local_asset_target(root: Path, url: str) -> Path | None:
+    parsed = urlsplit(url)
+    if parsed.scheme not in {"http", "https"} or parsed.netloc != urlsplit(ORIGIN).netloc:
+        return None
+    path = parsed.path
+    if not path or path.endswith("/"):
+        return None
+    return root / path.lstrip("/")
+
+
 def main() -> int:
     argument_parser = argparse.ArgumentParser()
     argument_parser.add_argument("root", type=Path, help="Static build directory, e.g. site/dist")
@@ -135,6 +146,16 @@ def main() -> int:
             failures.append(f"{relative}: og:url does not match canonical")
         if not open_graph_image.startswith(f"{ORIGIN}/"):
             failures.append(f"{relative}: invalid og:image {open_graph_image!r}")
+        else:
+            image_target = local_asset_target(root, open_graph_image)
+            if image_target is None or not image_target.is_file():
+                failures.append(f"{relative}: og:image has no local build target {open_graph_image!r}")
+
+        twitter_image = meta_content(parser, name="twitter:image")
+        if twitter_image:
+            twitter_target = local_asset_target(root, twitter_image)
+            if twitter_target is None or not twitter_target.is_file():
+                failures.append(f"{relative}: twitter:image has no local build target {twitter_image!r}")
 
         page_schema_types: set[str] = set()
         for raw_payload in parser.json_ld:
@@ -145,7 +166,7 @@ def main() -> int:
         if not page_schema_types:
             failures.append(f"{relative}: missing structured data")
 
-        if relative.parts[:1] == ("projects",):
+        if relative.parts[:1] == ("projects",) and relative != Path("projects/index.html"):
             article_pages += 1
             if "Article" not in page_schema_types:
                 failures.append(f"{relative}: missing Article structured data")
@@ -207,7 +228,8 @@ def main() -> int:
         llms = llms_path.read_text(encoding="utf-8")
         if not llms.startswith("# Bing Gao — Engineering Portfolio"):
             failures.append("llms.txt has an invalid heading")
-        if llms.count(f"{ORIGIN}/projects/") != article_pages:
+        project_links = re.findall(rf"\]\({re.escape(ORIGIN)}/projects/[^/]+/\):", llms)
+        if len(project_links) != article_pages:
             failures.append("llms.txt project count does not match rendered Article pages")
         if any(host in llms for host in FORBIDDEN_HOSTS):
             failures.append("llms.txt contains a local host reference")

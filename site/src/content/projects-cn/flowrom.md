@@ -8,7 +8,7 @@ tags: [CFD]
 summary: '在一次做非定常 CFD 时，我发现硬盘很容易就被塞满了。我在想是否可以像压缩视频一样，把几百帧复杂的流场提炼成 8 张核心骨架图，并能脱离方程直接预测未来的流动。'
 role: '数值方法与软件工程'
 duration: '独立研究'
-featured: false
+featured: true
 order: 4
 studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg

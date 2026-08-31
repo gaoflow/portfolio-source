@@ -9,7 +9,7 @@ tags: [CFD]
 summary: 'To understand CFD solver internals, I implemented a 2D Lattice Boltzmann Method (LBM) solver in JavaScript and verified it against the classic Re=100 lid-driven cavity benchmark.'
 role: 'Numerical Methods & Software Engineering'
 duration: 'Independent Research'
-featured: false
+featured: true
 order: 5
 studySequence: 14
 heroImage: /images/projects/flowlab/cavity-vorticity.svg

@@ -17,7 +17,7 @@ academic:
     - '运行 Re=150 的瞬态算例，并通过受控速度扰动触发对称性破缺。'
     - '记录升力和阻力历程，并识别卡门涡街。'
     - '将受力结果与提供的实验参考值比较，并讨论差异。'
-featured: true
+featured: false
 order: 17
 studySequence: 12
 heroImage: /images/projects/fluent-cylinder-vortex/source/developed-vorticity.png

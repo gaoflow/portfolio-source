@@ -9,7 +9,7 @@ summary: '我先用热流体模型否决了 40 °C 环境下的被动 E3 方案�
 role: '热系统与数值建模'
 team: 'Vinci Eco Drive — ESILV FSAE'
 duration: 'E3 / E7 / E8 三代数值基线'
-featured: false
+featured: true
 order: 2
 studySequence: 5
 heroImage: '/images/projects/fsae-cooling/thermal-screen.svg'

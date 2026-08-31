@@ -5,7 +5,7 @@ date: '2026-04-04'
 status: complete
 categories: [validation, design]
 tags: [有限元分析]
-summary: '课程作业记录，从真实拉伸试验到 Abaqus 分析'
+summary: '我在 Abaqus 中重建 XC48 钢拉伸试验，用实测应力–应变数据标定三维损伤模型，并比较网格、求解器、加载和单元删除设置对断裂响应的影响。'
 duration: '8 周'
 academic:
   institution: 'ESILV'

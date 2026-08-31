@@ -18,20 +18,67 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("sitemap", type=Path)
     parser.add_argument("key")
+    parser.add_argument(
+        "--previous-sitemap",
+        type=Path,
+        help="Only submit URLs that are new or whose sitemap lastmod changed; submit all URLs when omitted.",
+    )
+    parser.add_argument(
+        "--always-url",
+        action="append",
+        default=[],
+        help="Always submit this URL when using --previous-sitemap (repeatable).",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Print the URL set without making a network request.",
+    )
     args = parser.parse_args()
 
-    tree = ElementTree.parse(args.sitemap)
-    urls = [
-        node.text
-        for node in tree.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc")
-        if node.text
-    ]
-    if not urls:
+    def sitemap_entries(path: Path) -> dict[str, str]:
+        tree = ElementTree.parse(path)
+        entries: dict[str, str] = {}
+        for url_node in tree.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}url"):
+            loc_node = url_node.find("{http://www.sitemaps.org/schemas/sitemap/0.9}loc")
+            lastmod_node = url_node.find("{http://www.sitemaps.org/schemas/sitemap/0.9}lastmod")
+            if loc_node is not None and loc_node.text:
+                entries[loc_node.text] = lastmod_node.text if lastmod_node is not None and lastmod_node.text else ""
+        return entries
+
+    current_entries = sitemap_entries(args.sitemap)
+    current_urls = list(current_entries)
+    if not current_entries:
         parser.error("sitemap contains no URLs")
+
+    urls = current_urls
+    if args.previous_sitemap:
+        if args.previous_sitemap.exists():
+            previous_entries = sitemap_entries(args.previous_sitemap)
+            urls = [
+                url for url, lastmod in current_entries.items()
+                if previous_entries.get(url) != lastmod
+            ]
+        else:
+            print(f"Previous sitemap not found; submitting all {len(current_urls)} current URLs")
+
+        missing_always = [url for url in args.always_url if url not in current_entries]
+        if missing_always:
+            parser.error(f"always URL not found in current sitemap: {missing_always[0]}")
+        urls.extend(url for url in args.always_url if url not in urls)
+
+    if not urls:
+        print("IndexNow: no new or changed URLs to submit")
+        return 0
 
     host = urlsplit(urls[0]).netloc
     if not host or any(urlsplit(url).netloc != host for url in urls):
         parser.error("all sitemap URLs must use one host")
+
+    if args.dry_run:
+        print(f"IndexNow dry run: {len(urls)} URLs for {host}")
+        print("\n".join(urls))
+        return 0
 
     payload = {
         "host": host,

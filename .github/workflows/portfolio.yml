@@ -32,23 +32,5 @@ jobs:
           npm ci --prefix site
           python3 -m pip install Pillow==12.3.0
 
-      - name: Build static site
-        run: npm --prefix site run build
-
-      - name: Check SEO signals
-        run: npm --prefix site run check:seo
-
-      - name: Check local links
-        run: python3 site/scripts/check_static_links.py site/dist
-
-      - name: Check rendered content
-        run: python3 site/scripts/check_rendering.py site/dist
-
-      - name: Check image assets
-        run: python3 site/scripts/check_assets.py site/public/images
-
-      - name: Check UI colors
-        run: python3 site/scripts/check_dark_ui.py site/dist
-
-      - name: Check CV locale isolation
-        run: python3 site/scripts/check_cv_locales.py site/dist
+      - name: Verify site
+        run: npm --prefix site run verify:all

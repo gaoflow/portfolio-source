@@ -13,14 +13,22 @@ interface Props {
 const { project, relatedProjects } = Astro.props;
 const d = project.data;
 const { Content } = await render(project);
-const basePath = '/#projects';
+const basePath = '/projects/';
 const projectTopics = d.categories.map((slug) => ({ slug, ...topicBySlug[slug] }));
+const formatDate = (value: string) => new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  timeZone: 'UTC',
+}).format(new Date(`${value}T00:00:00Z`));
+const statusLabel = d.status === 'active' ? 'In progress' : 'Complete';
 ---
 
 <Base
   title={d.title}
   description={d.summary}
   image={`/og/projects/${project.id}.png`}
+  imageAlt={`${d.title} — Bing Gao engineering project`}
   pageType="article"
   publishedTime={d.date}
   modifiedTime={d.updated}
@@ -31,15 +39,61 @@ const projectTopics = d.categories.map((slug) => ({ slug, ...topicBySlug[slug] }
       <a href={basePath} class="font-mono text-xs text-muted hover:text-accent">← Projects</a>
       <h1 class="text-3xl md:text-5xl font-medium leading-tight tracking-tight">{d.title}</h1>
       <p class="text-xl text-warm leading-relaxed">{d.summary}</p>
+      <p class="font-mono text-xs leading-relaxed text-stone">
+        By <a href="/" class="text-accent hover:underline">Bing Gao</a>
+        <span aria-hidden="true"> · </span>{statusLabel}
+      </p>
       <nav class="flex flex-wrap gap-2" aria-label="Project topics">
         {projectTopics.map((topic) => (
           <a href={`/topics/${topic.slug}/`} class="tag hover:text-accent">{topic.title}</a>
         ))}
+        {d.tags.map((tag) => <span class="tag">{tag}</span>)}
       </nav>
       {d.nda && (
         <div class="flex flex-wrap items-center gap-2">
           <span class="tag">NDA-safe write-up</span>
         </div>
+      )}
+      <dl class="grid gap-x-6 gap-y-4 border-y border-edge-soft py-5 text-sm sm:grid-cols-2">
+        {d.role && (
+          <div>
+            <dt class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-stone">Role</dt>
+            <dd class="mt-1 text-warm">{d.role}</dd>
+          </div>
+        )}
+        {d.team && (
+          <div>
+            <dt class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-stone">Team</dt>
+            <dd class="mt-1 text-warm">{d.team}</dd>
+          </div>
+        )}
+        {d.duration && (
+          <div>
+            <dt class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-stone">Duration</dt>
+            <dd class="mt-1 text-warm">{d.duration}</dd>
+          </div>
+        )}
+        {d.academic?.course && (
+          <div>
+            <dt class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-stone">Course</dt>
+            <dd class="mt-1 text-warm">{d.academic.course}</dd>
+          </div>
+        )}
+        <div>
+          <dt class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-stone">Published</dt>
+          <dd class="mt-1 text-warm"><time datetime={d.date}>{formatDate(d.date)}</time></dd>
+        </div>
+        <div>
+          <dt class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-stone">Updated</dt>
+          <dd class="mt-1 text-warm"><time datetime={d.updated}>{formatDate(d.updated)}</time></dd>
+        </div>
+      </dl>
+      {d.github && (
+        <p class="text-sm">
+          <a href={d.github} target="_blank" rel="noopener noreferrer" class="font-medium text-accent hover:underline">
+            Read the source on GitHub →
+          </a>
+        </p>
       )}
     </header>
 

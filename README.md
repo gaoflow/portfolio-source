@@ -51,3 +51,9 @@ site/src/content/projects-cn/
 cd site
 npm run verify:seo
 ```
+
+The full release gate, including the image-asset audit, is `npm run verify:all`.
+
+Install Pillow 12.3.0 first when running the image audit locally: `python3 -m pip install Pillow==12.3.0`.
+
+Production publishing uses `npm run deploy:production`; it captures the live sitemap before deployment so IndexNow receives new or changed URLs and the key site hubs.

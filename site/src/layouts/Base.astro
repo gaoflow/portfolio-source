@@ -12,6 +12,7 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
   locale?: 'en';
   alternates?: { hreflang: string; path: string }[];
   pageType?: 'website' | 'profile' | 'article';
@@ -25,6 +26,7 @@ const {
   title,
   description = profile.tagline,
   image = '/og-card.png',
+  imageAlt,
   locale = 'en',
   alternates,
   pageType = 'website',
@@ -59,6 +61,7 @@ const alternateLinks = alternates?.map((alternate) => ({
 })) ?? [{ hreflang: htmlLang, href: canonicalUrl }];
 const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — ${copy.role}`;
 const socialImage = new URL(image, siteUrl).toString();
+const socialImageAlt = imageAlt ?? `${pageTitle} social preview`;
 const person = {
   '@type': 'Person',
   '@id': personId,
@@ -144,14 +147,17 @@ const structuredData = {
     <link rel="apple-touch-icon" href="/avatar_memoji_05_nobg.png" />
     <link rel="alternate" type="application/rss+xml" title={copy.rssTitle} href="/rss.xml" />
     <meta property="og:type" content={pageType === 'article' ? 'article' : pageType === 'profile' ? 'profile' : 'website'} />
+    <meta property="og:site_name" content={copy.websiteName} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content={socialImageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={socialImageAlt} />
     {publishedTime && <meta property="article:published_time" content={publishedTime} />}
     {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
     <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData)}></script>
@@ -159,8 +165,13 @@ const structuredData = {
   </head>
   <body class="min-h-screen">
     <div class="sticky top-0 z-40 border-b border-edge bg-bg/90 backdrop-blur">
-      <div class="mx-auto flex h-14 max-w-7xl items-center px-6 text-sm lg:px-8">
+      <div class="mx-auto flex h-14 max-w-7xl items-center justify-between px-6 text-sm lg:px-8">
         <a href="/" class="font-medium text-ink">{profile.name}</a>
+        <nav class="flex items-center gap-4 text-muted" aria-label="Primary navigation">
+          <a href="/" class="transition-colors hover:text-accent">Home</a>
+          <a href="/projects/" class="transition-colors hover:text-accent">Projects</a>
+          <a href="/cv/" class="transition-colors hover:text-accent">CV</a>
+        </nav>
       </div>
     </div>
 
