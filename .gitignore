@@ -1,0 +1,18 @@
+# macOS metadata
+.DS_Store
+
+# Local agent and research caches
+.agent-workbench/
+.firecrawl/
+
+# Private source material and working data
+196479.MP4
+avatar_faroe2.jpg
+f1_photos/
+projects/
+scripts/
+site/.private/
+
+# Local agent instructions
+site/AGENTS.md
+site/CLAUDE.md
