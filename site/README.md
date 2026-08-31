@@ -39,4 +39,4 @@ The full gate needs Pillow 12.3.0 for the image audit (`python3 -m pip install P
 npm run deploy:production
 ```
 
-The production wrapper captures the live sitemap before deployment and submits new or `lastmod`-changed URLs, plus the home/CV/projects hubs, to IndexNow.
+The production wrapper captures the live sitemap before deployment and submits new or `lastmod`-changed URLs, plus the home/CV hubs, to IndexNow.

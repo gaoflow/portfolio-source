@@ -19,5 +19,4 @@ npx --yes wrangler@4.125.0 pages deploy dist --project-name vinzzy --branch main
 python3 scripts/submit_indexnow.py dist/sitemap.xml c68a268aff5d62140ef3185062c68b9d \
   --previous-sitemap "$previous_sitemap" \
   --always-url "https://binggao.dev/" \
-  --always-url "https://binggao.dev/cv/" \
-  --always-url "https://binggao.dev/projects/"
+  --always-url "https://binggao.dev/cv/"
