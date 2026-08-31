@@ -2,6 +2,8 @@
 
 Personal engineering portfolio focused on external aerodynamics, CFD methodology, numerical validation, and simulation tooling.
 
+Live site: [binggao.dev](https://binggao.dev/)
+
 ## Site
 
 - Astro 7
