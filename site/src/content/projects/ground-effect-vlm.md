@@ -13,7 +13,7 @@ featured: false
 order: 6
 studySequence: 13
 heroImage: /images/projects/ground-effect-vlm/reference/faa-wake-vortex-generation.svg
-github: 'https://github.com/gaoflow/ground-effect-vlm'
+github: 'https://github.com/binggao1230/ground-effect-vlm'
 ---
 
 ## Ground Effect in Formula 1
@@ -142,10 +142,10 @@ This model is built on steady, incompressible, inviscid, and zero-thickness assu
 
 ## Code & Reproducibility
 
-This project is open-sourced on GitHub: [gaoflow/ground-effect-vlm](https://github.com/gaoflow/ground-effect-vlm)
+This project is open-sourced on GitHub: [binggao1230/ground-effect-vlm](https://github.com/binggao1230/ground-effect-vlm)
 
 ```bash
-git clone https://github.com/gaoflow/ground-effect-vlm.git
+git clone https://github.com/binggao1230/ground-effect-vlm.git
 cd ground-effect-vlm
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

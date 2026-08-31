@@ -13,7 +13,7 @@ order: 13
 studySequence: 3
 heroImage: /images/projects/pipe-flow-sizing/reference/car-water-pump.jpg
 cardImageFit: cover
-github: 'https://github.com/gaoflow/pipe-flow-sizing'
+github: 'https://github.com/binggao1230/pipe-flow-sizing'
 ---
 
 ## 说明书的 40 L/min 不等于实际
@@ -129,10 +129,10 @@ $$
 
 ## 代码
 
-完整代码和测试位于 [gaoflow/pipe-flow-sizing](https://github.com/gaoflow/pipe-flow-sizing)：
+完整代码和测试位于 [binggao1230/pipe-flow-sizing](https://github.com/binggao1230/pipe-flow-sizing)：
 
 ```bash
-git clone https://github.com/gaoflow/pipe-flow-sizing.git
+git clone https://github.com/binggao1230/pipe-flow-sizing.git
 cd pipe-flow-sizing
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

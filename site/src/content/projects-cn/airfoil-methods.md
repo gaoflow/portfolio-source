@@ -12,7 +12,7 @@ featured: false
 order: 7
 studySequence: 8
 heroImage: /images/projects/airfoil-methods/source/airfoil-cfd-simulation.webp
-github: 'https://github.com/gaoflow/airfoil-methods'
+github: 'https://github.com/binggao1230/airfoil-methods'
 ---
 
 ## 正式 CFD 前做极简检查的必要性
@@ -170,10 +170,10 @@ NASA 在风洞里是通过下游的尾流测量耙测定气流经过翼型后的
 
 ## 代码
 
-demo 求解器与数据分析代码均已开源在 GitHub：[gaoflow/airfoil-methods](https://github.com/gaoflow/airfoil-methods)
+demo 求解器与数据分析代码均已开源在 GitHub：[binggao1230/airfoil-methods](https://github.com/binggao1230/airfoil-methods)
 
 ```bash
-git clone https://github.com/gaoflow/airfoil-methods.git
+git clone https://github.com/binggao1230/airfoil-methods.git
 cd airfoil-methods
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

@@ -13,7 +13,7 @@ order: 12
 studySequence: 6
 heroImage: /images/projects/steady-conduction-1d/reference/metal-bar-induction-heating.jpg
 cardImageFit: cover
-github: 'https://github.com/gaoflow/steady-conduction-1d'
+github: 'https://github.com/binggao1230/steady-conduction-1d'
 ---
 
 ## 跑通了 = 对了 ？
@@ -84,7 +84,7 @@ $$
 
 ## 复现写求解器
 
-所有节点的方程拼起来是一个三对角矩阵：除了中间三条对角线，其余全是零。这种矩阵有个专门的解法叫 Thomas 算法，从左往右消一遍、再从右往左回代一遍就完事，计算量只随节点数线性增长。我没有调 NumPy 的现成求解器，自己写了一遍。求解器的完整代码在 GitHub 上：[src/steady_conduction_1d.py](https://github.com/gaoflow/steady-conduction-1d/blob/main/src/steady_conduction_1d.py)，组装矩阵的是 `assemble_system`，Thomas 求解是 `thomas_solve`。
+所有节点的方程拼起来是一个三对角矩阵：除了中间三条对角线，其余全是零。这种矩阵有个专门的解法叫 Thomas 算法，从左往右消一遍、再从右往左回代一遍就完事，计算量只随节点数线性增长。我没有调 NumPy 的现成求解器，自己写了一遍。求解器的完整代码在 GitHub 上：[src/steady_conduction_1d.py](https://github.com/binggao1230/steady-conduction-1d/blob/main/src/steady_conduction_1d.py)，组装矩阵的是 `assemble_system`，Thomas 求解是 `thomas_solve`。
 
 求解器写完了，接下来就是这篇文章的正题：它到底对不对？我从四个维度来分别验证
 ## 1. 和手算的标准答案对比
@@ -149,12 +149,12 @@ $$
 
 ## 代码
 
-本项目全部求解代码、测试与绘图脚本已开源：[gaoflow/steady-conduction-1d](https://github.com/gaoflow/steady-conduction-1d)
+本项目全部求解代码、测试与绘图脚本已开源：[binggao1230/steady-conduction-1d](https://github.com/binggao1230/steady-conduction-1d)
 
 本地命令：
 
 ```bash
-git clone https://github.com/gaoflow/steady-conduction-1d.git
+git clone https://github.com/binggao1230/steady-conduction-1d.git
 cd steady-conduction-1d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

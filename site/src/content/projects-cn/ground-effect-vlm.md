@@ -12,7 +12,7 @@ featured: false
 order: 6
 studySequence: 13
 heroImage: /images/projects/ground-effect-vlm/reference/faa-wake-vortex-generation.svg
-github: 'https://github.com/gaoflow/ground-effect-vlm'
+github: 'https://github.com/binggao1230/ground-effect-vlm'
 ---
 
 ## F1 赛车的地面效应
@@ -141,10 +141,10 @@ $h/c=0.25$ 时，模型给出 $C_L=0.5419$，是自由空间的 2.07 倍，传�
 
 ## 代码与运行
 
-本项目已开源在 GitHub：[gaoflow/ground-effect-vlm](https://github.com/gaoflow/ground-effect-vlm)
+本项目已开源在 GitHub：[binggao1230/ground-effect-vlm](https://github.com/binggao1230/ground-effect-vlm)
 
 ```bash
-git clone https://github.com/gaoflow/ground-effect-vlm.git
+git clone https://github.com/binggao1230/ground-effect-vlm.git
 cd ground-effect-vlm
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

@@ -13,7 +13,7 @@ order: 15
 studySequence: 7
 heroImage: /images/projects/heat-diffusion-2d/thermal-spreading-infrared.jpg
 cardImageFit: cover
-github: 'https://github.com/gaoflow/heat-diffusion-2d'
+github: 'https://github.com/binggao1230/heat-diffusion-2d'
 ---
 
 ## 从铺路石上的积雪说起
@@ -151,12 +151,12 @@ $$
 
 ## 代码
 
-本项目全部求解代码、测试用例与分析脚本已开源：[gaoflow/heat-diffusion-2d](https://github.com/gaoflow/heat-diffusion-2d)
+本项目全部求解代码、测试用例与分析脚本已开源：[binggao1230/heat-diffusion-2d](https://github.com/binggao1230/heat-diffusion-2d)
 
 本地命令：
 
 ```bash
-git clone https://github.com/gaoflow/heat-diffusion-2d.git
+git clone https://github.com/binggao1230/heat-diffusion-2d.git
 cd heat-diffusion-2d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

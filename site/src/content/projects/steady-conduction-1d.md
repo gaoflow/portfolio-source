@@ -14,7 +14,7 @@ order: 12
 studySequence: 6
 heroImage: /images/projects/steady-conduction-1d/reference/metal-bar-induction-heating.jpg
 cardImageFit: cover
-github: 'https://github.com/gaoflow/steady-conduction-1d'
+github: 'https://github.com/binggao1230/steady-conduction-1d'
 ---
 
 ## Running Without Errors = Correct?
@@ -84,7 +84,7 @@ The middle term—heat generated in that half-cell—is the easiest to overlook.
 
 ## Implementing the Solver
 
-Assembling the equations for all nodes produces a tridiagonal matrix system: all entries are zero except along the main, upper, and lower diagonals. This system can be solved efficiently using the Thomas algorithm (tridiagonal matrix algorithm, TDMA), which performs a forward elimination pass followed by a backward substitution pass. Its computational cost scales linearly with the number of nodes. Rather than calling an off-the-shelf NumPy solver, I implemented the algorithm from scratch. The full solver implementation is on GitHub: [src/steady_conduction_1d.py](https://github.com/gaoflow/steady-conduction-1d/blob/main/src/steady_conduction_1d.py), where `assemble_system` builds the linear system and `thomas_solve` solves it.
+Assembling the equations for all nodes produces a tridiagonal matrix system: all entries are zero except along the main, upper, and lower diagonals. This system can be solved efficiently using the Thomas algorithm (tridiagonal matrix algorithm, TDMA), which performs a forward elimination pass followed by a backward substitution pass. Its computational cost scales linearly with the number of nodes. Rather than calling an off-the-shelf NumPy solver, I implemented the algorithm from scratch. The full solver implementation is on GitHub: [src/steady_conduction_1d.py](https://github.com/binggao1230/steady-conduction-1d/blob/main/src/steady_conduction_1d.py), where `assemble_system` builds the linear system and `thomas_solve` solves it.
 
 With the solver completed, we arrive at the core question of this article: is it actually correct? I validated it across four distinct dimensions.
 
@@ -149,12 +149,12 @@ Finally, the physical assumptions and boundaries of this model must be clearly s
 
 ## Code
 
-All solver code, test suites, and plotting scripts for this project are open source: [gaoflow/steady-conduction-1d](https://github.com/gaoflow/steady-conduction-1d)
+All solver code, test suites, and plotting scripts for this project are open source: [binggao1230/steady-conduction-1d](https://github.com/binggao1230/steady-conduction-1d)
 
 Local commands:
 
 ```bash
-git clone https://github.com/gaoflow/steady-conduction-1d.git
+git clone https://github.com/binggao1230/steady-conduction-1d.git
 cd steady-conduction-1d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

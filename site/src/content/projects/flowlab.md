@@ -13,7 +13,7 @@ featured: false
 order: 5
 studySequence: 14
 heroImage: /images/projects/flowlab/cavity-vorticity.svg
-github: 'https://github.com/gaoflow/flowlab'
+github: 'https://github.com/binggao1230/flowlab'
 ---
 
 ## Building a Solver from Scratch
@@ -82,10 +82,10 @@ Several limitations remain: only the steady $Re=100$ cavity has undergone strict
 
 ## Code and Reproduction
 
-The codebase is open source on GitHub: [gaoflow/flowlab](https://github.com/gaoflow/flowlab)
+The codebase is open source on GitHub: [binggao1230/flowlab](https://github.com/binggao1230/flowlab)
 
 ```bash
-git clone https://github.com/gaoflow/flowlab.git
+git clone https://github.com/binggao1230/flowlab.git
 cd flowlab
 npm test
 npm run validate

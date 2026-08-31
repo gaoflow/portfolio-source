@@ -12,7 +12,7 @@ featured: false
 order: 4
 studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg
-github: 'https://github.com/gaoflow/flowrom'
+github: 'https://github.com/binggao1230/flowrom'
 ---
 ## 手写求解器
 
@@ -115,10 +115,10 @@ POD 只能把已经发生过的历史流场压缩存好，但它自己不知道�
 
 ## 代码与运行
 
-本项目已开源在 GitHub: [gaoflow/flowrom](https://github.com/gaoflow/flowrom)
+本项目已开源在 GitHub: [binggao1230/flowrom](https://github.com/binggao1230/flowrom)
 
 ```bash
-git clone https://github.com/gaoflow/flowrom.git
+git clone https://github.com/binggao1230/flowrom.git
 cd flowrom
 node scripts/generate-snapshots.mjs
 python3 scripts/analyse.py

@@ -15,7 +15,7 @@ export const GET: APIRoute = async ({ site }) => {
     `- [${markdownText(project.data.title)}](${url(`/projects/${project.id}/`)}): ${markdownText(project.data.summary)}`,
   );
   const sourceLines = projects.map((project) =>
-    `- [${markdownText(project.data.title)} source](https://raw.githubusercontent.com/gaoflow/portfolio-source/main/site/src/content/projects/${project.id}.md)`,
+    `- [${markdownText(project.data.title)} source](https://raw.githubusercontent.com/binggao1230/portfolio-source/main/site/src/content/projects/${project.id}.md)`,
   );
   const topicLines = topics.map((topic) =>
     `- [${topic.title}](${url(`/topics/${topic.slug}/`)}): ${topic.description}`,
@@ -48,7 +48,7 @@ export const GET: APIRoute = async ({ site }) => {
     '## Optional',
     '',
     `- [RSS feed](${url('/rss.xml')})`,
-    '- [Public source repository](https://github.com/gaoflow/portfolio-source)',
+    '- [Public source repository](https://github.com/binggao1230/portfolio-source)',
     ...sourceLines,
     '',
   ].join('\n');

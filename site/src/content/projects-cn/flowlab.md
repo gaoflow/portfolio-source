@@ -12,7 +12,7 @@ featured: false
 order: 5
 studySequence: 14
 heroImage: /images/projects/flowlab/cavity-vorticity.svg
-github: 'https://github.com/gaoflow/flowlab'
+github: 'https://github.com/binggao1230/flowlab'
 ---
 
 ## 尝试手写求解器
@@ -79,10 +79,10 @@ $$
 
 ## 代码与复现
 
-代码在 GitHub：[gaoflow/flowlab](https://github.com/gaoflow/flowlab)
+代码在 GitHub：[binggao1230/flowlab](https://github.com/binggao1230/flowlab)
 
 ```bash
-git clone https://github.com/gaoflow/flowlab.git
+git clone https://github.com/binggao1230/flowlab.git
 cd flowlab
 npm test
 npm run validate

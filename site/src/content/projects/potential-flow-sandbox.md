@@ -13,7 +13,7 @@ featured: false
 order: 14
 studySequence: 2
 heroImage: /images/projects/potential-flow-sandbox/cylinder-lift-hero.svg
-github: 'https://github.com/gaoflow/potential-flow-sandbox'
+github: 'https://github.com/binggao1230/potential-flow-sandbox'
 ---
 
 ## First Hearing About Flow Past a Cylinder
@@ -110,7 +110,7 @@ When I later developed the Hess–Smith airfoil panel method and the vortex latt
 
 ## Code
 
-The source code is available at [gaoflow/potential-flow-sandbox](https://github.com/gaoflow/potential-flow-sandbox).
+The source code is available at [binggao1230/potential-flow-sandbox](https://github.com/binggao1230/potential-flow-sandbox).
 
 ```bash
 python3 -m unittest discover -s tests -v

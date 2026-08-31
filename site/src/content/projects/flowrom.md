@@ -13,7 +13,7 @@ featured: false
 order: 4
 studySequence: 15
 heroImage: /images/projects/flowrom/pod-modes.svg
-github: 'https://github.com/gaoflow/flowrom'
+github: 'https://github.com/binggao1230/flowrom'
 ---
 
 ## Building the Foundation
@@ -117,10 +117,10 @@ Nonetheless, the established pipeline—leakage-free temporal partitioning, POD 
 
 ## Code and Reproduction
 
-The project is open source on GitHub: [gaoflow/flowrom](https://github.com/gaoflow/flowrom)
+The project is open source on GitHub: [binggao1230/flowrom](https://github.com/binggao1230/flowrom)
 
 ```bash
-git clone https://github.com/gaoflow/flowrom.git
+git clone https://github.com/binggao1230/flowrom.git
 cd flowrom
 node scripts/generate-snapshots.mjs
 python3 scripts/analyse.py

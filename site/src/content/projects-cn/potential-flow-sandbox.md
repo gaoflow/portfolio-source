@@ -12,7 +12,7 @@ featured: false
 order: 14
 studySequence: 2
 heroImage: /images/projects/potential-flow-sandbox/cylinder-lift-hero.svg
-github: 'https://github.com/gaoflow/potential-flow-sandbox'
+github: 'https://github.com/binggao1230/potential-flow-sandbox'
 ---
 
 ## 首次听到圆柱绕流
@@ -109,7 +109,7 @@ $$
 
 ## 代码
 
-项目代码在 [gaoflow/potential-flow-sandbox](https://github.com/gaoflow/potential-flow-sandbox)
+项目代码在 [binggao1230/potential-flow-sandbox](https://github.com/binggao1230/potential-flow-sandbox)
 
 ```bash
 python3 -m unittest discover -s tests -v

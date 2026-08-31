@@ -12,7 +12,7 @@ featured: false
 order: 11
 studySequence: 1
 heroImage: /images/projects/dimensionless-numbers/source/reynolds-observations-1883.svg
-github: 'https://github.com/gaoflow/dimensionless-numbers'
+github: 'https://github.com/binggao1230/dimensionless-numbers'
 ---
 
 ## 从雷诺玻璃管实验说起
@@ -67,10 +67,10 @@ $$
 
 ## 代码
 
-源代码和测试在 [gaoflow/dimensionless-numbers](https://github.com/gaoflow/dimensionless-numbers)：
+源代码和测试在 [binggao1230/dimensionless-numbers](https://github.com/binggao1230/dimensionless-numbers)：
 
 ```bash
-git clone https://github.com/gaoflow/dimensionless-numbers.git
+git clone https://github.com/binggao1230/dimensionless-numbers.git
 cd dimensionless-numbers
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

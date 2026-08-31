@@ -13,7 +13,7 @@ featured: false
 order: 7
 studySequence: 8
 heroImage: /images/projects/airfoil-methods/source/airfoil-cfd-simulation.webp
-github: 'https://github.com/gaoflow/airfoil-methods'
+github: 'https://github.com/binggao1230/airfoil-methods'
 ---
 
 ## The Need for Minimal Upfront Sanity Checks in CFD
@@ -174,10 +174,10 @@ The panel method's integrated pressure drag remains below 0.0008 across all angl
 
 ## Code
 
-The solver implementation and validation scripts are open-source on GitHub: [gaoflow/airfoil-methods](https://github.com/gaoflow/airfoil-methods)
+The solver implementation and validation scripts are open-source on GitHub: [binggao1230/airfoil-methods](https://github.com/binggao1230/airfoil-methods)
 
 ```bash
-git clone https://github.com/gaoflow/airfoil-methods.git
+git clone https://github.com/binggao1230/airfoil-methods.git
 cd airfoil-methods
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

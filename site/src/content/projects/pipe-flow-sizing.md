@@ -14,7 +14,7 @@ order: 13
 studySequence: 3
 heroImage: /images/projects/pipe-flow-sizing/reference/car-water-pump.jpg
 cardImageFit: cover
-github: 'https://github.com/gaoflow/pipe-flow-sizing'
+github: 'https://github.com/binggao1230/pipe-flow-sizing'
 ---
 
 ## 40 L/min on the Datasheet $\neq$ Real-World Flow Rate
@@ -136,10 +136,10 @@ Naturally, 26.22 L/min is not necessarily the final target flow rate for the act
 
 ## Code
 
-The complete source code and test suite are available at [gaoflow/pipe-flow-sizing](https://github.com/gaoflow/pipe-flow-sizing):
+The complete source code and test suite are available at [binggao1230/pipe-flow-sizing](https://github.com/binggao1230/pipe-flow-sizing):
 
 ```bash
-git clone https://github.com/gaoflow/pipe-flow-sizing.git
+git clone https://github.com/binggao1230/pipe-flow-sizing.git
 cd pipe-flow-sizing
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

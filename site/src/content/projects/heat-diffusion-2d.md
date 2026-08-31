@@ -14,7 +14,7 @@ order: 15
 studySequence: 7
 heroImage: /images/projects/heat-diffusion-2d/thermal-spreading-infrared.jpg
 cardImageFit: cover
-github: 'https://github.com/gaoflow/heat-diffusion-2d'
+github: 'https://github.com/binggao1230/heat-diffusion-2d'
 ---
 
 ## Observing Snow on Cobblestones
@@ -153,12 +153,12 @@ Looking back, the journey went from observing snow melting patterns on cobblesto
 
 ## Code & Reproducibility
 
-All solver code, unit tests, and analysis scripts are open-sourced: [gaoflow/heat-diffusion-2d](https://github.com/gaoflow/heat-diffusion-2d)
+All solver code, unit tests, and analysis scripts are open-sourced: [binggao1230/heat-diffusion-2d](https://github.com/binggao1230/heat-diffusion-2d)
 
 Local commands:
 
 ```bash
-git clone https://github.com/gaoflow/heat-diffusion-2d.git
+git clone https://github.com/binggao1230/heat-diffusion-2d.git
 cd heat-diffusion-2d
 python3 -m unittest discover -s tests -v
 python3 scripts/analyse.py

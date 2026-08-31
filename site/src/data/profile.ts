@@ -5,7 +5,7 @@ export const profile = {
   tagline: 'External aerodynamics, CFD methodology & simulation tooling',
   email: 'gaobing1230@gmail.com',
   linkedin: 'https://www.linkedin.com/in/bing-gao/',
-  github: 'https://github.com/gaoflow',
+  github: 'https://github.com/binggao1230',
   image: '/avatar_faroe2.jpg',
   affiliation: {
     name: 'ESILV',
