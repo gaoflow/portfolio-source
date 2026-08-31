@@ -2,7 +2,6 @@
 import Base from '../layouts/Base.astro';
 import ModelViewer from './ModelViewer.astro';
 import { render, type CollectionEntry } from 'astro:content';
-import { topicBySlug } from '../data/topics';
 
 
 interface Props {
@@ -14,7 +13,6 @@ const { project, relatedProjects } = Astro.props;
 const d = project.data;
 const { Content } = await render(project);
 const basePath = '/#projects';
-const projectTopics = d.categories.map((slug) => ({ slug, ...topicBySlug[slug] }));
 ---
 
 <Base
@@ -31,11 +29,6 @@ const projectTopics = d.categories.map((slug) => ({ slug, ...topicBySlug[slug] }
       <a href={basePath} class="font-mono text-xs text-muted hover:text-accent">← Projects</a>
       <h1 class="text-3xl md:text-5xl font-medium leading-tight tracking-tight">{d.title}</h1>
       <p class="text-xl text-warm leading-relaxed">{d.summary}</p>
-      <nav class="flex flex-wrap gap-2" aria-label="Project topics">
-        {projectTopics.map((topic) => (
-          <a href={`/topics/${topic.slug}/`} class="tag hover:text-accent">{topic.title}</a>
-        ))}
-      </nav>
       {d.nda && (
         <div class="flex flex-wrap items-center gap-2">
           <span class="tag">NDA-safe write-up</span>

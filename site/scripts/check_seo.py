@@ -15,6 +15,7 @@ from xml.etree import ElementTree
 ORIGIN = "https://binggao.dev"
 INDEXNOW_KEY = "c68a268aff5d62140ef3185062c68b9d"
 FORBIDDEN_HOSTS = ("localhost", "127.0.0.1", "192.168.")
+TOPIC_LINK_PATTERN = re.compile(r'<a\b[^>]+href=["\']/topics/[^"\']+["\']', re.I)
 
 
 class SeoParser(HTMLParser):
@@ -165,6 +166,12 @@ def main() -> int:
                 failures.append(f"{relative}: invalid JSON-LD: {error}")
         if not page_schema_types:
             failures.append(f"{relative}: missing structured data")
+
+        if relative == Path("index.html") or relative.parts[:1] == ("projects",):
+            if 'aria-label="Project topics"' in source or "aria-label='Project topics'" in source:
+                failures.append(f"{relative}: topic tag navigation must stay hidden")
+            if TOPIC_LINK_PATTERN.search(source):
+                failures.append(f"{relative}: visible topic links must stay hidden")
 
         if relative.parts[:1] == ("projects",) and relative != Path("projects/index.html"):
             article_pages += 1

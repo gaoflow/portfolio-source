@@ -2,7 +2,6 @@
 import Base from '../layouts/Base.astro';
 import { profile } from '../data/profile';
 import { getCollection } from 'astro:content';
-import { topics } from '../data/topics';
 
 const projects = (await getCollection('projects')).sort(
   (a, b) => b.data.date.localeCompare(a.data.date) || (b.data.studySequence ?? 0) - (a.data.studySequence ?? 0) || a.data.order - b.data.order,
@@ -101,11 +100,6 @@ const paddockCV = {
 
   <section id="projects" class="mt-6 scroll-mt-24" aria-labelledby="projects-heading">
     <h2 id="projects-heading" class="text-3xl font-medium tracking-tight text-ink">Projects</h2>
-    <nav class="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted" aria-label="Project topics">
-      {topics.map((topic) => (
-        <a href={`/topics/${topic.slug}/`} class="hover:text-accent">{topic.title}</a>
-      ))}
-    </nav>
     <div class="mt-7 grid gap-5 sm:grid-cols-2">
       <a
         href={paddockCV.href}
