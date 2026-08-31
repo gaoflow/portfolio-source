@@ -4,7 +4,7 @@ export const profile = {
   role: 'CFD Engineer & Developer',
   tagline: 'External aerodynamics, CFD methodology & simulation tooling',
   email: 'binggao1230@gmail.com',
-  linkedin: 'https://www.linkedin.com/in/bing-gao/',
+  linkedin: 'https://www.linkedin.com/in/binggao1230/',
   github: 'https://github.com/binggao1230',
   image: '/avatar_faroe2.jpg',
   affiliation: {
